@@ -1,0 +1,1907 @@
+@import url('https://fonts.googleapis.com/css?family=Raleway:300,400,500,600,700|Roboto:400,500,700,900');
+body { font-family: 'Roboto', sans-serif; font-size: 14px; font-weight: 400; line-height: 24px; margin: 0; color: #555; }
+* { padding:0px; margin:0px; box-sizing:border-box; }
+img { max-width:100%; height:auto; }
+a { color:#ff6500; text-decoration:none; }
+a:hover { color:#000; text-decoration:none; }
+.top-header { padding:15px 0; }
+.top-header .contact-holder { float: right; margin:16px 0;}
+.top-header .contact-info { line-height: normal; display: inline-block; padding: 0; vertical-align: middle;}
+.top-header .contact-info small { font-size: 12px; font-weight: 500; display: block; margin: 0 0 2px; color: #a8a8a8;}
+.top-header .contact-info span { color: #000; font-size: 18px; font-weight: 600;}
+.top-header .contact-info ~ .header-add-property { display: inline-block; margin: 0 0 0 35px;}
+.top-header .property-btn { font-size: 12px; font-weight: 700; line-height: normal; display: inline-block; padding: 10px 15px; vertical-align: middle; text-decoration: none; letter-spacing: 1px; text-transform: uppercase; color: #ff6500; border: 1px solid #ff6500; border-radius: 3px; outline: none;}
+.top-header .property-btn:hover { color: #fff; background:#ff6500; }
+.main-header { min-height:auto; }
+#sticky-header.sticky-active { position: fixed; top: 0; width: 100%; left: 0; z-index: 999;}
+.main-header .nav-area { position: relative; padding: 0; background-color: #ff6500; z-index: 999;}
+.main-header .main-nav ul { margin:0px; padding:0px;}
+.main-header .main-nav li { margin: 0 0 0 36px; line-height: normal; position: relative; display: inline-block; list-style: none; vertical-align: middle; padding:0px;}
+.main-header .main-navigation > ul > li:first-child { margin:0px;}
+.main-header .main-navigation > ul > li:first-child > a::before { display: none;}
+.main-header .main-navigation > ul > li > a::before { position: absolute; top: 50%; left: -23px; width: 1px; height: 12px; content: ''; -webkit-transform: translateY(-50%); -moz-transform: translateY(-50%); -ms-transform: translateY(-50%); -o-transform: translateY(-50%); transform: translateY(-50%); background-color: rgba(255,255,255,.2);}
+.main-header .main-nav li a { color:#fff; text-decoration:none; display: block; padding: 15px 0; text-transform: uppercase; font:normal 700 12px/19px "Raleway", sans-serif !important; }
+.main-header .login-area { float: right; padding: 12px 0;}
+.main-header .social-media { position: relative; display: inline-block; margin: 0; padding: 0; vertical-align: middle;}
+.main-header .social-media li { line-height: normal; line-height: 14px; display: inline-block; margin: 0 0 0 12px; list-style: none; vertical-align: middle;}
+.main-header .social-media li a { color:#fff; text-decoration:none; }
+.main-header .login-option::before { position: absolute; top: 0; bottom: 0; left: 0; width: 1px; height: 12px; margin: auto; content: ''; background-color: rgba(255,255,255,.2);}
+.main-header .login-option { position: relative; margin: 0 0 0 18px; padding-left: 18px; line-height: 18px; display: inline-block; vertical-align: middle;}
+.main-header .login-option i, .main-header .login-option a, .main-header .login-option span { color:#fff; vertical-align: middle; }
+.main-header .login-option i { margin: 0 10px 0 0;}
+.main-header .login-option a { font-size: 12px; font-weight: 700; text-decoration: none; text-transform: uppercase; color: #fff; outline: none;}
+.page-section { padding:50px 0 }
+.page-sec-78910 { background:url(../images/home-search-bg.jpg) no-repeat center / cover; padding:100px 0; }
+.icons-lists ul { margin-bottom: 30px; padding: 45px 0 0 0;}
+.icons-lists ul li { font-size: 18px; font-weight: 700; display: block; margin: 0 0 15px; list-style: none; color: #fff; text-shadow: 0 0 1px rgba(0, 0, 0, .7);}
+.icons-lists ul li i { font-size: 14px; line-height: 30px; float: left; width: 30px; height: 30px; margin: 0 12px 0 0; text-align: center; color: #ff6500; border-radius: 100%; background-color: #fff;}
+.main-search .nav-tabs { margin: 0; border: none; }
+.main-search .nav-tabs li { background-color: #ff6500; float: left; margin-bottom: -1px; position: relative; display: block;  font-family: 'Raleway', sans-serif; font-size: 18px; font-weight: 700; padding: 18px 44px; color: #fff; cursor: pointer; }
+.nav-tabs > li.active, .nav-tabs > li:hover, .nav-tabs > li:focus { background-color: #e05900;}
+.main-search .tab-content { padding: 15px 20px 25px; background-color: #ff6500;}
+.main-search .search-popup-holder { text-align:right; display:block; width: 100%; }
+.field-holder { position: relative;}
+.main-search .search-popup-btn { font-size: 12px; padding: 0 0 5px; text-decoration: underline; color: rgba(255, 255, 255, .4);}
+.main-search .search-default-fields { display: -ms-flexbox; display: -webkit-box; display: flex;}
+.main-search .field-holder { display: inline-block; padding: 0 5px; vertical-align: top;}
+.main-search .field-holder input { width:100%; padding:8px; border:none; color:#000; background:#fff; }
+.main-search .field-holder select { width:100%; padding:10px 10px 11px 10px; border:none; color:#000; background:#fff; }
+.main-search .search-input, .main-search .select-dropdown {    min-width: 160px;    width: 33.33%;}
+.main-search .field-holder label { width:100%; padding:8px 8px 9px 8px; cursor:pointer; color:#fff; text-align:center; background:#d64521; }
+.main-search .field-holder input[type="submit"] { cursor:pointer; color:#fff; text-align:center; background:#d64521;  font-family: 'Roboto', sans-serif; font-size: 14px; font-weight: 700; text-transform: uppercase; padding:8px 15px; }
+.page-sec-78911 { background:#f1f1f1; }
+.show-more-property .element-title { position: relative; display: inline-block; width: 100%; margin: 0 0 18px;}
+.show-more-property .element-title .show-more-property { line-height: normal; position: absolute; top: 50%; right: 0; padding: 10px 15px; text-decoration: none; color: #ff6500; border: 2px solid #ff6500; border-radius: 5px; outline: none; -webkit-transform: translateY(-50%); -moz-transform: translateY(-50%); -ms-transform: translateY(-50%); -o-transform: translateY(-50%); transform: translateY(-50%);}
+.show-more-property .element-title .show-more-property:hover { color: #fff; background:#ff6500; }
+.property-grid { min-height: 420px; margin: 0 0 30px; background-color: #fff; border: 1px solid #f1f1f1;}
+.property-grid .text-holder { position: relative; display: inline-block; width: 100%; padding: 25px; background-color: #fff;}
+.property-grid .property-price, .property-medium .property-price { font-size: 18px; font-weight: 700; display: block; margin-bottom: 7px; color: #ff6500; line-height: 24px;}
+.property-price .price-type, .property-price .guid-price { font-size: 12px !important; font-weight: 400 !important; line-height: 18px; display: inline-block;}
+.property-grid .post-title { margin-bottom: 7px; padding: 0;}
+.property-grid .post-category-list { padding: 0; margin:0;}
+.property-grid .post-category-list li { font-size: 13px; font-weight: 600; font-style: normal; line-height: normal; display: inline-block; margin: 0 12px 0 0; list-style: none; color: #999999;}
+.property-search .element-title h2 { font-size: 18px; line-height: 24px; letter-spacing: 0px; text-transform: none;}
+.property-search .property-list { margin: 0; padding: 0;}
+.property-search .property-list li { font-size: 14px; font-weight: 400; line-height: 18px; margin: 0; padding: 6px 0; list-style: none; color: #ff6500; outline: none; box-shadow: none; text-shadow: none;}
+.page-sec-78913 { background:#f1f1f1; }
+.section-title { margin: 0 0 46px 0;}
+.page-sec-78913 .section-title { text-align:center; }
+.blog.blog-grid.simple .text-holder { padding: 23px 30px 20px 30px;}
+.blog.blog-grid .blog-post { background-color: #fff; margin-bottom: 30px; border: solid 1px #f1f1f1; position: relative;}
+.blog.blog-grid.simple .text-holder .post-options { margin-bottom: 12px;}
+.blog.blog-grid.simple .text-holder .post-options li:first-child::before { display: none;}
+.blog.blog-grid.simple .text-holder .post-options li::before { position: absolute; top: 8px; left: -12px; width: 3px; height: 3px; content: ''; background-color: #dcdcdc;}
+.blog .text-holder .post-options li { position: relative; margin: 0 10px; display: inline-block; padding: 0; border: none; box-shadow: none; list-style: none;}
+.blog.blog-grid .post-options li:first-child { margin-left: 0;}
+.blog .text-holder .post-options li a { font-weight: 400; font-style: normal; color: #bbb; font-size: 12px; line-height: 20px; display: block;}
+.blog .text-holder .post-options li a:hover { color: #ff6500; }
+.blog .text-holder .post-title h4 { font: normal 600 18px/24px "Raleway", sans-serif ; text-transform: uppercase ; color: #000000 ;}
+.blog.blog-grid .blog-post p { margin-bottom: 15px; font-size: 14px; line-height: 22px; color: #555;}
+.blog.blog-grid .button-holder .btn-readmore { font-size: 14px; font-weight: 500; line-height: 18px; display: block; padding:22px 0 0; text-align: left; color: #ff6500; padding-top: 22px; border-top: 1px solid #eaeaea; border-radius: 0; background-color: #fff;}
+.blog.blog-grid .button-holder .btn-readmore i { font-size: 14px; float: right; margin-top: 2px; color: #3b3b3b;}
+.blog.blog-grid .button-holder .btn-readmore i:hover { color: #ff6500;}
+.icon-boxes.top-center { text-align: center;}
+.icon-boxes .img-holder { margin: 0 0 15px; min-height:88px;}
+.icon-boxes h5 {font-family: 'Raleway', sans-serif; margin: 0 0 20px; letter-spacing: .5px; text-transform: none; color: #3a3a3a;}
+.icon-boxes p {font-family: 'Raleway', sans-serif; line-height:22px; margin:0px; color: #3a3a3a;}
+.page-sec-78915 { background:#f1f1f1; padding-left:15px; padding-right:15px; }
+.section-title h2 { font: normal 600 30px/30px "Raleway", sans-serif; letter-spacing: 2px; text-transform: uppercase; color: #ff6500;}
+.section-title span { font-size: 20px; font-weight: 700; line-height: 30px; display: block; padding: 0; letter-spacing: 1px; text-transform: uppercase; color: #a9a9a9;}
+.testimonial-carousel { position: relative; width: 100%; height: 100%; z-index: 1; display: -webkit-box; display: -moz-box; display: -ms-flexbox; display: -webkit-flex; display: flex; -webkit-transition-property: -webkit-transform; -moz-transition-property: -moz-transform; -o-transition-property: -o-transform; -ms-transition-property: -ms-transform; transition-property: transform; -webkit-box-sizing: content-box; -moz-box-sizing: content-box; box-sizing: content-box;}
+.testimonial.fancy { position: relative; margin-bottom:15px;}
+.owl-item { float:left; }
+.owl-stage-outer {
+    overflow: hidden;
+}
+.testimonial.fancy .testimonial-description { position: absolute; bottom: 0; left: 0; width: 100%; height: auto; padding: 20px 80px 40px 80px;}
+.testimonial.fancy .testimonial-description .img-holder { display: inline-block; width: 62px; margin-right: -4px; vertical-align: top;}
+.testimonial.fancy .testimonial-description .img-holder img { border: 2px solid #fff; border-radius: 100%; }
+.testimonial.fancy .testimonial-description .text-holder { display: inline-block; width: calc(100% - 62px); width: -webkit-calc(100% - 62px); width: -moz-calc(100% - 62px); margin-right: -4px; padding-left: 30px;}
+.testimonial.fancy p { font-size: 14px; font-weight: 400; line-height: 24px; margin-bottom: 15px; color: #fff;}
+.testimonial.fancy .authore-detail .authore-name { font: 700 18px/20px 'Roboto', sans-serif; display: block; margin-bottom: 8px; color: #fff;}
+.testimonial.fancy .authore-detail address { font-size: 14px; font-weight: 700; font-style: normal; margin-bottom: 0; text-transform: uppercase; color: #99c522;}
+#footer { position: relative; background-color: #000; color:#999; font-size: 12px; padding:20px;}
+#footer a { color:#999; }
+#footer a:hover { color:#fff; }
+.form { padding:15px; border-radius:5px; border:1px solid #ccc; background:#fff; }
+.form h2 { text-align:center; margin:0 0 15px; text-transform:uppercase; }
+.page-sec-35811 { background:url(../images/home-search-bg.jpg) no-repeat center / cover; position:relative; }
+.page-sec-35811:before { background:rgba(0,0,0,.7); display:block; height:100%; width:100%; position:absolute; content:""; top:0; }
+.mt10 { margin-top:10px !important; }
+.mt20 { margin-top:20px !important; }
+.form button { font-size: 14px; font-weight: 700; line-height: normal; display: block; padding: 10px 30px; width:100%; vertical-align: middle; text-decoration: none; letter-spacing: 1px; text-transform: uppercase;  background:#ff6500; color: #fff; border: 1px solid #ff6500; border-radius: 3px; outline: none;}
+.form button:hover { color: #ff6500; background:none; }
+.login-with { padding:0 10px; }
+.flex-c { display: -webkit-box; display: -webkit-flex; display: -moz-box; display: -ms-flexbox; display: flex; justify-content: center;}
+.login100-social-item { font-size: 25px; color: #3b5998; display: -webkit-box; display: -webkit-flex; display: -moz-box; display: -ms-flexbox; display: flex; justify-content: center; align-items: center; width: 50px; height: 50px; border-radius: 50%; background-color: #fff; margin: 5px; box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.2); -moz-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.2); -webkit-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.2); -o-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.2); -ms-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.2);}
+.login100-social-item:hover { box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.3); -moz-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.3); -webkit-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.3); -o-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.3); -ms-box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.3);}
+
+.login100-social-item img { width: 26px;}
+.btn-face { color: #fff !important; background-color: #3b5998; }
+.sec_1564 { padding:0 0 15px; border-bottom:1px solid #ccc; margin:0 0 10px; }
+ul.nav-tabs { margin:0 0 15px; }
+ul.nav-tabs li a { padding:8px 15px; color:#fff; display:block; background:#ff6500; }
+ul.nav-tabs li a.active { background:#e05900; }
+
+
+/****sale_css******/
+
+.sale_form_div , .property_feature , .property_details , .adition_details {
+    background: #fff none repeat scroll 0 0;
+    border: 5px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 0 5px 0 #333;
+    margin: 0 auto;
+    max-width: 800px;
+    padding: 15px 20px;
+    position: relative;
+    width: 100%;
+}
+
+
+h4.heading {
+    text-align: center;
+}
+.locality_map {
+    margin: 15px 0;
+}
+.locality_map .lacalty_input {
+    border-color: #ccc;
+    border-style: solid;
+    border-width: 0 0 1px;
+    display: inline-block;
+    height: 35px;
+    width: 100%;
+}
+.property_type {
+}
+.property_type ul li {
+    display: inline-block;
+    height: 100px;
+    list-style-type: none;
+    margin: 10px 9px;
+    text-align: center;
+    width: 155px;
+	position:relative;
+}
+.property_type > ul {
+    text-align: center;
+}
+.badroom_type li {
+    display: inline-block;
+    list-style-type: none;
+}
+.badroom_type span {
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    display: inline-block;
+    height: 40px;
+    margin: 0 3px;
+    padding: 7px 0;
+    text-align: center;
+    width: 40px;
+}
+.badroom_type ul {
+    text-align: center;
+}
+
+
+.property_area ul li {
+    display: inline-block;
+}
+.property_area input, .property_area select {
+    border-color: #ccc;
+    border-style: solid;
+    border-width: 0 0 1px;
+    height: 35px;
+}
+.property_area input {
+    width: 100%;
+}
+.property_area ul li:nth-child(2n+1) {
+    margin-right: -8px;
+    width: 30%;
+}
+.property_area ul li:nth-child(2n) {
+    margin: 0 2%;
+	width:16%;
+}
+.property_area ul {
+    text-align: center;
+}
+.room_configartion ul li {
+    display: inline-block;
+    list-style-type: none;
+    padding: 0 5px;
+    width: 48%;
+}
+.room_configartion select {
+    border-color: #ccc;
+    border-style: solid;
+    border-width: 0 0 1px;
+    display: table;
+    width: 100%;
+	height:35px;
+}
+
+.room_configartion .ad_room li {
+    display: inline-block;
+    height: 85px;
+    margin: 0 6px;
+    max-width: 130px;
+    position: relative;
+    text-align: center;
+    width: 100%;
+}
+.ex_price .price {
+    margin: 15px 0;
+}
+.ex_price .price input {
+    border-color: #ccc;
+    border-style: solid;
+    border-width: 0 0 1px;
+    width: 35%;
+	height:35px;
+}
+.ex_price .booking_amout {
+    margin: 15px 0;
+}
+.booking_amout input {
+    border-color: #ccc;
+    border-style: solid;
+    border-width: 0 0 1px;
+	height:35px;
+}
+
+
+.property_status ul li {
+    display: inline-block;
+    width: 48%;
+}
+.property_status label {
+    padding: 0 15px;
+}
+.property_age select, .Possession_Date input {
+    border: 1px solid #ccc;
+    height: 35px;
+    padding: 0 15px 4px 5px;
+    width: 90%;
+}
+.Possession_Date input {
+}
+.new_sale {
+    margin: 20px 0;
+}
+
+.new_sale li {
+    display: inline-block;
+    width: 160px;
+}
+.new_sale li label {
+    padding: 10px 20px;
+}
+.descript textarea {
+    border: 1px solid #ccc;
+    height: 100px;
+    resize: none;
+    width: 100%;
+	padding: 0 10px;
+}
+
+.property_type span {
+    display: table;
+    font-size: 12px;
+    margin: 5px auto 0;
+}
+
+.ad_room_extra li {
+    display: inline-block;
+    height: 85px;
+    margin: 0 5px;
+    max-width: 130px;
+    position: relative;
+    text-align: center;
+    width: 130px;
+}
+
+.property_feature {
+    background: #fff none repeat scroll 0 0;
+    margin: 20px auto;
+    max-width: 800px;
+    padding: 15px 20px;
+    position: relative;
+    width: 100%;
+}
+.furnished_festure ul li {
+    display: inline-block;
+    max-width: 170px;
+    width: 100%;
+}
+.furnished_festure .wardorobe li {
+    margin: 5px;
+    max-width: none;
+    width: 48%;
+}
+.furnished_festure .wardorobe select {
+    border: 1px solid #ccc;
+    height: 40px;
+    width: 100%;
+}
+
+.adition_furnish ul li, .adition_furnish_amenities ul li {
+    display: inline-block;
+    font-size: 11px;
+    height: 80px;
+    margin: 0 5px;
+    text-align: center;
+    width: 110px;
+	position:relative;
+}
+.carparking ul li {
+    display: inline-block;
+    margin: 0 5px;
+    width: 48%;
+}
+.carparking select {
+    border: 1px solid #ccc;
+    height: 40px;
+    width: 100%;
+}
+.furnished_festure {
+    margin: 25px 0;
+}
+
+.property_details {
+    background: #fff none repeat scroll 0 0;
+    margin: 0 auto;
+    max-width: 800px;
+    padding: 15px 20px;
+    position: relative;
+    width: 100%;
+}
+.property_details ul li {
+    display: inline-block;
+    list-style-type: none;
+    margin: 8px 5px;
+    width: 48%;
+}
+.property_details li select {
+    border: 1px solid #ccc;
+    height: 40px;
+    width: 100%;
+}
+.property_details ul li.last input {
+    border: 1px solid #ccc;
+    float: left;
+    height: 40px;
+    padding: 0 5px;
+    width: 70%;
+}
+.property_details li.last select {
+    float: right;
+    width: 25%;
+}
+.property_details ul {
+    margin: 30px 0 20px;
+}
+
+.adition_details {
+    background: #fff none repeat scroll 0 0;
+    margin: 15px auto;
+    max-width: 800px;
+    padding: 10px 20px;
+    position: relative;
+    width: 100%;
+}
+.over_looking ul li {
+    border: 1px solid #ccc;
+    display: inline-block;
+    height: 85px;
+    text-align: center;
+    width: 112px;
+	position:relative;
+}
+.ownership_div ul li {
+    display: inline-block;
+    margin: 0 10px;
+}
+.ownership_div li label {
+    padding: 8px 10px;
+}
+
+.floring_type ul li {
+    display: inline-block;
+    list-style-type: none;
+    margin: 10px 0;
+    padding: 0 10px;
+    width: 48%;
+}
+.floring_type ul select {
+    border: 1px solid #ccc;
+    height: 40px;
+    width: 100%;
+}
+
+.property_type li img {
+    max-width: 25px;
+}
+.furnished_festure li span {
+    padding: 0 8px;
+}
+
+/***********************/
+
+
+.about_baner .bg-overlay-2::before , .contact_baner .bg-overlay-2::before {
+    background: rgba(0, 0, 0, 0.65) none repeat scroll 0 0;
+	content: "";
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+.bg-2 {
+    background: rgba(0, 0, 0, 0) url("../images/ab_bg.jpg") repeat scroll 0 0 / cover ;
+}
+.ptb-165 {
+    padding-bottom: 165px;
+    padding-top: 150px;
+}
+.banner-title h1 {
+    font-size: 36px;
+    line-height: 29px;
+}
+.text-white {
+    color: #fff;
+}
+.text-uppercase {
+    text-transform: uppercase;
+}
+.text-center {
+    text-align: center;
+}
+.about_baner , .contact_baner{
+    position: relative;
+}
+.mt-130 {
+    margin-top: 130px;
+}
+.pb-100 {
+    padding-bottom: 100px;
+}
+.pt-60 {
+    padding-top: 60px;
+}
+.fun-factor-area .single-fun-factor {
+    text-align: center;
+}
+.text-dark {
+    color: #1f223e;
+}
+.mb-8 {
+    margin-bottom: 8px;
+}
+.block {
+    display: block;
+}
+.text-icon img {
+    display: inline-block;
+}
+.mr-15 {
+    margin-right: 15px;
+}
+.text-dark .text-icon > h2, .single-fun-factor.text-dark h4 {
+    color: #1f223e;
+}
+.single-fun-factor h4 {
+    color: #e0e0e0;
+    font-size: 15px;
+    font-weight: 400;
+}
+.text-icon > h2 {
+    color: #ffffff;
+    display: inline-block;
+    font-weight: 400;
+    line-height: 28px;
+    position: relative;
+    top: 8px;
+}
+.pb-120 {
+    padding-bottom: 120px;
+}
+.section-title {
+    position: relative;
+}
+.mb-38 {
+    margin-bottom: 38px;
+}
+.mt-31 {
+    margin-top: 31px;
+}
+
+.opacity-text.center {
+    left: 0;
+    right: 0;
+}
+.opacity-text {
+    color: #f4f4f4;
+    font-size: 60px;
+    left: 0;
+    letter-spacing: 4px;
+    position: absolute;
+    top: -21px;
+    z-index: 1;
+}
+.section-title h2 {
+    font-size: 26px;
+    line-height: 20px;
+    position: relative;
+    z-index: 2;
+}
+.mb-20 {
+    margin-bottom: 20px;
+}
+.section-title p {
+    font-size: 14px;
+    margin-bottom: 0;
+}
+.pb-19 {
+    padding-bottom: 19px;
+}
+.white-hover::before {
+    background: #1f223e none repeat scroll 0 0;
+    bottom: 10px;
+    content: "";
+    left: 10px;
+    opacity: 0.5;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    transform: scale(0);
+    transition: all 300ms ease 0s;
+    z-index: 1;
+}
+.mr-20 {
+    margin-right: 20px;
+}
+.pull_left {
+    float: left;
+}
+.fix {
+    overflow: hidden;
+}
+.single-service-text h4 {
+    font-size: 18px;
+    font-weight: 400;
+}
+.mb-14 {
+    margin-bottom: 14px;
+}
+.single-service-text p {
+    margin-bottom: 0;
+}
+.mr-10 {
+    margin-right: 10px;
+}
+.bg-overlay-1::before, .bg-overlay-2::before {
+    background: rgba(0, 0, 0, 0) url("../images/blue.png") repeat scroll 0 0;
+    content: "";
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+.bg-overlay-1 {
+    position: relative;
+}
+.bg-1 {
+    background: rgba(0, 0, 0, 0) url("../images/hom2.jpg") repeat scroll 0 0 / cover ;
+}
+.advertise-area h1 {
+    font-size: 32px;
+    font-weight: 800;
+}
+.advertise-area h2 {
+    font-size: 32px;
+    font-weight: 500;
+}
+.pb-76 {
+    padding-bottom: 76px;
+}
+.pt-76 {
+    padding-top: 76px;
+}
+
+section.min_section {
+    width: 100%;
+}
+
+.contct_adress {
+    margin: 35px auto;
+    max-width: 1170px;
+}
+.moto-link {
+    padding: 0 10px;
+}
+.adress_text p span:last-child {
+    padding: 0 10px;
+}
+
+.map_world iframe {
+    width: 100%;
+}
+footer#footer {
+    float: left;
+    width: 100%;
+}
+
+
+.form_contact .input_box input {
+    border: 1px solid #ccc;
+    display: table;
+    height: 40px;
+    padding: 0 10px;
+    width: 100%;
+}
+.form_contact .input_box {
+    margin-bottom: 18px;
+}
+.form_contact .textarea_box textarea {
+    border: 1px solid #ccc;
+    display: table;
+    height: 160px;
+    resize: none;
+    width: 100%;
+}
+.submit_button {
+    margin: 15px 0;
+}
+.submit_button button {
+    background: #ff6500 none repeat scroll 0 0;
+    border: 1px solid #ff6500;
+    color: #fff;
+    font-size: 16px;
+    padding: 10px;
+}
+.form_contact .input_box label, .form_contact .textarea_box label {
+    font-weight: bold;
+}
+
+.adress_text h2 , .contct_adress h2 {
+    font-size: 25px;
+    margin-bottom: 30px;
+}
+.adress_text .img_contact {
+    margin-bottom: 20px;
+}
+.adress_text > h4 {
+    font-size: 18px;
+}
+.map_world {
+    float: left;
+    margin: 40px 0 0;
+    width: 100%;
+}
+
+footer#footer {
+    background-color: #444;
+    color: #eee;
+    padding: 25px;
+}
+
+
+.row.footerLinks.standPadding.pt_20 {
+    margin: 0 auto;
+    max-width: 1170px;
+}
+.row.footerLinks.standPadding {
+    margin: 0 auto;
+    max-width: 1170px;
+}
+.row.disclamer.standPadding {
+    margin: 0 auto;
+    max-width: 1170px;
+}
+.row.copyright.standPadding {
+    text-align: center;
+}
+.footer_heading {
+    font-size: 16px;
+    font-weight: 600;
+}
+#footer li {
+    list-style-type: none;
+}
+#footer .row li {
+    list-style-type: none;
+}
+footer#footer a {
+    color: #eee;
+}
+
+.pading_zero .page-section.parallex-bg {
+    padding: 0;
+}
+
+.property_type .ui-checkboxradio-label.ui-corner-all {
+    background: transparent none repeat scroll 0 0;
+    color: #333;
+    display: table-cell;
+    height: 100px;
+    vertical-align: bottom;
+    width: 154px;
+	font-size:12px;
+}
+
+.property_type li span {
+    left: 0;
+    margin: 10px auto;
+    position: absolute;
+    right: 0;
+	display:inline;
+}
+.property_type li .ui-checkboxradio-checked.ui-state-active {
+    color: #333;
+	border-color: #ff6500;
+}
+.property_type li .ui-checkboxradio-checked.ui-state-active:hover , .new_sale li .ui-checkboxradio-checked.ui-state-active , .furnished_festure li .ui-checkboxradio-checked.ui-state-active , .ownership_div li .ui-checkboxradio-checked.ui-state-active {
+    background: transparent none repeat scroll 0 0;
+    border-color: #ff6500;
+    box-shadow: none;
+}
+.property_type li .ui-checkboxradio-checked.ui-state-active:focus , .property_type li .ui-checkboxradio-checked.ui-state-active:active , .ad_room .ui-checkboxradio-checked.ui-state-active:active , .property_status li ui-checkboxradio-checked.ui-state-active:active  {
+    border-color: #ff6500;
+    box-shadow: none;
+}
+
+.property_type li .ui-visual-focus , .badroom_type li .ui-visual-focus , .ad_room li .ui-visual-focus , .ad_room_extra li .ui-visual-focus , .property_status li .ui-visual-focus , .new_sale li .ui-visual-focus , .furnished_festure li .ui-visual-focus , .adition_furnish li .ui-visual-focus , .adition_furnish_amenities li .ui-visual-focus , .over_looking li .ui-visual-focus , .ownership_div li .ui-visual-focus {
+    box-shadow: none;
+}
+
+.property_type li .ui-checkboxradio-checked.ui-state-active::before {
+    bottom: 0;
+    color: #ff6500;
+    content: "\f00c";
+    font-family: fontawesome;
+    font-size: 20px;
+    left: 0;
+    margin: 0 auto;
+    position: absolute;
+    right: 0;
+    top: 40%;
+}
+
+.badroom_type li .ui-checkboxradio-checked.ui-state-active:hover{ background:#ff6500;}
+.badroom_type li .ui-checkboxradio-checked.ui-state-active , .ad_room li .ui-checkboxradio-checked.ui-state-active , .ad_room_extra li .ui-checkboxradio-checked.ui-state-active , .property_status .tab li ui-checkboxradio-checked.ui-state-active , .adition_furnish li .ui-checkboxradio-checked.ui-state-active , .adition_furnish_amenities li .ui-checkboxradio-checked.ui-state-active , .over_looking li .ui-checkboxradio-checked.ui-state-active {
+    background-color: #ff6500;
+    border-color: #ff6500;
+}
+
+
+.ad_room .ui-checkboxradio-label.ui-corner-all.ui-button.ui-widget , .ad_room_extra li .ui-checkboxradio-label.ui-corner-all.ui-button.ui-widget , .adition_furnish li .ui-checkboxradio-label.ui-corner-all.ui-button.ui-widget , .adition_furnish_amenities li .ui-checkboxradio-label.ui-corner-all.ui-button.ui-widget , .over_looking li .ui-checkboxradio-label.ui-corner-all.ui-button.ui-widget {
+    background: transparent none repeat scroll 0 0;
+    color: #333;
+    display: table-cell;
+    height: 85px;
+    vertical-align: bottom;
+    width: 130px;
+	font-size:12px;
+}
+.ad_room li span , .ad_room_extra li span , .adition_furnish li span , .adition_furnish_amenities li span , .over_looking li span {
+    left: 0;
+    margin: 10px auto;
+    position: absolute;
+    right: 0;
+}
+.ad_room span img , .ad_room_extra span img , .adition_furnish span img , .adition_furnish_amenities span img , .over_looking span img  {
+    max-width: 25px;
+}
+.ad_room .ui-checkboxradio-checked.ui-state-active:hover , .ad_room_extra .ui-checkboxradio-checked.ui-state-active:hover {
+    background: transparent none repeat scroll 0 0;
+}
+
+.ad_room li .ui-checkboxradio-checked.ui-state-active::before , .ad_room_extra li .ui-checkboxradio-checked.ui-state-active::before , .adition_furnish li .ui-checkboxradio-checked.ui-state-active::before , .adition_furnish_amenities li .ui-checkboxradio-checked.ui-state-active::before , .over_looking li .ui-checkboxradio-checked.ui-state-active::before {
+    background: #ff6500 none repeat scroll 0 0;
+    color: #fff;
+    content: "\f00c";
+    font-family: fontawesome;
+    font-size: 15px;
+    height: auto;
+    margin: 0 auto;
+    padding: 4px;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+.accordion {
+    color: #444;
+    cursor: pointer;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+    transition: 0.4s;
+}
+
+.accordion.active, .accordion:hover {
+    background-color: #ccc;
+}
+
+.accordion:after {
+    content: '\002B';
+    color: #777;
+    font-weight: bold;
+    float: right;
+    margin-left: 5px;
+}
+
+.accordion.active::after {
+    content: "−";
+}
+.panel {
+    padding: 0 0px;
+    background-color: white;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+}
+button.accordion {
+    background: #fff none repeat scroll 0 0;
+    padding: 0;
+    width: 115px;
+}
+button.accordion:hover {
+    background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
+}
+button.accordion.active {
+    margin-bottom: 20px;
+}
+
+
+/************/
+
+/* Style the tab */
+.tab {
+    overflow: hidden;
+}
+
+/* Style the buttons inside the tab */
+.tab label {
+    border: medium none;
+    cursor: pointer;
+    outline: medium none;
+    padding: 10px 20px;
+    transition: all 0.3s ease 0s;
+}
+.property_status .tab li {
+    display: inline-block;
+    list-style-type: none;
+    text-align: center;
+    width: 48%;
+}
+
+
+/* Style the tab content */
+.tabcontent {
+    display: none;
+    padding: 6px 12px;
+}
+
+.property_status .tab li .ui-checkboxradio-checked.ui-state-active {
+    background: #ff6500 none repeat scroll 0 0;
+}
+
+.property_status .tab li .ui-widget.ui-checkboxradio-radio-label:hover {
+    border: medium none;
+}
+.property_status .tabcontent .property_age, .property_status .tabcontent .Possession_Date {
+    background: #eee none repeat scroll 0 0;
+    border: 1px solid #ccc;
+    margin: 25px auto 0;
+    max-width: 200px;
+    padding: 12px 0;
+    text-align: center;
+}
+
+.new_sale li .ui-checkboxradio-checked.ui-state-active , .furnished_festure li .ui-checkboxradio-checked.ui-state-active , .ownership_div li .ui-checkboxradio-checked.ui-state-active {
+    background: #ff6500 none repeat scroll 0 0;
+    border-color: #ff6500;
+}
+
+.new_sale .ui-checkboxradio-radio-label.ui-checkboxradio-checked .ui-icon , .new_sale .ui-checkboxradio-radio-label.ui-checkboxradio-checked:hover .ui-icon , .furnished_festure li .ui-checkboxradio-radio-label.ui-checkboxradio-checked .ui-icon , .furnished_festure li .ui-checkboxradio-radio-label.ui-checkboxradio-checked:hover .ui-icon , .ownership_div li .ui-checkboxradio-radio-label.ui-checkboxradio-checked:hover .ui-icon , .ownership_div li .ui-checkboxradio-radio-label.ui-checkboxradio-checked .ui-icon  {
+    background: #222 none repeat scroll 0 0;
+    border-color: #fff;
+    border-style: solid;
+    border-width: 4px;
+    height: 15px;
+    width: 15px;
+	padding: 0;
+}
+
+.ownership_div li span {
+    padding: 0 8px;
+}
+
+/***************************/
+
+.form.register .nav.nav-tabs li {
+    margin: 0;
+    max-width: 122px;
+    text-align: center;
+    width: 100%;
+}
+.form.register .nav.nav-tabs li:nth-child(2) {
+    margin: 0 0;
+}
+
+.form.register h4 {
+    text-align: center;
+}
+
+
+.register ul.nav-tabs li a{
+	padding:8px 0px;
+}
+
+.form.register {
+    margin: 0 auto;
+    max-width: 400px;
+    width: 100%;
+}
+
+.form-group .form-control::-moz-placeholder {
+    color: #555;
+    opacity: 0.5;
+}
+
+.form.register .nav-tabs {
+    border-bottom: medium none;
+}
+
+
+.myaccount {
+    background: #fff none repeat scroll 0 0;
+    padding: 15px;
+	position:relative;
+}
+.myaccount h2 {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0 0 20px;
+    text-align: center;
+    text-transform: uppercase;
+	position:relative;
+}
+
+.myaccount h2::before {
+    background: #999 none repeat scroll 0 0;
+    bottom: -3px;
+    content: "";
+    height: 1px;
+    left: 0;
+    margin: 0 auto;
+    position: absolute;
+    right: 0;
+    width: 140px;
+}
+
+
+.input_box_myaccount {
+    margin: 10px 0 0;
+    padding: 0 15px;
+}
+.input_box_inner input {
+    background: #f7f7f7 none repeat scroll 0 0;
+    border: 1px solid #ccc;
+    height: 35px;
+    width: 100%;
+	padding: 0 10px;
+	margin-bottom:8px;
+}
+.input_box_myaccount span label {
+    padding: 0 8px;
+}
+.input_box_myaccount textarea {
+    background: #f7f7f7 none repeat scroll 0 0;
+    border: 1px solid #ccc;
+    resize: none;
+    width: 100%;
+}
+
+.input_box_myaccount .input_box_inner {
+    display: inline-block;
+    padding: 0;
+    width: 48%;
+	position:relative;
+}
+.input_box_myaccount .input_box_inner:first-child {
+    margin-right: 3%;
+}
+.input_box_myaccount .input_box_inner:nth-child(3) {
+    margin-right: 3%;
+}
+
+
+.input_box_inner select {
+    background: #f7f7f7 none repeat scroll 0 0;
+    border: 1px solid #ccc;
+    height: 35px;
+    width: 100%;
+}
+.input_box_inner input[type="file"] {
+    background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
+    padding: 0;
+}
+
+.input_box_inner label {
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 0;
+}
+.input_box_myaccount h6 {
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 2px;
+}
+
+
+.title_heading {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 15px 0 0;
+}
+
+
+.input_box_inner .title {
+    position: relative;
+}
+
+.title_input_select {
+    display: inline-block;
+    width: 60px;
+}
+.title .title_input_text {
+    display: inline-block;
+    margin-left: 18px;
+}
+
+
+.menu-bar {
+    color: #fff;
+    display: inline-block;
+    margin: 0 0px;
+    position: relative;
+	padding:0px 12px;
+	cursor: pointer;
+}
+.menu-bar .fa.fa-ellipsis-h {
+    font-size: 22px;
+    position: relative;
+    top: 5px;
+}
+
+
+.fa.fa-ellipsis-v {
+    position: relative;
+    top: 2px;
+}
+
+.owl-carousel .owl-nav {
+    margin: 0 !important;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+.owl-carousel.owl-theme.owl-loaded.owl-drag {
+    padding-top: 50px;
+}
+.owl-carousel .owl-nav .owl-prev, .owl-carousel .owl-nav .owl-next {
+    background: #ff6500 none repeat scroll 0 0 !important;
+    font-size: 10px !important;
+    font-weight: lighter;
+    text-transform: uppercase;
+}
+div.show-more-property .element-title {
+    margin: 15px 0 0;
+}
+
+
+/***************/
+
+.sidenav {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    right: 0;
+    background-color: #fff;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+}
+
+.sidenav a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+}
+
+.sidenav a:hover {
+    color: #f1f1f1;
+}
+
+.sidenav .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+}
+
+#main {
+    transition: margin-right .5s;
+    padding: 16px;
+}
+
+@media screen and (max-height: 450px) {
+  .sidenav {padding-top: 15px;}
+  .sidenav a {font-size: 18px;}
+}
+
+body#main.page {
+    padding: 0;
+}
+.myaccount_info ul li {
+    border-bottom: 1px solid #999;
+    color: #333;
+    padding: 5px 20px;
+	line-height:30px;
+}
+
+.myaccount_info ul li:hover {
+    background: #ff6500 none repeat scroll 0 0;
+    border-color: orange;
+    color: #fff;
+}
+
+
+#mySidenav.sidenav .closebtn {
+    border: 1px solid #666;
+    border-radius: 50%;
+    font-size: 30px;
+    height: 50px;
+    line-height: 50px;
+    margin: 0 auto;
+    padding: 0;
+    position: relative;
+    right: 0;
+    text-align: center;
+    top: 5px;
+    width: 50px;
+}
+#mySidenav.sidenav .closebtn:hover {
+    color: red;
+	text-decoration:none;
+}
+#mySidenav.sidenav {
+    box-shadow: 0 0 2px 0 #666;
+    padding-top: 0;
+}
+.myaccount_info ul {
+    padding-top: 15px;
+}
+div.main-header .login-option::before {
+    content: none;
+}
+.testimonial-slider {
+    margin: 0 auto;
+    max-width: 800px;
+}
+.carousel-control.left, .carousel-control.right {
+    background-image: none !important;
+    opacity: 1;
+}
+.field-holder.select-dropdown.property-type.checkbox {
+    margin: 0;
+}
+.form.register .nav.nav-tabs > li > a {
+    border: medium none;
+    border-radius: 0;
+    color: #fff;
+    margin: 0;
+}
+.form.register .nav > li > a:focus, .form.register .nav > li > a:hover {
+    background-color: #af4600;
+    text-decoration: none;
+}
+
+.reffral_inner_div {
+    display: inline-block;
+    width: 49%;
+}
+.reffral_inner_div input {
+    border: 1px solid #ccc;
+    height: 35px;
+    margin-bottom: 12px;
+    width: 100%;
+}
+.add_refral_user .reffral_inner_div:nth-child(2n) {
+    padding-left: 2%;
+}
+.reffral_inner_div label {
+    font-size: 13px;
+    margin-bottom: 0;
+}
+
+.reffral_inner_div1 .reffral_inner_div:nth-child(2n) {
+   padding-left: 2%;
+}
+
+.reffral_inner_div:nth-child(2n+1) {
+    padding-right: 2%;
+}
+.social_div_footer li {
+    display: inline-block;
+    padding-right: 8px;
+}
+.social_div_footer {
+    margin: 8px 0;
+}
+
+.my_wishlist_inner {
+    display: inline-block;
+    margin-bottom: 10px;
+    width: 48%;
+}
+.my_wishlist_inner input {
+    border: 1px solid #ccc;
+    height: 35px;
+    width: 100%;
+}
+.my_wishlist .my_wishlist_inner:nth-child(2n) {
+    margin-left: 3%;
+}
+.my_wishlist label {
+    font-size: 13px;
+    margin-bottom: 0;
+}
+.my_wishlist input[type="file"] {
+    border: medium none;
+    height: 35px;
+}
+
+.delete_view .delete_btn {
+    background: red none repeat scroll 0 0;
+    border: medium none;
+    color: #fff;
+    padding: 7px 15px;
+}
+.delete_view .view {
+    background: green none repeat scroll 0 0;
+    border: medium none;
+    color: #fff;
+    padding: 7px 21px;
+}
+.my_wishlist_inner.myoffer button {
+    background: #ff6500 none repeat scroll 0 0;
+    border: medium none;
+    color: #fff;
+    padding: 7px 0;
+    width: 100%;
+}
+
+.delete_view .fa {
+    padding: 0 4px;
+}
+
+.my_wishlist_inner.delete_view.reject_accept {
+    text-align: center;
+    width: 100%;
+}
+.my_wishlist_inner.reject_accept button {
+    width: 48%;
+}
+
+.sidenav li a {
+    color: #333;
+    font-size: 15px;
+    padding: 0;
+    text-align: left;
+    text-decoration: none;
+}
+
+/*************/
+
+
+.compalin_div_inner input {
+    border: 1px solid #ccc;
+    height: 35px;
+    margin-bottom: 8px;
+    width: 100%;
+}
+.compalin_div_inner1 textarea {
+    border: 1px solid #ccc;
+    height: 200px;
+    resize: none;
+    width: 100%;
+}
+.compalin_div_inner label, .compalin_div_inner1 > label {
+    font-size: 13px;
+    margin: 0;
+}
+.compalin_div_inner {
+    display: inline-block;
+    width: 48%;
+}
+.compalin_div_inner:first-child {
+    margin-right: 3%;
+}
+.uniqu_tickt_gnerater {
+    margin: 15px 0 0;
+    text-align: center;
+}
+.uniqu_tickt_gnerater button {
+    background: #ff6500;
+    border: medium none;
+    color: #fff;
+    max-width: 200px;
+    padding: 10px 0;
+    text-transform: uppercase;
+    width: 100%;
+}
+
+/**********************/
+
+/*the container must be positioned relative:*/
+.custom-select {
+  position: relative;
+  font-family: Arial;
+}
+.custom-select select {
+  display: none; /*hide original SELECT element:*/
+}
+
+/*style the arrow inside the select element:*/
+.select-selected:after {
+  position: absolute;
+  content: "";
+  top: 14px;
+  right: 10px;
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+  border-color: #222 transparent transparent transparent;
+}
+/*point the arrow upwards when the select box is open (active):*/
+.select-selected.select-arrow-active:after {
+  border-color: transparent transparent #222 transparent;
+  top: 7px;
+}
+/*style the items (options), including the selected item:*/
+.select-items div,.select-selected {
+  color: #fff;
+  padding: 8px 4px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  user-select: none;
+}
+/*style items (options):*/
+.custom-select .select-items {
+  position: absolute;
+  background-color: #ff6500;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 99;
+}
+/*hide the items when the select box is closed:*/
+.select-hide {
+  display: none;
+}
+.select-items div:hover, .same-as-selected {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.custom-select .select-selected {
+    color: #222;
+}
+div.custom-select {
+    background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
+    border: 1px solid #ccc;
+    border-radius: 0;
+    display: inline-block;
+    height: 36px;
+    line-height: 20px;
+    padding: 0;
+	top:-1px;
+}
+
+.input_box_inner_radio {
+    display: inline-block;
+    width: 48%;
+}
+.input_box_inner_radio:first-child {
+    margin-right: 3%;
+}
+/* The container_radio */
+.container_radio {
+    position: relative;
+    padding-left: 26px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+	margin-right:15px;
+	line-height: 28px;
+}
+
+/* Hide the browser's default radio button */
+.container_radio input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* Create a custom radio button */
+.checkmark {
+    background-color: #eee;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    height: 22px;
+    left: 0;
+    position: absolute;
+    top: 3px;
+    width: 22px;
+}
+
+/* On mouse-over, add a grey background color */
+.container_radio:hover input ~ .checkmark {
+    background-color: #ccc;
+}
+
+/* When the radio button is checked, add a blue background */
+.container_radio input:checked ~ .checkmark {
+    background-color: #ff6500;
+    border-color: #ff6500;
+}
+
+/* Create the indicator (the dot/circle - hidden when not checked) */
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+/* Show the indicator (dot/circle) when checked */
+.container_radio input:checked ~ .checkmark:after {
+    display: block;
+}
+
+/* Style the indicator (dot/circle) */
+.container_radio .checkmark::after {
+    background: white none repeat scroll 0 0;
+    border-radius: 50%;
+    height: 8px;
+    left: 6px;
+    top: 6px;
+    width: 8px;
+}
+
+  .inputfile-2 + label {
+    border: 2px solid currentcolor;
+    color: #d3394c;
+}
+.inputfile + label {
+    cursor: pointer;
+    display: inline-block;
+    font-size: 1.25rem;
+    font-weight: 700;
+    max-width: 80%;
+    overflow: hidden;
+    padding: 0.625rem 1.25rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+     .js .inputfile {
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    width: 0.1px;
+    z-index: -1;
+}  
+
+input.inputfile {
+    left: 0;
+    margin: 0 auto;
+    opacity: 0;
+    position: absolute;
+    right: 0;
+    width: 100%;
+	height:100%;
+	cursor:pointer;
+}
+
+
+/********************/
+
+.input_box_inner .inputfile + label {
+    background: #f7f7f7 none repeat scroll 0 0;
+    border-color: #ccc;
+    border-width: 1px;
+    color: #222;
+    font-size: 1.25rem;
+    font-weight: 700;
+    height: 35px;
+    max-width: 100%;
+    width: 100%;
+	overflow: visible;
+} 
+
+
+
+@media only screen and (min-width: 601px) {
+	
+	
+	.open_btn_mobile {
+    display: none;
+}
+.closebtn_formob {
+    display: none;
+}
+
+	
+	
+	}
+
+
+@media only screen and (max-width: 600px) {
+	
+	div.compalin_div_inner {
+    display: inline-block;
+    margin: 0 !important;
+    width: 100%;
+}
+div.input_box_myaccount .input_box_inner {
+    display: inline-block;
+    margin-right: 0 !important;
+    padding: 5px;
+    width: 49%;
+} 
+
+div.input_box_myaccount {
+    margin: 10px 0 0;
+    padding: 0;
+}
+
+div.myaccount {
+    padding: 15px 5px;
+}
+div.input_box_inner_radio {
+    display: inline-block;
+    margin: 0 !important;
+    width: 49%;
+}
+div.title_input_select {
+    width: 100%;
+}
+.title_input_select div.custom-select {
+    width: 100% !important;
+}
+div.title .title_input_text {
+    margin-left: 0;
+}
+
+div.top-header .contact-holder {
+    float: right;
+    margin: 0;
+    text-align: right;
+}
+
+div.top-header .contact-info span {
+    color: #000;
+    font-size: 14px;
+}
+div.top-header .contact-info ~ .header-add-property {
+    display: inline-block;
+    margin: 0;
+}
+body#main.page {
+    margin-right: 0 !important;
+    padding: 0;
+}
+
+
+.overlay_nav {
+    height: 0%;
+    width: 100%;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0, 0.9);
+    overflow-y: hidden;
+    transition: 0.5s;
+}
+
+.overlay-content_nav {
+    position: relative;
+    top: 5%;
+    width: 100%;
+    text-align: center;
+    margin-top: 30px;
+}
+
+.overlay_nav a {
+    padding: 8px;
+    text-decoration: none;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+}
+
+.overlay_nav a:hover, .overlay a:focus {
+    color: #f1f1f1;
+}
+
+.overlay_nav .closebtn {
+    position: absolute;
+    top: 20px;
+    right: 45px;
+}
+
+@media screen and (max-height: 450px) {
+  .overlay_nav {overflow-y: auto;}
+  .overlay_nav .closebtn {
+    top: 15px;
+    right: 35px;
+  }
+}
+
+.open_btn_mobile {
+    color: #fff;
+    left: 18px;
+    position: absolute;
+    top: 12px;
+    z-index: 99999;
+}
+.main-nav.overlay_nav {
+    z-index: 999999;
+}
+
+.overlay-content_nav #menu-menu .menu-item {
+    margin: 5px 0;
+    padding: 5px 0;
+    width: 100%;
+}
+.overlay-content_nav #menu-menu .menu-item a {
+    font-size: 20px !important;
+    letter-spacing: 1px;
+}
+.overlay-content_nav a.closebtn_formob {
+    border: 1px solid #444;
+    border-radius: 50%;
+    font-size: 27px;
+    height: 50px;
+    line-height: 33px;
+    margin: 0 auto;
+    text-decoration: none;
+    width: 50px;
+}
+
+label.container_radio {
+    font-size: 11px;
+    line-height: 20px;
+    margin-bottom: 12px;
+    margin-right: 6px;
+    padding-left: 17px;
+    position: relative;
+}
+label.container_radio .checkmark::after {
+    background: white none repeat scroll 0 0;
+    border-radius: 50%;
+    height: 6px;
+    left: 3px;
+    top: 3px;
+    width: 6px;
+}
+
+span.checkmark {
+    height: 14px;
+    left: 0;
+    position: absolute;
+    top: 3px;
+    width: 14px;
+}
+
+div.my_wishlist_inner {
+    display: inline-block;
+    margin-bottom: 10px;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100%;
+}
+.my_wishlist {
+    padding: 0 10px;
+}
+.my_wishlist_inner.delete_view {
+    text-align: center;
+}
+
+}
+
+.closebtn {
+    color: #333;
+    cursor: pointer;
+    font-size: 22px;
+    font-weight: bold;
+    line-height: 20px;
+    margin-left: 0;
+    position: absolute;
+    right: 17px;
+    transition: all 0.3s ease 0s;
+    z-index: 99999;
+}
+
+.last div.custom-select {
+    float: right;
+    height: 40px;
+    width: 25%;
+}
+.ad_room_extra {
+    padding-top: 4px;
+}
+
+.furnished_festure .custom-select .select-selected::before {
+    background: rgba(0, 0, 0, 0) url("../images/lockers.png") no-repeat scroll 0 0 / contain ;
+    content: "";
+    height: 25px;
+    left: 5px;
+    position: absolute;
+    top: 6px;
+    width: 25px;
+}
+
+.wardorobe li:nth-child(2) .custom-select .select-selected::before {
+     background: rgba(0, 0, 0, 0) url("../images/bed.png") no-repeat scroll 0 0 / contain ;
+}
+
+
+.wardorobe li:nth-child(3) .custom-select .select-selected::before {
+     background: rgba(0, 0, 0, 0) url("../images/air-conditioner.png") no-repeat scroll 0 0 / contain ;
+}
+
+
+.wardorobe li:nth-child(4) .custom-select .select-selected::before {
+     background: rgba(0, 0, 0, 0) url("../images/television.png") no-repeat scroll 0 0 / contain ;
+}
+
+
+.furnished_festure .custom-select .select-selected {
+    padding-left: 40px;
+}
+
+/*******************/
+
+.min_section .page-sec-78910::before {
+    background: rgba(0, 0, 0, 0.3) none repeat scroll 0 0;
+    content: "";
+    height: 100%;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 100%;
+}
+.page-sec-78910 {
+	position:relative;
+}
+div.main-search .field-holder select {
+    padding: 9px 10px;
+}
+
+.flex-c {
+    display: flex;
+    width: 100%;
+}
+
+.modal.fade.mymodal {
+    margin: 0 auto;
+}
+.mymodal button.close {
+    color: #555;
+    font-size: 28px;
+    position: absolute;
+    right: 5px;
+    top: 0;
+    width: auto;
+	cursor:pointer;
+}
+.mymodal .form {
+    position: relative;
+}
+.mymodal .modal-dialog.modal-lg {
+    max-width: 500px;
+    width: 100%;
+}
+.sign_in , .reg-in{ cursor:pointer;}
+
+
+
+/* Modal Content */
+.modal-content {
+    position: relative;
+    margin: auto;
+    padding: 0;
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s
+}
+
+
+/* Add Animation */
+@-webkit-keyframes animatetop {
+    from {top:-300px; opacity:0} 
+    to {top:0; opacity:1}
+}
+
+@keyframes animatetop {
+    from {top:-300px; opacity:0}
+    to {top:0; opacity:1}
+}
+.form.register .nav.nav-tabs > li.active > a {
+    background: #af4600 none repeat scroll 0 0;
+}
+.form.register {
+    margin: 45px auto;
+}
+
+.modalsign , .modalreg {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+.modalsign , .modalreg {
+    bottom: 0;
+    display: none;
+    left: 0;
+    outline: 0 none;
+    overflow: hidden;
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: 1050;
+}
+.sale_form_div h4.heading {
+    font-size: 15px;
+    font-weight: bold;
+    margin: 0;
+    padding: 6px 0;
+    position: relative;
+    text-align: center;
+    text-transform: uppercase;
+}
+.sale_form_div h4.heading::before {
+    background: #999 none repeat scroll 0 0;
+    bottom: 0;
+    content: "";
+    height: 2px;
+    left: 0;
+    margin: 0 auto;
+    position: absolute;
+    right: 0;
+    width: 130px;
+}
+.property_age .custom-select {
+    background: #fff none repeat scroll 0 0;
+    width: 80%;
+}

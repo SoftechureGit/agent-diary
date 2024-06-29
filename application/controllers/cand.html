@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<!-- 
+
+-->
+<!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="zxx">
+<!--[endif]-->
+
+
+<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    
+    <title>Sign Up as a Candidate</title>
+   
+   
+   <script>
+   
+   /*(function($) {
+
+  $('#meal_preference').parent().append('<ul class="list-item" id="newmeal_preference" name="meal_preference"></ul>');
+  $('#meal_preference option').each(function(){
+      $('#newmeal_preference').append('<li value="' + $(this).val() + '">'+$(this).text()+'</li>');
+  });
+  $('#meal_preference').remove();
+  $('#newmeal_preference').attr('id', 'meal_preference');
+  $('#meal_preference li').first().addClass('init');
+  $("#meal_preference").on("click", ".init", function() {
+      $(this).closest("#meal_preference").children('li:not(.init)').toggle();
+  });
+  
+  var allOptions = $("#meal_preference").children('li:not(.init)');
+  $("#meal_preference").on("click", "li:not(.init)", function() {
+      allOptions.removeClass('selected');
+      $(this).addClass('selected');
+      $("#meal_preference").children('.init').html($(this).html());
+      allOptions.toggle();
+  });
+
+  var marginSlider = document.getElementById('slider-margin');
+  if (marginSlider != undefined) {
+      noUiSlider.create(marginSlider, {
+            start: [500],
+            step: 10,
+            connect: [true, false],
+            tooltips: [true],
+            range: {
+                'min': 0,
+                'max': 1000
+            },
+            format: wNumb({
+                decimals: 0,
+                thousand: ',',
+                prefix: '$ ',
+            })
+    });
+  }
+  $('#reset').on('click', function(){
+      $('#register-form').reset();
+  });*/
+
+  /*$('#register-form1').validate({
+    rules : {
+        first_name : {
+            required: true,
+        },
+        last_name : {
+            required: true,
+        },
+        company : {
+            required: true
+        },
+        email : {
+            required: true,
+            email : true
+        },
+        phone_number : {
+            required: true,
+        }
+    },
+    onfocusout: function(element) {
+        $(element).valid();
+    },
+});
+
+    jQuery.extend(jQuery.validator.messages, {
+        required: "",
+        remote: "",
+        email: "",
+        url: "",
+        date: "",
+        dateISO: "",
+        number: "",
+        digits: "",
+        creditcard: "",
+        equalTo: ""
+    });
+})(jQuery);*/
+   </script>
+   <style>
+    label.error {
+      color: #c70000;
+      position: relative !important;
+      text-transform: none;
+      font-weight: normal;
+      margin-top: 4px;
+
+    }
+    label.error:after {
+      display: none;
+    }
+
+    .chk label {
+      font-weight: normal;display: initial !important;width: auto !important;text-transform: unset;cursor: pointer;
+    }
+    .chk input {
+      width: auto;display: initial !important;
+    }
+    textarea {
+      box-sizing: border-box;
+    border: 1px solid #ebebeb;
+    padding: 14px 20px;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;font-size: 14px;
+    font-family: 'Poppins';
+    }
+.nice-select {
+    float: none !important;
+    line-height: 28px !important;
+    }
+   </style>
+</head>
+
+<body>
+<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+  <a href="javascript:" id="return-to-top"><i class="fas fa-angle-double-up"></i></a>
+   
+      <?php include('include/header.php')?>
+    
+  
+
+    <div class="page_title_section">
+
+       <div class="page_header">
+            <div class="container">
+                <div class="row">
+                    <!-- section_heading start -->
+                    <div class="col-lg-9 col-md-8 col-12 col-sm-7">
+
+                        <h1>Sign Up as a Candidate</h1>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-12 col-sm-5">
+                        <div class="sub_title_section">
+                            <ul class="sub_title">
+                                <li> <a href="#"> Home </a>&nbsp; / &nbsp; </li>
+                                <li>Sign Up as a Candidate</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> 
+    </div>
+    <!-- top header wrapper end -->
+    <!-- sign up wrapper start -->
+    <div class="login_wrapper jb_cover" style="margin-top: 110px;">
+        <div class="container">
+            <div class="signup-content">
+                <div class="signup-img">
+                    <img src="<?php echo base_url('public/front/')?>images/form-img.jpg" alt="" style="border-radius:10px; box-shadow: 3px 3px 1px #ccc;
+  -webkit-box-shadow: 6px 5px 15px black;
+  -moz-box-shadow: 3px 3px 1px #ccc; margin-top:-83px">
+                    <div class="signup-img-content">
+                        <h2>Register now </h2>
+                      
+                    </div>
+                </div>
+                <div class="signup-form" style="margin-top:-170px">
+                    <form method="POST" class="register-form" id="register-form" autocomplete="off">
+
+                      <div class="error-msg">
+                        <?php if($this->session->flashdata('error_msg')) { ?>
+                              <div class="alert alert-danger pd8">
+                                <?php echo $this->session->flashdata('error_msg'); ?>
+                              </div>
+                            <?php } ?>
+                            <?php if($this->session->flashdata('success_msg')) { ?>
+                              <div class="alert alert-success pd8">
+                                <?php echo $this->session->flashdata('success_msg'); ?>
+                              </div>
+                            <?php } ?>
+                      </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <div class="form-input">
+                                    <label for="name" class="required">Name (ಹೆಸರು)</label>
+                                    <input type="text" name="name" id="name" placeholder="Enter your name" required />
+                                </div>
+                                <div class="form-input">
+                                    <label for="email" class="required">Email (ಇ ಮೇಲ್)</label>
+                                    <input type="email" name="email" id="email" placeholder="Enter your email" required />
+                                </div>
+                                <div class="form-input">
+                                    <label for="mobile" class="required">Mobile (ಮೊಬೈಲ್ ಸಂಖ್ಯೆ)</label>
+                                    <input type="text" name="mobile" id="mobile" placeholder="Enter your mobile" required oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" maxlength="10" />
+                                </div>
+                                <div class="form-input">
+                                    <label for="email" class="required">Date of Birth (ಜನ್ಮ ದಿನಾಂಕ)</label>
+                                    <input type="date" name="dob" id="dob" placeholder="Enter Your DOB" required />
+                                </div>
+                                <div class="form-select">
+                                    <div class="label-flex">
+                                        <label for="gender" class="required">Gender (ಲಿಂಗ) </label>
+                                       
+                                    </div>
+                                  <select class="custom-select" id="gender" name="gender" required>
+  <option value="" selected>Select your gender</option>
+  <option value="Male">Male</option>
+  <option value="Female">Female</option>
+  <option value="Other">Other</option>
+</select>
+                                </div>
+                
+                 <div class="form-input">
+                                    <label for="phone_number" class="required">Address (ವಿಳಾಸ)</label>
+                                   <textarea cols="80" rows="6" id="address" name="address" required></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                  <div class="form-input">
+                                    <label for="phone_number" class="required">Qualification (ವಿದ್ಯಾರ್ಹತೆ)</label>
+                                    <select class="custom-select" id="qualification" name="qualification" required>
+  <option value="" selected>Your Qualification</option>
+  <?php foreach ($qualification_list as $item) { ?>
+    <option value="<?= $item->qualification_name ?>"><?= $item->qualification_name ?></option>
+  <?php } ?>
+</select>
+                                </div>
+                                  <div class="form-input">
+                                    <label for="phone_number">Other qualification if any (ಇತರ ಅರ್ಹತೆ)</label>
+                                    <input type="text" name="other_qualification" id="other_qualification" placeholder="Qualification if any" />
+                                </div>
+                             <div class="form-select">
+                                    <div class="label-flex">
+                                        <label for="meal_preference" class="required">Preferred work location</label>
+                                       
+                                    </div>
+                                   <select class="custom-select" id="work_location" name="work_location" required>
+  <option value="" selected>Select Location</option>
+  <?php foreach ($location_list as $item) { ?>
+    <option value="<?= $item->location_name ?>"><?= $item->location_name ?></option>
+  <?php } ?>
+</select>
+                                </div>
+                                  <div class="form-input">
+                                    <label for="experience">Experience (ಅನುಭವ)</label>
+                                    <input type="text" name="experience" id="experience" placeholder="Experience if any" />
+                                </div>
+                
+                
+                
+                            </div>
+                        </div>
+                                            <div class="form-group">
+    <label for="exampleFormControlSelect2">Job Interested (ಆಸಕ್ತ ವಲಯ)</label>
+    <div class="row">
+    <?php foreach ($industry_list as $item) { ?>
+    <div class="col-md-6 chk">
+      <label><input type="checkbox" name="industry[]" value="<?= $item->industry_name ?>"> <?= $item->industry_name ?></label>
+    </div>
+  <?php } ?>
+  </div>
+  </div>
+  <div class="form-group">
+    <label for="other_information">Any Other Information</label>
+    <textarea class="form-control" name="other_information" id="other_information" rows="3"></textarea>
+  </div>
+
+ <div class="form-submit">
+                            <button type="submit" class="submit form-btn" id="submit" name="submit">Submit</button>
+                            <input type="reset" value="Reset" class="submit" id="reset" name="reset" />
+                        </div>
+
+                       
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="<?php echo base_url('public/front/')?>js/bootstrap.min.js"></script>
+    <script src="<?php echo base_url('public/front/')?>js/modernizr.js"></script>
+    <script src="<?php echo base_url('public/front/')?>js/jquery.menu-aim.js"></script>
+    <script src="<?php echo base_url('public/front/')?>js/plugin.js"></script>
+    <script src="<?php echo base_url('public/front/')?>js/owl.carousel.js"></script>
+    <script src="<?php echo base_url('public/front/')?>js/jquery-ui.js"></script>
+    <script src="<?php echo base_url('public/front/')?>js/jquery.countTo.js"></script>
+    <script src="<?php echo base_url('public/front/')?>js/jquery.magnific-popup.js"></script>
+    <script src="<?php echo base_url('public/front/')?>js/dropify.min.js"></script>
+    <script src="<?php echo base_url('public/front/')?>js/jquery.inview.min.js"></script>
+    <script src="<?php echo base_url('public/front/')?>js/jquery.nice-select.min.js"></script>
+    <script src="<?php echo base_url('public/front/')?>js/imagesloaded.pkgd.min.js"></script>
+    <script src="<?php echo base_url('public/front/')?>js/isotope.pkgd.min.js"></script>
+ <script src="<?php echo base_url('public/front/')?>js/custom.js"></script></script>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.16.0/jquery.validate.min.js"></script>
+  
+
+<script>
+function alertMessage(type,message) {
+  if (type=='error') {
+    type = 'danger';
+  }
+
+  return "<div class='alert alert-"+type+" alert-dismissible'> "+message+" </div>";
+}
+
+ $("#register-form").validate({
+    rules: {
+      mobile: {
+          digits: true,
+          minlength: 10,
+          maxlength: 10
+      }
+    },
+    messages: {
+    },
+    submitHandler: function(form) {
+      var myform = document.getElementById("register-form");
+      var fd = new FormData(myform );
+
+      $.ajax({
+        type: "POST",
+        url: "<?= base_url('candidate_register_process') ?>",
+        data: fd,
+        cache: false,
+        processData: false,
+        contentType: false,
+        beforeSend: function (data) {
+          $(".error-msg").html('');
+          $(".form-btn").html("Please wait...").prop('disabled',true);
+        },
+        success: function (response) {
+          setTimeout(function(){
+            var dataOBJ;
+              try {
+                dataOBJ = JSON.parse(response);
+                var obj = dataOBJ.data;
+                $(".form-btn").html("Submit").prop('disabled',false);
+
+                if (obj.status=='success') {
+                  //$(".error-msg").html(alertMessage('success',obj.msg));
+                  window.location.href="<?= base_url('candidate-register') ?>";
+                }
+                else {
+                  $(".error-msg").html(alertMessage('error',obj.msg));
+            $('html, body').animate({
+            scrollTop: $("html").offset().top
+        }, 2000);
+                }
+              }
+              catch(err) {
+                $(".form-btn").html("Submit").prop('disabled',false);
+                $(".error-msg").html(alertMessage('error','Some error occurred, please try again.'));
+            $('html, body').animate({
+            scrollTop: $("html").offset().top
+        }, 2000);
+              }
+          },500);
+        },
+        error: function () {
+            $(".form-btn").html("Submit").prop('disabled',false);
+          $(".error-msg").html(alertMessage('error','Some error occurred, please try again.'));
+            $('html, body').animate({
+            scrollTop: $("html").offset().top
+        }, 2000);
+           
+        }
+
+    });
+
+    }
+});
+</script>
+    
+
+</body>
+
+</html>
