@@ -11044,5 +11044,24 @@ $writer->save('php://output');
         echo json_encode($array);
         
     }
+
+   function get_data(){
+
+        $postData = $this->input->post();
+
+ 
+
+        $select = "lead_id,CONCAT(lead_first_name,' ',lead_last_name) as lead_name, lead_mobile_no ,  CONCAT(first_name,' ',last_name) as user_name , lead_status as status";
+        $where = '';
+
+        $searchValue = $postData['search']['value'];
+        $searchQuery = "";
+        if($searchValue != ''){
+            $searchQuery = " (lead_first_name like '%".$searchValue."%' ) ";
+        }
+        $data = $this->Action_model->ajaxDatatable($postData,$searchQuery,'tbl_leads',$where,$select,array('tbl_users','tbl_users.user_id=tbl_leads.user_id' ));
+
+        echo json_encode($data);
+   }
 }
 ?>
