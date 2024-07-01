@@ -21,7 +21,7 @@
                                         <h4 class="card-title"><?php if($id) { echo 'Update Lead'; } else {  echo 'Add New Lead'; } ?></h4>
                                     </div>
                                     <div class="col-md-6 col-sm-6 col-xs-6" align="right">
-                                        <a href="<?= base_url(AGENT_URL.'leads') ?>"><button type="button" class="btn btn-dark btn-sm" >Back</button></a>
+                                        <a href="<?= base_url(AGENT_URL.'data') ?>"><button type="button" class="btn btn-dark btn-sm" >Back</button></a>
                                     </div>
                                 </div>
                                 <div class="basic-form">
