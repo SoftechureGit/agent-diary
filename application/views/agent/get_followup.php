@@ -20,9 +20,25 @@
     font-weight: 400;
   }
 
+  /* Unit Modal */
   #unitModal form .form-control {
     border-radius: 5px;
   }
+
+  #unitModal .card {
+    box-shadow: 2px 2px 22px #80808045;
+  }
+
+  #unitModal .card .card-body {
+    padding: 1rem 2rem !important;
+  }
+
+  label.error {
+    color: #a94442 !important;
+    font-size: 14px !important;
+}
+
+  /* Unit Modal */
 
   #unit-details-modal table caption {
     font-family: Roboto;
@@ -356,6 +372,7 @@
       <!-- Units -->
       <div id="navtabs-units" class="tab-pane">
         <div class="row">
+          <?php foreach(lead_units(12) as $lead_unit): ?>
           <!-- Unit Card -->
           <div class="col-md-12">
             <div class="card unit-card">
@@ -367,51 +384,59 @@
                   </div>
                   <div class="col-md-10 p-0">
                     <span class="label-value">
-                      Project name, Location , City
+                    <?=  $lead_unit->project_name.', '.$lead_unit->property_name.', '.$lead_unit->city_name.', '.$lead_unit->state_name ?>
                     </span>
                   </div>
                   <!-- End Project -->
 
                   <!-- Project -->
+                  <?php if($lead_unit->property_details->unit_number ?? 0): ?>
                   <div class="col-md-2">
                     <label for=""> Unit No :</label>
                   </div>
                   <div class="col-md-2 p-0">
                     <span class="label-value">
-                      Project
+                    <?=  $lead_unit->property_details->unit_number; ?>
                     </span>
                   </div>
+                  <?php endif; ?>
 
+                  <?php if($lead_unit->property_details->plot_size ?? 0): ?>
                   <div class="col-md-1 pr-0">
                     <label for="">Size :</label>
                   </div>
                   <div class="col-md-2">
                     <span class="label-value">
-                      Project
+                    <?=  $lead_unit->property_details->plot_size; ?>
                     </span>
                   </div>
+                  <?php endif; ?>
 
-                  <div class="col-md-3">
-                    <label for="">Date of Booking :</label>
+                  <?php if($lead_unit->booking_date ?? 0): ?>
+                  <div class="col-md-2 pr-0">
+                    <label for="">Booking Date :</label>
                   </div>
-                  <div class="col-md-1 p-0">
+                  <div class="col-md-2 p-0">
                     <span class="label-value">
-                      Project
+                      <?=  $lead_unit->booking_date; ?>
                     </span>
                   </div>
+                  <?php endif; ?>
                   <!-- End Project -->
 
                   <!-- Project -->
-                  <div class="col-md-2">
+                  <?php if($lead_unit->property_details->referance_number ?? 0): ?>
+                  <div class="col">
                     <label for="">Unit Ref No :</label>
                   </div>
-                  <div class="col-md-8 p-0">
+                  <div class="col">
                     <span class="label-value">
-                      Project
+                    <?=  $lead_unit->property_details->referance_number ?? ''; ?>
                     </span>
                   </div>
-                  <div class="col-md-2 align-self-end">
-                    <div class="d-flex text-end">
+                  <?php endif; ?>
+                  <div class="col align-self-end">
+                    <div class="d-flex text-end" style="justify-content: right;">
                       <i class="fa fa-edit px-2  text-success add-edit-new-unit-btn"></i>
                       <i class="fa fa-eye px-2 text-primary view-unit-details"></i>
                     </div>
@@ -423,279 +448,8 @@
               </div>
             </div>
           </div>
-          <!-- Unit Card -->
-          <!-- Unit Card -->
-          <div class="col-md-12">
-            <div class="card unit-card">
-              <div class="card-body">
-                <div class="row">
-                  <!-- Project -->
-                  <div class="col-md-2">
-                    <label for="">Project :</label>
-                  </div>
-                  <div class="col-md-10 p-0">
-                    <span class="label-value">
-                      Project name, Location , City
-                    </span>
-                  </div>
-                  <!-- End Project -->
-
-                  <!-- Project -->
-                  <div class="col-md-2">
-                    <label for=""> Unit No :</label>
-                  </div>
-                  <div class="col-md-2 p-0">
-                    <span class="label-value">
-                      Project
-                    </span>
-                  </div>
-
-                  <div class="col-md-1 pr-0">
-                    <label for="">Size :</label>
-                  </div>
-                  <div class="col-md-2">
-                    <span class="label-value">
-                      Project
-                    </span>
-                  </div>
-
-                  <div class="col-md-3">
-                    <label for="">Date of Booking :</label>
-                  </div>
-                  <div class="col-md-1 p-0">
-                    <span class="label-value">
-                      Project
-                    </span>
-                  </div>
-                  <!-- End Project -->
-
-                  <!-- Project -->
-                  <div class="col-md-2">
-                    <label for="">Unit Ref No :</label>
-                  </div>
-                  <div class="col-md-8 p-0">
-                    <span class="label-value">
-                      Project
-                    </span>
-                  </div>
-                  <div class="col-md-2 align-self-end">
-                    <div class="d-flex text-end">
-                      <i class="fa fa-edit px-2  text-success add-edit-new-unit-btn"></i>
-                      <i class="fa fa-eye px-2 text-primary view-unit-details"></i>
-                    </div>
-                  </div>
-                  <!-- End Project -->
-
-
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- Unit Card -->
-          <!-- Unit Card -->
-          <div class="col-md-12">
-            <div class="card unit-card">
-              <div class="card-body">
-                <div class="row">
-                  <!-- Project -->
-                  <div class="col-md-2">
-                    <label for="">Project :</label>
-                  </div>
-                  <div class="col-md-10 p-0">
-                    <span class="label-value">
-                      Project name, Location , City
-                    </span>
-                  </div>
-                  <!-- End Project -->
-
-                  <!-- Project -->
-                  <div class="col-md-2">
-                    <label for=""> Unit No :</label>
-                  </div>
-                  <div class="col-md-2 p-0">
-                    <span class="label-value">
-                      Project
-                    </span>
-                  </div>
-
-                  <div class="col-md-1 pr-0">
-                    <label for="">Size :</label>
-                  </div>
-                  <div class="col-md-2">
-                    <span class="label-value">
-                      Project
-                    </span>
-                  </div>
-
-                  <div class="col-md-3">
-                    <label for="">Date of Booking :</label>
-                  </div>
-                  <div class="col-md-1 p-0">
-                    <span class="label-value">
-                      Project
-                    </span>
-                  </div>
-                  <!-- End Project -->
-
-                  <!-- Project -->
-                  <div class="col-md-2">
-                    <label for="">Unit Ref No :</label>
-                  </div>
-                  <div class="col-md-8 p-0">
-                    <span class="label-value">
-                      Project
-                    </span>
-                  </div>
-                  <div class="col-md-2 align-self-end">
-                    <div class="d-flex text-end">
-                      <i class="fa fa-edit px-2  text-success add-edit-new-unit-btn"></i>
-                      <i class="fa fa-eye px-2 text-primary view-unit-details"></i>
-                    </div>
-                  </div>
-                  <!-- End Project -->
-
-
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- Unit Card -->
-          <!-- Unit Card -->
-          <div class="col-md-12">
-            <div class="card unit-card">
-              <div class="card-body">
-                <div class="row">
-                  <!-- Project -->
-                  <div class="col-md-2">
-                    <label for="">Project :</label>
-                  </div>
-                  <div class="col-md-10 p-0">
-                    <span class="label-value">
-                      Project name, Location , City
-                    </span>
-                  </div>
-                  <!-- End Project -->
-
-                  <!-- Project -->
-                  <div class="col-md-2">
-                    <label for=""> Unit No :</label>
-                  </div>
-                  <div class="col-md-2 p-0">
-                    <span class="label-value">
-                      Project
-                    </span>
-                  </div>
-
-                  <div class="col-md-1 pr-0">
-                    <label for="">Size :</label>
-                  </div>
-                  <div class="col-md-2">
-                    <span class="label-value">
-                      Project
-                    </span>
-                  </div>
-
-                  <div class="col-md-3">
-                    <label for="">Date of Booking :</label>
-                  </div>
-                  <div class="col-md-1 p-0">
-                    <span class="label-value">
-                      Project
-                    </span>
-                  </div>
-                  <!-- End Project -->
-
-                  <!-- Project -->
-                  <div class="col-md-2">
-                    <label for="">Unit Ref No :</label>
-                  </div>
-                  <div class="col-md-8 p-0">
-                    <span class="label-value">
-                      Project
-                    </span>
-                  </div>
-                  <div class="col-md-2 align-self-end">
-                    <div class="d-flex text-end">
-                      <i class="fa fa-edit px-2  text-success add-edit-new-unit-btn"></i>
-                      <i class="fa fa-eye px-2 text-primary view-unit-details"></i>
-                    </div>
-                  </div>
-                  <!-- End Project -->
-
-
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- Unit Card -->
-          <!-- Unit Card -->
-          <div class="col-md-12">
-            <div class="card unit-card">
-              <div class="card-body">
-                <div class="row">
-                  <!-- Project -->
-                  <div class="col-md-2">
-                    <label for="">Project :</label>
-                  </div>
-                  <div class="col-md-10 p-0">
-                    <span class="label-value">
-                      Project name, Location , City
-                    </span>
-                  </div>
-                  <!-- End Project -->
-
-                  <!-- Project -->
-                  <div class="col-md-2">
-                    <label for=""> Unit No :</label>
-                  </div>
-                  <div class="col-md-2 p-0">
-                    <span class="label-value">
-                      Project
-                    </span>
-                  </div>
-
-                  <div class="col-md-1 pr-0">
-                    <label for="">Size :</label>
-                  </div>
-                  <div class="col-md-2">
-                    <span class="label-value">
-                      Project
-                    </span>
-                  </div>
-
-                  <div class="col-md-3">
-                    <label for="">Date of Booking :</label>
-                  </div>
-                  <div class="col-md-1 p-0">
-                    <span class="label-value">
-                      Project
-                    </span>
-                  </div>
-                  <!-- End Project -->
-
-                  <!-- Project -->
-                  <div class="col-md-2">
-                    <label for="">Unit Ref No :</label>
-                  </div>
-                  <div class="col-md-8 p-0">
-                    <span class="label-value">
-                      Project
-                    </span>
-                  </div>
-                  <div class="col-md-2 align-self-end">
-                    <div class="d-flex text-end">
-                      <i class="fa fa-edit px-2  text-success add-edit-new-unit-btn"></i>
-                      <i class="fa fa-eye px-2 text-primary view-unit-details"></i>
-                    </div>
-                  </div>
-                  <!-- End Project -->
-
-
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- Unit Card -->
+          <!-- End Unit Card -->
+           <?php endforeach; ?>
 
           <div class="col-md-12">
             <!-- Add -->
@@ -758,9 +512,9 @@
 <!-- end transfer lead modal -->
 
 <!-- Add / Edit Unit -->
-<!-- Modal -->
-<div class="modal fade" id="unitModal" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
+
+<div class="modal fade" id="unitModal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalCenterTitle">Add Unit</h5>
@@ -769,13 +523,18 @@
         </button>
       </div>
       <div class="modal-body">
-        <form action="" method="post">
+        <div class="ajax-msg"></div>
+        <form id="lead-unit-form" method="post" enctype="multipart/form-data">
           <div class="row">
+            <!-- User Id  -->
+            <input type="hidden" name="lead_id" value="<?= $record->lead_id; ?>">
+            <!-- End User Id -->
+
             <!-- Looking For -->
             <div class="col-md-6">
               <div class="form-group">
-                <label for="">Looking For</label>
-                <select name="" id="" class="form-control">
+                <label for="">Looking For <span class="text-danger">*</span></label>
+                <select name="looking_for" id="" class="form-control" required>
                   <option value="" selected disabled>Choose..</option>
                   <option value="sale">Sale</option>
                   <option value="rent">Rent</option>
@@ -788,8 +547,8 @@
             <!-- Date -->
             <div class="col-md-6">
               <div class="form-group">
-                <label for="">Date</label>
-                <input type="date" class="form-control" name="date">
+                <label for="">Booking Date <span class="text-danger">*</span></label>
+                <input type="date" class="form-control" name="booking_date" required>
               </div>
             </div>
             <!-- End Date -->
@@ -797,11 +556,14 @@
             <!-- Project Type -->
             <div class="col-md-6">
               <div class="form-group">
-                <label for="">Project Type</label>
-                <select name="" id="" class="form-control">
+                <label for="">Project Type <span class="text-danger">*</span></label>
+                <select name="project_type_id" id="" class="form-control get_property_types" required>
                   <option value="" selected disabled>Choose..</option>
-                  <option value="residential">Residential</option>
-                  <option value="commercial">Commercial</option>
+                  <?php
+                  foreach (project_types() as $project_type) :
+                    echo "<option value='$project_type->id'>$project_type->name</option>";
+                  endforeach;
+                  ?>
                 </select>
               </div>
             </div>
@@ -810,12 +572,9 @@
             <!-- Property Type -->
             <div class="col-md-6">
               <div class="form-group">
-                <label for="">Property Type</label>
-                <select name="" id="" class="form-control">
+                <label for="">Property Type <span class="text-danger">*</span></label>
+                <select name="property_type_id" id="" class="form-control set_property_types get_property_form" required>
                   <option value="" selected disabled>Choose..</option>
-                  <option value="plot">Plot</option>
-                  <option value="villa">Villa</option>
-                  <option value="office">Office</option>
                 </select>
               </div>
             </div>
@@ -824,10 +583,14 @@
             <!-- State -->
             <div class="col-md-6">
               <div class="form-group">
-                <label for="">State</label>
-                <select name="" id="" class="form-control">
+                <label for="">State <span class="text-danger">*</span></label>
+                <select name="state_id" id="" class="form-control get_cities select2" required>
                   <option value="" selected disabled>Choose..</option>
-                  <option value="rajasthan">Rajasthan</option>
+                  <?php
+                  foreach (states() as $state) :
+                    echo "<option value='$state->id'>$state->name</option>";
+                  endforeach;
+                  ?>
                 </select>
               </div>
             </div>
@@ -836,10 +599,9 @@
             <!-- City -->
             <div class="col-md-6">
               <div class="form-group">
-                <label for="">City</label>
-                <select name="" id="" class="form-control">
+                <label for="">City <span class="text-danger">*</span></label>
+                <select name="city_id" id="" class="form-control set_cities" required>
                   <option value="" selected disabled>Choose..</option>
-                  <option value="jaipur">Jaipur</option>
                 </select>
               </div>
             </div>
@@ -848,8 +610,8 @@
             <!-- Location -->
             <div class="col-md-6">
               <div class="form-group">
-                <label for="">Location</label>
-                <input type="text" class="form-control" name="location" placeholder="Enter location">
+                <label for="">Location <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" name="location" placeholder="Enter location" required>
               </div>
             </div>
             <!-- End Location -->
@@ -858,7 +620,7 @@
             <div class="col-md-6">
               <div class="form-group">
                 <label for="">List of Project</label>
-                <select name="" id="" class="form-control">
+                <select name="project_id" id="" class="form-control">
                   <option value="" selected disabled>Choose..</option>
                   <option value="test">Test</option>
                 </select>
@@ -866,10 +628,14 @@
             </div>
             <!-- End List of Project -->
 
+            <!-- Form View -->
+            <div class="set_property_form w-100"></div>
+            <!-- Form View -->
+
             <!-- List of Project -->
             <div class="col-md-12">
               <div class="text-center">
-                <button type="button" class="btn btn-primary btn-sm">Submit</button>
+                <button type="submit" class="btn btn-primary btn-sm submit-btn">Submit</button>
               </div>
             </div>
             <!-- End List of Project -->
@@ -1064,7 +830,10 @@
       getFollowupList(<?= $record->lead_id ?>);
     <?php } ?>
 
-    // 
+    // ##########
+
+    // $('.select2').select2();
+
     $('.add-edit-new-unit-btn').on('click', function() {
       $('#unitModal').modal('show')
     })
@@ -1072,5 +841,124 @@
     $('.view-unit-details').on('click', function() {
       $('#unit-details-modal').modal('show')
     })
-    // 
+
+    /* Get Property Types */
+    $('.get_property_types').on('change', function() {
+      var project_type_id = $(this).val();
+
+      get_and_set_property_types(project_type_id);
+
+    })
+
+    function get_and_set_property_types(project_type_id) {
+      $.ajax({
+        method: 'GET',
+        url: "<?= base_url('helper/get_property_types'); ?>",
+        data: {
+          project_type_id: project_type_id
+        },
+        dataType: 'json',
+        success: (res) => {
+          if (res.status) {
+            $('.set_property_types').html(res.options_view)
+          }
+        }
+      })
+    }
+    /* End Get Property Types */
+
+    /* End Get Property Form */
+    $('.get_property_form').on('change', function() {
+      var property_id = $(this).val();
+
+      $.ajax({
+        method: 'GET',
+        url: "<?= base_url('helper/get_property_form'); ?>",
+        data: {
+          property_id: property_id
+        },
+        dataType: 'json',
+        success: (res) => {
+          if (res.status) {
+            $('.set_property_form').html(res.form_view)
+          }
+        }
+      })
+    })
+    /* End Get Property Form */
+
+    /*  Get Cities */
+    $('.get_cities').on('change', function() {
+      var state_id = $(this).val();
+
+      get_and_set_cities(state_id);
+
+    })
+
+    function get_and_set_cities(state_id) {
+      $.ajax({
+        method: 'GET',
+        url: "<?= base_url('helper/get_cities'); ?>",
+        data: {
+          state_id: state_id
+        },
+        dataType: 'json',
+        success: (res) => {
+          if (res.status) {
+            $('.set_cities').html(res.options_view)
+          }
+        }
+      })
+    }
+    /*  End Get Cities */
+
+    /*  Lead Unit Form */
+    $('#lead-unit-form').validate({
+      rules: {
+        looking_for: {
+          required: true
+        }
+      },
+      messages: {},
+      submitHandler: function(form) {
+        var myform = document.getElementById("lead-unit-form");
+        var fd = new FormData(myform);
+
+        $.ajax({
+          type: "POST",
+          url: "<?= base_url('store_lead_unit') ?>",
+          data: fd,
+          dataType: 'json',
+          cache: false,
+          processData: false,
+          contentType: false,
+          beforeSend: function(data) {
+            $(".error-msg").html('');
+            $(".submit-btn").html("Please wait...").prop('disabled', true);
+          },
+          success: function(res) {
+            if(res.status){
+              $('.ajax-msg').html(`<div class="alert alert-success">${res.message}</div>`)
+              setTimeout(function(){
+                $('#unitModal').modal('hide')
+                $('#lead-unit-form')[0].reset()
+                $('.ajax-msg').html('')
+                $('.set_property_form').html('')
+              },1000)
+            }else{
+              $('.ajax-msg').html(`<div class="alert alert-danger">${res.message}</div>`)
+            }
+            $(".submit-btn").html("Submit").prop('disabled', false);
+          },
+          error: function() {
+      
+          }
+
+        });
+
+      }
+    });
+    /*  End Lead Unit Form */
+
+    // ##########
   </script>

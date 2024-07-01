@@ -99,5 +99,7 @@ $route['courses-details/(:any)'] = 'Front/courses_details/$1';
 $route['famous/(:any)']='Front/famous/$1';
 $route['gallery/(:any)']='Front/gallery/$1';*/
 $route['(:any)'] = 'Front/$1';
+$route['helper/(:any)'] = 'Helper/$1';
+
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = TRUE;

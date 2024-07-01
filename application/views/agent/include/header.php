@@ -21,6 +21,16 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id,$user
     <link href="<?php echo base_url('public/admin/') ?>css/style.css" rel="stylesheet">
 
     <style>
+        /* Debug */
+        #main-wrapper {
+            opacity: 1;
+        }
+
+        /* body{
+            overflow: hidden;
+        } */
+        /* End Debug */
+
         .header {
             height: 50px !important;
         }
@@ -215,7 +225,6 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id,$user
 
                 <div class="header-right">
                     <ul class="clearfix">
-
                         <li class="icons dropdown username-desk"> Hi <?= $this->session->userdata('agent_name') ?></li>
 
                         <li class="icons dropdown"><a href="javascript:void(0)" >
