@@ -87,6 +87,11 @@
   .advance_search {
     display: none;
   }
+
+  .dataTables_filter label .form-control  {
+   border: 1px solid #ced4da;
+  } 
+
 </style>
 <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.10/css/select2.min.css">
 <?php include ('include/sidebar.php'); ?>
