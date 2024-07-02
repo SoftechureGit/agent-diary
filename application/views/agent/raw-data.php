@@ -130,7 +130,7 @@
                       enctype="multipart/form-data">
                       <div class="row align-items-center">
                         <div class="col-6 my-3">
-                          <select name="data_type" class="form-control" id="data-type">
+                          <select name="lead_data_type" class="form-control" id="data-type">
                             <option selected disabled> --Select Lead Data Type-- </option>
                             <option value="1">hello 1</option>
                             <option value="2">hello 2</option>
@@ -181,6 +181,27 @@
                             </div>
                         </div>
 
+                        <div class="row my-3">
+                      <div class="col-md-4">
+                          <input type="text" id="searchBox" class="form-control" placeholder="Name or Mobile">
+                      </div>
+                      <div class="col-md-4">
+                          <select id="statusFilter" class="form-control">
+                              <option value="">All Status</option>
+                              <option value="1">Active</option>
+                              <option value="0">Deactive</option>
+                          </select>
+                      </div>
+                      <div class="col-md-4">
+                          <select id="reasonFilter" class="form-control">
+                              <option value="">All Reasons</option>
+                              <!-- Add your reason options here -->
+                              <option value="reason1">Reason 1</option>
+                              <option value="reason2">Reason 2</option>
+                          </select>
+                      </div>
+                  </div>
+
                         <div class="table-responsive">
                         <table id="empTable" class="table table-bordered">
                             <thead>
@@ -190,7 +211,7 @@
                                     <th>Name</th>
                                     <th>Mobile No</th>
                                     <th>Assign To</th>
-                                    <th class="nosort wd-50 text-center">Status</th>
+                                    <th class=" wd-50 text-center">Status</th>
                                     <th>Reason</th>
                                     <th class="nosort wd-100 text-center">Action</th>
                                 </tr>
@@ -211,7 +232,7 @@
     <div class="modal-dialog modal-md" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Transfer Lead</h5>
+                <h5 class="modal-title">Assign Lead</h5>
                 <button type="button" class="close" onclick="closeTransferModal()" aria-label="Close"><span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -222,7 +243,7 @@
                   <div class="row">
 
                         <div class="col-md-12" style="margin-top: 10px;">
-                          <label>Transfer To:</label>
+                          <label>Assign To:</label>
                             <select class="form-control" id="transfer_to" name="transfer_to" required>
                                   <option value="">Select User</option>
                                   <?php foreach ($user_list as $item) { if($record->user_id!=$item->user_id) {  ?>
@@ -233,7 +254,7 @@
 
                 <div class="col-md-12 pt-4 pb-2" align="right">
                   <button type="button" class="btn btn-danger btn-lg mr-3" onclick="closeTransferModal()">Close</button>
-                  <button type="submit" class="btn btn-dark btn-lg transfer-form-btn w-120">Transfer</button>
+                  <button type="submit" class="btn btn-dark btn-lg transfer-form-btn w-120">Assign</button>
                 </div>
 
                     </div>
@@ -342,6 +363,12 @@
 <!-- all data fetch  -->
 <script>
     $(document).ready(function () {
+
+
+      $('#statusFilter, #reasonFilter, #searchBox').on('change keyup', function() {
+          table.draw();
+      });
+
         // Initialize DataTable
         var table = $('#empTable').DataTable({
             'processing': true,
@@ -351,7 +378,13 @@
             },
             'ajax': {
                 'url': '<?= base_url(AGENT_URL . "api/get_data") ?>',
-                'type': 'POST'
+                'type': 'POST',
+                'data': function(d) {
+                d.status = $('#statusFilter').val();
+                d.reason = $('#reasonFilter').val();
+                d.search.value = $('#searchBox').val(); // Search value
+             }
+
             },
             'columns': [
                 {
@@ -373,13 +406,18 @@
                         } else {
                             return "<span class='badge badge-danger'>Deactive</span>";
                         }
-                    }
+                    },
+                    'orderable': false,
+                    'searchable': false,
                 },
                 {
                     className: "text-center",
                     'render': function (data, type, row) {
                         return "hello";
-                    }
+                        
+                    },
+                    'orderable': false,
+                    'searchable': false,
                 },
                 {
                     data: null,

@@ -2299,6 +2299,7 @@ $writer->save('php://output');
                                 'lead_date'=>date("d-m-Y"),
                                 'lead_time'=>date("h:i:s a"),
                                 'lead_mobile_no_2'=>"",
+                                'lead_data_type' => $this->input->post('lead_data_type') ?? '' ,
                                 'lead_address'=>"",
                                 'lead_state_id'=>"",
                                 'lead_city_id'=>"",
