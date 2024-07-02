@@ -11069,9 +11069,22 @@ $writer->save('php://output');
 
         $searchValue = $postData['search']['value'];
         $searchQuery = "";
+
+        if($this->input->post('status')!='') {
+            $searchQuery = "lead_status=".$this->input->post('status');
+        }   
+
+
         if($searchValue != ''){
-            $searchQuery = " (lead_first_name LIKE '%".$searchValue."%' OR 	lead_mobile_no LIKE '%".$searchValue."%') ";
+             if($this->input->post('status')!=''){
+
+                 $searchQuery .= " AND (lead_first_name LIKE '%".$searchValue."%' OR mobile LIKE '%".$searchValue."%') ";
+                }
+                else{
+                    $searchQuery .= "(lead_first_name LIKE '%".$searchValue."%' OR mobile LIKE '%".$searchValue."%') ";
+             }
         }
+
         $data = $this->Action_model->ajaxDatatable($postData,$searchQuery,'tbl_leads',$where,$select,array('tbl_users','tbl_users.user_id=tbl_leads.user_id' ));
 
         echo json_encode($data);

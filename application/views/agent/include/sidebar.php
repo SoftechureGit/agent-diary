@@ -13,7 +13,7 @@
                     </li>
 
                     <?php if(isset($menu_item_array['leads']) && $menu_item_array['leads']['rr_view']) { ?>
-                    <li>
+                    <!-- <li>
                         <a class="has-arrow" href="javascript:void()" aria-expanded="false">
                             <i class="icon-globe-alt menu-icon"></i><span class="nav-text">Leads</span>
                         </a>
@@ -27,7 +27,7 @@
 
                         </ul>
                     
-                    </li>
+                    </li> -->
                     <?php } ?>
 
                     <li>
