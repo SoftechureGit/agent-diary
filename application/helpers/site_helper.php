@@ -1,4 +1,67 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
+
+# Get Instance
+function CI()
+{
+    $CI          = &get_instance();
+
+    return $CI;
+}
+# End Get Instance
+
+# Get DB Instance
+function db_instance()
+{
+    $CI          = &get_instance();
+    $CI->load->database();
+
+    return $CI->db;
+}
+# End Get DB Instance
+
+# Upload File
+if (!function_exists('upload_file')) {
+    function upload_file($name, $upload_folder, $old_file_name = null)
+    {
+        $upload_path                    = "./public/other/$upload_folder/";
+
+        # Create Folder if Folder Not Exits
+        if (!file_exists($upload_path)) {
+            mkdir($upload_path, 0777, true);
+        }
+        # End Create Folder if Folder Not Exits
+
+        $config                         = array();
+        $config['upload_path']          = $upload_path;
+        $config['allowed_types']        = 'png|jpg|jpeg';
+        $config['max_size']             = 10 * 1024;
+        $config['remove_spaces']        = TRUE;
+        
+        # File Upload
+        if (!empty($_FILES[$name]['name'])) :
+            # File Name and Config
+            $file_name                  = time().'_'.$_FILES[$name]['name'];
+            $config['file_name']        = $file_name;
+            
+            CI()->load->library('upload', $config);
+            # End File Name and Config
+
+            if (!CI()->upload->do_upload($name)) :
+                $error   =   array('error' => CI()->upload->display_errors());
+                return (object) ['status' => false, 'message' => $error['error']];
+            else :
+                CI()->upload->data($name);
+            endif;
+        else :
+            $file_name                  =   $old_file_name;
+        endif;
+        # End File Upload
+
+        return (object) ['status' => true, 'messgae' => 'Successfully file uploaded', 'file_name' => $file_name];
+    }
+}
+# End Upload File
+
 if (!function_exists('getAccountId')) {
 
     function getAccountId()
@@ -43,25 +106,6 @@ if (!function_exists('getAccountId')) {
 
         return $account_id;
     }
-
-    # Get Instance
-    function CI()
-    {
-        $CI          = &get_instance();
-
-        return $CI;
-    }
-    # End Get Instance
-
-    # Get DB Instance
-    function db_instance()
-    {
-        $CI          = &get_instance();
-        $CI->load->database();
-
-        return $CI->db;
-    }
-    # End Get DB Instance
 
     # Project Types
     function project_types()
@@ -131,17 +175,17 @@ if (!function_exists('getAccountId')) {
         endif;
 
         $records    =   db_instance()
-                        ->select('lead_unit.*, product_type.product_type_name as project_name, unit_type.unit_type_name as property_name, state.state_name, city.city_name')
-                        ->join('tbl_product_types as product_type', 'product_type.product_type_id = lead_unit.project_type_id', 'left')
-                        ->join('tbl_unit_types as unit_type', 'unit_type.unit_type_id = lead_unit.property_type_id', 'left')
-                        ->join('tbl_states as state', 'state.state_id = lead_unit.state_id', 'left')
-                        ->join('tbl_city as city', 'city.city_id = lead_unit.city_id', 'left')
-                        ->where("lead_unit.lead_id = $lead_id")
-                        ->order_by("lead_unit.id", "desc")
-                        ->get('tbl_lead_units as lead_unit')
-                        ->result();
-        
-        foreach( $records ?? [] as  $record):
+            ->select('lead_unit.*, product_type.product_type_name as project_type_name, unit_type.unit_type_name as property_type_name, state.state_name, city.city_name')
+            ->join('tbl_product_types as product_type', 'product_type.product_type_id = lead_unit.project_type_id', 'left')
+            ->join('tbl_unit_types as unit_type', 'unit_type.unit_type_id = lead_unit.property_type_id', 'left')
+            ->join('tbl_states as state', 'state.state_id = lead_unit.state_id', 'left')
+            ->join('tbl_city as city', 'city.city_id = lead_unit.city_id', 'left')
+            ->where("lead_unit.lead_id = $lead_id")
+            ->order_by("lead_unit.id", "desc")
+            ->get('tbl_lead_units as lead_unit')
+            ->result();
+
+        foreach ($records ?? [] as  $record) :
             $record->property_details       =   $record->property_details ? json_decode($record->property_details) : null;
         endforeach;
 
@@ -149,8 +193,33 @@ if (!function_exists('getAccountId')) {
     }
     # End Lead Units
 
+    # Lead Unit Details
+    function lead_unit_details($id)
+    {
+        if (!$id) :
+            return null;
+        endif;
+
+        $record    =   db_instance()
+            ->select('lead_unit.*, product_type.product_type_name as project_type_name, unit_type.unit_type_name as property_type_name, state.state_name, city.city_name')
+            ->join('tbl_product_types as product_type', 'product_type.product_type_id = lead_unit.project_type_id', 'left')
+            ->join('tbl_unit_types as unit_type', 'unit_type.unit_type_id = lead_unit.property_type_id', 'left')
+            ->join('tbl_states as state', 'state.state_id = lead_unit.state_id', 'left')
+            ->join('tbl_city as city', 'city.city_id = lead_unit.city_id', 'left')
+            ->where("lead_unit.id = $id")
+            ->order_by("lead_unit.id", "desc")
+            ->get('tbl_lead_units as lead_unit')
+            ->row();
+
+        $record->property_details           =   $record->property_details ? json_decode($record->property_details) : null;
+        $record->property_layout_url        =   $record->property_layout ? base_url("public/other/lead-unit-layouts/$record->property_layout") : null;
+
+        return $record ?? null;
+    }
+    # End Lead Unit Details
+
     # Get Property Form
-    function property_form($property_id)
+    function property_form($property_id, $property_details = null)
     {
         $form          =   '';
 
@@ -179,10 +248,11 @@ if (!function_exists('getAccountId')) {
         endswitch;
 
         if ($form) :
-            return CI()->load->view("components/property-forms/$form", [], true);
+            return CI()->load->view("components/property-forms/$form", $property_details ?? [], true);
         else :
             return "<div class='text-center my-3'><h4>Form not available.</h4></div>";
         endif;
     }
     # End Get Property Form
+
 }

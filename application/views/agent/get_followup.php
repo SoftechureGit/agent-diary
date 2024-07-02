@@ -36,11 +36,16 @@
   label.error {
     color: #a94442 !important;
     font-size: 14px !important;
-}
+  }
 
   /* Unit Modal */
 
-  #unit-details-modal table caption {
+  .add-edit-new-unit-btn,
+  .view-unit-details {
+    cursor: pointer;
+  }
+
+  .lead-unit-details-container table caption {
     font-family: Roboto;
     caption-side: top;
     font-weight: 600;
@@ -135,7 +140,7 @@
       </li>
       <!-- Unit -->
       <li class="nav-item">
-        <a href="#navtabs-units" class="nav-link" data-toggle="tab">Unit</a>
+        <a href="#navtabs-units" class="nav-link" data-toggle="tab" onclick="lead_units(<?= $record->lead_id ?>)">Unit</a>
       </li>
       <!-- End Unit -->
     </ul>
@@ -371,105 +376,26 @@
 
       <!-- Units -->
       <div id="navtabs-units" class="tab-pane">
+        <section class="lead-units-section"></section>
         <div class="row">
-          <?php foreach(lead_units(12) as $lead_unit): ?>
-          <!-- Unit Card -->
-          <div class="col-md-12">
-            <div class="card unit-card">
-              <div class="card-body">
-                <div class="row">
-                  <!-- Project -->
-                  <div class="col-md-2">
-                    <label for="">Project :</label>
-                  </div>
-                  <div class="col-md-10 p-0">
-                    <span class="label-value">
-                    <?=  $lead_unit->project_name.', '.$lead_unit->property_name.', '.$lead_unit->city_name.', '.$lead_unit->state_name ?>
-                    </span>
-                  </div>
-                  <!-- End Project -->
-
-                  <!-- Project -->
-                  <?php if($lead_unit->property_details->unit_number ?? 0): ?>
-                  <div class="col-md-2">
-                    <label for=""> Unit No :</label>
-                  </div>
-                  <div class="col-md-2 p-0">
-                    <span class="label-value">
-                    <?=  $lead_unit->property_details->unit_number; ?>
-                    </span>
-                  </div>
-                  <?php endif; ?>
-
-                  <?php if($lead_unit->property_details->plot_size ?? 0): ?>
-                  <div class="col-md-1 pr-0">
-                    <label for="">Size :</label>
-                  </div>
-                  <div class="col-md-2">
-                    <span class="label-value">
-                    <?=  $lead_unit->property_details->plot_size; ?>
-                    </span>
-                  </div>
-                  <?php endif; ?>
-
-                  <?php if($lead_unit->booking_date ?? 0): ?>
-                  <div class="col-md-2 pr-0">
-                    <label for="">Booking Date :</label>
-                  </div>
-                  <div class="col-md-2 p-0">
-                    <span class="label-value">
-                      <?=  $lead_unit->booking_date; ?>
-                    </span>
-                  </div>
-                  <?php endif; ?>
-                  <!-- End Project -->
-
-                  <!-- Project -->
-                  <?php if($lead_unit->property_details->referance_number ?? 0): ?>
-                  <div class="col">
-                    <label for="">Unit Ref No :</label>
-                  </div>
-                  <div class="col">
-                    <span class="label-value">
-                    <?=  $lead_unit->property_details->referance_number ?? ''; ?>
-                    </span>
-                  </div>
-                  <?php endif; ?>
-                  <div class="col align-self-end">
-                    <div class="d-flex text-end" style="justify-content: right;">
-                      <i class="fa fa-edit px-2  text-success add-edit-new-unit-btn"></i>
-                      <i class="fa fa-eye px-2 text-primary view-unit-details"></i>
-                    </div>
-                  </div>
-                  <!-- End Project -->
-
-
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- End Unit Card -->
-           <?php endforeach; ?>
-
           <div class="col-md-12">
             <!-- Add -->
             <div class="add-unit-wrapper">
               <div class="text-right m-2">
-                <button class="btn btn-primary btn-sm add-edit-new-unit-btn">Add New</button>
+                <button class="btn btn-primary btn-sm add-edit-new-unit-btn" data-lead_id="<?= $record->lead_id ?>">Add New</button>
               </div>
             </div>
             <!-- End Add -->
           </div>
         </div>
       </div>
-      <!-- End Units -->
-
     </div>
+    <!-- End Units -->
 
   </div>
+
 </div>
-
-
+</div>
 
 <!-- start transfer lead modal -->
 <div class="modal fade" id="transferModal" tabindex="-1" role="dialog" aria-hidden="true">
@@ -527,7 +453,8 @@
         <form id="lead-unit-form" method="post" enctype="multipart/form-data">
           <div class="row">
             <!-- User Id  -->
-            <input type="hidden" name="lead_id" value="<?= $record->lead_id; ?>">
+            <input type="hidden" name="id" value="">
+            <input type="hidden" name="lead_id" value="">
             <!-- End User Id -->
 
             <!-- Looking For -->
@@ -628,6 +555,17 @@
             </div>
             <!-- End List of Project -->
 
+            <!-- Layout Upload -->
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="">Layout Upload</label>
+                <input type="file" name="property_layout" value="" class="form-control p-1">
+                <input type="hidden" name="old_property_layout" value="">
+                <a href="#" class="nav-link property-layout-anchor text-primary d-none" target="_blank">View</a>
+              </div>
+            </div>
+            <!-- End Layout Upload -->
+
             <!-- Form View -->
             <div class="set_property_form w-100"></div>
             <!-- Form View -->
@@ -648,7 +586,7 @@
 <!-- End Add Unit -->
 
 <!-- Unit Detials -->
-<div class="modal fade" id="unit-details-modal" tabindex="-1" role="dialog">
+<div class="modal fade" id="lead-unit-details-modal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -658,97 +596,7 @@
         </button>
       </div>
       <div class="modal-body">
-        <div class="row">
-          <div class="col-md-6">
-
-
-            <div class="table-responsive">
-              <table class="table table-bordered">
-                <caption>Basic Details</caption>
-                <tr>
-                  <th>Looking For</th>
-                  <td>Sale</td>
-                </tr>
-
-                <tr>
-                  <th>Date</th>
-                  <td>26 March, 2024</td>
-                </tr>
-
-                <tr>
-                  <th>State</th>
-                  <td>Rajasthan</td>
-                </tr>
-
-                <tr>
-                  <th>City</th>
-                  <td>Jaipur</td>
-                </tr>
-
-                <tr>
-                  <th>Location</th>
-                  <td>Sodal</td>
-                </tr>
-
-                <tr>
-                  <th>List of Project</th>
-                  <td>Test</td>
-                </tr>
-
-              </table>
-            </div>
-          </div>
-
-          <div class="col-md-6">
-            <div class="table-responsive">
-              <table class="table table-bordered">
-                <caption>Property Details</caption>
-                <tr>
-                  <th>Project Type</th>
-                  <td>Residential</td>
-                </tr>
-
-                <tr>
-                  <th>Property Type</th>
-                  <td>Plot</td>
-                </tr>
-
-                <tr>
-                  <th>Block</th>
-                  <td>2 BHK</td>
-                </tr>
-
-                <tr>
-                  <th>Unit No</th>
-                  <td>26</td>
-                </tr>
-
-                <tr>
-                  <th>Size</th>
-                  <td>100 Sqyd</td>
-                </tr>
-
-                <tr>
-                  <th>Facing</th>
-                  <td>Facing</td>
-                </tr>
-
-                <tr>
-                  <th>Diamantion</th>
-                  <td>Unit Diamantion</td>
-                </tr>
-
-                <tr>
-                  <th>PLC if Any</th>
-                  <td>...........</td>
-                </tr>
-
-
-
-              </table>
-            </div>
-          </div>
-        </div>
+        <div class="lead-unit-details-container"></div>
       </div>
     </div>
   </div>
@@ -834,33 +682,112 @@
 
     // $('.select2').select2();
 
-    $('.add-edit-new-unit-btn').on('click', function() {
-      $('#unitModal').modal('show')
+    /* Add or Edit Lead Unit */
+    $(document).on('click', '.add-edit-new-unit-btn', function() {
+      id = $(this).data('id')
+      lead_id = $(this).data('lead_id')
+
+      $('#lead-unit-form')[0].reset()
+      $('#lead-unit-form [name="lead_id"]').val(lead_id)
+
+      if (!id) {
+        $('#unitModal').modal('show')
+      } else {
+        editLeadUnit(id);
+      }
     })
 
-    $('.view-unit-details').on('click', function() {
-      $('#unit-details-modal').modal('show')
-    })
-
-    /* Get Property Types */
-    $('.get_property_types').on('change', function() {
-      var project_type_id = $(this).val();
-
-      get_and_set_property_types(project_type_id);
-
-    })
-
-    function get_and_set_property_types(project_type_id) {
+    function editLeadUnit(id) {
       $.ajax({
         method: 'GET',
-        url: "<?= base_url('helper/get_property_types'); ?>",
+        url: "<?= base_url('agent/lead_unit_details'); ?>",
         data: {
-          project_type_id: project_type_id
+          id: id,
+          view: false
         },
         dataType: 'json',
         success: (res) => {
           if (res.status) {
-            $('.set_property_types').html(res.options_view)
+             
+            /* Set Data */
+            $('#lead-unit-form  [name="id"]').val(res.data.id)
+            $('#lead-unit-form  [name="looking_for"]').val(res.data.looking_for)
+            $('#lead-unit-form  [name="booking_date"]').val(res.data.booking_date)
+
+            $('#lead-unit-form  [name="project_type_id"]').attr('data-selected_property_id', res.data.property_type_id)
+            $('#lead-unit-form  [name="project_type_id"]').val(res.data.project_type_id).trigger('change')
+
+            $('#lead-unit-form [name="state_id"]').attr('data-selected_city_id', res.data.city_id)
+            $('#lead-unit-form [name="state_id"]').val(res.data.state_id).trigger('change')
+            $('#lead-unit-form [name="city_id"]').val(res.data.city_id).trigger('change')
+            $('#lead-unit-form [name="location"]').val(res.data.location)
+
+            $('#lead-unit-form [name="project_id"]').val(res.data.project_id)
+            $('#lead-unit-form [name="property_type_id"]').attr('data-property_details', JSON.stringify(res.data.property_details))
+
+            $('#lead-unit-form [name="old_property_layout"]').val(res.data.property_layout)
+            if(res.data.property_layout_ur){
+              $('.property-layout-anchor').removeClass('d-none').attr('href', res.data.property_layout_url)
+            }
+            /* End Set Data */
+
+            $('#unitModal').modal('show')
+          }
+        }
+      })
+    }
+    /* Add or Edit Lead Unit */
+
+    /* Lead Unit Details */
+    $(document).on('click', '.view-unit-details', function() {
+      var id = $(this).data('id');
+      if (!id) {
+        alert('Invalid record')
+        return false;
+      }
+
+      get_and_set_unit_details(id);
+    })
+
+    function get_and_set_unit_details(id) {
+      $.ajax({
+        method: 'GET',
+        url: "<?= base_url('agent/lead_unit_details'); ?>",
+        data: {
+          id: id,
+          view: true
+        },
+        dataType: 'json',
+        success: (res) => {
+          if (res.status) {
+            $('#lead-unit-details-modal').modal('show')
+            $('.lead-unit-details-container').html(res.details_view)
+          }
+        }
+      })
+    }
+    /* End Lead Unit Details */
+
+    /* Get Property Types */
+    $('.get_property_types').on('change', function() {
+      var project_type_id = $(this).val();
+      var selected_property_id = $(this).data('selected_property_id');
+
+      get_and_set_property_types(project_type_id, selected_property_id);
+    })
+
+    function get_and_set_property_types(project_type_id, selected_property_id) {
+      $.ajax({
+        method: 'GET',
+        url: "<?= base_url('helper/get_property_types'); ?>",
+        data: {
+          project_type_id: project_type_id,
+          selected_property_id: selected_property_id
+        },
+        dataType: 'json',
+        success: (res) => {
+          if (res.status) {
+            $('.set_property_types').html(res.options_view).trigger('change')
           }
         }
       })
@@ -870,12 +797,16 @@
     /* End Get Property Form */
     $('.get_property_form').on('change', function() {
       var property_id = $(this).val();
+      var property_details = $(this).data(property_details);
+
+      var selected_property_id = $('.get_property_types').data('selected_property_id');
 
       $.ajax({
         method: 'GET',
         url: "<?= base_url('helper/get_property_form'); ?>",
         data: {
-          property_id: property_id
+          property_id: property_id,
+          property_details: property_id == selected_property_id ? property_details : null
         },
         dataType: 'json',
         success: (res) => {
@@ -888,19 +819,21 @@
     /* End Get Property Form */
 
     /*  Get Cities */
-    $('.get_cities').on('change', function() {
+    $(document).on('change', '.get_cities', function() {
       var state_id = $(this).val();
+      var selected_city_id = $(this).data('selected_city_id');
 
-      get_and_set_cities(state_id);
+      get_and_set_cities(state_id, selected_city_id);
 
     })
 
-    function get_and_set_cities(state_id) {
+    function get_and_set_cities(state_id, selected_city_id) {
       $.ajax({
         method: 'GET',
         url: "<?= base_url('helper/get_cities'); ?>",
         data: {
-          state_id: state_id
+          state_id: state_id,
+          selected_city_id: selected_city_id
         },
         dataType: 'json',
         success: (res) => {
@@ -926,7 +859,7 @@
 
         $.ajax({
           type: "POST",
-          url: "<?= base_url('store_lead_unit') ?>",
+          url: "<?= base_url('agent/store_lead_unit') ?>",
           data: fd,
           dataType: 'json',
           cache: false,
@@ -937,21 +870,26 @@
             $(".submit-btn").html("Please wait...").prop('disabled', true);
           },
           success: function(res) {
-            if(res.status){
+            if (res.status) {
               $('.ajax-msg').html(`<div class="alert alert-success">${res.message}</div>`)
-              setTimeout(function(){
+              setTimeout(function() {
                 $('#unitModal').modal('hide')
                 $('#lead-unit-form')[0].reset()
                 $('.ajax-msg').html('')
                 $('.set_property_form').html('')
-              },1000)
-            }else{
+                
+                /* Refresh Lead Units */
+                lead_units($('[name="lead_id"]').val());
+                /* End Refresh Lead Units */
+
+              }, 1000)
+            } else {
               $('.ajax-msg').html(`<div class="alert alert-danger">${res.message}</div>`)
             }
             $(".submit-btn").html("Submit").prop('disabled', false);
           },
           error: function() {
-      
+
           }
 
         });
@@ -959,6 +897,25 @@
       }
     });
     /*  End Lead Unit Form */
+
+    /*  Lead Units */
+    function lead_units(lead_id) {
+      $.ajax({
+        method: 'GET',
+        url: "<?= base_url('helper/get_lead_units'); ?>",
+        data: {
+          lead_id: lead_id
+        },
+        dataType: 'json',
+        success: (res) => {
+          if (res.status) {
+            $('.lead-units-section').html(res.view)
+          }
+        }
+      })
+    }
+    /*  End Lead Units */
+
 
     // ##########
   </script>
