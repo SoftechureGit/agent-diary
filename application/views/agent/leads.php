@@ -725,7 +725,6 @@ function get_lead(id) {
 }
 
 function add_to_followup(id) {
-
   $(".error-msg-right").html('');
   openFolloupModal(1,0,id);
   nextAction();

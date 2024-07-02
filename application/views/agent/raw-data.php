@@ -174,10 +174,10 @@
                                 <h4 class="card-title">All Data</h4>
                             </div>
                             <div class="col-md-6 col-sm-6 col-xs-6" align="right">
-                                <button class="btn btn-primary btn-sm form-btn" onclick="transfer_lead()" >Assign</button>
+                                <button class="btn btn-primary btn-sm " onclick="transfer_lead()" >Assign</button>
                                 <?php // if(isset($menu_item_array['unit_types']) && $menu_item_array['unit_types']['rr_create']) { ?>
                                 <!--<a href="<?= base_url(ADMIN_URL.'unit_type-detail') ?>"><button type="button" class="btn btn-info btn-sm" >Add New</button></a><?php //  } ?>-->
-                                <a class="btn btn-dark btn-sm  form-btn" href="<?= base_url(AGENT_URL.'lead-detail/') ?>"> Add New </a>
+                                <a class="btn btn-dark btn-sm  " href="<?= base_url(AGENT_URL.'lead-detail/') ?>"> Add New </a>
                             </div>
                         </div>
 
@@ -253,6 +253,23 @@
   </div>
 </div>
 <!-- end pre loading -->
+
+<!-- start lead form modal -->
+<div class="modal fade" id="leadFormModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Lead</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="lead_form"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end lead form modal -->
 
 <?php include ('include/footer.php'); ?>
 <script src="<?php echo base_url('public/admin/') ?>plugins/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
@@ -370,8 +387,8 @@
                     'orderable': false,
                     'searchable': false,
                     'render': function (data, type, row) {
-                        return `<button type='button' class='btn btn-success btn-sm' onclick='formModal(${row.lead_id}, 2)'><i class='fa fa-edit'></i></button>
-                                <button type='button' class='btn btn-danger btn-sm' onclick='confirmDelete(${row.lead_id})'><i class='fa fa-trash'></i></button>`;
+                        return `<button type='button' class='btn btn-success btn-sm' onclick='get_lead_form(${row.lead_id})'><i class='fa fa-edit'></i></button>
+                                `;
                     }
                 }
             ],
@@ -505,6 +522,52 @@
         function closeTransferModal() {
             $("#transferModal").modal('hide');
         }
+
+        function get_lead_form(id) {
+   $.ajax({
+    type: "POST",
+    url: "<?php echo base_url(AGENT_URL.'api/get_lead_form'); ?>",
+    data: {id:id},
+    beforeSend: function() {
+      //$(".error-msg-right").html('');
+      //$(".detail-loader").show();
+      $("#preLoading").show();
+    },
+    success: function (response) {
+
+      setTimeout(function() {
+        $("#preLoading").hide();
+        //$(".customer_detail").show();
+        //$(".detail-loader").hide();
+        
+        if (response!="error") {
+
+          $("#leadFormModal").modal({
+              backdrop: 'static',
+              keyboard: false
+          });
+          $(".lead_form").html(response);
+        }
+        else {
+            //$(".customer_detail").html("");
+            //$(".error-msg-right").html(alertMessage('error','Some error occurred, please try again.'));
+        }
+        
+      },500);
+    },
+    error: function () {
+      $("#preLoading").hide();
+     //$(".detail-loader").hide();
+     //$(".error-msg-right").html(alertMessage('error','Some error occurred, please try again.'));
+    }
+
+  });
+}
+
+function hideLeadEditModal(id){
+  showCustomer(id)
+  $("#leadFormModal").modal('hide');
+}
 
 </script>
 

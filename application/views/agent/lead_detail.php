@@ -265,7 +265,7 @@ function alertMessage(type,message) {
                   //$(".error-msg").html(alertMessage('success',obj.message));
                 }
                 else if (obj.status=='updated') {
-                    window.location.href='';
+                  location.reload();
                   //$(".error-msg").html(alertMessage('success',obj.message));
                 }
                 else {
