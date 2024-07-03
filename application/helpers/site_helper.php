@@ -40,7 +40,7 @@ if (!function_exists('upload_file')) {
         # File Upload
         if (!empty($_FILES[$name]['name'])) :
             # File Name and Config
-            $file_name                  = time().'_'.$_FILES[$name]['name'];
+            $file_name                  = str_replace(' ', '-', time().'_'.$_FILES[$name]['name']);
             $config['file_name']        = $file_name;
             
             CI()->load->library('upload', $config);
@@ -167,6 +167,24 @@ if (!function_exists('getAccountId')) {
     }
     # End Get Cities
 
+    # Get Locations
+    function locations($city_id)
+    {
+        if (!$city_id) :
+            return null;
+        endif;
+
+        $records    =   db_instance()
+            ->select('location_id as id, location_name as name')
+            ->where("city_id = $city_id")
+            ->order_by("location_name", "asc")
+            ->get('tbl_locations')
+            ->result();
+
+        return $records ?? [];
+    }
+    # End Get Locations
+
     # Lead Units
     function lead_units($lead_id)
     {
@@ -175,11 +193,12 @@ if (!function_exists('getAccountId')) {
         endif;
 
         $records    =   db_instance()
-            ->select('lead_unit.*, product_type.product_type_name as project_type_name, unit_type.unit_type_name as property_type_name, state.state_name, city.city_name')
+            ->select('lead_unit.*, product_type.product_type_name as project_type_name, unit_type.unit_type_name as property_type_name, state.state_name, city.city_name, location.location_name')
             ->join('tbl_product_types as product_type', 'product_type.product_type_id = lead_unit.project_type_id', 'left')
             ->join('tbl_unit_types as unit_type', 'unit_type.unit_type_id = lead_unit.property_type_id', 'left')
             ->join('tbl_states as state', 'state.state_id = lead_unit.state_id', 'left')
             ->join('tbl_city as city', 'city.city_id = lead_unit.city_id', 'left')
+            ->join('tbl_locations as location', 'location.location_id = lead_unit.location_id', 'left')
             ->where("lead_unit.lead_id = $lead_id")
             ->order_by("lead_unit.id", "desc")
             ->get('tbl_lead_units as lead_unit')
@@ -201,17 +220,20 @@ if (!function_exists('getAccountId')) {
         endif;
 
         $record    =   db_instance()
-            ->select('lead_unit.*, product_type.product_type_name as project_type_name, unit_type.unit_type_name as property_type_name, state.state_name, city.city_name')
+            ->select('lead_unit.*, product.project_name ,product_type.product_type_name as project_type_name, unit_type.unit_type_name as property_type_name, state.state_name, city.city_name, location.location_name')
+            ->join('tbl_products as product', 'product.product_id = lead_unit.project_id', 'left')
             ->join('tbl_product_types as product_type', 'product_type.product_type_id = lead_unit.project_type_id', 'left')
             ->join('tbl_unit_types as unit_type', 'unit_type.unit_type_id = lead_unit.property_type_id', 'left')
             ->join('tbl_states as state', 'state.state_id = lead_unit.state_id', 'left')
             ->join('tbl_city as city', 'city.city_id = lead_unit.city_id', 'left')
+            ->join('tbl_locations as location', 'location.location_id = lead_unit.location_id', 'left')
             ->where("lead_unit.id = $id")
             ->order_by("lead_unit.id", "desc")
             ->get('tbl_lead_units as lead_unit')
             ->row();
 
-        $record->property_details           =   $record->property_details ? json_decode($record->property_details) : null;
+
+        $record->property_details           =   ( $record->property_details ?? 0 ) ? json_decode($record->property_details) : null;
         $record->property_layout_url        =   $record->property_layout ? base_url("public/other/lead-unit-layouts/$record->property_layout") : null;
 
         return $record ?? null;
@@ -254,5 +276,22 @@ if (!function_exists('getAccountId')) {
         endif;
     }
     # End Get Property Form
+
+    # Project Properties
+    function project_properties($project_id){
+        if (!$project_id) :
+            return null;
+        endif;
+
+        $records    =   db_instance()
+            ->select('product_unit_detail_id as id, code')
+            ->where("product_id = $project_id")
+            ->order_by("code", "asc")
+            ->get('tbl_product_unit_details')
+            ->result();
+
+        return $records ?? [];
+    }
+    # End Project Properties
 
 }

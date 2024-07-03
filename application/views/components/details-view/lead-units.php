@@ -34,7 +34,7 @@
                     </div>
                     <div class="col-md-9">
                       <span class="label-value">
-                        : &nbsp;&nbsp; <?= "$lead_unit->location, $lead_unit->city_name, $lead_unit->state_name"; ?>
+                        : &nbsp;&nbsp; <?= ($lead_unit->location_name ?? 'N/A').', '.($lead_unit->city_name ?? 'N/A').', '.($lead_unit->state_name ?? 'N/A'); ?>
                       </span>
                     </div>
                     <!-- End Location -->

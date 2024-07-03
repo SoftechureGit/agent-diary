@@ -10,6 +10,11 @@
                 </tr>
 
                 <tr>
+                  <th>Project Name</th>
+                  <td><?= $record->project_name ?? 'N/A' ?></td>
+                </tr>
+
+                <tr>
                   <th>Project Type</th>
                   <td><?= ucfirst($record->project_type_name ?? '') ?></td>
                 </tr>
@@ -36,19 +41,14 @@
 
                 <tr>
                   <th>Location</th>
-                  <td><?= $record->location ?? '' ?></td>
-                </tr>
-
-                <tr>
-                  <th>List of Project</th>
-                  <td>Test</td>
+                  <td><?= $record->location_name ?? '' ?></td>
                 </tr>
 
               </table>
             </div>
           </div>
 
-          <div class="col-md-6">
+           <div class="col-md-6">
             <div class="table-responsive">
               <table class="table table-bordered">
                 <caption>Property Details</caption>
