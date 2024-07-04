@@ -152,12 +152,23 @@
     <div class="set_property_form w-100"></div>
     <!-- Form View -->
 
-    <!-- List of Project -->
-    <div class="col-md-12">
+    <!-- Photo Gallery -->
+     <div class="col-md-12">
+      <details>
+        <summary>Photo Gallery</summary>
+        <div class="photo-gallery">
+          <?php $this->view('components/other/photo-gallery') ?>
+        </div>
+      </details>
+     </div>
+    <!-- Photo Gallery -->
+
+    <!-- Submit Button -->
+    <div class="col-md-12 mt-4">
       <div class="text-center">
-        <button type="submit" class="btn btn-primary btn-sm submit-btn">Submit</button>
+        <button type="submit" class="btn btn-primary submit-btn">Submit</button>
       </div>
     </div>
-    <!-- End List of Project -->
+    <!-- End Submit Button -->
   </div>
 </form>

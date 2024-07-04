@@ -36,13 +36,13 @@ if (!function_exists('upload_file')) {
         $config['allowed_types']        = 'png|jpg|jpeg';
         $config['max_size']             = 10 * 1024;
         $config['remove_spaces']        = TRUE;
-        
+
         # File Upload
         if (!empty($_FILES[$name]['name'])) :
             # File Name and Config
-            $file_name                  = str_replace(' ', '-', time().'_'.$_FILES[$name]['name']);
+            $file_name                  = str_replace(' ', '-', time() . '_' . $_FILES[$name]['name']);
             $config['file_name']        = $file_name;
-            
+
             CI()->load->library('upload', $config);
             # End File Name and Config
 
@@ -62,43 +62,93 @@ if (!function_exists('upload_file')) {
 }
 # End Upload File
 
-    # String Before : str_before()
-    if(!function_exists('str_before')){
-        function str_before($search, $subject ) {
-            if ($search === '') {
-                return $subject;
-            }
-            
-            $pos = strpos($subject, $search);
-        
-            if ($pos === false) {
-                return $subject;
-            }
-        
-            return substr($subject,  0, $pos - strlen($search));
-        }
-        
-    }
-    # End String Before
+# Upload Files
+if (!function_exists('upload_files')) {
+    function upload_files($name, $upload_folder, $old_file_name = null)
+    {
+        $upload_path                    = "./public/other/gallery-images/$upload_folder/";
 
-    # String After : str_after()
-    if(!function_exists('str_after')){
-        function str_after($search, $subject ) {
-            if ($search === '') {
-                return $subject;
-            }
-            
-            $pos = strpos($subject, $search);
-        
-            if ($pos === false) {
-                return $subject;
-            }
-        
-            return substr($subject, $pos + strlen($search));
+        # Create Folder if Folder Not Exits
+        if (!file_exists($upload_path)) {
+            mkdir($upload_path, 0777, true);
         }
-        
+        # End Create Folder if Folder Not Exits
+
+        $images                     =   array();
+        $config                     =   array();
+        $config['upload_path']      =   $upload_path;
+        $config['allowed_types']    =   'jpeg|jpg|png';
+        $config['max_size']         =   10 * 1024;
+        $config['remove_spaces']    =   TRUE;
+        $config['encrypt_name']     =   TRUE;
+
+        CI()->load->library('upload', $config);
+
+        for ($x = 0; $x < count($_FILES[$name]['name']); $x++) {
+            $_FILES['file']['name']         = $_FILES[$name]['name'][$x];
+            $_FILES['file']['type']         = $_FILES[$name]['type'][$x];
+            $_FILES['file']['tmp_name']     = $_FILES[$name]['tmp_name'][$x];
+            $_FILES['file']['error']        = $_FILES[$name]['error'][$x];
+            $_FILES['file']['size']         = $_FILES[$name]['size'][$x];
+            $config['file_name']            = $_FILES[$name]['name'][$x];
+
+            CI()->upload->initialize($config);
+
+
+            if (!empty($_FILES[$name]['name'][$x])) {
+                if (!CI()->upload->do_upload('file')) {
+                    $error = array('error' => CI()->upload->display_errors());
+                    $array = array('status' => 'false', 'msg' => $error['error']);
+                    echo json_encode($array);
+                    exit;
+                } else {
+                    $images[] = CI()->upload->data('file_name');
+                }
+            }
+        }
+
+        return $images;
     }
-    # End String After
+}
+# End Upload Files
+
+# String Before : str_before()
+if (!function_exists('str_before')) {
+    function str_before($search, $subject)
+    {
+        if ($search === '') {
+            return $subject;
+        }
+
+        $pos = strpos($subject, $search);
+
+        if ($pos === false) {
+            return $subject;
+        }
+
+        return substr($subject,  0, $pos - strlen($search));
+    }
+}
+# End String Before
+
+# String After : str_after()
+if (!function_exists('str_after')) {
+    function str_after($search, $subject)
+    {
+        if ($search === '') {
+            return $subject;
+        }
+
+        $pos = strpos($subject, $search);
+
+        if ($pos === false) {
+            return $subject;
+        }
+
+        return substr($subject, $pos + strlen($search));
+    }
+}
+# End String After
 
 if (!function_exists('getAccountId')) {
 
@@ -272,7 +322,7 @@ if (!function_exists('getAccountId')) {
             ->row();
 
 
-        $record->property_details           =   ( $record->property_details ?? 0 ) ? json_decode($record->property_details) : null;
+        $record->property_details           =   ($record->property_details ?? 0) ? json_decode($record->property_details) : null;
         $record->property_layout_url        =   $record->property_layout ? base_url("public/other/lead-unit-layouts/$record->property_layout") : null;
 
         return $record ?? null;
@@ -317,7 +367,8 @@ if (!function_exists('getAccountId')) {
     # End Get Property Form
 
     # Project Properties
-    function project_properties($project_id){
+    function project_properties($project_id)
+    {
         if (!$project_id) :
             return null;
         endif;
@@ -334,7 +385,8 @@ if (!function_exists('getAccountId')) {
     # End Project Properties
 
     # Project Property Details
-    function project_property_details($property_type_id, $project_property_id){
+    function project_property_details($property_type_id, $project_property_id)
+    {
         if (!$project_property_id || !$property_type_id) :
             return null;
         endif;
@@ -349,5 +401,13 @@ if (!function_exists('getAccountId')) {
         return $record ?? null;
     }
     # End Project Property Details
+
+    ##### Gallery Images #####
+    function insert_or_update_gallery_images($gallery_images){
+        $data                           =   [];
+
+        return true;
+    }
+    ##### End Gallery Images #####
 
 }

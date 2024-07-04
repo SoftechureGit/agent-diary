@@ -2707,6 +2707,12 @@ $writer->save('php://output');
     # Store Lead Unit
     public function store_lead_unit()
     {
+        // echo "<pre>";
+        // print_r($this->input->post());
+
+        // print_r(upload_files('gallery_images', 'lead-units'));
+        // die;
+
         if (!$this->input->post()) :
             echo json_encode(['status' => false, 'message' => 'Reqeust method is not POST']);
         endif;

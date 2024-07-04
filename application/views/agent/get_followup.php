@@ -57,6 +57,16 @@
     padding-top: 0;
   }
 
+  #lead-unit-form details{
+    background: #b2cbff57;
+  }
+
+   #lead-unit-form summary {
+    font-size: 15px;
+    background: #b2cbff57;
+    padding: 1rem;
+    color: #000;
+}
 
 </style>
 <div style="padding: 0px 15px 0px 15px;">
