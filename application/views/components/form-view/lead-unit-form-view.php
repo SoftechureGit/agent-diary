@@ -119,7 +119,7 @@
     <div class="col-md-4 project_name_wrapper d-none">
       <div class="form-group">
         <label for="">Project Name <span class="text-danger">*</span></label>
-        <input name="project_name" id="" class="form-control" placeholder="Enter project name" required>
+        <input name="project_name" id="" class="form-control" placeholder="Enter project name" value="<?= $record->project_name ?? $record->lead_unit_project_name ?? '' ?>" required>
       </div>
     </div>
     <!-- End Project Name -->

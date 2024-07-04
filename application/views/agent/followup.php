@@ -127,6 +127,14 @@
   .lead-unit-form-view {
     margin: 0 1rem;
 }
+
+body {
+    overflow-y: hidden !important;
+  }
+
+  .customer{
+    margin:5px;
+  }
 </style>
 <!--  -->
 

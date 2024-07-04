@@ -56,6 +56,8 @@
     letter-spacing: 1px;
     padding-top: 0;
   }
+
+
 </style>
 <div style="padding: 0px 15px 0px 15px;">
   <div class="row" style="border-bottom: 1px solid #0000000f;padding-bottom: 13px;margin-bottom: 10px;">
@@ -713,17 +715,19 @@
       var property_details = $('#lead-unit-form .get_property_form').data(property_details);
 
       var selected_id = $('#lead-unit-form .get_property_form').data('selected_id');
+      var selected_property_id = $('#lead-unit-form [name="property_id"]').data('selected_id');
 
-      getPropertyForm(property_type_id, property_id,  property_details,  selected_id);
+      getPropertyForm(property_type_id, property_id, selected_property_id,  property_details,  selected_id);
     })
 
-    function getPropertyForm(property_type_id, property_id, property_details,  selected_id){
+    function getPropertyForm(property_type_id, property_id, selected_property_id, property_details,  selected_id){
       $.ajax({
         method: 'GET',
         url: "<?= base_url('helper/get_property_form'); ?>",
         data: {
           property_type_id: property_type_id,
           property_id: property_id,
+          selected_property_id: selected_property_id,
           property_details: property_type_id == selected_id ? property_details : null
         },
         dataType: 'json',

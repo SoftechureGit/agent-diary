@@ -84,13 +84,15 @@ class Helper extends CI_Controller
     {
         $property_type_id               = $this->input->get('property_type_id');
         $property_id                    = $this->input->get('property_id');
+        $selected_property_id                    = $this->input->get('selected_property_id');
         $property_details               = $this->input->get('property_details');
 
         if (!$property_type_id) :
             return null;
         endif;
 
-        if($property_id):
+
+        if($property_id && $selected_property_id != $property_id ):
             $property_details               =   project_property_details($property_type_id, $property_id);
         endif;
 

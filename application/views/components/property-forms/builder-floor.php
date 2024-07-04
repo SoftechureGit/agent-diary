@@ -17,8 +17,8 @@
                     <!-- Unit Code -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Unit Code</label>
-                            <input type="text" placeholder="Enter Unit Code" name="property_details[unit_code]" value="<?= $unit_code ?? '' ?>" class="form-control">
+                            <label for="">Unit Code <span class="text-danger">*</span></label>
+                            <input type="text" placeholder="Enter Unit Code" name="property_details[unit_code]" value="<?= $unit_code ?? '' ?>" class="form-control" required>
                         </div>
                     </div>
                     <!-- End Unit Code -->
@@ -26,8 +26,8 @@
                     <!-- Referance No -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Referance Number</label>
-                            <input type="text" placeholder="Enter Referance Number" name="property_details[referance_number]" value="<?= $referance_number ?? '' ?>" class="form-control">
+                            <label for="">Referance Number <span class="text-danger">*</span></label>
+                            <input type="text" placeholder="Enter Referance Number" name="property_details[referance_number]" value="<?= $referance_number ?? '' ?>" class="form-control" required>
                         </div>
                     </div>
                     <!-- End Referance No -->
@@ -35,8 +35,8 @@
                     <!-- Plot No -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Plot No</label>
-                            <input type="text" placeholder="Enter Plot No" name="property_details[plot_no]" value="<?= $plot_no ?? '' ?>" class="form-control">
+                            <label for="">Plot No <span class="text-danger">*</span></label>
+                            <input type="text" placeholder="Enter Plot No" name="property_details[plot_no]" value="<?= $plot_no ?? '' ?>" class="form-control" required>
                         </div>
                     </div>
                     <!-- End Plot No -->
@@ -44,8 +44,8 @@
                     <!-- Plot Size (Sqyd) -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Plot Size (Sqyd)</label>
-                            <input type="text" placeholder="Enter Plot Size (Sqyd)" name="property_details[plot_size]" value="<?= $plot_size ?? '' ?>" class="form-control">
+                            <label for="">Plot Size (Sqyd) <span class="text-danger">*</span></label>
+                            <input type="text" placeholder="Enter Plot Size (Sqyd)" name="property_details[plot_size]" value="<?= $plot_size ?? '' ?>" class="form-control" required>
                         </div>
                     </div>
                     <!-- End Plot Size (Sqyd) -->
@@ -54,7 +54,7 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Unit Size (Sq.ft)</label>
-                            <input type="text" placeholder="Enter Unit Size (Sq.ft)" name="property_details[unit_size]" value="<?= $unit_size ?? '' ?>" class="form-control">
+                            <input type="text" placeholder="Enter Unit Size (Sq.ft)" name="property_details[unit_size]" value="<?= $unit_size ?? '' ?>" class="form-control" required>
                         </div>
                     </div>
                     <!-- End Unit Size (Sq.ft) -->
@@ -62,8 +62,8 @@
                     <!-- Floor -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Floor</label>
-                            <input type="text" placeholder="Enter Floor" name="property_details[floor]" value="<?= $floor ?? '' ?>" class="form-control">
+                            <label for="">Floor <span class="text-danger">*</span></label>
+                            <input type="text" placeholder="Enter Floor" name="property_details[floor]" value="<?= $floor ?? '' ?>" class="form-control" required>
                         </div>
                     </div>
                     <!-- End Floor -->
@@ -72,7 +72,7 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Block</label>
-                            <input type="text" placeholder="Enter Block" name="property_details[block]" value="<?= $block ?? '' ?>" class="form-control">
+                            <input type="text" placeholder="Enter Block" name="property_details[block]" value="<?= $block ?? '' ?>" class="form-control" required>
                         </div>
                     </div>
                     <!-- End Block -->
@@ -80,8 +80,8 @@
                     <!-- Applicable PLC -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Applicable PLC</label>
-                            <input type="text" placeholder="Enter Applicable PLC" name="property_details[applicable_plc]" value="<?= $applicable_plc ?? '' ?>" class="form-control">
+                            <label for="">Applicable PLC <span class="text-danger">*</span></label>
+                            <input type="text" placeholder="Enter Applicable PLC" name="property_details[applicable_plc]" value="<?= $applicable_plc ?? '' ?>" class="form-control" required>
                         </div>
                     </div>
                     <!-- End Applicable PLC -->
@@ -91,11 +91,12 @@
                         <div class="form-group">
                             <label for="">Facing <span class="text-danger">*</span></label>
                             <select name="property_details[facing]" id="" class="form-control" required>
+                            <option value="" disabled selected>Choose...</option>
                                 <?php 
                                     foreach(facings() ?? [] as $facing_item): 
-                                    $selected         = $facing_item->facing_id == ($facing ? str_before('|', $facing ) : '') ? 'selected' : '';
+                                    $selected         = $facing_item->facing_id == (( $facing ?? 0 ) ? str_before('|', $facing ) : '') ? 'selected' : '';
                                 ?>
-                                    <option <?=  $facing ? str_before('|', $facing ) : '' ?> value="<?= "$facing_item->facing_id | $facing_item->title" ?>"  <?= $selected ?>><?= $facing_item->title ?></option>   
+                                    <option <?=  ( $facing ?? 0 ) ? str_before('|', $facing ) : '' ?> value="<?= "$facing_item->facing_id | $facing_item->title" ?>"  <?= $selected ?>><?= $facing_item->title ?></option>   
                                     <?php endforeach; ?>
                                 </select>
                         </div>
@@ -105,8 +106,8 @@
                     <!-- Dimantion F x B x S1 x S2 -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Dimantion F x B x S1 x S2</label>
-                            <input type="text" placeholder="Enter Dimantion F x B x S1 x S2" name="property_details[dimantion]" value=<?= $dimantion ?? '' ?>"" class="form-control">
+                            <label for="">Dimantion F x B x S1 x S2 <span class="text-danger">*</span></label>
+                            <input type="text" placeholder="Enter Dimantion F x B x S1 x S2" name="property_details[dimantion]" value="<?= $dimantion ?? '' ?>" class="form-control" required>
                         </div>
                     </div>
                     <!-- End Dimantion F x B x S1 x S2 -->
@@ -114,8 +115,8 @@
                     <!-- Tarrace -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Tarrace</label>
-                            <input type="text" placeholder="Enter Tarrace" name="property_details[tarrace]" value="<?= $tarrace ?? '' ?>" class="form-control">
+                            <label for="">Tarrace <span class="text-danger">*</span></label>
+                            <input type="text" placeholder="Enter Tarrace" name="property_details[tarrace]" value="<?= $tarrace ?? '' ?>" class="form-control" required>
                         </div>
                     </div>
                     <!-- End Tarrace -->
@@ -123,8 +124,8 @@
                     <!-- Basment -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Basment</label>
-                            <input type="text" placeholder="Enter Basment" name="property_details[basment]" value="<?= $basment ?? '' ?>" class="form-control">
+                            <label for="">Basment <span class="text-danger">*</span></label>
+                            <input type="text" placeholder="Enter Basment" name="property_details[basment]" value="<?= $basment ?? '' ?>" class="form-control" required>
                         </div>
                     </div>
                     <!-- End Basment -->
@@ -132,8 +133,8 @@
                     <!-- Parking -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Parking</label>
-                            <input type="text" placeholder="Enter Parking" name="property_details[parking]" value="<?= $parking ?? '' ?>" class="form-control">
+                            <label for="">Parking <span class="text-danger">*</span></label>
+                            <input type="text" placeholder="Enter Parking" name="property_details[parking]" value="<?= $parking ?? '' ?>" class="form-control" required>
                         </div>
                     </div>
                     <!-- End Parking -->

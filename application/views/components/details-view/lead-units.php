@@ -1,5 +1,16 @@
 
         <div class="row">
+
+          <?php 
+            if(!count(lead_units($lead_id ?? 0))):
+              ?>
+            <div class="col-md-12">
+              <div class='text-center'>No data available</div>
+            </div>
+              <?php 
+            endif;
+          ?>
+
           <?php foreach (lead_units($lead_id ?? 0) as $lead_unit) : ?>
             <!-- Unit Card -->
             <div class="col-md-12">

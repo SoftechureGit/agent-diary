@@ -62,8 +62,8 @@
                     <!-- Applicable PLC -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Applicable PLC</label>
-                            <input type="text" placeholder="Enter Applicable PLC" name="property_details[applicable_plc]" value="<?= $applicable_plc ?? '' ?>" class="form-control">
+                            <label for="">Applicable PLC <span class="text-danger">*</span></label>
+                            <input type="text" placeholder="Enter Applicable PLC" name="property_details[applicable_plc]" value="<?= $applicable_plc ?? '' ?>" class="form-control" required>
                         </div>
                     </div>
                     <!-- End Applicable PLC -->
@@ -73,11 +73,12 @@
                         <div class="form-group">
                             <label for="">Facing <span class="text-danger">*</span></label>
                             <select name="property_details[facing]" id="" class="form-control" required>
+                                <option value="" disabled selected>Choose...</option>
                                 <?php 
                                     foreach(facings() ?? [] as $facing_item): 
-                                    $selected         = $facing_item->facing_id == ($facing ? str_before('|', $facing ) : '') ? 'selected' : '';
+                                    $selected         = $facing_item->facing_id == (( $facing ?? 0 ) ? str_before('|', $facing ) : '') ? 'selected' : '';
                                 ?>
-                                    <option <?=  $facing ? str_before('|', $facing ) : '' ?> value="<?= "$facing_item->facing_id | $facing_item->title" ?>"  <?= $selected ?>><?= $facing_item->title ?></option>   
+                                    <option <?=  ( $facing ?? 0 ) ? str_before('|', $facing ) : '' ?> value="<?= "$facing_item->facing_id | $facing_item->title" ?>"  <?= $selected ?>><?= $facing_item->title ?></option>   
                                     <?php endforeach; ?>
                                 </select>
                         </div>
