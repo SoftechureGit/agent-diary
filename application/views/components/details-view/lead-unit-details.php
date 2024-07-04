@@ -11,7 +11,12 @@
 
                 <tr>
                   <th>Project Name</th>
-                  <td><?= $record->project_name ?? 'N/A' ?></td>
+                  <td><?= $record->project_name ?? $record->lead_unit_project_name ?? 'N/A' ?></td>
+                </tr>
+
+                <tr>
+                  <th>Property Name ( Unit Code )</th>
+                  <td><?= $record->property_name ?? 'N/A' ?></td>
                 </tr>
 
                 <tr>
@@ -61,7 +66,7 @@
                 ?>
                 <tr>
                   <th><?= str_replace('_', ' ', ucwords($property_detail_key ?? '')) ?></th>
-                  <td><?= $property_detail_value ?? '' ?></td>
+                  <td><?= str_after('|', $property_detail_value ?? '' ) ?></td>
                 </tr>
                 <?php endforeach; ?>
 

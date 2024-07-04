@@ -62,6 +62,44 @@ if (!function_exists('upload_file')) {
 }
 # End Upload File
 
+    # String Before : str_before()
+    if(!function_exists('str_before')){
+        function str_before($search, $subject ) {
+            if ($search === '') {
+                return $subject;
+            }
+            
+            $pos = strpos($subject, $search);
+        
+            if ($pos === false) {
+                return $subject;
+            }
+        
+            return substr($subject,  0, $pos - strlen($search));
+        }
+        
+    }
+    # End String Before
+
+    # String After : str_after()
+    if(!function_exists('str_after')){
+        function str_after($search, $subject ) {
+            if ($search === '') {
+                return $subject;
+            }
+            
+            $pos = strpos($subject, $search);
+        
+            if ($pos === false) {
+                return $subject;
+            }
+        
+            return substr($subject, $pos + strlen($search));
+        }
+        
+    }
+    # End String After
+
 if (!function_exists('getAccountId')) {
 
     function getAccountId()
@@ -220,8 +258,9 @@ if (!function_exists('getAccountId')) {
         endif;
 
         $record    =   db_instance()
-            ->select('lead_unit.*, product.project_name ,product_type.product_type_name as project_type_name, unit_type.unit_type_name as property_type_name, state.state_name, city.city_name, location.location_name')
+            ->select('lead_unit.*, lead_unit.project_name as lead_unit_project_name, product.project_name, property.code as property_name ,product_type.product_type_name as project_type_name, unit_type.unit_type_name as property_type_name, state.state_name, city.city_name, location.location_name')
             ->join('tbl_products as product', 'product.product_id = lead_unit.project_id', 'left')
+            ->join('tbl_product_unit_details as property', 'property.product_unit_detail_id = lead_unit.property_id', 'left')
             ->join('tbl_product_types as product_type', 'product_type.product_type_id = lead_unit.project_type_id', 'left')
             ->join('tbl_unit_types as unit_type', 'unit_type.unit_type_id = lead_unit.property_type_id', 'left')
             ->join('tbl_states as state', 'state.state_id = lead_unit.state_id', 'left')
@@ -293,5 +332,22 @@ if (!function_exists('getAccountId')) {
         return $records ?? [];
     }
     # End Project Properties
+
+    # Project Property Details
+    function project_property_details($property_type_id, $project_property_id){
+        if (!$project_property_id || !$property_type_id) :
+            return null;
+        endif;
+
+        $record    =   db_instance()
+            ->select('*')
+            ->where("property_type = $property_type_id and product_unit_detail_id = $project_property_id")
+            ->order_by("code", "asc")
+            ->get('tbl_product_unit_details')
+            ->row();
+
+        return $record ?? null;
+    }
+    # End Project Property Details
 
 }

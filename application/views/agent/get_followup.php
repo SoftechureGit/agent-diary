@@ -26,16 +26,20 @@
   }
 
   #unitModal .card {
-    box-shadow: 2px 2px 22px #80808045;
+    box-shadow: unset;
   }
 
   #unitModal .card .card-body {
-    padding: 1rem 2rem !important;
+    padding: 0 !important;
   }
 
   label.error {
     color: #a94442 !important;
     font-size: 14px !important;
+  }
+
+  .modal-xl{
+    max-width:1140px;
   }
 
   /* Unit Modal */
@@ -440,11 +444,11 @@
 <!-- Add / Edit Unit -->
 
 <div class="modal fade" id="unitModal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
-  <div class="modal-dialog modal-lg" role="document">
+  <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalCenterTitle">Add Unit</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <h5 class="modal-title" id="exampleModalCenterTitle">Add / Edit Unit</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="$('#lead-unit-form')[0].reset(0);">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -576,6 +580,11 @@
 
             $('#lead-unit-form [name="project_type_id"]').trigger('change')
             $('#lead-unit-form [name="state_id"]').trigger('change')
+            
+            setTimeout(function(){
+              $('#lead-unit-form [name="property_id"]').trigger('change')
+            }, 500)
+          
 
             // 
             /*  Lead Unit Form */
@@ -687,7 +696,9 @@
         success: (res) => {
           if (res.status) {
             $('.set_property_types').html(res.options_view).trigger('change')
-            $('#lead-unit-form .get_property_form').trigger('change')
+            if(selected_id){
+              $('#lead-unit-form .get_property_form').trigger('change')
+            }
           }
         }
       })
@@ -695,18 +706,25 @@
     /* End Get Property Types */
 
     /* End Get Property Form */
-    $(document).on('change', '#lead-unit-form .get_property_form', function() {
-      var property_id = $(this).val();
-      var property_details = $(this).data(property_details);
+    $(document).on('change', '#lead-unit-form [name="property_type_id"], #lead-unit-form [name="project_id"], #lead-unit-form [name="property_id"]', function() {
+      var property_type_id = $('#lead-unit-form .get_property_form').val();
+      var project_id = $('#lead-unit-form [name="project_id"]').val();
+      var property_id = project_id ? $('#lead-unit-form [name="property_id"]').val() : 0;
+      var property_details = $('#lead-unit-form .get_property_form').data(property_details);
 
-      var selected_id = $(this).data('selected_id');
+      var selected_id = $('#lead-unit-form .get_property_form').data('selected_id');
 
+      getPropertyForm(property_type_id, property_id,  property_details,  selected_id);
+    })
+
+    function getPropertyForm(property_type_id, property_id, property_details,  selected_id){
       $.ajax({
         method: 'GET',
         url: "<?= base_url('helper/get_property_form'); ?>",
         data: {
+          property_type_id: property_type_id,
           property_id: property_id,
-          property_details: property_id == selected_id ? property_details : null
+          property_details: property_type_id == selected_id ? property_details : null
         },
         dataType: 'json',
         success: (res) => {
@@ -715,7 +733,7 @@
           }
         }
       })
-    })
+    }
     /* End Get Property Form */
 
     /*  Get Cities */
@@ -829,7 +847,7 @@
             if (!selected_id) {
               $('#lead-unit-form .project_name_wrapper').removeClass('d-none')
             }
-
+            $('#lead-unit-form [name="project_id"]').trigger('change')
 
           }
         }
@@ -840,7 +858,7 @@
     /* Project Properties */
       $(document).on('change', '#lead-unit-form [name="project_id"]', function(){
         var project_id  = $(this).val();
-        var selected_id  = $(this).data('selected_id');
+        var selected_id  = $('#lead-unit-form [name="property_id"]').data('selected_id');
 
         $.ajax({
         method: 'GET',
@@ -852,7 +870,6 @@
         },
         dataType: 'json',
         success: (res) => {
-          console.log(res)
           if (res.status) {
             $('#lead-unit-form [name="property_id"]').html(res.view)
           }
@@ -861,12 +878,37 @@
       })
     /*  End Project Properties */
 
+    /* Project Property Details */
+      $(document).on('change', '#lead-unit-form [name="property_id"]', function(){
+        var property_type_id  = $(this).val();
+        var project_property_id  = $(this).val();
+   
+        $.ajax({
+        method: 'GET',
+        url: "<?= base_url('helper/project_property_details'); ?>",
+        data: {
+          property_type_id : property_type_id,
+          project_property_id : project_property_id
+        },
+        dataType: 'json',
+        success: (res) => {
+          
+          if (res.status) {
+            
+          }
+        }
+      })
+      })
+    /*  End Project Property Details */
+
     /*  Selected Project */
     $(document).on('change', '#lead-unit-form [name="project_id"]', function() {
       if (this.value) {
         $('#lead-unit-form .project_name_wrapper').addClass('d-none')
+        $('#lead-unit-form .project_properties').removeClass('d-none')
       } else {
         $('#lead-unit-form .project_name_wrapper').removeClass('d-none')
+        $('#lead-unit-form .project_properties').addClass('d-none')
       }
     })
     /*  End Selected Project */

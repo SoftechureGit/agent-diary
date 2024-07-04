@@ -104,9 +104,9 @@
 
 <!--  -->
 <style>
-  .theme-form .form-heading {
+  #lead-unit-form .form-heading {
     font-family: Roboto;
-    font-size: 24px;
+    font-size: 18px;
     color: #272523d6;
   }
 
@@ -123,6 +123,10 @@
     font-weight: 500;
     margin-bottom: 4px;
   }
+
+  .lead-unit-form-view {
+    margin: 0 1rem;
+}
 </style>
 <!--  -->
 

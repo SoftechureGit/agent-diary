@@ -82,14 +82,20 @@ class Helper extends CI_Controller
     # Get Property Form
     public function get_property_form()
     {
-        $property_id            = $this->input->get('property_id');
-        $property_details       = $this->input->get('property_details');
+        $property_type_id               = $this->input->get('property_type_id');
+        $property_id                    = $this->input->get('property_id');
+        $property_details               = $this->input->get('property_details');
 
-        if (!$property_id) :
+        if (!$property_type_id) :
             return null;
         endif;
 
-        $form_view                =   property_form($property_id, $property_details);
+        if($property_id):
+            $property_details               =   project_property_details($property_type_id, $property_id);
+        endif;
+
+        $form_view                      =   property_form($property_type_id, $property_details);
+
 
         echo json_encode(['status' => true, 'message' => 'Successfully data fetched', 'form_view' => $form_view]);
     }
@@ -194,5 +200,19 @@ class Helper extends CI_Controller
         echo json_encode(['status' => true, 'message' => 'Successfully data fetched', 'data' => $records, 'view' => $options]);
      }
      # End Fetch Project Properties
+     
+     # Fetch Project Properties
+    public function project_property_details(){
+        $property_type_id            = $this->input->get('property_type_id');
+        $project_property_id            = $this->input->get('project_property_id');
+      
+        if (!$project_property_id) :
+            return null;
+        endif;
 
+        $data                =   project_property_details($property_type_id, $project_property_id);
+
+        echo json_encode(['status' => true, 'message' => 'Successfully data fetched', 'data' => $data]);
+    }
+     # End Fetch Project Properties
 }

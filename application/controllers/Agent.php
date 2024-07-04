@@ -2742,33 +2742,14 @@ $writer->save('php://output');
         $property_layout                            =   $upload_response->file_name;
         # End File Upload
 
-            # Create New Project
-            if(!$project_id):
-                $project_data                   =   [
-                                                        'lead_id'               => $result ?? $id ?? 0,
-                                                        'added_from'            => 'Lead Unit',
-                                                        'agent_id'              => $agent_id,
-                                                        'project_name'          => $project_name,
-                                                        'slug'                  => url_title($project_name, 'dash', true),
-                                                        'project_type'          => $project_type_id,
-                                                        'property_type'         => $property_type_id,
-                                                        'state_id'              => $state_id,
-                                                        'city_id'               => $city_id,
-                                                        'location'           => $location_id,
-                                                        'product_status'        => 0,
-                                                    ];
-    
-                $project_result                 =   $this->Action_model->insert_data($project_data, 'tbl_products');
-            endif;
-            # End Create New Project
-
         # Db Data
         $data                                   =   [
                                                         'lead_id'           => $lead_id,
                                                         'added_by'          => $agent_id,
                                                         'looking_for'       => $looking_for,
                                                         'booking_date'      => $booking_date,
-                                                        'project_id'        => $project_id ? $project_id :  $project_result,
+                                                        'project_id'        => $project_id,
+                                                        'project_name'        => $project_name,
                                                         'property_id'        => $property_id,
                                                         'project_type_id'   => $project_type_id,
                                                         'property_type_id'  => $property_type_id,
