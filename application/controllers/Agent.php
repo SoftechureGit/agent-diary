@@ -2720,6 +2720,20 @@ $writer->save('php://output');
     # Store Lead Unit
     public function store_lead_unit()
     {
+        // $property_documents         =   $this->input->post('property_documents');
+        // $property_document_data     =   [];
+
+        // foreach($property_documents ?? [] as $property_document):
+        //     $property_document_data[]           =   [
+        //                                                 'title'   => $property_document['title'] ?? ''
+        //                                             ];
+        // endforeach;
+
+        // print_r($property_document_data);
+
+        // die;
+        // $upload_response            =   upload_file('property_documents', 'lead-unit-layouts', $old_property_layout);
+
         if (!$this->input->post()) :
             echo json_encode(['status' => false, 'message' => 'Reqeust method is not POST']);
         endif;

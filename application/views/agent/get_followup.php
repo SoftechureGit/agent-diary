@@ -42,6 +42,11 @@
     max-width: 1140px;
   }
 
+  #unitModal .clone-template .form-control {
+    border-radius: 5px;
+    height: 1.8rem;
+}
+
   /* Unit Modal */
 
   .add-edit-new-unit-btn,
@@ -85,6 +90,21 @@
     color: #000000d6 !important;
   }
 
+  .add-more-btn:focus, .add-more-btn:active{
+    outline: none !important;
+  }
+  .remove-clone-template-row {
+    position: absolute;
+    top: 12px;
+    right: 10px;
+    background: red;
+    color: #fff;
+    padding: 8px;
+    border-radius: 50%;
+    font-size: 12px;
+    cursor: pointer;
+    z-index: 9;
+  }
 
   /* Toast */
   #toast-container {
@@ -996,5 +1016,53 @@
 
     // });
     // ########## End Toast #########
+
+    
+        // Add More
+
+        function removeCloneTemplateRow(el) {
+      $(el).parents('.clone-template').remove();
+
+      $.each($('.itinerary'), function(i) {
+        var key = i + 1;
+        $(this).find('#day').val(key);
+        $(this).attr('data-clone-template-id', key)
+      });
+    }
+
+    var remove_combo_btn_html = '';
+    var clone_template_id = 0;
+
+    function add_more(e, type, parent_class) {
+
+      var clone_template = $(e).parents(parent_class).find('.clone-template');
+      var last_clone_template_id = clone_template.last().attr('data-clone-template-id');
+      var dublicate_clone_template = clone_template.first().clone();
+
+      next_clone_template_id = parseInt(last_clone_template_id) + 1;
+      html_remove_current_clone_template_btn = '<span class="remove-clone-template-row fa fa-trash" onclick="removeCloneTemplateRow(this)"></span>';
+
+      modifyCloneTemplate(dublicate_clone_template, next_clone_template_id, type);
+
+      dublicate_clone_template.append(html_remove_current_clone_template_btn);
+      clone_template.last().after(dublicate_clone_template);
+    }
+
+    function modifyCloneTemplate(dublicate_clone_template, clone_template_id, type) {
+
+      dublicate_clone_template.attr('data-clone-template-id', clone_template_id);
+      dublicate_clone_template.find('input[name="product_id"]').remove();
+      dublicate_clone_template.find('span.text-danger').html('');
+
+      switch (type) {
+        case 'property-documents':
+          dublicate_clone_template.find('.document_title').attr('name', "property_documents[" + clone_template_id + "][title]").val('');
+          dublicate_clone_template.find('.document_file').attr('name', "property_documents[" + clone_template_id + "][document_file]").val('');
+          break;
+      }
+
+    }
+
+    // End Add More
     // ##########
   </script>
