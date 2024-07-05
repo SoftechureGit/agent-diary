@@ -285,8 +285,8 @@ $("#form-modal").validate({
                   //$(".error-msg").html(alertMessage('success',obj.message));
                 }
                 else if (obj.status=='updated') {
-                    //window.location.href='';
-                  //$(".error-msg").html(alertMessage('success',obj.message));
+                    window.location.href=''; 
+                  $(".error-msg").html(alertMessage('success',obj.message));
                   hideLeadEditModal(<?= $id ?>);
                 }
                 else {
@@ -301,8 +301,7 @@ $("#form-modal").validate({
         },
         error: function () {
             $(".form-btn").html(btn_label);
-          $(".error-msg").html(alertMessage('error','Some error occurred, please try again.'));
-           
+            $(".error-msg").html(alertMessage('error','Some error occurred, please try again.'));  
         }
 
     });
@@ -338,8 +337,7 @@ function getCityLead(state_id) {
           }
         },
         error: function () {
-            alert('Some error occurred, please try again.');
-           
+            alert('Some error occurred, please try again.'); 
         }
 
     });

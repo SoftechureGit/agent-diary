@@ -6250,7 +6250,7 @@ class Admin_api extends CI_Controller {
                     }
 
                     if ($location) {
-                        $location .= "<br>";
+                        $location .= " ";
                     }
 
                     if ($item->state_name) {

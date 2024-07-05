@@ -687,35 +687,35 @@ function getRequirementList(lead_id) {
                     }
 
                     html += "<div style='border-bottom: 1px solid rgba(0, 0, 0, 0.125);padding-bottom: 13px;margin-bottom: 14px;'>"+
-"    <div class='row'>"+
-"        <div class='col-md-4'>"+
+"    <div class='row align-items-center'>"+
+"        <div class='col-md-4 py-2'>"+
 "            <label>Requirement Id:</label> <strong>"+requirement_list[i].requirement_id+"</strong>"+
 "        </div>"+
-"        <div class='col-md-4'>"+
+"        <div class='col-md-4 py-2'>"+
 "            <label>Date:</label> <strong>"+requirement_list[i].dor+"</strong>"+
 "        </div>"+
-"        <div class='col-md-4' align='right'>"+
+"        <div class='col-md-4 py-2' align='right'>"+
 "            <label>Status:</label> <strong>"+requirement_status+"</strong>"+
 "        </div>"+
-"        <div class='col-md-12'>"+
-"            <label>Looking For:</label> <strong>"+requirement_list[i].look_for+"</strong>"+
+"        <div class='col-md-12 py-2'>"+
+"            <label class='pr-2'>Looking For:</label> <strong>"+requirement_list[i].look_for+"</strong>"+
 "        </div>"+
-"        <div class='col-md-12'>"+
-"            <label>Location:</label> <strong>"+requirement_list[i].location+"</strong>"+
+"        <div class='col-md-12 py-2'>"+
+"            <label class='pr-2'><i class='fa fa-map-marker fa-lg'  aria-hidden='true'></i></label> <strong>"+requirement_list[i].location+"</strong>"+
 "        </div>"+
-"        <div class='col-md-6'>"+
-"            <label>Price:</label> <strong>"+price+"</strong>"+
+"        <div class='col-md-6 py-2'>"+
+"            <label class='pr-2'>Budget:</label> <strong>"+price+"</strong>"+
 "        </div>"+
-"        <div class='col-md-6'>"+
-"            <label>Size:</label> <strong>"+size+"</strong>"+
+"        <div class='col-md-6 py-2'>"+
+"            <label class='pr-2'>Size:</label> <strong>"+size+"</strong>"+
 "        </div>"+
-"        <div class='col-md-8'>"+
-"            <label>Note:</label> <strong>"+requirement_list[i].remark+"</strong>"+
+"        <div class='col-md-8 py-2'>"+
+"            <label class='pr-2'>Remarks :</label> <strong>"+requirement_list[i].remark+"</strong>"+
 "        </div>"+
-"        <div class='col-md-8'>"+
-"            <label>Created By:</label> <strong>"+requirement_list[i].agent_name+", "+requirement_list[i].dor+"</strong>"+
+"        <div class='col-md-8 py-2'>"+
+"            <label class='pr-2'>Agent :</label> <strong>"+requirement_list[i].agent_name+", "+requirement_list[i].dor+"</strong>"+
 "        </div>"+
-"        <div class='col-md-4' align='right'>"+
+"        <div class='col-md-4 py-2' align='right'>"+
 "            <!--<button type='button' class='btn btn-success btn-sm' onclick='reqFormModal("+requirement_list[i].requirement_id+",2,"+requirement_list[i].lead_id+")' style='color: white;'><i class='fa fa-edit'></i> Edit</button>-->"+
 "        </div>"+
 "    </div>"+

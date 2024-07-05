@@ -2249,19 +2249,19 @@ $writer->save('php://output');
 
     public function upload_lead()
     {
+        $account_id     = 0;
+        $user_id        = 0;
+        $where          = "user_hash='".$this->session->userdata('agent_hash')."'";
+        $user_detail    = $this->Action_model->select_single('tbl_users',$where);
 
-        
-
-        $account_id = 0;
-        $user_id = 0;
-
-        $where = "user_hash='".$this->session->userdata('agent_hash')."'";
-        $user_detail = $this->Action_model->select_single('tbl_users',$where);
         if ($user_detail) {
-            $user_id=$user_detail->user_id;
-            $account_id = $user_detail->user_id;
+            $user_id    =   $user_detail->user_id;
+            $account_id =   $user_detail->user_id;
+
             if ($user_detail->role_id!=2) {
+
                 $account_id = $user_detail->parent_id;
+
             }
         }
 
@@ -2271,76 +2271,41 @@ $writer->save('php://output');
     
             if ($_FILES["file"]["size"] > 0) {
                 
-                $file = fopen($fileName, "r");
+                $file   = fopen($fileName, "r");
                 
-                $l = 0;
+                $l      =    0;
+
                 while (($column = fgetcsv($file, 10000, ",")) !== FALSE) {
-                    //echo $sqlInsert = "INSERT into users (userId,userName,password,firstName,lastName)
-                    //       values ('" . $column[0] . "','" . $column[1] . "','" . $column[2] . "','" . $column[3] . "','" . $column[4] . "')";
+                 
                     if($l) {
-                        
+            
                         $data_array = array(
-                            'lead_title'=>$column[1],
-                            'lead_first_name'=>$column[2],
-                            'lead_last_name'=>$column[3],
-                            'lead_mobile_no'=>$column[4],
-                            'lead_email'=>$column[5]
+                            'data_title'        =>  $column[1],
+                            'data_first_name'   =>  $column[2],
+                            'data_last_name'    =>  $column[3],
+                            'data_mobile'            =>  $column[4],
+                            'data_email'             =>  $column[5]
                         );
 
-                        $where = "lead_mobile_no='".$column[4]."' AND account_id='".$account_id."'";
-                        $lead_detail = $this->Action_model->select_single('tbl_leads',$where);
+                        $where          =   "data_mobile='".$column[4]."' AND account_id='".$account_id."'";
+                        $lead_detail    =   $this->Action_model->select_single('tbl_data',$where);
 
                         if ($lead_detail) {
-                            $this->Action_model->update_data($data_array,'tbl_leads',$where);
+
+                            $this->Action_model->update_data($data_array,'tbl_data',$where);
+                            
                         }
                         else {
 
                             $data_array2 = array(
-                                'lead_date'=>date("d-m-Y"),
-                                'lead_time'=>date("h:i:s a"),
-                                'lead_mobile_no_2'=>"",
-                                'lead_data_type' => $this->input->post('lead_data_type') ?? '' ,
-                                'lead_address'=>"",
-                                'lead_state_id'=>"",
-                                'lead_city_id'=>"",
-                                'lead_occupation_id'=>"",
-                                'lead_department_id'=>"",
-                                'lead_dob'=>"",
-                                'lead_doa'=>"",
-                                'lead_source_id'=>"",
-                                'lead_stage_id'=>"",
-                                'lead_status'=>"",
-                                'user_id'=>$user_id,
-                                'added_by'=>$user_id,
-                                'account_id'=>$account_id,
-                                'lead_pan_no'=>"",
-                                'lead_adhar_no'=>"",
-                                'lead_voter_id'=>"",
-                                'lead_passport_no'=>"",
-                                'lead_gender'=>"",
-                                'lead_marital_status'=>"",
-                                'lead_designation'=>"",
-                                'lead_company'=>"",
-                                'lead_annual_income'=>""
+                                'added_by'          =>  $user_id,
+                                'account_id'        =>  $account_id,
+                                'data_status'       =>  1,
+                                'file_name'         =>  $this->input->post('lead_data_type'),
                             );
 
-                            $data_array = array_merge($data_array,$data_array2);
-
-
-                            $record_array['created_at'] = time();
-                            $record_array['updated_at'] = time();
-
-                            $lead_id = $this->Action_model->insert_data($data_array,'tbl_leads');
-
-                            $lead_history_array = array(
-                                'title' => 'Lead Created',
-                                'description' => 'Lead created by '.$this->Action_model->get_name($user_id),
-                                'lead_id' => $lead_id,
-                                'created_at' => time(),
-                                "account_id"=>$account_id,
-                                "user_id"=>$user_id
-                            );
-                            $this->Action_model->insert_data($lead_history_array,'tbl_lead_history');
+                            $data_array     =   array_merge($data_array,$data_array2);
+                            $lead_id        =   $this->Action_model->insert_data($data_array,'tbl_data');
                         }
                     }
                     
@@ -2568,6 +2533,23 @@ $writer->save('php://output');
     # changes 2024-06-28 add new method
 
     function data(){
+
+        $all_file_type = $this->db->distinct()->select('file_name')->get('tbl_data')->result();
+
+
+        // echo  '<pre>';
+
+        // print_r($all_file_type); die;
+        
+        // foreach($all_file_type as $row):
+        // echo '<pre>';
+        // echo $row->file_name;
+        // endforeach;
+        
+        // die;
+
+        $data['all_file_type'] = $all_file_type;
+
         $all_unit_type_list = $this->Action_model->detail_result('tbl_unit_types',"unit_type_status='1'",'unit_type_id,unit_type_name,requirement_accomodation');
         $data['all_unit_type_list'] = $all_unit_type_list;
 

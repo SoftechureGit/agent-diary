@@ -11062,30 +11062,37 @@ $writer->save('php://output');
 
         $postData = $this->input->post();
 
- 
-
-        $select = "lead_id,CONCAT(lead_first_name,' ',lead_last_name) as lead_name, lead_mobile_no ,  CONCAT(first_name,' ',last_name) as user_name , lead_status as status";
+        $select = "data_id,CONCAT(data_first_name,' ',data_last_name) as data_name, data_mobile as mobile  ,data_status as  status , CONCAT(first_name,' ',last_name) as user_name , 'file_name'";
         $where = '';
 
         $searchValue = $postData['search']['value'];
         $searchQuery = "";
 
+        // if($this->input->post('file_name')!=''){
+        //      $searchQuery = "file_name=".$this->input->post('file_name');
+        // }
+
+        // if($this->input->post('status')!='') {
+        //     $searchQuery .= "data_status=".$this->input->post('status');
+        // }   
+
+
         if($this->input->post('status')!='') {
-            $searchQuery = "lead_status=".$this->input->post('status');
+            $searchQuery .= "data_status=".$this->input->post('status');
         }   
 
 
         if($searchValue != ''){
              if($this->input->post('status')!=''){
 
-                 $searchQuery .= " AND (lead_first_name LIKE '%".$searchValue."%' OR mobile LIKE '%".$searchValue."%') ";
+                 $searchQuery .= " AND (data_first_name LIKE '%".$searchValue."%' OR mobile LIKE '%".$searchValue."%') ";
                 }
                 else{
-                    $searchQuery .= "(lead_first_name LIKE '%".$searchValue."%' OR mobile LIKE '%".$searchValue."%') ";
+                    $searchQuery .= "(data_first_name LIKE '%".$searchValue."%' OR mobile LIKE '%".$searchValue."%') ";
              }
         }
 
-        $data = $this->Action_model->ajaxDatatable($postData,$searchQuery,'tbl_leads',$where,$select,array('tbl_users','tbl_users.user_id=tbl_leads.user_id' ));
+        $data = $this->Action_model->ajaxDatatable($postData,$searchQuery,'tbl_data',$where,$select,array('tbl_users','tbl_users.user_id=tbl_data.account_id' ));
 
         echo json_encode($data);
    }
