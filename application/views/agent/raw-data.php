@@ -182,7 +182,7 @@
         <div class="row">
             <div class="col-12">
               <div class="card">
-                <p class="p-5 text-center">Please Select File Name</p>        
+                <p class="p-5 text-center data-p">Please Select File Name</p>        
                 <div id="data-body" class="card-body  d-none">
                         <div class="row">
                             <div class="col-md-6 col-sm-6 col-xs-6">
@@ -408,7 +408,9 @@
                     'orderable': false,
                     'searchable': false,
                     'data': null,
-                    'defaultContent': '<input type="checkbox" class="lead_id_select">'
+                    'render' :function(data ,type , row ) {
+                      return '<input type="checkbox" class="lead_id_select" value="'+data.data_id+'">'
+                    }
                 },
                 { data: 'data_id' },
                 { data: 'data_name' },
@@ -441,8 +443,7 @@
                     'orderable': false,
                     'searchable': false,
                     'render': function (data, type, row) {
-                        return `<button type='button' class='btn btn-success btn-sm' onclick='get_lead_form(${row.data_id})'><i class='fa fa-edit'></i></button>
-                                `;
+                        return `<button type='button' class='btn btn-success btn-sm' onclick='get_lead_form(${row.data_id})'><i class='fa fa-edit'></i></button> `;
                     }
                 }
             ],
@@ -481,6 +482,7 @@
                 var leadId = table.row(row).data().lead_id;
                 selectedLeads.push(leadId);
             });
+            console.log(selectedLeads)
             $('#selected_lead_ids').val(selectedLeads.join(','));
         }
 
@@ -498,6 +500,7 @@
 
         $("#transfer-form-modal").validate({
             rules: {
+
             },
             messages: {
             },
@@ -507,7 +510,7 @@
 
                 $.ajax({
                     type: "POST",
-                    url: "<?= base_url(AGENT_URL.'api/transfer_lead') ?>",
+                    url: "<?= base_url(AGENT_URL.'api/data_assign') ?>",
                     data: fd,
                     cache: false,
                     processData: false,
@@ -555,6 +558,7 @@
 
         $('#file_name').on('change keyup', function() {
           $('#data-body').removeClass('d-none');
+          $('.data-p').addClass('d-none');
           table.draw();
       });
 

@@ -2276,16 +2276,23 @@ $writer->save('php://output');
                 $l      =    0;
 
                 while (($column = fgetcsv($file, 10000, ",")) !== FALSE) {
+
+
+                    
                  
                     if($l) {
-            
+
                         $data_array = array(
-                            'data_title'        =>  $column[1],
-                            'data_first_name'   =>  $column[2],
-                            'data_last_name'    =>  $column[3],
-                            'data_mobile'            =>  $column[4],
-                            'data_email'             =>  $column[5]
+                            'data_title'            =>  $column[1],
+                            'data_first_name'       =>  $column[2],
+                            'data_last_name'        =>  $column[3],
+                            'data_mobile'           =>  $column[4],
+                            'data_email'            =>  $column[5]
                         );
+
+
+
+                        
 
                         $where          =   "data_mobile='".$column[4]."' AND account_id='".$account_id."'";
                         $lead_detail    =   $this->Action_model->select_single('tbl_data',$where);

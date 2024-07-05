@@ -10374,6 +10374,25 @@ $writer->save('php://output');
     }
 
 
+    #  DATA ASSIGN 
+
+        public function data_assign(){
+
+            
+            $transfer_lead_ids=  $this->input->post('selected_lead_ids');
+
+            $transfer_lead_ids = explode(',', $transfer_lead_ids);
+
+            echo '<pre>';
+            print_r($transfer_lead_ids); die;
+            
+        }
+
+    # END DATA ASSIGN
+
+
+
+
     public function transfer_lead()
     {
         $array = array();
@@ -10422,31 +10441,30 @@ $writer->save('php://output');
                                 $this->Action_model->update_data($record_array,'tbl_site_visit',"lead_id='".$transfer_lead_id."' AND user_id='".$record->user_id."'");
                 
                                 $record_array = array(
-                                    'lead_id'=>$transfer_lead_id,
-                                    'transfer_from'=>$record->user_id,
-                                    'transfer_to'=>$transfer_to,
-                                    'transfer_by'=>$user_id,
-                                    'created_at'=>time()
+                                    'lead_id'           =>  $transfer_lead_id,
+                                    'transfer_from'     =>  $record->user_id,
+                                    'transfer_to'       =>  $transfer_to,
+                                    'transfer_by'       =>  $user_id,
+                                    'created_at'        =>  time()
                                 );
                 
                                 $this->Action_model->insert_data($record_array,'tbl_lead_transfer');
                 
                                 $lead_history_array = array(
-                                    'title' => 'Transfer Lead',
-                                    'description' => 'Lead transfer to '.$this->Action_model->get_name($transfer_to).' by '.$this->Action_model->get_name($user_id),
-                                    'lead_id' => $transfer_lead_id,
-                                    'created_at' => time(),
-                                    "account_id"=>$account_id,
-                                    "user_id"=>$user_id
+                                    'title'             => 'Transfer Lead',
+                                    'description'       => 'Lead transfer to '.$this->Action_model->get_name($transfer_to).' by '.$this->Action_model->get_name($user_id),
+                                    'lead_id'           => $transfer_lead_id,
+                                    'created_at'        => time(),
+                                    "account_id"        =>$account_id,
+                                    "user_id"           =>$user_id
                                 );
                                 $this->Action_model->insert_data($lead_history_array,'tbl_lead_history');
                 
                             }
                                 
-                            }
+            } 
 
-
-                            $array = array('status'=>'success','message'=>'Lead Transfered Successfully!!'); 
+            $array = array('status'=>'success','message'=>'Lead Transfered Successfully!!'); 
         }
         else { 
            $array = array('status'=>'error','message'=>'Some error occurred, please try again.');
@@ -11068,27 +11086,33 @@ $writer->save('php://output');
         $searchValue = $postData['search']['value'];
         $searchQuery = "";
 
-        // if($this->input->post('file_name')!=''){
-        //      $searchQuery = "file_name=".$this->input->post('file_name');
-        // }
+
+        if($this->input->post('file_name')!=''){
+
+            $file_name = $this->input->post('file_name');
+                 $searchQuery .= "file_name= '$file_name'";
+
+        }
+
 
         // if($this->input->post('status')!='') {
+
         //     $searchQuery .= "data_status=".$this->input->post('status');
+
         // }   
 
 
-        if($this->input->post('status')!='') {
-            $searchQuery .= "data_status=".$this->input->post('status');
-        }   
-
-
         if($searchValue != ''){
+
              if($this->input->post('status')!=''){
 
-                 $searchQuery .= " AND (data_first_name LIKE '%".$searchValue."%' OR mobile LIKE '%".$searchValue."%') ";
+                    $searchQuery .= " AND (data_first_name LIKE '%".$searchValue."%' OR data_mobile LIKE '%".$searchValue."%') ";
+
                 }
                 else{
-                    $searchQuery .= "(data_first_name LIKE '%".$searchValue."%' OR mobile LIKE '%".$searchValue."%') ";
+
+                    $searchQuery .= "(data_first_name LIKE '%".$searchValue."%' OR data_mobile LIKE '%".$searchValue."%') ";
+
              }
         }
 
