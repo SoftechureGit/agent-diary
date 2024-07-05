@@ -235,4 +235,20 @@ class Helper extends CI_Controller
     }
     # End Remove Gallery Image
 
+    # Remove Add More Record
+    public function remove_add_more_record(){
+        if(!$this->input->post()){
+            echo json_encode(['status' => false, 'message' => 'Request method not matched.']);
+            exit;
+        }
+            $id                 =   $this->input->post('id');
+           
+            $this->db->where("id = $id")->delete('tbl_property_documents');
+
+            echo json_encode(['status' => true, 'message' => 'Successfully record removed.']);
+
+
+    }
+    # End Remove Add More Record
+
 }

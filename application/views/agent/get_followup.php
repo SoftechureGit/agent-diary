@@ -45,7 +45,7 @@
   #unitModal .clone-template .form-control {
     border-radius: 5px;
     height: 1.8rem;
-}
+  }
 
   /* Unit Modal */
 
@@ -79,20 +79,22 @@
     border: 1px solid #80808061;
   }
 
-  .lead-unit-details-container table caption{
+  .lead-unit-details-container table caption {
     color: #000000d6 !important;
-  } 
-  
-  .lead-unit-details-container table tr, 
-  .lead-unit-details-container table th, 
+  }
+
+  .lead-unit-details-container table tr,
+  .lead-unit-details-container table th,
   .lead-unit-details-container table td {
     border: 1px solid #00000038 !important;
     color: #000000d6 !important;
   }
 
-  .add-more-btn:focus, .add-more-btn:active{
+  .add-more-btn:focus,
+  .add-more-btn:active {
     outline: none !important;
   }
+
   .remove-clone-template-row {
     position: absolute;
     top: 12px;
@@ -104,6 +106,10 @@
     font-size: 12px;
     cursor: pointer;
     z-index: 9;
+  }
+
+  .property-documents.clone-template .form-group {
+    margin-bottom: 0;
   }
 
   /* Toast */
@@ -689,7 +695,7 @@
                   success: function(res) {
                     if (res.status) {
                       // $('.ajax-msg').html(`<div class="alert alert-success">${res.message}</div>`)
-                      
+
                       showToast('success', res.message)
 
                       setTimeout(function() {
@@ -1017,17 +1023,40 @@
     // });
     // ########## End Toast #########
 
-    
-        // Add More
 
-        function removeCloneTemplateRow(el) {
-      $(el).parents('.clone-template').remove();
+    // Add More
 
-      $.each($('.itinerary'), function(i) {
-        var key = i + 1;
-        $(this).find('#day').val(key);
-        $(this).attr('data-clone-template-id', key)
-      });
+    function removeCloneTemplateRow(el) {
+
+      var id = $(el).data('id')
+      if (id) {
+        if (confirm('Are you sure to remove this file?')) {
+          // Ajax - Remove Add More Record
+          $.ajax({
+            type: "post",
+            url: "<?= base_url('helper/remove-add-more-record') ?>",
+            dataType: 'json',
+            data: {
+              id: id
+            },
+            success: (data) => {
+              if (data.status) {
+                $(el).parents('.clone-template').remove();
+                showToast('success', data.message)
+              } else {
+                showToast('danger', data.message)
+              }
+            },
+            error: function() {
+              showToast('danger', 'Some Error Occured.')
+            }
+          });
+          // End Ajax - Remove Add More Record
+        }
+      } else {
+        $(el).parents('.clone-template').remove();
+      }
+
     }
 
     var remove_combo_btn_html = '';
@@ -1058,6 +1087,8 @@
         case 'property-documents':
           dublicate_clone_template.find('.document_title').attr('name', "property_documents[" + clone_template_id + "][title]").val('');
           dublicate_clone_template.find('.document_file').attr('name', "property_documents[" + clone_template_id + "][document_file]").val('');
+          dublicate_clone_template.find('.old_document_file').remove();
+          dublicate_clone_template.find('.view-property-document').remove();
           break;
       }
 

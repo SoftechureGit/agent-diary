@@ -157,7 +157,7 @@
       <details <?= isset($record) ? 'open' : '' ?>>
         <summary>Documents</summary>
         <div class="property-documents-container p-4">
-        <?php $this->view('components/other/add-more/property-documents') ?>
+        <?php $this->view('components/other/add-more/property-documents', [ 'property_documents' => $property_documents ?? [] ]) ?>
         <div class="text-right">
           <button type="button" class="btn btn-warning btn-sm text-white add-more-btn" onclick="add_more(this, 'property-documents' ,'.property-documents-container')">Add More</button>
         </div>
