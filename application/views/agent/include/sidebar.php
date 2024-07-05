@@ -32,7 +32,7 @@
 
                     <li>
                         <a href="<?= base_url(AGENT_URL.'followup/') ?>" aria-expanded="false">
-                            <i class="icon-screen-tablet menu-icon"></i> <span class="nav-text">Followup</span>
+                            <i class="icon-screen-tablet menu-icon"></i> <span class="nav-text">Leads</span>
                         </a>
                        
                     </li>
