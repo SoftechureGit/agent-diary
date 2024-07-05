@@ -2648,4 +2648,141 @@ $writer->save('php://output');
 
     # changes 2024-06-28 add new method
 
+    # Lead Unit Form View
+    public function lead_unit_form_view(){
+        $id                 =    $this->input->get('id');
+        $lead_id            =    $this->input->get('lead_id');
+
+        if($id):
+            $record             =    lead_unit_details($id);
+
+            # Gallery Images
+            $full_url                   =   base_url('public/other/gallery-images/lead-units/');
+            $gallery_images             =   $this->db->select("id, name, CONCAT('$full_url', name) as full_url, type")->where("type = 'lead_unit' and parent_id = $id")->get('tbl_gallery_images')->result();
+            # End Gallery Images
+        endif;
+
+
+        $view               =  $this->load->view('components/form-view/lead-unit-form-view', [ 'lead_id' => $lead_id, 'record' => $record ?? null, 'gallery_images' => $gallery_images ?? null ], true);
+        echo json_encode(['status' => true, 'message' => 'Record successfully fetched', 'view' => $view]);
+        
+    }
+    # End Lead Unit Form View
+
+
+    # Lead Unit Details
+    public function lead_unit_details(){
+        
+        $id                 =    $this->input->get('id');
+        $is_view            =    $this->input->get('view') == 'true' ? true : false;
+
+        if(!$id):
+            echo json_encode(['status' => false, 'message' => 'Invalid Record']);
+        endif;
+
+        $record             =    lead_unit_details($id);
+
+        if($record):
+            if($is_view):
+        
+                # Gallery Images
+                $full_url                   =   base_url('public/other/gallery-images/lead-units/');
+                $gallery_images             =   $this->db->select("id, name, CONCAT('$full_url', name) as full_url")->where("type = 'lead_unit' and parent_id = $id")->get('tbl_gallery_images')->result();
+                # End Gallery Images
+
+                $details_view     = $this->load->view('components/details-view/lead-unit-details', [ 'record' => $record, 'gallery_images' => $gallery_images ?? [] ], true );
+            endif;
+            echo json_encode(['status' => true, 'message' => 'Record successfully fetched', 'data' => $record, 'details_view' => $details_view ?? null]);
+        else:
+            echo json_encode(['status' => false, 'message' => 'Invalid Record']);
+        endif;
+    }
+    # End Lead Unit Details
+
+    # Store Lead Unit
+    public function store_lead_unit()
+    {
+        if (!$this->input->post()) :
+            echo json_encode(['status' => false, 'message' => 'Reqeust method is not POST']);
+        endif;
+
+        $res_arr                                    =   [];
+
+        # Init
+        $id                                         =   $this->input->post('id');
+        $lead_id                                    =   $this->input->post('lead_id');
+        $looking_for                                =   $this->input->post('looking_for');
+        $booking_date                               =   $this->input->post('booking_date');
+        $project_id                                 =   $this->input->post('project_id');
+        $property_id                                 =   $this->input->post('property_id');
+        $project_type_id                            =   $this->input->post('project_type_id');
+        $property_type_id                           =   $this->input->post('property_type_id');
+        $state_id                                   =   $this->input->post('state_id');
+        $city_id                                    =   $this->input->post('city_id');
+        $location_id                                =   $this->input->post('location_id');
+        $property_details                           =   $this->input->post('property_details');
+        $old_property_layout                        =   $this->input->post('old_property_layout');
+        $project_name                               =   $this->input->post('project_name');
+        $agent_id                                   =   $this->session->userdata('user_id');
+        # End Init
+        
+        # File Upload
+        $upload_response            =   upload_file('property_layout', 'lead-unit-layouts', $old_property_layout);
+        
+        if(!isset($upload_response) || !$upload_response->status):
+            echo json_encode(['status' => false, 'message' => $upload_response->message]);
+            exit;
+        endif;
+
+        $property_layout                            =   $upload_response->file_name;
+        # End File Upload
+
+        # Db Data
+        $data                                   =   [
+                                                        'lead_id'           => $lead_id,
+                                                        'added_by'          => $agent_id,
+                                                        'looking_for'       => $looking_for,
+                                                        'booking_date'      => $booking_date,
+                                                        'project_id'        => $project_id,
+                                                        'project_name'        => $project_name,
+                                                        'property_id'        => $property_id,
+                                                        'project_type_id'   => $project_type_id,
+                                                        'property_type_id'  => $property_type_id,
+                                                        'state_id'          => $state_id,
+                                                        'city_id'           => $city_id,
+                                                        'location_id'          => $location_id,
+                                                        'property_details'  => $property_details ? json_encode($property_details) : NULL,
+                                                        'property_layout'   => $property_layout,
+                                                        'created_at'        => date('Y-m-d h:i:m:s'),
+                                                    ];
+        # End Db Data
+
+        if ($id) :
+            $result                             =   $this->Action_model->update_data($data, 'tbl_lead_units', "id = $id");
+            $res_arr                            =   $result ? ['status' => true, 'message' => 'Successfully record updated'] : ['status' => false, 'message' => 'Some error occured'];
+        else :
+            $result                             =   $this->Action_model->insert_data($data, 'tbl_lead_units');
+            $res_arr                            =   $result ? ['status' => true, 'message' => 'Successfully record inserted'] : ['status' => false, 'message' => 'Some error occured'];
+        endif;
+
+        # Gallery Images Functionality
+        if($id ?? $result ?? 0):
+           
+            $gallery_images                 =   upload_files('gallery_images', 'lead-units');
+          
+            if($gallery_images->status && count($gallery_images->images)):
+                insert_or_update_gallery_images($gallery_images->images, 'lead_unit', $id ?? $result ?? 0);
+            else:
+                $res_arr   = $gallery_images;
+            endif;
+        endif;
+
+        # End Gallery Images Functionality
+
+        # Init
+
+        echo json_encode($res_arr);
+    }
+    # End Store Lead Unit
+
 }

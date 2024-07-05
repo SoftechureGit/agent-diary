@@ -1,3 +1,4 @@
+<?php extract($property_details?? []); ?>
 <!-- Plot Details -->
 <section id="plot-property-form" class="theme-form">
     <div class="container">
@@ -6,7 +7,7 @@
                 <div class="row">
                     <!-- Form Name -->
                     <div class="col-md-12">
-                        <div class="text-center">
+                        <div class="text-left">
                             <h3 class="form-heading">Plot Details</h3>
                             <hr>
                         </div>
@@ -14,85 +15,84 @@
                     <!-- End Form Name -->
 
                     <!-- Unit Code -->
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Unit Code <span class="text-danger">*</span></label>
-                            <input type="text" placeholder="Enter Unit Code" name="property_details[unit_code]" value="" class="form-control" required>
+                            <input type="text" placeholder="Enter Unit Code" name="property_details[unit_code]" value="<?= $unit_code ?? $code ?? '' ?>" class="form-control" required>
                         </div>
                     </div>
                     <!-- End Unit Code -->
 
                     <!-- Referance No -->
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Referance Number <span class="text-danger">*</span></label>
-                            <input type="text" placeholder="Enter Referance Number" name="property_details[referance_number]" value="" class="form-control" required>
+                            <input type="text" placeholder="Enter Referance Number" name="property_details[referance_number]" value="<?= $referance_number ?? '' ?>" class="form-control" required>
                         </div>
                     </div>
                     <!-- End Referance No -->
 
                     <!-- Plot No -->
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Plot Number <span class="text-danger">*</span></label>
-                            <input type="text" placeholder="Enter Plot Number" name="property_details[plot_number]" value="" class="form-control" required>
+                            <input type="text" placeholder="Enter Plot Number" name="property_details[plot_number]" value="<?= $plot_number ?? '' ?>" class="form-control" required>
                         </div>
                     </div>
                     <!-- End Plot No -->
 
                     <!-- Plot Size (Sqyd) -->
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Plot Size (Sqyd) <span class="text-danger">*</span></label>
-                            <input type="text" placeholder="Enter Plot Size (Sqyd)" name="property_details[plot_size]" value="" class="form-control" required>
+                            <input type="text" placeholder="Enter Plot Size (Sqyd)" name="property_details[plot_size]" value="<?= $plot_size ?? '' ?>" class="form-control" required>
                         </div>
                     </div>
                     <!-- End Plot Size (Sqyd) -->
 
                     <!-- Block -->
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Block <span class="text-danger">*</span></label>
-                            <input type="text" placeholder="Enter Block" name="property_details[block]" value="" class="form-control" required>
+                            <input type="text" placeholder="Enter Block" name="property_details[block]" value="<?= $block ?? '' ?>" class="form-control" required>
                         </div>
                     </div>
                     <!-- End Block -->
 
                     <!-- Applicable PLC -->
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Applicable PLC</label>
-                            <input type="text" placeholder="Enter Applicable PLC" name="property_details[applicable_plc]" value="" class="form-control">
+                            <label for="">Applicable PLC <span class="text-danger">*</span></label>
+                            <input type="text" placeholder="Enter Applicable PLC" name="property_details[applicable_plc]" value="<?= $applicable_plc ?? '' ?>" class="form-control" required>
                         </div>
                     </div>
                     <!-- End Applicable PLC -->
 
                     <!-- Facing -->
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Facing <span class="text-danger">*</span></label>
-                            <input type="text" placeholder="Enter Facing" name="property_details[facing]" value="" class="form-control" required>
+                            <select name="property_details[facing]" id="" class="form-control" required>
+                                <option value="" disabled selected>Choose...</option>
+                                <?php 
+                                    foreach(facings() ?? [] as $facing_item): 
+                                    $selected         = $facing_item->facing_id == (( $facing ?? 0 ) ? str_before('|', $facing ) : '') ? 'selected' : '';
+                                ?>
+                                    <option <?=  ( $facing ?? 0 ) ? str_before('|', $facing ) : '' ?> value="<?= "$facing_item->facing_id | $facing_item->title" ?>"  <?= $selected ?>><?= $facing_item->title ?></option>   
+                                    <?php endforeach; ?>
+                                </select>
                         </div>
                     </div>
                     <!-- End Facing -->
 
                     <!-- Dimantion F x B x S1 x S2 -->
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Dimantion F x B x S1 x S2 <span class="text-danger">*</span></label>
-                            <input type="text" placeholder="Enter Dimantion F x B x S1 x S2" name="property_details[dimantion]" value="" class="form-control" required>
+                            <input type="text" placeholder="Enter Dimantion F x B x S1 x S2" name="property_details[dimantion]" value="<?= $dimantion ?? $dimension ?? '' ?>" class="form-control" required>
                         </div>
                     </div>
                     <!-- End Dimantion F x B x S1 x S2 -->
-
-                    <!-- Layout Upload -->
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="">Layout Upload</label>
-                            <input type="file" name="property_layout" value="" class="form-control p-1">
-                        </div>
-                    </div>
-                    <!-- End Layout Upload -->
                 </div>
             </div>
         </div>
