@@ -43,8 +43,8 @@
     </li>
 
 		<li class="nav-item active" onclick="getRequirementList(<?= $record->lead_id ?>);"><a href="#navtabs-requirement" class="nav-link" data-toggle="tab" aria-expanded="false">Requirement</a>
-		<li class="nav-item" onclick="getReferenceList(<?= $record->lead_id ?>);"><a href="#navtabs-reference" class="nav-link" data-toggle="tab" aria-expanded="false">Reference</a>
 		<li class="nav-item" onclick="getUnitList(<?= $record->lead_id ?>);"><a href="#navtabs-unit" class="nav-link" data-toggle="tab" aria-expanded="false">Unit</a>
+		<li class="nav-item" onclick="getReferenceList(<?= $record->lead_id ?>);"><a href="#navtabs-reference" class="nav-link" data-toggle="tab" aria-expanded="false">Agent</a>
     </li>
     </ul>
     <div class="tab-content br-n pn" style="height: 45vh;overflow-y: auto;overflow-x: hidden;padding-right: 6px;">

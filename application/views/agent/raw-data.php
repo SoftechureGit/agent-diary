@@ -92,6 +92,10 @@
    border: 1px solid #ced4da;
   } 
 
+  .justify-content-space-between {
+    justify-content: space-between !important;
+  }
+
 </style>
 <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.10/css/select2.min.css">
 <?php include ('include/sidebar.php'); ?>
@@ -106,9 +110,18 @@
             <div class="row">
 
               <div class="col-md-12">
-                <div class="row">
+                <div class="row justify-content-space-between">
                   <div class="col-md-6">
                     <h4 class="card-title">Data</h4>
+                  </div>
+                  <div class="col-md-3">
+                      <label for="">File Name</label>
+                      <select name="" class="form-control" id="file_name" onchange="showData();">
+                          <option value="" disabled  selected> -- Choose One -- </option>
+                          <?php foreach($all_file_type as $file_type):?>
+                            <option value="<?=$file_type->file_name ?>"><?=$file_type->file_name?></option>
+                          <?php endforeach; ?>
+                      </select>
                   </div>
                   <div class="col-12">
                     <div class="error-msg-right">
@@ -130,13 +143,14 @@
                       enctype="multipart/form-data">
                       <div class="row align-items-center">
                         <div class="col-6 my-3">
-                          <select name="lead_data_type" class="form-control" id="data-type">
+                          <!-- <select name="lead_data_type" class="form-control" id="data-type">
                             <option selected disabled> --Select Lead Data Type-- </option>
                             <option value="1">hello 1</option>
                             <option value="2">hello 2</option>
                             <option value="3">hello 3 </option>
                             <option value="4">hello 4</option>
-                          </select>
+                          </select> -->
+                           <input type="text" name="lead_data_type" class="form-control" placeholder="Enter File Name">
                         </div>
                         <div class="col-6">
                           <p class="m-0"> <span> <button type="button" class="btn btn-dark btn-sm  form-btn"
@@ -167,8 +181,9 @@
   <div class="container-fluid">
         <div class="row">
             <div class="col-12">
-                <div class="card">
-                    <div class="card-body">
+              <div class="card">
+                <p class="p-5 text-center">Please Select File Name</p>        
+                <div id="data-body" class="card-body  d-none">
                         <div class="row">
                             <div class="col-md-6 col-sm-6 col-xs-6">
                                 <h4 class="card-title">All Data</h4>
@@ -203,14 +218,14 @@
                   </div>
 
                         <div class="table-responsive">
-                        <table id="empTable" class="table table-bordered">
+                        <table id="empTable" class="table table-bordered w-100">
                             <thead>
                                 <tr>
                                     <th><input type="checkbox" id="select_all"></th>
                                     <th style="width: 30px;">S.No</th>
                                     <th>Name</th>
                                     <th>Mobile No</th>
-                                    <th>Assign To</th>
+                                    <th>Added By</th>
                                     <th class=" wd-50 text-center">Status</th>
                                     <th>Reason</th>
                                     <th class="nosort wd-100 text-center">Action</th>
@@ -382,6 +397,7 @@
                 'data': function(d) {
                 d.status = $('#statusFilter').val();
                 d.reason = $('#reasonFilter').val();
+                d.file_name = $('#file_name').val();
                 d.search.value = $('#searchBox').val(); // Search value
              }
 
@@ -394,9 +410,9 @@
                     'data': null,
                     'defaultContent': '<input type="checkbox" class="lead_id_select">'
                 },
-                { data: 'lead_id' },
-                { data: 'lead_name' },
-                { data: 'lead_mobile_no' },
+                { data: 'data_id' },
+                { data: 'data_name' },
+                { data: 'mobile' },
                 { data: 'user_name' },
                 {
                     className: "text-center",
@@ -413,7 +429,7 @@
                 {
                     className: "text-center",
                     'render': function (data, type, row) {
-                        return "hello";
+                        return "-";
                         
                     },
                     'orderable': false,
@@ -425,7 +441,7 @@
                     'orderable': false,
                     'searchable': false,
                     'render': function (data, type, row) {
-                        return `<button type='button' class='btn btn-success btn-sm' onclick='get_lead_form(${row.lead_id})'><i class='fa fa-edit'></i></button>
+                        return `<button type='button' class='btn btn-success btn-sm' onclick='get_lead_form(${row.data_id})'><i class='fa fa-edit'></i></button>
                                 `;
                     }
                 }
@@ -536,6 +552,13 @@
             }
         });
 
+
+        $('#file_name').on('change keyup', function() {
+          $('#data-body').removeClass('d-none');
+          table.draw();
+      });
+
+
     });
 
     function transfer_lead() {
@@ -606,6 +629,9 @@ function hideLeadEditModal(id){
   showCustomer(id)
   $("#leadFormModal").modal('hide');
 }
+
+
+
 
 </script>
 

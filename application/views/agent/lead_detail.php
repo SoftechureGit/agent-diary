@@ -259,13 +259,13 @@ function alertMessage(type,message) {
               try {
                 obj = JSON.parse(response);
                 $(".form-btn").html(btn_label);
-
+                
                 if (obj.status=='added') {
                     window.location.href='';
                   //$(".error-msg").html(alertMessage('success',obj.message));
                 }
                 else if (obj.status=='updated') {
-                  location.reload();
+                    window.location.href='';
                   //$(".error-msg").html(alertMessage('success',obj.message));
                 }
                 else {
