@@ -217,4 +217,22 @@ class Helper extends CI_Controller
         echo json_encode(['status' => true, 'message' => 'Successfully data fetched', 'data' => $data]);
     }
      # End Fetch Project Properties
+
+    # Remove Gallery Image
+    public function remove_gallery_image(){
+        if(!$this->input->post()){
+            echo json_encode(['status' => false, 'message' => 'Request method not matched.']);
+            exit;
+        }
+            $id                 =   $this->input->post('id');
+            $type                 =   $this->input->post('type');
+
+            $this->db->where("id = $id and type = '$type'")->delete('tbl_gallery_images');
+
+            echo json_encode(['status' => true, 'message' => 'Successfully image removed.']);
+
+
+    }
+    # End Remove Gallery Image
+
 }

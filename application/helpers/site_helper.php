@@ -98,16 +98,15 @@ if (!function_exists('upload_files')) {
             if (!empty($_FILES[$name]['name'][$x])) {
                 if (!CI()->upload->do_upload('file')) {
                     $error = array('error' => CI()->upload->display_errors());
-                    $array = array('status' => 'false', 'msg' => $error['error']);
-                    echo json_encode($array);
-                    exit;
+                    $array = array('status' => false, 'message' => $error['error'].' * ( Photo Gallery ) ');
+                    return (object) $array;
                 } else {
                     $images[] = CI()->upload->data('file_name');
                 }
             }
         }
 
-        return $images;
+        return (object) array('status' => true, 'message' => 'Images uploaded successfully', 'images' => $images);
     }
 }
 # End Upload Files
@@ -403,8 +402,22 @@ if (!function_exists('getAccountId')) {
     # End Project Property Details
 
     ##### Gallery Images #####
-    function insert_or_update_gallery_images($gallery_images){
+    function insert_or_update_gallery_images($gallery_images, $type, $parent_id){
         $data                           =   [];
+        
+        foreach($gallery_images ?? [] as $gallery_image):
+            $data[]                           =   [
+                                                    'name'              => $gallery_image,
+                                                    'type'              => $type,
+                                                    'parent_id'         => $parent_id,
+                                                    'updated_at'         => date('Y-m-d h:i:m:s'),
+                                                    'created_at'         => date('Y-m-d h:i:m:s'),
+                                                ];
+        endforeach;
+
+        if(count($data)):
+            db_instance()->insert_batch('tbl_gallery_images', $data);
+        endif;
 
         return true;
     }

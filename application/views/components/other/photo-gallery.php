@@ -1,5 +1,4 @@
     <style>
-        
         /* Gallery Images */
         #image-gallery-section #image-gallery-input {
             display: block;
@@ -111,22 +110,22 @@
     <!-- Gallery Images -->
     <div class="p-4">
         <div class="image-gallery-section" id="image-gallery-section">
-              <!-- <label for="">Gallery Images</label> -->
-                    <label for="image-gallery-input" class="drop-container bg-white" id="dropcontainer">
-                        <span class="drop-title">Drop files here</span>
-                        or
-                        <input type="file" id="image-gallery-input" name="gallery_images[]" accept="image/*" multiple />
-                    </label>
-                    <div id="image-gallery-preview">
-                    <?php foreach ($galleryImages ?? [] as $galleryImage): ?>
-                        <span class="item">
-                            <img class="imageThumb" src="{{ $galleryImage->full_url }}" title="{{ $galleryImage->name }}"/>
-                            <span class="remove remove-gallery-image-btn" data-id="{{ $galleryImage->id }}">
-                                <i class="fa fa-times"></i>
-                            </span>
+            <!-- <label for="">Gallery Images</label> -->
+            <label for="image-gallery-input" class="drop-container bg-white" id="dropcontainer">
+                <span class="drop-title">Drop files here</span>
+                or
+                <input type="file" id="image-gallery-input" name="gallery_images[]" accept=".jpg, .jpeg, .png" multiple />
+            </label>
+            <div id="image-gallery-preview">
+                <?php foreach ($gallery_images ?? [] as $galleryImage) : ?>
+                    <span class="item">
+                        <img class="imageThumb" src="<?= $galleryImage->full_url ?? '#' ?>" title="<?= $galleryImage->name ?? '' ?>" />
+                        <span class="remove remove-gallery-image-btn" data-id="<?= $galleryImage->id ?? '' ?>" data-type="<?= $galleryImage->type ?? '' ?>">
+                            <i class="fa fa-times"></i>
                         </span>
-                        <?php endforeach; ?>
-                    </div>
+                    </span>
+                <?php endforeach; ?>
+            </div>
         </div>
     </div>
     <!-- End Gallery Images -->
@@ -169,38 +168,38 @@
             }
 
             $(document).on('click', ".remove", function() {
-                if(confirm("Are you sure?")){
+                if (confirm("Are you sure?")) {
 
-                    if($(this).hasClass('remove-gallery-image-btn')){
-                        var id          =   $(this).data('id');
-                        var type        =   $(this).data('type');
+                    if ($(this).hasClass('remove-gallery-image-btn')) {
+                        var id = $(this).data('id');
+                        var type = $(this).data('type');
 
                         // Ajax - Remove Gallery Image
                         $.ajax({
-                                type: "post",
-                                url: "{{ url('admin/remove-gallery-image') }}",
-                                dataType: 'json',
-                                data: {
-                                    "_token": "{{ csrf_token() }}",
-                                    id: id, 
-                                    type: type 
-                                },
-                                success: function(data) {
-                                    if (data.status) {
-                                        // alert(data.message)
-                                    } else {
-                                        alert(data.message)
-                                    }
-                                },
-                                error: function() {
-                                    alert('Some Error Occured.');
+                            type: "post",
+                            url: "<?= base_url('helper/remove-gallery-image') ?>",
+                            dataType: 'json',
+                            data: {
+                                id: id,
+                                type: type
+                            },
+                            success: (data) => {
+                                if (data.status) {
+                                    $(this).parent(".item").remove();
+                                    showToast('success', data.message)
+                                } else {
+                                    showToast('danger', data.message)
                                 }
-                            });
+                            },
+                            error: function() {
+                                showToast('danger', 'Some Error Occured.')
+                            }
+                        });
                         // End Ajax - Remove Gallery Image
 
                     }
-                    $(this).parent(".item").remove();
-                }   
+
+                }
             });
 
 

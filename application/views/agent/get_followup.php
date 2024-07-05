@@ -38,8 +38,8 @@
     font-size: 14px !important;
   }
 
-  .modal-xl{
-    max-width:1140px;
+  .modal-xl {
+    max-width: 1140px;
   }
 
   /* Unit Modal */
@@ -57,18 +57,61 @@
     padding-top: 0;
   }
 
-  #lead-unit-form details{
+  #lead-unit-form details {
     background: #b2cbff57;
   }
 
-   #lead-unit-form summary {
+  #lead-unit-form summary {
     font-size: 15px;
     background: #b2cbff57;
     padding: 1rem;
     color: #000;
-}
+  }
 
+  section.photo-gallery .gallery-image {
+    object-fit: contain;
+    border-radius: 7px;
+    border: 1px solid #80808061;
+  }
+
+  .lead-unit-details-container table caption{
+    color: #000000d6 !important;
+  } 
+  
+  .lead-unit-details-container table tr, 
+  .lead-unit-details-container table th, 
+  .lead-unit-details-container table td {
+    border: 1px solid #00000038 !important;
+    color: #000000d6 !important;
+  }
+
+
+  /* Toast */
+  #toast-container {
+    position: fixed;
+    top: 5%;
+    right: 5%;
+    width: 250px;
+    z-index: 1000;
+    z-index: 9999;
+  }
+
+  .toast {
+    padding: 10px 20px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+
+  }
+
+  /* End Toast */
 </style>
+
+<!-- Toast -->
+<div id="toast-container"></div>
+<!-- End Toast -->
+
 <div style="padding: 0px 15px 0px 15px;">
   <div class="row" style="border-bottom: 1px solid #0000000f;padding-bottom: 13px;margin-bottom: 10px;">
     <div class="col-md-2" align="center">
@@ -477,7 +520,7 @@
 
 <!-- Unit Detials -->
 <div class="modal fade" id="lead-unit-details-modal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
-  <div class="modal-dialog modal-lg" role="document">
+  <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalCenterTitle">Unit Details</h5>
@@ -592,11 +635,11 @@
 
             $('#lead-unit-form [name="project_type_id"]').trigger('change')
             $('#lead-unit-form [name="state_id"]').trigger('change')
-            
-            setTimeout(function(){
+
+            setTimeout(function() {
               $('#lead-unit-form [name="property_id"]').trigger('change')
             }, 500)
-          
+
 
             // 
             /*  Lead Unit Form */
@@ -625,7 +668,10 @@
                   },
                   success: function(res) {
                     if (res.status) {
-                      $('.ajax-msg').html(`<div class="alert alert-success">${res.message}</div>`)
+                      // $('.ajax-msg').html(`<div class="alert alert-success">${res.message}</div>`)
+                      
+                      showToast('success', res.message)
+
                       setTimeout(function() {
                         $('#unitModal').modal('hide')
                         $('#lead-unit-form')[0].reset()
@@ -638,7 +684,8 @@
 
                       }, 1000)
                     } else {
-                      $('.ajax-msg').html(`<div class="alert alert-danger">${res.message}</div>`)
+                      // $('.ajax-msg').html(`<div class="alert alert-danger">${res.message}</div>`)
+                      showToast('danger', res.message)
                     }
                     $(".submit-btn").html("Submit").prop('disabled', false);
                   },
@@ -708,7 +755,7 @@
         success: (res) => {
           if (res.status) {
             $('.set_property_types').html(res.options_view).trigger('change')
-            if(selected_id){
+            if (selected_id) {
               $('#lead-unit-form .get_property_form').trigger('change')
             }
           }
@@ -727,10 +774,10 @@
       var selected_id = $('#lead-unit-form .get_property_form').data('selected_id');
       var selected_property_id = $('#lead-unit-form [name="property_id"]').data('selected_id');
 
-      getPropertyForm(property_type_id, property_id, selected_property_id,  property_details,  selected_id);
+      getPropertyForm(property_type_id, property_id, selected_property_id, property_details, selected_id);
     })
 
-    function getPropertyForm(property_type_id, property_id, selected_property_id, property_details,  selected_id){
+    function getPropertyForm(property_type_id, property_id, selected_property_id, property_details, selected_id) {
       $.ajax({
         method: 'GET',
         url: "<?= base_url('helper/get_property_form'); ?>",
@@ -870,11 +917,11 @@
     /*  End Projects */
 
     /* Project Properties */
-      $(document).on('change', '#lead-unit-form [name="project_id"]', function(){
-        var project_id  = $(this).val();
-        var selected_id  = $('#lead-unit-form [name="property_id"]').data('selected_id');
+    $(document).on('change', '#lead-unit-form [name="project_id"]', function() {
+      var project_id = $(this).val();
+      var selected_id = $('#lead-unit-form [name="property_id"]').data('selected_id');
 
-        $.ajax({
+      $.ajax({
         method: 'GET',
         url: "<?= base_url('helper/project_properties'); ?>",
         data: {
@@ -889,30 +936,30 @@
           }
         }
       })
-      })
+    })
     /*  End Project Properties */
 
     /* Project Property Details */
-      $(document).on('change', '#lead-unit-form [name="property_id"]', function(){
-        var property_type_id  = $(this).val();
-        var project_property_id  = $(this).val();
-   
-        $.ajax({
+    $(document).on('change', '#lead-unit-form [name="property_id"]', function() {
+      var property_type_id = $(this).val();
+      var project_property_id = $(this).val();
+
+      $.ajax({
         method: 'GET',
         url: "<?= base_url('helper/project_property_details'); ?>",
         data: {
-          property_type_id : property_type_id,
-          project_property_id : project_property_id
+          property_type_id: property_type_id,
+          project_property_id: project_property_id
         },
         dataType: 'json',
         success: (res) => {
-          
+
           if (res.status) {
-            
+
           }
         }
       })
-      })
+    })
     /*  End Project Property Details */
 
     /*  Selected Project */
@@ -929,5 +976,25 @@
 
 
 
+    // ########## Toast #########
+    // $(document).ready(function() {
+    function showToast(type, message) {
+      const toast = $(`<div class="toast alert alert-${type}"></div>`).text(message);
+      $('#toast-container').append(toast);
+
+      setTimeout(() => {
+        toast.css('opacity', '1');
+      }, 100); // Small delay to ensure the transition effect
+
+      setTimeout(() => {
+        toast.css('opacity', '0');
+        setTimeout(() => {
+          toast.remove();
+        }, 500); // Match the CSS transition duration
+      }, 3000); // Duration the toast is visible
+    }
+
+    // });
+    // ########## End Toast #########
     // ##########
   </script>

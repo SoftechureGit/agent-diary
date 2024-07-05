@@ -81,5 +81,25 @@
               </table>
             </div>
           </div>
+
+          <!-- Gallery Images -->
+          <?php if(count($gallery_images ?? [])): ?>
+            <div class="col-md-12">
+              <hr>
+              <section class="photo-gallery">
+                <h4 class="heading">Photo Gallery</h4>
+                <div class="row">
+                  <?php foreach($gallery_images ?? [] as $gallery_image): ?>
+                  <div class="col-md-2 my-2">
+                    <a href="<?= $gallery_image->full_url ?? '#' ?>" target="_blank">
+                      <img src="<?= $gallery_image->full_url ?? '' ?>" alt="" class="w-100 gallery-image" height="150px">
+                    </a>
+                  </div>
+                  <?php endforeach; ?>
+                </div>
+                </section>
+            </div>
+            <?php endif; ?>
+          <!-- End Gallery Images -->
         </div>
 <!-- End Lead Unit Details -->

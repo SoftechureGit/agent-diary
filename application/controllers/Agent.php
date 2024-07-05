@@ -2673,9 +2673,15 @@ $writer->save('php://output');
 
         if($id):
             $record             =    lead_unit_details($id);
+
+            # Gallery Images
+            $full_url                   =   base_url('public/other/gallery-images/lead-units/');
+            $gallery_images             =   $this->db->select("id, name, CONCAT('$full_url', name) as full_url, type")->where("type = 'lead_unit' and parent_id = $id")->get('tbl_gallery_images')->result();
+            # End Gallery Images
         endif;
 
-        $view               =  $this->load->view('components/form-view/lead-unit-form-view', [ 'lead_id' => $lead_id, 'record' => $record ?? null], true);
+
+        $view               =  $this->load->view('components/form-view/lead-unit-form-view', [ 'lead_id' => $lead_id, 'record' => $record ?? null, 'gallery_images' => $gallery_images ?? null ], true);
         echo json_encode(['status' => true, 'message' => 'Record successfully fetched', 'view' => $view]);
         
     }
@@ -2684,6 +2690,7 @@ $writer->save('php://output');
 
     # Lead Unit Details
     public function lead_unit_details(){
+        
         $id                 =    $this->input->get('id');
         $is_view            =    $this->input->get('view') == 'true' ? true : false;
 
@@ -2695,7 +2702,13 @@ $writer->save('php://output');
 
         if($record):
             if($is_view):
-                $details_view     = $this->load->view('components/details-view/lead-unit-details', [ 'record' => $record ], true );
+        
+                # Gallery Images
+                $full_url                   =   base_url('public/other/gallery-images/lead-units/');
+                $gallery_images             =   $this->db->select("id, name, CONCAT('$full_url', name) as full_url")->where("type = 'lead_unit' and parent_id = $id")->get('tbl_gallery_images')->result();
+                # End Gallery Images
+
+                $details_view     = $this->load->view('components/details-view/lead-unit-details', [ 'record' => $record, 'gallery_images' => $gallery_images ?? [] ], true );
             endif;
             echo json_encode(['status' => true, 'message' => 'Record successfully fetched', 'data' => $record, 'details_view' => $details_view ?? null]);
         else:
@@ -2707,12 +2720,6 @@ $writer->save('php://output');
     # Store Lead Unit
     public function store_lead_unit()
     {
-        // echo "<pre>";
-        // print_r($this->input->post());
-
-        // print_r(upload_files('gallery_images', 'lead-units'));
-        // die;
-
         if (!$this->input->post()) :
             echo json_encode(['status' => false, 'message' => 'Reqeust method is not POST']);
         endif;
@@ -2775,6 +2782,20 @@ $writer->save('php://output');
             $result                             =   $this->Action_model->insert_data($data, 'tbl_lead_units');
             $res_arr                            =   $result ? ['status' => true, 'message' => 'Successfully record inserted'] : ['status' => false, 'message' => 'Some error occured'];
         endif;
+
+        # Gallery Images Functionality
+        if($id ?? $result ?? 0):
+           
+            $gallery_images                 =   upload_files('gallery_images', 'lead-units');
+          
+            if($gallery_images->status && count($gallery_images->images)):
+                insert_or_update_gallery_images($gallery_images->images, 'lead_unit', $id ?? $result ?? 0);
+            else:
+                $res_arr   = $gallery_images;
+            endif;
+        endif;
+
+        # End Gallery Images Functionality
 
         # Init
 

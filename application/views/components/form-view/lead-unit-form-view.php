@@ -154,10 +154,10 @@
 
     <!-- Photo Gallery -->
      <div class="col-md-12">
-      <details>
+      <details <?= isset($record) ? 'open' : '' ?>>
         <summary>Photo Gallery</summary>
         <div class="photo-gallery">
-          <?php $this->view('components/other/photo-gallery') ?>
+          <?php $this->view('components/other/photo-gallery', [ 'gallery_images' => $gallery_images ?? null ]) ?>
         </div>
       </details>
      </div>
