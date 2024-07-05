@@ -152,11 +152,26 @@
     <div class="set_property_form w-100"></div>
     <!-- Form View -->
 
+    <!-- Documents - Add More Functionality -->
+     <div class="col-md-12 my-3">
+      <details <?= isset($record) ? 'open' : '' ?>>
+        <summary>Documents</summary>
+        <div class="property-documents-container p-4">
+        <?php $this->view('components/other/add-more/property-documents', [ 'property_documents' => $property_documents ?? [] ]) ?>
+        <div class="text-right">
+          <button type="button" class="btn btn-warning btn-sm text-white add-more-btn" onclick="add_more(this, 'property-documents' ,'.property-documents-container')">Add More</button>
+        </div>
+        </div>
+        
+      </details>
+     </div>
+    <!-- Documents - Add More Functionality -->
+
     <!-- Photo Gallery -->
      <div class="col-md-12">
       <details <?= isset($record) ? 'open' : '' ?>>
         <summary>Photo Gallery</summary>
-        <div class="photo-gallery">
+        <div class="photo-gallery p-4">
           <?php $this->view('components/other/photo-gallery', [ 'gallery_images' => $gallery_images ?? null ]) ?>
         </div>
       </details>

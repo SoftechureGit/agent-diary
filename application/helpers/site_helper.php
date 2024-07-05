@@ -33,7 +33,8 @@ if (!function_exists('upload_file')) {
 
         $config                         = array();
         $config['upload_path']          = $upload_path;
-        $config['allowed_types']        = 'png|jpg|jpeg';
+        // $config['allowed_types']        = 'png|jpg|jpeg|pdf';
+        $config['allowed_types']        = '*';
         $config['max_size']             = 10 * 1024;
         $config['remove_spaces']        = TRUE;
 

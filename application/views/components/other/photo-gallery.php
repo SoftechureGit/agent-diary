@@ -108,7 +108,7 @@
 
 
     <!-- Gallery Images -->
-    <div class="p-4">
+    <div class="">
         <div class="image-gallery-section" id="image-gallery-section">
             <!-- <label for="">Gallery Images</label> -->
             <label for="image-gallery-input" class="drop-container bg-white" id="dropcontainer">
@@ -205,4 +205,5 @@
 
         });
         //  End Gallery Image Preview
+
     </script>

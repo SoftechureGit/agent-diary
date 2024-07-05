@@ -2249,19 +2249,19 @@ $writer->save('php://output');
 
     public function upload_lead()
     {
-        $account_id     = 0;
-        $user_id        = 0;
-        $where          = "user_hash='".$this->session->userdata('agent_hash')."'";
-        $user_detail    = $this->Action_model->select_single('tbl_users',$where);
 
+        
+
+        $account_id = 0;
+        $user_id = 0;
+
+        $where = "user_hash='".$this->session->userdata('agent_hash')."'";
+        $user_detail = $this->Action_model->select_single('tbl_users',$where);
         if ($user_detail) {
-            $user_id    =   $user_detail->user_id;
-            $account_id =   $user_detail->user_id;
-
+            $user_id=$user_detail->user_id;
+            $account_id = $user_detail->user_id;
             if ($user_detail->role_id!=2) {
-
                 $account_id = $user_detail->parent_id;
-
             }
         }
 
@@ -2271,10 +2271,9 @@ $writer->save('php://output');
     
             if ($_FILES["file"]["size"] > 0) {
                 
-                $file   = fopen($fileName, "r");
+                $file = fopen($fileName, "r");
                 
-                $l      =    0;
-
+                $l = 0;
                 while (($column = fgetcsv($file, 10000, ",")) !== FALSE) {
 
 
@@ -2298,21 +2297,56 @@ $writer->save('php://output');
                         $lead_detail    =   $this->Action_model->select_single('tbl_data',$where);
 
                         if ($lead_detail) {
-
-                            $this->Action_model->update_data($data_array,'tbl_data',$where);
-                            
+                            $this->Action_model->update_data($data_array,'tbl_leads',$where);
                         }
                         else {
 
                             $data_array2 = array(
-                                'added_by'          =>  $user_id,
-                                'account_id'        =>  $account_id,
-                                'data_status'       =>  1,
-                                'file_name'         =>  $this->input->post('lead_data_type'),
+                                'lead_date'=>date("d-m-Y"),
+                                'lead_time'=>date("h:i:s a"),
+                                'lead_mobile_no_2'=>"",
+                                'lead_data_type' => $this->input->post('lead_data_type') ?? '' ,
+                                'lead_address'=>"",
+                                'lead_state_id'=>"",
+                                'lead_city_id'=>"",
+                                'lead_occupation_id'=>"",
+                                'lead_department_id'=>"",
+                                'lead_dob'=>"",
+                                'lead_doa'=>"",
+                                'lead_source_id'=>"",
+                                'lead_stage_id'=>"",
+                                'lead_status'=>"",
+                                'user_id'=>$user_id,
+                                'added_by'=>$user_id,
+                                'account_id'=>$account_id,
+                                'lead_pan_no'=>"",
+                                'lead_adhar_no'=>"",
+                                'lead_voter_id'=>"",
+                                'lead_passport_no'=>"",
+                                'lead_gender'=>"",
+                                'lead_marital_status'=>"",
+                                'lead_designation'=>"",
+                                'lead_company'=>"",
+                                'lead_annual_income'=>""
                             );
 
-                            $data_array     =   array_merge($data_array,$data_array2);
-                            $lead_id        =   $this->Action_model->insert_data($data_array,'tbl_data');
+                            $data_array = array_merge($data_array,$data_array2);
+
+
+                            $record_array['created_at'] = time();
+                            $record_array['updated_at'] = time();
+
+                            $lead_id = $this->Action_model->insert_data($data_array,'tbl_leads');
+
+                            $lead_history_array = array(
+                                'title' => 'Lead Created',
+                                'description' => 'Lead created by '.$this->Action_model->get_name($user_id),
+                                'lead_id' => $lead_id,
+                                'created_at' => time(),
+                                "account_id"=>$account_id,
+                                "user_id"=>$user_id
+                            );
+                            $this->Action_model->insert_data($lead_history_array,'tbl_lead_history');
                         }
                     }
                     
@@ -2540,23 +2574,6 @@ $writer->save('php://output');
     # changes 2024-06-28 add new method
 
     function data(){
-
-        $all_file_type = $this->db->distinct()->select('file_name')->get('tbl_data')->result();
-
-
-        // echo  '<pre>';
-
-        // print_r($all_file_type); die;
-        
-        // foreach($all_file_type as $row):
-        // echo '<pre>';
-        // echo $row->file_name;
-        // endforeach;
-        
-        // die;
-
-        $data['all_file_type'] = $all_file_type;
-
         $all_unit_type_list = $this->Action_model->detail_result('tbl_unit_types',"unit_type_status='1'",'unit_type_id,unit_type_name,requirement_accomodation');
         $data['all_unit_type_list'] = $all_unit_type_list;
 
@@ -2663,6 +2680,11 @@ $writer->save('php://output');
         if($id):
             $record             =    lead_unit_details($id);
 
+            # Property Documents
+            $property_document_full_url                   =   base_url('public/other/property-documents/');
+            $property_documents             =   $this->db->select("id, title, document, CONCAT('$property_document_full_url', document) as document_full_url")->where("lead_unit_id = $id")->get('tbl_property_documents')->result();
+            # End Property Documents
+
             # Gallery Images
             $full_url                   =   base_url('public/other/gallery-images/lead-units/');
             $gallery_images             =   $this->db->select("id, name, CONCAT('$full_url', name) as full_url, type")->where("type = 'lead_unit' and parent_id = $id")->get('tbl_gallery_images')->result();
@@ -2670,7 +2692,7 @@ $writer->save('php://output');
         endif;
 
 
-        $view               =  $this->load->view('components/form-view/lead-unit-form-view', [ 'lead_id' => $lead_id, 'record' => $record ?? null, 'gallery_images' => $gallery_images ?? null ], true);
+        $view               =  $this->load->view('components/form-view/lead-unit-form-view', [ 'lead_id' => $lead_id, 'record' => $record ?? null, 'gallery_images' => $gallery_images ?? null, 'property_documents' => $property_documents ?? [] ], true);
         echo json_encode(['status' => true, 'message' => 'Record successfully fetched', 'view' => $view]);
         
     }
@@ -2692,12 +2714,17 @@ $writer->save('php://output');
         if($record):
             if($is_view):
         
+                # Property Documents
+                $property_document_full_url                   =   base_url('public/other/property-documents/');
+                $property_documents             =   $this->db->select("id, title, document, CONCAT('$property_document_full_url', document) as document_full_url")->where("lead_unit_id = $id")->get('tbl_property_documents')->result();
+                # End Property Documents
+
                 # Gallery Images
                 $full_url                   =   base_url('public/other/gallery-images/lead-units/');
                 $gallery_images             =   $this->db->select("id, name, CONCAT('$full_url', name) as full_url")->where("type = 'lead_unit' and parent_id = $id")->get('tbl_gallery_images')->result();
                 # End Gallery Images
 
-                $details_view     = $this->load->view('components/details-view/lead-unit-details', [ 'record' => $record, 'gallery_images' => $gallery_images ?? [] ], true );
+                $details_view     = $this->load->view('components/details-view/lead-unit-details', [ 'record' => $record, 'gallery_images' => $gallery_images ?? [], 'property_documents' => $property_documents ?? [] ], true );
             endif;
             echo json_encode(['status' => true, 'message' => 'Record successfully fetched', 'data' => $record, 'details_view' => $details_view ?? null]);
         else:
@@ -2709,6 +2736,8 @@ $writer->save('php://output');
     # Store Lead Unit
     public function store_lead_unit()
     {
+     
+
         if (!$this->input->post()) :
             echo json_encode(['status' => false, 'message' => 'Reqeust method is not POST']);
         endif;
@@ -2721,7 +2750,7 @@ $writer->save('php://output');
         $looking_for                                =   $this->input->post('looking_for');
         $booking_date                               =   $this->input->post('booking_date');
         $project_id                                 =   $this->input->post('project_id');
-        $property_id                                 =   $this->input->post('property_id');
+        $property_id                                =   $this->input->post('property_id');
         $project_type_id                            =   $this->input->post('project_type_id');
         $property_type_id                           =   $this->input->post('property_type_id');
         $state_id                                   =   $this->input->post('state_id');
@@ -2772,14 +2801,19 @@ $writer->save('php://output');
             $res_arr                            =   $result ? ['status' => true, 'message' => 'Successfully record inserted'] : ['status' => false, 'message' => 'Some error occured'];
         endif;
 
+        
         # Gallery Images Functionality
         if($id ?? $result ?? 0):
+
+            # Property Documents Functionality
+            $this->propertyDocumentsFunctionality($this->input->post('property_documents'), 0, $id ?? $result ?? 0);
+            # End Property Documents Functionality
            
             $gallery_images                 =   upload_files('gallery_images', 'lead-units');
           
             if($gallery_images->status && count($gallery_images->images)):
                 insert_or_update_gallery_images($gallery_images->images, 'lead_unit', $id ?? $result ?? 0);
-            else:
+            elseif(!$gallery_images->status ?? 0):
                 $res_arr   = $gallery_images;
             endif;
         endif;
@@ -2791,5 +2825,71 @@ $writer->save('php://output');
         echo json_encode($res_arr);
     }
     # End Store Lead Unit
+
+    # Property Documents Functionality
+    public function propertyDocumentsFunctionality($records, $property_id = 0, $lead_unit_id = 0) {
+
+        if(!$lead_unit_id && !$property_id):
+            return false;
+        endif;
+
+        $property_document_data = [];
+    
+        # File Upload Configuration
+        $config = array();
+        $config['upload_path'] = "./public/other/property-documents/";
+        $config['allowed_types'] = '*';
+        $config['max_size'] = 10 * 1024;
+        $config['remove_spaces'] = TRUE;
+    
+        foreach ($records ?? [] as $key => $record) {
+            if (!empty($_FILES['property_documents']['name'][$key]['document_file'])) {
+                # Reformat the $_FILES array
+                $_FILES['file']['name'] = $_FILES['property_documents']['name'][$key]['document_file'];
+                $_FILES['file']['type'] = $_FILES['property_documents']['type'][$key]['document_file'];
+                $_FILES['file']['tmp_name'] = $_FILES['property_documents']['tmp_name'][$key]['document_file'];
+                $_FILES['file']['error'] = $_FILES['property_documents']['error'][$key]['document_file'];
+                $_FILES['file']['size'] = $_FILES['property_documents']['size'][$key]['document_file'];
+    
+                # File Name and Config
+                $file_name = str_replace(' ', '-', time() . '_' . $_FILES['file']['name']);
+                $config['file_name'] = $file_name;
+    
+                $this->load->library('upload', $config);
+                $this->upload->initialize($config);
+    
+                # File Upload
+                if (!$this->upload->do_upload('file')) {
+                    $error = array('error' => $this->upload->display_errors());
+                    // print_r($error);
+                    // die;
+                    // return (object) ['status' => false, 'message' => $error['error']];
+                } else {
+                    $upload_data = $this->upload->data();
+                    $file_name = $upload_data['file_name'];
+                }
+    
+                if(($record['title'] ?? 0 && $file_name )):
+                # Save the uploaded file data
+                    $property_document_data[] = [
+                        'property_id'           => $property_id,
+                        'lead_unit_id'          => $lead_unit_id,
+                        'title'                 => $record['title'] ?? '',
+                        'document'              => $file_name,
+                        'updated_at'            => date('Y-m-d h:i:m s'),
+                        'created_at'            => date('Y-m-d h:i:m s'),
+                    ];
+                endif;
+            }
+        }
+    
+        if(count($property_document_data)):
+            $this->db->insert_batch('tbl_property_documents', $property_document_data);
+        endif;
+
+        return true;
+    }
+    
+    # End Property Documents Functionality
 
 }

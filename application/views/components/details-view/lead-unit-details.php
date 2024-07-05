@@ -82,6 +82,40 @@
             </div>
           </div>
 
+          <!-- Property Documents -->
+          <?php if(count($property_documents ?? [])): ?>
+            <div class="col-md-12">
+            <div class="table-responsive">
+              <table class="table table-bordered">
+                <caption>Property Documents</caption>
+                <tr>
+                  <th class="text-center">#</th>
+                  <th>Name</th>
+                  <th class="text-center">Action</th>
+                </tr>
+                <?php 
+                    foreach($property_documents ?? [] as $property_document_key => $property_document):
+                ?>
+                <tr>
+                  <td  class="text-center">
+                      <?= ++$property_document_key ?>
+                    </td>
+                  <td>
+                      <?= $property_document->title ?? '' ?>
+                    </td>
+                  <td  class="text-center">
+                    <a href="<?= $property_document->document_full_url ?? ''?>" class="text-primary" target="_blank">
+                      View
+                    </a>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+              </table>
+            </div>
+          </div>
+          <?php endif; ?>
+          <!-- End Property Documents -->
+
           <!-- Gallery Images -->
           <?php if(count($gallery_images ?? [])): ?>
             <div class="col-md-12">
