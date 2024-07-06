@@ -1,3 +1,10 @@
+<?php
+  $is_followup      = false;
+  
+  if($record->added_to_followup == '1' ):
+    $is_followup      = true;
+  endif;
+?>
 <style>
   .card.unit-card {
     box-shadow: 2px 2px 8px #80808038 !important;
@@ -112,26 +119,6 @@
     margin-bottom: 0;
   }
 
-  /* Toast */
-  #toast-container {
-    position: fixed;
-    top: 5%;
-    right: 5%;
-    width: 250px;
-    z-index: 1000;
-    z-index: 9999;
-  }
-
-  .toast {
-    padding: 10px 20px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out;
-
-  }
-
-  /* End Toast */
 </style>
 
 <!-- Toast -->
@@ -167,7 +154,9 @@
       <div class="row" style="margin-top: 2px;">
         <div class="col-md-6">
           <h6 class="card-text text-muted  ft-sm" style="margin-top: 4px;margin-bottom: 0px;padding-bottom: 0px;"><i class="fa fa-mobile ft-14"></i> <span>+91<?= $record->lead_mobile_no ?></span></h6>
+          <?php if($record->lead_mobile_no_2 != ''): ?>
           <h6 class="card-text text-muted  ft-sm" style="margin-top: 4px;padding-top: 0px;"><i class="fa fa-phone ft-14"></i> <span>+91<?= $record->lead_mobile_no_2 ?></span></h6>
+          <?php endif; ?>
         </div>
         <div class="col-md-6" align="right">
           <div class="card-text text-muted pt-1 ft-sm"><span><?php if ($record->lead_type_id == 1) {
@@ -181,7 +170,9 @@
                                                               } ?></span></div>
           <div class="card-text text-muted pt-1 ft-sm"><span><?= $record->lead_stage_name ?></span></div>
           <div class="card-text text-muted ft-sm"><span><?= $record->lead_source_name ?></span></div>
-          <button type="button" class="btn btn-dark btn-sm btn-add-followup w-120 mt-1 ft-sm" style="color: white;" onclick="add_to_followup_new(<?= $record->lead_id ?>)"><i class="fa fa-pencil"></i> Add to Followup</button>
+          <?php if (!$record->added_to_followup) : ?>
+            <button type="button" class="btn btn-dark btn-sm btn-add-followup w-120 mt-1 ft-sm" style="color: white;" onclick="add_to_followup_new(<?= $record->lead_id ?>)"><i class="fa fa-pencil"></i> Add to Followup</button>
+          <?php endif; ?>
         </div>
       </div>
 
@@ -200,41 +191,80 @@
 
         <a href="javascript:void(0)" onclick="get_sms_form('2','<?= $record->lead_id ?>','<?= $record->lead_email ?>')"><button class="btn btn-warning btn-sm btn-rounded" style="margin-right: 8px;"><i class="fa fa-envelope" style="color: #fff;"></i></button></a>
 
-        <button class="btn btn-dark btn-sm btn-rounded" style="margin-right: 8px;" onclick="transfer_lead(<?= $record->lead_id ?>)"><i class="fa fa-exchange" style="color: #fff;"></i></button>
+        <button class="btn btn-dark btn-sm btn-rounded d-none" style="margin-right: 8px;" onclick="transfer_lead(<?= $record->lead_id ?>)"><i class="fa fa-exchange" style="color: #fff;"></i></button>
       </div>
 
     </div>
   </div>
 
   <div style="margin-top: 10px;">
-    <ul class="nav nav-tabs mb-3">
-      <li class="nav-item"><a href="#navtabs-profile" class="nav-link <?php if ($this->input->post('def') == 1) {
-                                                                        echo 'active';
-                                                                      } ?>" data-toggle="tab" aria-expanded="false">Profile</a>
-      </li>
-      <li class="nav-item" onclick="getRequirementList(<?= $record->lead_id ?>);"><a href="#navtabs-requirement" class="nav-link" data-toggle="tab" aria-expanded="false">Requirement</a>
-      </li>
-      <li class="nav-item" onclick="getFollowupList(<?= $record->lead_id ?>);"><a href="#navtabs-followup" class="nav-link <?php if ($this->input->post('def') == 0) {
-                                                                                                                              echo 'active';
-                                                                                                                            } ?>" data-toggle="tab" aria-expanded="true">Followup</a>
-      </li><!-- onclick="getLeadHistoryList(<?= $record->lead_id ?>);" -->
-      <?php if ($this->Action_model->check_perm('followup_history', 'rr_view')) { ?>
-        <li class="nav-item" onclick="getLeadHistoryList(<?= $record->lead_id ?>);"> <a href="#navtabs-history" class="nav-link" data-toggle="tab" aria-expanded="true">History</a>
+      <!-- Tabs List -->
+      <ul class="nav nav-tabs mb-3">
+        <!-- Profile -->
+        <li class="nav-item">
+          <a href="#navtabs-profile" class="nav-link active" data-toggle="tab" aria-expanded="false">Profile</a>
         </li>
-      <?php } ?>
-      <li class="nav-item" onclick="getFeedbackList(<?= $record->lead_id ?>);"><a href="#navtabs-product" class="nav-link" data-toggle="tab" aria-expanded="true">Product</a>
-      </li>
-      <!-- Unit -->
-      <li class="nav-item">
-        <a href="#navtabs-units" class="nav-link" data-toggle="tab" onclick="lead_units(<?= $record->lead_id ?>)">Unit</a>
-      </li>
-      <!-- End Unit -->
-    </ul>
-    <div class="tab-content br-n pn" style="height: 40vh;overflow-y: auto;overflow-x: hidden;padding-right: 6px;">
-      <div id="navtabs-profile" class="tab-pane <?php if ($this->input->post('def') == 1) {
-                                                  echo 'active';
-                                                } ?>">
+        <!-- End Profile -->
+        
+        <!-- Requirement -->
+        <li class="nav-item <?= $is_followup ? '' : 'd-none'; ?>" onclick="getRequirementList(<?= $record->lead_id ?>);">
+          <a href="#navtabs-requirement" class="nav-link" data-toggle="tab" aria-expanded="false">Requirement</a>
+        </li>
+        <!-- Requirement -->
+
+        <!-- Follow Up -->
+        <li class="nav-item <?= $is_followup ? '' : 'd-none'; ?>" onclick="getFollowupList(<?= $record->lead_id ?>);">
+          <a href="#navtabs-followup" class="nav-link" data-toggle="tab" aria-expanded="true">Followup</a>
+        </li>
+        <!-- Follow Up -->
+
+        <!-- Lead History -->
+        <?php if ($this->Action_model->check_perm('followup_history', 'rr_view')) { ?>
+          <li class="nav-item <?= $is_followup ? '' : 'd-none'; ?>" onclick="getLeadHistoryList(<?= $record->lead_id ?>);">
+            <a href="#navtabs-history" class="nav-link" data-toggle="tab" aria-expanded="true">History</a>
+          </li>
+        <?php } ?>
+        <!-- Lead History -->
+
+        <!-- Feedback List / Product -->
+        <li class="nav-item <?= $is_followup ? '' : 'd-none'; ?>" onclick="getFeedbackList(<?= $record->lead_id ?>);">
+          <a href="#navtabs-product" class="nav-link" data-toggle="tab" aria-expanded="true">Product</a>
+        </li>
+        <!-- Feedback List / Product -->
+
+        <!-- Unit -->
+        <li class="nav-item <?= $is_followup ? '' : 'd-none'; ?>">
+          <a href="#navtabs-units" class="nav-link" data-toggle="tab" onclick="lead_units(<?= $record->lead_id ?>)">Unit</a>
+        </li>
+        <!-- End Unit -->
+      </ul>
+      <!-- End Tabs List -->
+
+    <div class="tab-content br-n pn" style="height: 50vh;overflow-y: auto;overflow-x: hidden;padding-right: 6px;">
+      <div id="navtabs-profile" class="tab-pane active">
+
         <div class="row">
+
+          <div class="col-md-12 d-none">
+            <!-- Table -->
+             <table class="table table-bordered">
+                <!-- Name -->
+                <tr>
+                  <th>Name</th>
+                  <td><?= ucwords($record->lead_title . ' ' . $record->lead_first_name . ' ' . $record->lead_last_name) ?></td>
+                </tr>
+                <!-- End Name -->
+
+                <!-- Mobile -->
+                <tr>
+                  <th>Mobile</th>
+                  <td>+91 <?= $record->lead_mobile_no ?></td>
+                </tr>
+                <!-- End Mobile -->
+             </table>
+            <!-- End Table -->
+          </div>
+
           <div class="col-md-12">
             <label>Name:</label> <strong><?= ucwords($record->lead_title . ' ' . $record->lead_first_name . ' ' . $record->lead_last_name) ?></strong>
           </div>
@@ -433,7 +463,7 @@
       </div>
 
       <div id="navtabs-followup" class="tab-pane <?php if ($this->input->post('def') == 0) {
-                                                    echo 'active';
+                                                    echo 'actived';
                                                   } ?>">
         <div class="followup_list"></div>
       </div>

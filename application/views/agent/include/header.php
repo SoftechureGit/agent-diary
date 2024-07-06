@@ -1,6 +1,6 @@
-<?php 
-$user_data = $this->Action_model->select_single('tbl_users',"user_hash='".$this->session->userdata('agent_hash')."'");
-$menu_item_array = $this->Action_model->get_menu_items($user_data->user_id,$user_data->role_id); ?>
+<?php
+$user_data = $this->Action_model->select_single('tbl_users', "user_hash='" . $this->session->userdata('agent_hash') . "'");
+$menu_item_array = $this->Action_model->get_menu_items($user_data->user_id, $user_data->role_id); ?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -21,6 +21,48 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id,$user
     <link href="<?php echo base_url('public/admin/') ?>css/style.css" rel="stylesheet">
 
     <style>
+        body {
+            font-family: Roboto;
+        }
+
+        .lead-list .customer.active,
+        .lead-list .customer:hover {
+            background: #fff;
+            border: 1px solid #ffa96980 !important;
+        }
+
+        .lead-list {
+            margin: 2rem 0;
+        }
+
+        .lead-list .customer {
+            border: 1px solid transparent;
+            box-shadow: 2px 2px 10px #80808040;
+            border-radius: 8px;
+            margin: 1rem;
+        }
+
+        /* Toast */
+        #toast-container {
+            position: fixed;
+            top: 5%;
+            right: 5%;
+            width: 250px;
+            z-index: 1000;
+            z-index: 9999;
+        }
+
+        .toast {
+            padding: 10px 20px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+
+        }
+
+        /* End Toast */
+
         /* Debug */
         #main-wrapper {
             opacity: 1;
@@ -34,146 +76,167 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id,$user
         .header {
             height: 50px !important;
         }
+
         .nav-header {
             height: 106px !important;
         }
-        .nk-sidebar  {
+
+        .nk-sidebar {
             top: 117px !important;
         }
+
         .s-hide {
             display: none;
         }
+
         .s-show {
             display: block;
         }
+
         .sb-show {
             display: inline-block;
         }
+
         .brand-logo {
             border-right: 1px solid #c5c5c529 !important;
             border-bottom: 1px solid #c5c5c529 !important;
             background: #fff;
         }
+
         @media only screen and (min-width: 768px) {
             .brand-logo {
-            padding: 10px !important;
+                padding: 10px !important;
+            }
         }
-        }
+
         .h50 {
             height: 106px !important;
         }
+
         .nav-header .brand-logo a {
-    padding: 0px !important;
-    padding-left: 0px !important;
-}
+            padding: 0px !important;
+            padding-left: 0px !important;
+        }
+
         .header-right .icons .user-img img {
             height: 30px !important;
             width: 30px !important;
             vertical-align: text-top !important;
         }
-        .header-right .icons > a i {
+
+        .header-right .icons>a i {
             vertical-align: middle !important;
         }
 
-        .dropdown-profile,.dropdown-notfication {
+        .dropdown-profile,
+        .dropdown-notfication {
             top: -30px !important;
         }
 
         @media only screen and (max-width: 768px) {
-          .logo-abbr {
+            .logo-abbr {
                 height: 50px;
                 padding-top: 15px;
-                padding-left: 15px;            
+                padding-left: 15px;
             }
+
             .nk-sidebar {
                 top: 50px !important;
                 border-top: 1px solid #f2f2f8;
             }
+
             .nav-header {
                 height: 50px !important;
             }
+
             .mtm {
                 margin-top: 8px;
             }
+
             .username-desk {
                 display: none !important;
             }
+
             .username-mob {
                 display: block;
             }
         }
 
         @media only screen and (min-width: 768px) {
-          .logo-abbr {
+            .logo-abbr {
                 height: 116px;
                 padding-top: 39px;
             }
-            .slimScrollDiv { 
-            }
+
+            .slimScrollDiv {}
+
             .username-desk {
                 display: block !important;
             }
+
             .username-mob {
                 display: none;
             }
         }
+
         [data-nav-headerbg="color_1"] .nav-header {
             background-color: #f2f2f8 !important;
-            box-shadow:none;
+            box-shadow: none;
         }
+
         .btn-4 {
             margin-right: 4px;
         }
+
         .mr-10 {
             margin-right: 10px;
         }
+
         label.error {
             color: #a94442;
             font-weight: normal;
             margin-top: 4px;
-          }
+        }
 
-/*.content-body {
+        /*.content-body {
     min-height: 500px !important;
 }*/
-.dataTables_wrapper {
-    padding: 0px !important;
-}
+        .dataTables_wrapper {
+            padding: 0px !important;
+        }
 
-.w-120 {
-    width: 120px;
-}
-.w-90 {
-    width: 90px;
-}
+        .w-120 {
+            width: 120px;
+        }
 
-.nk-nav-scroll::-webkit-scrollbar-track
-{
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-    border-radius: 0px;
-    background-color: transparent;
-}
+        .w-90 {
+            width: 90px;
+        }
 
-.nk-nav-scroll::-webkit-scrollbar
-{
-   width: 0px;
-    background-color: transparent;
-}
+        .nk-nav-scroll::-webkit-scrollbar-track {
+            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+            border-radius: 0px;
+            background-color: transparent;
+        }
 
-.nk-nav-scroll::-webkit-scrollbar-thumb
-{
-    border-radius: 0px;
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
-    background-color: transparent;
-}
-</style>
+        .nk-nav-scroll::-webkit-scrollbar {
+            width: 0px;
+            background-color: transparent;
+        }
+
+        .nk-nav-scroll::-webkit-scrollbar-thumb {
+            border-radius: 0px;
+            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+            background-color: transparent;
+        }
+    </style>
 
 </head>
 
 <body>
 
 
-    
+
     <!--**********************************
         Main wrapper start
     ***********************************-->
@@ -200,19 +263,19 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id,$user
         <!--**********************************
             Header start
         ***********************************-->
-        <div class="header">    
+        <div class="header">
             <div class="header-content clearfix">
-                  <div class="nav-control">
+                <div class="nav-control">
                     <div class="hamburger">
                         <span class="toggle-icon"><i class="icon-menu"></i></span>
                     </div>
 
                 </div>
                 <div class="header-left">
-                    
+
                     <div class="input-group icons">
-                        
-                       
+
+
                         <div class="drop-down animated flipInX d-md-none">
                             <form action="#">
                                 <input type="text" class="form-control" placeholder="Search">
@@ -227,11 +290,11 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id,$user
                     <ul class="clearfix">
                         <li class="icons dropdown username-desk"> Hi <?= $this->session->userdata('agent_name') ?></li>
 
-                        <li class="icons dropdown"><a href="javascript:void(0)" >
+                        <li class="icons dropdown"><a href="javascript:void(0)">
                                 <i class="fa fa-refresh" aria-hidden="true"></i>
-                             
+
                             </a>
-                        
+
                         </li>
                         <li class="icons dropdown"><a href="javascript:void(0)" data-toggle="dropdown">
                                 <i class="mdi mdi-bell-outline"></i>
@@ -239,7 +302,7 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id,$user
                             </a>
                             <div class="drop-down animated fadeIn dropdown-menu dropdown-notfication">
                                 <div class="dropdown-content-heading d-flex justify-content-between">
-                                    <span class="">2 New Notifications</span>  
+                                    <span class="">2 New Notifications</span>
                                     <a href="javascript:void()" class="d-inline-block">
                                         <span class="badge badge-pill gradient-2">5</span>
                                     </a>
@@ -251,7 +314,7 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id,$user
                                                 <span class="mr-3 avatar-icon bg-success-lighten-2"><i class="icon-present"></i></span>
                                                 <div class="notification-content">
                                                     <h6 class="notification-heading">Events near you</h6>
-                                                    <span class="notification-text">Within next 5 days</span> 
+                                                    <span class="notification-text">Within next 5 days</span>
                                                 </div>
                                             </a>
                                         </li>
@@ -260,7 +323,7 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id,$user
                                                 <span class="mr-3 avatar-icon bg-danger-lighten-2"><i class="icon-present"></i></span>
                                                 <div class="notification-content">
                                                     <h6 class="notification-heading">Event Started</h6>
-                                                    <span class="notification-text">One hour ago</span> 
+                                                    <span class="notification-text">One hour ago</span>
                                                 </div>
                                             </a>
                                         </li>
@@ -278,16 +341,16 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id,$user
                                                 <span class="mr-3 avatar-icon bg-danger-lighten-2"><i class="icon-present"></i></span>
                                                 <div class="notification-content">
                                                     <h6 class="notification-heading">Events to Join</h6>
-                                                    <span class="notification-text">After two days</span> 
+                                                    <span class="notification-text">After two days</span>
                                                 </div>
                                             </a>
                                         </li>
                                     </ul>
-                                    
+
                                 </div>
                             </div>
                         </li>
-                       <!-- <li class="icons dropdown d-none d-md-flex">
+                        <!-- <li class="icons dropdown d-none d-md-flex">
                             <a href="javascript:void(0)" class="log-user"  data-toggle="dropdown">
                                 <span>English</span>  <i class="fa fa-angle-down f-s-14" aria-hidden="true"></i>
                             </a>
@@ -301,19 +364,19 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id,$user
                             </div>
                         </li>-->
                         <li class="icons dropdown">
-                            <div class="user-img c-pointer position-relative"   data-toggle="dropdown">
+                            <div class="user-img c-pointer position-relative" data-toggle="dropdown">
                                 <span class="activity active"></span>
-                                <img src="<?php echo base_url('public/admin/images/');?>user/1.png" height="40" width="40" alt="">
+                                <img src="<?php echo base_url('public/admin/images/'); ?>user/1.png" height="40" width="40" alt="">
                             </div>
                             <div class="drop-down dropdown-profile animated fadeIn dropdown-menu">
                                 <div class="dropdown-content-body">
                                     <ul>
                                         <li class="username-mob"><span>Hi <?= $this->session->userdata('agent_name') ?></span></li>
-                                        <?php if(isset($menu_item_array['setting_email_configration']) && $menu_item_array['setting_email_configration']['rr_view']) { ?>
-                                        <li><a href="<?= base_url(AGENT_URL.'update-profile') ?>"><i class="icon-user"></i> <span>My Account</span></a></li>
+                                        <?php if (isset($menu_item_array['setting_email_configration']) && $menu_item_array['setting_email_configration']['rr_view']) { ?>
+                                            <li><a href="<?= base_url(AGENT_URL . 'update-profile') ?>"><i class="icon-user"></i> <span>My Account</span></a></li>
                                         <?php } ?>
-                                        <li><a href="<?= base_url(AGENT_URL.'change-password') ?>"><i class="icon-lock"></i> <span>Change Password</span></a></li>
-                                        <li><a href="<?= base_url(AGENT_URL.'logout') ?>"><i class="icon-key"></i> <span>Logout</span></a></li>
+                                        <li><a href="<?= base_url(AGENT_URL . 'change-password') ?>"><i class="icon-lock"></i> <span>Change Password</span></a></li>
+                                        <li><a href="<?= base_url(AGENT_URL . 'logout') ?>"><i class="icon-key"></i> <span>Logout</span></a></li>
                                     </ul>
                                 </div>
                             </div>

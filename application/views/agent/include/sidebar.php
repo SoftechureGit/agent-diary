@@ -31,7 +31,7 @@
                     <?php } ?>
 
                     <li>
-                        <a href="<?= base_url(AGENT_URL.'followup/') ?>" aria-expanded="false">
+                        <a href="<?= base_url(AGENT_URL.'leads') ?>" aria-expanded="false">
                             <i class="icon-screen-tablet menu-icon"></i> <span class="nav-text">Leads</span>
                         </a>
                        

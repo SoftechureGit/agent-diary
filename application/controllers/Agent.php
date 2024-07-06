@@ -1250,7 +1250,7 @@ class Agent extends CI_Controller {
         $this->load->view(AGENT_URL.'chats',$data);
     }
 
-    public function leads()
+    public function leads_old()
     {
         $all_unit_type_list = $this->Action_model->detail_result('tbl_unit_types',"unit_type_status='1'",'unit_type_id,unit_type_name,requirement_accomodation');
         $data['all_unit_type_list'] = $all_unit_type_list;
@@ -1350,8 +1350,6 @@ class Agent extends CI_Controller {
     public function lead_detail($id='')
     {
 
-        
-
         $account_id = getAccountId();
 
         $lead_detail = array();
@@ -1398,7 +1396,7 @@ class Agent extends CI_Controller {
         $this->load->view(AGENT_URL.'lead_detail',$data);
     }
 
-    public function followup()
+    public function leads()
     {
         $all_unit_type_list = $this->Action_model->detail_result('tbl_unit_types',"unit_type_status='1'",'unit_type_id,unit_type_name,requirement_accomodation');
         $data['all_unit_type_list'] = $all_unit_type_list;
@@ -1499,7 +1497,7 @@ class Agent extends CI_Controller {
         $filter_user_list = $query->result();
         $data['filter_user_list'] = $filter_user_list;
 
-        $this->load->view(AGENT_URL.'followup',$data);
+        $this->load->view(AGENT_URL.'leads',$data);
     }
 
     public function followup1()
