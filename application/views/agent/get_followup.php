@@ -1028,20 +1028,32 @@
 
     function removeCloneTemplateRow(el) {
 
-      var id = $(el).data('id')
+      var id      = $(el).data('id')
+      var is_main = $(el).data('type') == 'main' ? true : false;
+
+      
       if (id) {
         if (confirm('Are you sure to remove this file?')) {
+          if(is_main){
+                      $(el).parents('.clone-template').find('.view-property-document').remove();
+                      $(el).parents('.clone-template').find('.document_title').val('');
+          }
+
           // Ajax - Remove Add More Record
           $.ajax({
             type: "post",
-            url: "<?= base_url('helper/remove-add-more-record') ?>",
+            url: "<?= base_url('helper/remove_add_more_record_file') ?>",
             dataType: 'json',
             data: {
               id: id
             },
             success: (data) => {
               if (data.status) {
-                $(el).parents('.clone-template').remove();
+                if(is_main){
+                  $(el).parents('.clone-template').find('.remove-clone-template-row').remove();
+                }else{
+                  $(el).parents('.clone-template').remove();
+                }
                 showToast('success', data.message)
               } else {
                 showToast('danger', data.message)

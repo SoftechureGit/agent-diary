@@ -224,10 +224,33 @@ class Helper extends CI_Controller
             echo json_encode(['status' => false, 'message' => 'Request method not matched.']);
             exit;
         }
-            $id                 =   $this->input->post('id');
-            $type                 =   $this->input->post('type');
+            $id                     =   $this->input->post('id');
+            $type                   =   $this->input->post('type');
 
-            $this->db->where("id = $id and type = '$type'")->delete('tbl_gallery_images');
+            if($id):
+                
+                # Fetch Record
+                    $record = $this->db->where("id = $id")->get('tbl_gallery_images')->row();
+
+                    if($record):
+
+                        # Remove Image From Folder
+                        switch($record->type):
+                            case 'lead_unit';
+                                $file_path = "./public/other/gallery-images/lead-units/".$record->name;
+                                if(file_exists($file_path )):
+                                    unlink($file_path );
+                                endif;
+                            break;
+                        endswitch;
+                        # End Remove Image From Folder
+                    endif;
+                # End Fetch Record
+
+                # Delete Record
+                $this->db->where("id = $id and type = '$type'")->delete('tbl_gallery_images');
+                # End Delete Record
+            endif;
 
             echo json_encode(['status' => true, 'message' => 'Successfully image removed.']);
 
@@ -236,14 +259,35 @@ class Helper extends CI_Controller
     # End Remove Gallery Image
 
     # Remove Add More Record
-    public function remove_add_more_record(){
+    public function remove_add_more_record_file(){
         if(!$this->input->post()){
             echo json_encode(['status' => false, 'message' => 'Request method not matched.']);
             exit;
         }
             $id                 =   $this->input->post('id');
+
+            if($id):
+                
+                # Fetch Record
+                    $record = $this->db->where("id = $id")->get('tbl_property_documents')->row();
+
+                    if($record):
+
+                        # Remove File From Folder
+                        $file_path = "./public/other/property-documents/".$record->document;
+
+                        if(file_exists($file_path )):
+                            unlink($file_path );
+                        endif;
+                        # End Remove File From Folder
+                    endif;
+                # End Fetch Record
+
+                # Delete Record
+                $this->db->where("id = $id")->delete('tbl_property_documents');
+                # End Delete Record
+            endif;
            
-            $this->db->where("id = $id")->delete('tbl_property_documents');
 
             echo json_encode(['status' => true, 'message' => 'Successfully record removed.']);
 

@@ -2768,19 +2768,21 @@ $writer->save('php://output');
             $result                             =   $this->Action_model->insert_data($data, 'tbl_lead_units');
             $res_arr                            =   $result ? ['status' => true, 'message' => 'Successfully record inserted'] : ['status' => false, 'message' => 'Some error occured'];
         endif;
-
+        
         
         # Gallery Images Functionality
-        if($id ?? $result ?? 0):
+        $id        = $id ? $id : $result;
+
+        if($id):
 
             # Property Documents Functionality
-            $this->propertyDocumentsFunctionality($this->input->post('property_documents'), 0, $id ?? $result ?? 0);
+            $this->propertyDocumentsFunctionality($this->input->post('property_documents'), 0,  $id);
             # End Property Documents Functionality
            
             $gallery_images                 =   upload_files('gallery_images', 'lead-units');
           
             if($gallery_images->status && count($gallery_images->images)):
-                insert_or_update_gallery_images($gallery_images->images, 'lead_unit', $id ?? $result ?? 0);
+                insert_or_update_gallery_images($gallery_images->images, 'lead_unit', $id);
             elseif(!$gallery_images->status ?? 0):
                 $res_arr   = $gallery_images;
             endif;
@@ -2802,15 +2804,28 @@ $writer->save('php://output');
         endif;
 
         $property_document_data = [];
+
+        $upload_path      = "./public/other/property-documents/";
     
+        # Create Folder if Folder Not Exits
+        if (!file_exists($upload_path)) {
+           mkdir($upload_path, 0777, true);
+        }
+        # End Create Folder if Folder Not Exits
+
         # File Upload Configuration
         $config = array();
-        $config['upload_path'] = "./public/other/property-documents/";
+        $config['upload_path'] = $upload_path;
+
+
         $config['allowed_types'] = '*';
         $config['max_size'] = 10 * 1024;
         $config['remove_spaces'] = TRUE;
     
         foreach ($records ?? [] as $key => $record) {
+            $id                     =   $record['id'] ?? 0;
+            $title                 =   $record['title'] ?? '';
+         
             if (!empty($_FILES['property_documents']['name'][$key]['document_file'])) {
                 # Reformat the $_FILES array
                 $_FILES['file']['name'] = $_FILES['property_documents']['name'][$key]['document_file'];
@@ -2837,16 +2852,25 @@ $writer->save('php://output');
                     $file_name = $upload_data['file_name'];
                 }
     
-                if(($record['title'] ?? 0 && $file_name )):
+                if(($title && $file_name && !$id)):
                 # Save the uploaded file data
                     $property_document_data[] = [
                         'property_id'           => $property_id,
                         'lead_unit_id'          => $lead_unit_id,
-                        'title'                 => $record['title'] ?? '',
+                        'title'                 => $title,
                         'document'              => $file_name,
                         'updated_at'            => date('Y-m-d h:i:m s'),
                         'created_at'            => date('Y-m-d h:i:m s'),
                     ];
+                elseif($id):
+                    $update_property_document_data = [
+                        'property_id'           => $property_id,
+                        'lead_unit_id'          => $lead_unit_id,
+                        'title'                 => $title,
+                        'document'              => $file_name,
+                        'updated_at'            => date('Y-m-d h:i:m s'),
+                    ];
+                    $this->db->where("id = $id")->update('tbl_property_documents', $update_property_document_data);
                 endif;
             }
         }
