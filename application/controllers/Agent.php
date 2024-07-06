@@ -2061,7 +2061,7 @@ $objPHPExcel->getActiveSheet()->setTitle('Leads');
 //$writer->save('download-sample-leads.xlsx');
 
 header('Content-Type: text/csv');
-header('Content-Disposition: attachment;filename="download-sample-leads.csv"');
+header('Content-Disposition: attachment;filename="download-sample-leads.xlsx"');
 header('Cache-Control: max-age=0');
 $writer->save('php://output');
 
@@ -2250,6 +2250,7 @@ $writer->save('php://output');
    
     public function upload_lead()
     {
+        
         $account_id     = 0;
         $user_id        = 0;
         $where          = "user_hash='".$this->session->userdata('agent_hash')."'";
@@ -2278,9 +2279,6 @@ $writer->save('php://output');
 
                 while (($column = fgetcsv($file, 10000, ",")) !== FALSE) {
 
-
-                    
-                 
                     if($l) {
 
                         $data_array = array(
@@ -2290,10 +2288,6 @@ $writer->save('php://output');
                             'data_mobile'           =>  $column[4],
                             'data_email'            =>  $column[5]
                         );
-
-
-
-                        
 
                         $where          =   "data_mobile='".$column[4]."' AND account_id='".$account_id."'";
                         $lead_detail    =   $this->Action_model->select_single('tbl_data',$where);
@@ -2329,6 +2323,7 @@ $writer->save('php://output');
             redirect(AGENT_URL.'data');
         }
     }
+
     public function download_followup()
     {
         $array = array();
@@ -2863,6 +2858,99 @@ $writer->save('php://output');
         return true;
     }
     
+    
     # End Property Documents Functionality
+
+    public function  upload_raw_data(){
+
+        $account_id     = 0;
+        $user_id        = 0;
+        $where          = "user_hash='".$this->session->userdata('agent_hash')."'";
+        $user_detail    = $this->Action_model->select_single('tbl_users',$where);
+
+        if ($user_detail) {
+            $user_id    =   $user_detail->user_id;
+            $account_id =   $user_detail->user_id;
+
+            if ($user_detail->role_id!=2) {
+
+                $account_id = $user_detail->parent_id;
+
+            }
+        }
+	    
+		$data_excel = array();
+		$config['upload_path']        	 = FCPATH . './uploads/raw-data/';
+		$config['allowed_types'] 		 =	'xlsx';
+		$this->load->library('upload', $config);
+			
+        
+        if($account_id ){
+            if ($this->upload->do_upload('file')) 
+            {
+                $data = $this->upload->data();
+    
+                if ($data['file_ext'] == '.xlsx') {
+    
+                    require('application/libraries/php-excel-reader/excel_reader2.php');
+                    require('application/libraries/SpreadsheetReader.php');
+    
+                    
+                    $Reader = new SpreadsheetReader($data['full_path']);
+                    $Sheets = $Reader->Sheets();
+    
+    
+                    foreach ($Sheets as $Index => $Name) {
+                        if ($Index == 0) {
+                            $Reader->ChangeSheet($Index);
+                            foreach ($Reader as $Key => $Row) {
+                               if(  $Key  > 0){
+                                $data_array = array(
+                                    'data_title'            =>  $Row[1],
+                                    'data_first_name'       =>  $Row[2],
+                                    'data_last_name'        =>  $Row[3],
+                                    'data_mobile'           =>  $Row[4],
+                                    'data_email'            =>  $Row[5]
+                                );
+        
+                                $where          =   "data_mobile='".$Row[4]."' AND account_id='".$account_id."'";
+                                $lead_detail    =   $this->Action_model->select_single('tbl_data',$where);
+        
+                                if ($lead_detail) {
+        
+                                    $this->Action_model->update_data($data_array,'tbl_data',$where);
+                                    
+                                }
+                                else {
+        
+                                    $data_array2 = array(
+                                        'added_by'          =>  $user_id,
+                                        'account_id'        =>  $account_id,
+                                        'data_status'       =>  1,
+                                        'file_name'         =>  $this->input->post('lead_data_type'),
+                                    );
+        
+                                    $data_array     =   array_merge($data_array,$data_array2);
+                                    $lead_id        =   $this->Action_model->insert_data($data_array,'tbl_data');
+                                }
+                            }
+                        }
+                    }
+                    }
+
+                    unlink($data['full_path']);
+
+                }             
+            }
+
+            $this->session->set_flashdata('success_msg', 'Upload Successfully!!');
+            redirect(AGENT_URL.'data');
+        }
+        else{
+            redirect(AGENT_URL.'data');
+        }
+
+    }
+
 
 }
