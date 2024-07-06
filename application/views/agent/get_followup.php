@@ -181,6 +181,7 @@
                                                               } ?></span></div>
           <div class="card-text text-muted pt-1 ft-sm"><span><?= $record->lead_stage_name ?></span></div>
           <div class="card-text text-muted ft-sm"><span><?= $record->lead_source_name ?></span></div>
+          <button type="button" class="btn btn-dark btn-sm btn-add-followup w-120 mt-1 ft-sm" style="color: white;" onclick="add_to_followup_new(<?= $record->lead_id ?>)"><i class="fa fa-pencil"></i> Add to Followup</button>
         </div>
       </div>
 

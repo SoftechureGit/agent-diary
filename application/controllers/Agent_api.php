@@ -2372,7 +2372,7 @@ $query = $this->db->query($sql);
                 }
 
 
-                $where="tbl_leads.account_id='".$account_id."' AND tbl_leads.added_to_followup='1' AND tbl_leads.lead_status='1' AND is_customer='0'";
+                $where="tbl_leads.account_id='".$account_id."'  AND tbl_leads.lead_status='1' AND is_customer='0'";
                 $where_ids = "";
                 $user_ids = $this->get_level_user_ids();
                 if (count($user_ids)) {

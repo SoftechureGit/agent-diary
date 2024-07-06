@@ -625,6 +625,9 @@ body {
 </div>
 <!-- end followup status modal -->
 
+
+
+
 <!-- start lead form modal -->
 <div class="modal fade" id="leadFormModal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
@@ -2744,4 +2747,13 @@ body {
 
     window.location.href = "<?= base_url(AGENT_URL . 'download_followup?') ?>" + str;
   }
+
+  function add_to_followup_new(id) {
+  $(".error-msg-right").html('');
+  openFolloupModal(1,0,id);
+  nextAction();
+}
+
+
+
 </script>
