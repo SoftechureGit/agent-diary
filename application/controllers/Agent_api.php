@@ -10378,14 +10378,78 @@ $writer->save('php://output');
 
         public function data_assign(){
 
+
+                $account_id     = 0;
+                $user_id        = 0;
+                $where          = "user_hash='".$this->session->userdata('agent_hash')."'";
+                $user_detail    = $this->Action_model->select_single('tbl_users',$where);
+
+                if ($user_detail) {
+                    $user_id    =   $user_detail->user_id;
+                    $account_id =   $user_detail->user_id;
+
+                    if ($user_detail->role_id!=2) {
+
+                        $account_id = $user_detail->parent_id;
+
+                    }
+            }
             
             $transfer_lead_ids=  $this->input->post('selected_lead_ids');
 
             $transfer_lead_ids = explode(',', $transfer_lead_ids);
 
-            echo '<pre>';
-            print_r($transfer_lead_ids); die;
+            $assign_to = $this->input->post('transfer_to');
+
+
+            foreach(  $transfer_lead_ids as   $transfer_lead_id){
+
+             $raw_data =     $this->db->select('*')->where('data_id', $transfer_lead_id)->get('tbl_data')->row();
+
+             if( $raw_data){
+
+                              $data_array = array(
+                                 'lead_title'            =>  $raw_data->data_title,
+                                 'lead_first_name'       =>  $raw_data->data_first_name,
+                                 'lead_last_name'        =>  $raw_data->data_last_name,
+                                 'lead_mobile_no'        =>  $raw_data->data_mobile,
+                                 'lead_email'            =>  $raw_data->data_email
+                             );
+                 
+                             $where          =   "lead_mobile_no='".$raw_data->data_mobile."' AND account_id='".$assign_to."'";
+                             $lead_detail    =   $this->Action_model->select_single('tbl_leads',$where);
+                 
+                             if ($lead_detail) {
+                 
+                                 $this->Action_model->update_data($data_array,'tbl_leads',$where);
+                                 
+                             }
+                             else {
+                 
+                                 $data_array2 = array(
+                                     'user_id'           =>  $assign_to,
+                                     'account_id'        =>  $assign_to ,
+                                     'added_by'          =>  $account_id,
+                                     'lead_status'       =>  1,
+                                 );
+                 
+                                 $data_array     =   array_merge($data_array,$data_array2);
+                                 $lead_id        =   $this->Action_model->insert_data($data_array,'tbl_leads');
+
+                                 $this->db->where('data_id', $raw_data->data_id);
+                                 $this->db->update('tbl_data', array('is_in_lead' => 1));
+
+             }   
+            }
+
             
+            
+        }
+
+
+        $array = array('status'=>'success','message'=>'Lead Transfered Successfully!!'); 
+
+        echo json_encode($array);  
         }
 
     # END DATA ASSIGN
@@ -11084,22 +11148,22 @@ $writer->save('php://output');
         $where = '';
 
         $searchValue = $postData['search']['value'];
-        $searchQuery = "";
+        $searchQuery = 'is_in_lead=0';
 
 
         if($this->input->post('file_name')!=''){
 
             $file_name = $this->input->post('file_name');
-                 $searchQuery .= "file_name= '$file_name'";
+                 $searchQuery .= " AND file_name= '$file_name'";
 
         }
 
 
-        // if($this->input->post('status')!='') {
+        if($this->input->post('status')!='') {
 
-        //     $searchQuery .= "data_status=".$this->input->post('status');
+            $searchQuery .= " AND data_status=".$this->input->post('status');
 
-        // }   
+        }   
 
 
         if($searchValue != ''){
@@ -11120,5 +11184,23 @@ $writer->save('php://output');
 
         echo json_encode($data);
    }
+
+   public function data_delete(){
+
+    $file_name = $this->input->post('file_name');
+
+    $res =  $this->db->where('file_name' , $file_name)->delete('tbl_data');
+
+    if($res){
+        $array = array('status'=>'success','message'=>'Data deleted ');
+    }
+    else{
+        $array = array('status'=>'error','message'=>'Some error occurred, please try again.');
+    }
+
+        echo json_encode($array);
+
+   }
+
 }
 ?>
