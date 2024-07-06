@@ -122,6 +122,7 @@
                   </div>
                   <div class="col-12">
                     <div class="error-msg-right">
+                   
                       <?php if ($this->session->flashdata('error_msg')) { ?>
                         <div class="alert alert-danger pd8">
                           <?php echo $this->session->flashdata('error_msg'); ?>
@@ -174,6 +175,9 @@
                 <h4 class="card-title">All Data</h4>
               </div>
               <div class="col-md-6 col-sm-6 col-xs-6" align="right">
+                <button class="btn btn-danger btn-sm delete-form-btn" onclick="deleteData()">
+                        Delete Data 
+                </button>
                 <button class="btn btn-primary btn-sm " onclick="transfer_lead()">Assign</button>
                 <?php // if(isset($menu_item_array['unit_types']) && $menu_item_array['unit_types']['rr_create']) { ?>
                 <!--<a href="<?= base_url(ADMIN_URL . 'unit_type-detail') ?>"><button type="button" class="btn btn-info btn-sm" >Add New</button></a><?php //  } ?>-->
@@ -195,8 +199,15 @@
                 <!-- <input type="text" id="searchBox" class="form-control" placeholder="Name or Mobile"> -->
               </div>
               <div class="col-md-3">
-                <select id="statusFilter" class="form-control">
-                  <option value="">Team Member</option>
+                <select id="teamFilter" class="form-control">
+                  <option value="" >All Team Member</option>
+                  <?php foreach ($user_list as $item) {
+                  if ($record->user_id != $item->user_id) { ?>
+                    <option value="<?= $item->user_id ?>">
+                      <?= (($item->parent_id == 0) ? (($item->is_individual) ? ucwords($item->user_title . ' ' . $item->first_name . ' ' . $item->last_name) : $item->firm_name) : ucwords($item->user_title . ' ' . $item->first_name . ' ' . $item->last_name)) ?>
+                    </option>
+                  <?php }
+                } ?>
                 </select>
               </div>
               <div class="col-md-3">
@@ -209,6 +220,11 @@
               <div class="col-md-3">
                 <select id="reasonFilter" class="form-control">
                   <option value="">All Reasons</option>
+                  <?php if( count($all_reasons) > 0) { ?>
+                    <?php foreach ($all_reasons as $reason): ?>
+                      <option value="<?= $reason->data_reason ?>"><?= $reason->data_reason ?></option>
+                    <?php endforeach; ?>
+                  <?php  } ?>  
                 </select>
               </div>
             </div>
@@ -389,7 +405,7 @@
     table.draw();
   });
 
-  $('#statusFilter, #reasonFilter').on('change keyup', function () {
+  $('#statusFilter, #reasonFilter, #teamFilter').on('change keyup', function () {
     var file_data = $('#file_name').val();
 
     if (file_data) {
@@ -416,6 +432,7 @@
         d.status = $('#statusFilter').val();
         d.reason = $('#reasonFilter').val();
         d.file_name = $('#file_name').val();
+        d.account_id = $('#teamFilter').val();
         // d.search.value = $('#searchBox').val(); // Search value
       }
 
@@ -528,14 +545,19 @@
                 obj = JSON.parse(response);
                 $(".transfer-form-btn").html("Transfer");
                 if (obj.status == 'success') {
-                  location.reload();
+                  // location.reload();
+
+
                   $("#transferModal").modal('hide');
-                  $(".error-msg-right").html(alertMessage('success', obj.message));
+                  $(".error-msg-right").html(` <div class="alert alert-success pd8">
+                           Data Assigned
+                        </div>`);
                   $(".btn-add-followup").css("visibility", "hidden");
                   $(".transfer_btn").css("visibility", "hidden");
-                  setTimeout(function () {
-                    window.location.href = "";
-                  }, 1000);
+
+                  // setTimeout(function () {
+                  //   // window.location.href = "";
+                  // }, 1000);
                 }
                 else {
                   $(".transfer-error-msg").html(alertMessage('error', obj.message));
@@ -651,6 +673,69 @@
     $('#upload_btn').text('Uploading..');
   }
 
+ function deleteData()
+{
+
+   $file_name_d = $('#file_name').val();
+
+
+  
+  if($file_name_d == null){
+
+    alert('Please Select File ');
+
+  }
+  else{
+
+    var result = confirm("Do you Want to delete?");
+    if (result) {
+      
+      $.ajax({
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    },
+    type: "POST",
+    url: "<?= base_url(AGENT_URL . 'api/data_delete') ?>",
+    data: {'file_name' : $file_name_d},
+    dataType: "json",
+    beforeSend: function (data) {
+        $(".transfer-error-msg").html('');
+        $(".delete-form-btn").html("<i class='fa fa-circle-o-notch fa-spin'></i>");
+    },
+    success: function (response) {
+        setTimeout(function () {
+            var obj;
+            try {
+                obj = response;  // The response is already parsed
+    
+                if (obj.status == 'success') {
+                    $(".error-msg-right").html(`<div class="alert alert-success pd8">Data Delete</div>`);
+                    setTimeout(function () {
+                    window.location.href = "";
+                  }, 1000);
+       
+                } else {
+                    $(".transfer-error-msg").html(`<div class="alert alert-error pd8">Some Error</div>`);
+                }
+            } catch (err) {
+                $(".transfer-form-btn").html("Transfer");
+                $(".transfer-error-msg").html(`<div class="alert alert-error pd8">Some Error</div>`);
+            }
+        }, 500);
+    },
+    error: function () {
+        $(".transfer-form-btn").html("Transfer");
+        $(".transfer-error-msg").html(`<div class="alert alert-error pd8">Some Error</div>`);
+    }
+});
+
+
+    }
+
+  }
+  
+
+}
 
 </script>
 

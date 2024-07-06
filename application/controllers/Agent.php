@@ -2533,10 +2533,10 @@ $writer->save('php://output');
     # changes 2024-06-28 add new method
 
     function data(){
+ 
+        $all_file_type = $this->db->distinct()->select('file_name')->where('is_in_lead',0)->get('tbl_data')->result();
 
-        
-        $all_file_type = $this->db->distinct()->select('file_name')->get('tbl_data')->result();
-
+        $all_reasons  =  $this->db->distinct()->select('data_reason')->where('is_in_lead',0)->get('tbl_data')->result();
 
         $data['all_file_type'] = $all_file_type;
 
