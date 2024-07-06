@@ -200,7 +200,14 @@
               </div>
               <div class="col-md-3">
                 <select id="teamFilter" class="form-control">
-                  <option value="">Team Member</option>
+                  <option value="" >All Team Member</option>
+                  <?php foreach ($user_list as $item) {
+                  if ($record->user_id != $item->user_id) { ?>
+                    <option value="<?= $item->user_id ?>">
+                      <?= (($item->parent_id == 0) ? (($item->is_individual) ? ucwords($item->user_title . ' ' . $item->first_name . ' ' . $item->last_name) : $item->firm_name) : ucwords($item->user_title . ' ' . $item->first_name . ' ' . $item->last_name)) ?>
+                    </option>
+                  <?php }
+                } ?>
                 </select>
               </div>
               <div class="col-md-3">
@@ -213,6 +220,11 @@
               <div class="col-md-3">
                 <select id="reasonFilter" class="form-control">
                   <option value="">All Reasons</option>
+                  <?php if( count($all_reasons) > 0) { ?>
+                    <?php foreach ($all_reasons as $reason): ?>
+                      <option value="<?= $reason->data_reason ?>"><?= $reason->data_reason ?></option>
+                    <?php endforeach; ?>
+                  <?php  } ?>  
                 </select>
               </div>
             </div>
@@ -393,7 +405,7 @@
     table.draw();
   });
 
-  $('#statusFilter, #reasonFilter').on('change keyup', function () {
+  $('#statusFilter, #reasonFilter, #teamFilter').on('change keyup', function () {
     var file_data = $('#file_name').val();
 
     if (file_data) {
@@ -420,6 +432,7 @@
         d.status = $('#statusFilter').val();
         d.reason = $('#reasonFilter').val();
         d.file_name = $('#file_name').val();
+        d.account_id = $('#teamFilter').val();
         // d.search.value = $('#searchBox').val(); // Search value
       }
 

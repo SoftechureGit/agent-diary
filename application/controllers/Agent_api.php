@@ -11158,6 +11158,12 @@ $writer->save('php://output');
 
         }
 
+        if($this->input->post('account_id')){
+
+            $account_id = $this->input->post('account_id');
+            $searchQuery .= " AND account_id= '$account_id'";
+        }
+
 
         if($this->input->post('status')!='') {
 
