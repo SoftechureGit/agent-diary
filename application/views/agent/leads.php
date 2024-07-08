@@ -2049,9 +2049,15 @@
       var lid = $("#followup_lead_id").val();
       var btn_label = "Save";
 
+      var base_url_of_followup = 'followup_save';
+
+      if($('#followup_id').val() == 0){
+        var base_url_of_followup = 'add_to_followup';
+      }
+
       $.ajax({
         type: "POST",
-        url: "<?= base_url(AGENT_URL . 'api/followup_save') ?>",
+        url: "<?= base_url(AGENT_URL . 'api/') ?>"+base_url_of_followup,
         data: fd,
         cache: false,
         processData: false,
