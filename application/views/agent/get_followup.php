@@ -121,9 +121,7 @@
 
 </style>
 
-<!-- Toast -->
-<div id="toast-container"></div>
-<!-- End Toast -->
+
 
 <div style="padding: 0px 15px 0px 15px;">
   <div class="row" style="border-bottom: 1px solid #0000000f;padding-bottom: 13px;margin-bottom: 10px;">
@@ -134,7 +132,7 @@
 
       <div class="row">
         <div class="col-md-6">
-          <h6 class="card-text text-muted ft-sm"><i class="fa fa-calendar"></i> <?= $record->lead_date ?> (Age of Lead)</h6>
+          <h6 class="card-text text-muted ft-sm"><i class="fa fa-calendar"></i> <?= $record->lead_date ?></h6>
         </div>
         <div class="col-md-6" align="right">
           <!--<h6 class="card-text text-muted"><?= ucwords($record->user_title . ' ' . $record->first_name . ' ' . $record->last_name) ?></h6>-->
@@ -153,10 +151,22 @@
 
       <div class="row" style="margin-top: 2px;">
         <div class="col-md-6">
-          <h6 class="card-text text-muted  ft-sm" style="margin-top: 4px;margin-bottom: 0px;padding-bottom: 0px;"><i class="fa fa-mobile ft-14"></i> <span>+91<?= $record->lead_mobile_no ?></span></h6>
-          <?php if($record->lead_mobile_no_2 != ''): ?>
-          <h6 class="card-text text-muted  ft-sm" style="margin-top: 4px;padding-top: 0px;"><i class="fa fa-phone ft-14"></i> <span>+91<?= $record->lead_mobile_no_2 ?></span></h6>
+          <!-- Primary Mobile Number -->
+          <?php if($record->lead_mobile_no): ?>
+          <h6 class="card-text text-muted  ft-sm" style="margin-top: 4px;margin-bottom: 0px;padding-bottom: 0px;">
+            <i class="fa fa-mobile ft-14"></i> <span><?= ( $record->primary_mobile_number_country_data ?? 0 ) ? '+'.json_decode($record->primary_mobile_number_country_data)->dialCode : '+91' ?>  <?= $record->lead_mobile_no ?></span>
+          </h6>
           <?php endif; ?>
+          <!-- End Primary Mobile Number -->
+
+          <!-- Secondary Mobile Number -->
+          <?php if($record->lead_mobile_no_2): ?>
+          <h6 class="card-text text-muted  ft-sm" style="margin-top: 4px;padding-top: 0px;">
+            <i class="fa fa-phone ft-14"></i> <span><?= ( $record->secondary_mobile_number_country_data ?? 0 ) ? '+'.json_decode($record->secondary_mobile_number_country_data)->dialCode : '+91' ?> <?= $record->lead_mobile_no_2 ?></span>
+          </h6>
+          <?php endif; ?>
+          <!-- End Secondary Mobile Number -->
+
         </div>
         <div class="col-md-6" align="right">
           <div class="card-text text-muted pt-1 ft-sm"><span><?php if ($record->lead_type_id == 1) {
@@ -191,7 +201,7 @@
 
         <a href="javascript:void(0)" onclick="get_sms_form('2','<?= $record->lead_id ?>','<?= $record->lead_email ?>')"><button class="btn btn-warning btn-sm btn-rounded" style="margin-right: 8px;"><i class="fa fa-envelope" style="color: #fff;"></i></button></a>
 
-        <button class="btn btn-dark btn-sm btn-rounded d-none" style="margin-right: 8px;" onclick="transfer_lead(<?= $record->lead_id ?>)"><i class="fa fa-exchange" style="color: #fff;"></i></button>
+        <button class="btn btn-dark btn-sm btn-rounded" style="margin-right: 8px;" onclick="transfer_lead(<?= $record->lead_id ?>)"><i class="fa fa-exchange" style="color: #fff;"></i></button>
       </div>
 
     </div>
@@ -638,9 +648,7 @@
                   $(".error-msg-right").html(alertMessage('success', obj.message));
                   $(".btn-add-followup").css("visibility", "hidden");
                   $(".transfer_btn").css("visibility", "hidden");
-                  setTimeout(function() {
-                    window.location.href = "";
-                  }, 1000);
+                
 
                 } else {
                   $(".transfer-error-msg").html(alertMessage('error', obj.message));

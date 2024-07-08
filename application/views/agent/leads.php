@@ -168,7 +168,7 @@
               <div class="col-md-5">
                 <div class="row">
                   <div class="col-md-6">
-                    <h4 class="card-title">Leads</h4>
+                    <h4 class="card-title">Leads ( <span class="total_records">0</span> )</h4>
                   </div>
                   <div class="col-md-6" align="right">
                     <select class="form-control" style="height: 30px !important;min-height: 30px;padding: 0px 5px;width: 155px;" id="filter_by" onchange="filterData()">
@@ -177,10 +177,6 @@
                     </select>
                   </div>
 
-                  <div class="col-md-12">
-                    <p>Total Leads: <span class="total_records">0</span></p>
-                    <a class="btn btn-dark btn-sm  " href="<?= base_url(AGENT_URL . 'lead-detail/') ?>"> Add New </a>
-                  </div>
 
                   <div class="col-md-12">
 
@@ -217,7 +213,7 @@
                   </div>
 
                   <div class="pt-4 pl-5 pr-5 search_box" style="height: 76vh;overflow-y: auto;overflow-x: hidden;">
-                    <h4 class="text-center mb-4">All Followup</h4>
+                    <h4 class="text-center mb-4">Dashboard</h4>
 
                     <form class="mt-4" method="post" onsubmit="return searchData()">
                       <div class="form-group">
@@ -332,12 +328,14 @@
                       </div>
 
                       <div class="form-group text-right">
+                      <a class="btn btn-dark text-white" href="<?= base_url(AGENT_URL . 'lead-detail/') ?>"> Add New </a>
                         <button type="submit" class="btn btn-dark search_btn">Search</button>&nbsp;&nbsp;
                         <?php if (isset($menu_item_array['followup_advance_search']) && $menu_item_array['followup_advance_search']['rr_view']) { ?>
                           <button type="button" class="btn btn-dark adv_btn">Advance Search</button>&nbsp;&nbsp;
 
                           <button type="button" class="btn btn-info" onclick="downloadLeads()">Download</button>
                         <?php } ?>
+                        
                       </div>
                     </form>
 
@@ -1073,29 +1071,41 @@
                 //   "  </div>" +
                 //   "</div>";
 
+
+                lead_time = record.lead_time ? `( ${record.lead_time} )` : '';
+
+                 
                 html += `<div class='customer' onclick='showCustomer(${record.lead_id},0)'>
                      <div class='row'>
                      <div class='col-md-2' style='' align='center'>
-                       <img class='mr-3' src='<?= base_url('public/front/user.png') ?>' style='margin-top: 5px;border-radius:50%;' width='45' height='45' alt=''>
+                       <img class='mr-3' src='<?= base_url('public/front/user.png') ?>' style='border-radius:50%;' width='45' height='45' alt=''>
                      </div>
                      <div class='col-md-10'>
                        <div class='row'>
-                         <div class='col-md-8'>
-                           <div class='card-text ${is_followup}'><i class='fa fa-user pr-2'></i> ${record.lead_title} ${record.lead_first_name} ${record.lead_last_name} </div>
-                          <div class='card-text text-muted'>
-                          <i class='fa fa-phone  pr-2'></i> 
-                          <span style='font-size: 12px;'>+91${record.lead_mobile_no}</span></div>
-                        <div class='card-text text-muted ${is_email}'>
-                          <div style='display: inline-block;width:20px;vertical-align:top;'>
-                          <i class='fa fa-envelope' style='font-size: 12px;'></i></div>
-                          <div style='width:calc(100% - 30px);display: inline-block;padding:2px;'>
-                          <div style='font-size: 12px;display: table-cell;line-height: 16px;word-break: break-word;'>${record.lead_email}</div></div></div>
+                         <div class='col-md-5'>
+                           <div class='card-text ${is_followup}'>
+                           <i class='fa fa-user pr-2 d-none'></i> 
+                           ${record.lead_title} ${record.lead_first_name} ${record.lead_last_name} </div>
                          </div>
-                         <div class='col-md-4' align='right' style='font-size: 11px;line-height: 15px !important;'>
-                         <div class='text-muted l_next_followup_${record.lead_id}'>${next_followup_date}</div>
-                         <div class='text-muted pt-1'>${record.lead_stage_name}</div>
-                         <div class='text-muted'>${record.lead_source_name}</div>
-                         </div>
+
+                          <div class='col-md-7'>
+                            <div class='card-text text-right text-muted'>
+                              ${record.lead_date}
+                              ${lead_time} 
+                            </div>
+                          </div>
+
+                          <div class='col-md-6'>
+                            <div class='card-text text-muted'>
+              ${record.assgin_user_full_name}
+                           </div>
+                          </div>
+                          
+                          <div class='col-md-6'>
+                           <div class='card-text text-right text-muted'>
+                            Facebook
+                           </div>
+                        </div>
                        </div>
                      </div>
                    </div>
@@ -2033,23 +2043,19 @@
     rules: {},
     messages: {},
     submitHandler: function(form) {
+<<<<<<< HEAD
 
+=======
+>>>>>>> 1b8910dc5814e19d823adbc849bd7984308f14eb
       var myform = document.getElementById("followup-form-modal");
       var fd = new FormData(myform);
       var fid = $("#followup_id").val();
       var lid = $("#followup_lead_id").val();
       var btn_label = "Save";
 
-      var base_url_of_followup = 'followup_save';
-
-      if($('#followup_id').val() == 0){
-        var base_url_of_followup = 'add_to_followup';
-      }
-
-
       $.ajax({
         type: "POST",
-        url: "<?= base_url(AGENT_URL . 'api/') ?>"+base_url_of_followup,
+        url: "<?= base_url(AGENT_URL . 'api/followup_save') ?>",
         data: fd,
         cache: false,
         processData: false,
@@ -2207,6 +2213,11 @@
               keyboard: false
             });
             $(".lead_form").html(response);
+            
+            primary_mobile_number_with_dial_code();
+            secondary_mobile_number_with_dial_code();
+            $('.get_locations').trigger('change')
+
           } else {
             //$(".customer_detail").html("");
             //$(".error-msg-right").html(alertMessage('error','Some error occurred, please try again.'));

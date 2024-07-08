@@ -1557,39 +1557,49 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
 
         if ($user_detail && $this->input->post()) {
 
-            $id = $this->input->post('id');
-            $record = $this->Action_model->select_single('tbl_leads', "lead_id='" . $id . "'");
+            $id             =   $this->input->post('id');
+            $record         =   $this->Action_model->select_single('tbl_leads', "lead_id='" . $id . "'");
 
-            $record_array = array(
-                'lead_title' => $this->input->post('lead_title'),
-                'lead_first_name' => $this->input->post('lead_first_name'),
-                'lead_last_name' => $this->input->post('lead_last_name'),
-                'lead_date' => $this->input->post('lead_date'),
-                'lead_time' => $this->input->post('lead_time'),
-                'lead_mobile_no_2' => $this->input->post('lead_mobile_no_2'),
-                'lead_address' => $this->input->post('lead_address'),
-                'lead_state_id' => $this->input->post('lead_state_id'),
-                'lead_city_id' => $this->input->post('lead_city_id'),
-                'lead_occupation_id' => $this->input->post('lead_occupation_id'),
-                'lead_department_id' => $this->input->post('lead_department_id'),
-                'lead_dob' => $this->input->post('lead_dob'),
-                'lead_doa' => $this->input->post('lead_doa'),
-                'lead_source_id' => $this->input->post('lead_source_id'),
-                'lead_stage_id' => $this->input->post('lead_stage_id'),
-                'lead_status' => $this->input->post('lead_status'),
-                'user_id' => $user_id,
-                'added_by' => $user_id,
-                'account_id' => $account_id,
-                'lead_pan_no' => $this->input->post('lead_pan_no'),
-                'lead_adhar_no' => $this->input->post('lead_adhar_no'),
-                'lead_voter_id' => $this->input->post('lead_voter_id'),
-                'lead_passport_no' => $this->input->post('lead_passport_no'),
-                'lead_gender' => $this->input->post('lead_gender'),
-                'lead_marital_status' => $this->input->post('lead_marital_status'),
-                'lead_designation' => $this->input->post('lead_designation'),
-                'lead_company' => $this->input->post('lead_company'),
-                'lead_annual_income' => $this->input->post('lead_annual_income')
-            );
+            # Init
+            $primary_mobile_number_country_data                 =   $this->input->post('primary_mobile_number_country_data');
+            $secondary_mobile_number_country_data               =   $this->input->post('secondary_mobile_number_country_data');
+            $location_id                                        =   $this->input->post('location_id');
+            # End Init
+
+            $record_array           =   array(
+                                                'lead_title'                                 => $this->input->post('lead_title'),
+                                                'lead_first_name'                            => $this->input->post('lead_first_name'),
+                                                'lead_last_name'                             => $this->input->post('lead_last_name'),
+                                                'lead_date'                                  => $this->input->post('lead_date'),
+                                                'lead_time'                                  => $this->input->post('lead_time'),
+                                                'lead_mobile_no_2'                           => $this->input->post('lead_mobile_no_2'),
+                                                'lead_address'                               => $this->input->post('lead_address'),
+                                                'lead_state_id'                              => $this->input->post('lead_state_id'),
+                                                'lead_city_id'                               => $this->input->post('lead_city_id'),
+                                                'lead_occupation_id'                         => $this->input->post('lead_occupation_id'),
+                                                'lead_department_id'                         => $this->input->post('lead_department_id'),
+                                                'lead_dob'                                   => $this->input->post('lead_dob'),
+                                                'lead_doa'                                   => $this->input->post('lead_doa'),
+                                                'lead_source_id'                             => $this->input->post('lead_source_id'),
+                                                'lead_stage_id'                              => $this->input->post('lead_stage_id'),
+                                                'lead_status'                                => $this->input->post('lead_status'),
+                                                'user_id'                                    => $user_id,
+                                                'added_by'                                   => $user_id,
+                                                'account_id'                                 => $account_id,
+                                                'lead_pan_no'                                => $this->input->post('lead_pan_no'),
+                                                'lead_adhar_no'                              => $this->input->post('lead_adhar_no'),
+                                                'lead_voter_id'                              => $this->input->post('lead_voter_id'),
+                                                'lead_passport_no'                           => $this->input->post('lead_passport_no'),
+                                                'lead_gender'                                => $this->input->post('lead_gender'),
+                                                'lead_marital_status'                        => $this->input->post('lead_marital_status'),
+                                                'lead_designation'                           => $this->input->post('lead_designation'),
+                                                'lead_company'                               => $this->input->post('lead_company'),
+                                                'lead_annual_income'                         => $this->input->post('lead_annual_income'),
+
+                                                'primary_mobile_number_country_data'         => $primary_mobile_number_country_data,
+                                                'secondary_mobile_number_country_data'       => $secondary_mobile_number_country_data,
+                                                'location_id'                                => $this->input->post('location_id'),
+                                            );
 
             if ($record) {
 
@@ -1605,7 +1615,12 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
 
                 $this->Action_model->update_data($record_array, 'tbl_leads', "lead_id='" . $id . "'");
                 //$this->session->set_flashdata('success_msg', 'Lead Updated Successfully!!');
-                $array = array('status' => 'updated', 'message' => 'Lead Updated Successfully!!');
+
+                # Fetch Fresh Record
+                $lead               = $this->lead($id);
+                # Fetch Fresh Record
+
+                $array = array('status' => 'updated', 'message' => 'Lead Updated Successfully!!', 'data' => $lead);
             } else {
 
                 // if($this->Action_model->select_single('tbl_leads',"lead_email='".$this->input->post('lead_email')."' AND account_id='".$account_id."'")){
@@ -2292,8 +2307,10 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 //                                 WHERE ".(($user_ids)?"tbl_followup.followup_id in (select max(followup_id) from tbl_followup where ((tbl_followup.user_id='".implode("' OR tbl_followup.user_id='", $user_ids)."')  OR (tbl_followup.assign_user_id='".implode("' OR tbl_followup.assign_user_id='", $user_ids)."')) group by lead_id) AND ":"tbl_followup.followup_id in (select max(followup_id) from tbl_followup where lead_id=tbl_leads.lead_id group by lead_id) AND ")
                 //                                 ."".$where);
 
+                $this->db->select('tbl_leads.*, CONCAT(user.user_title, user.first_name, user.last_name) as assgin_user_full_name');
                 $this->db->where($where);
                 // $this->db->order_by('lead_id', 'desc');
+                $this->db->join('tbl_users as user', 'user.user_id = tbl_leads.user_id', 'left');
                 $query = $this->db->get('tbl_leads');
 
                 $record_data = $query->result();
@@ -2304,6 +2321,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 $records = array();
                 if ($record_data) {
                     foreach ($record_data as $item) {
+
 
                         $next_followup = "";
 
@@ -2329,14 +2347,16 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                             'lead_title' => $item->lead_title,
                             'lead_first_name' => $item->lead_first_name,
                             'lead_last_name' => $item->lead_last_name,
-                            'lead_date' => $item->lead_date,
+                            'lead_date' => $item->lead_date ? date('F d, Y', strtotime($item->lead_date)) : '',
+                            'lead_time' => $item->lead_time ? date('h:i a', strtotime($item->lead_time)) : '',
                             'next_followup_date' => $next_followup_date,
                             'lead_mobile_no' => $item->lead_mobile_no,
                             'lead_stage_name' => $item->lead_stage_name ?? '',
                             'lead_source_name' => $item->lead_source_name ?? '',
                             'lead_email' => $item->lead_email,
                             'next_followup' => $next_followup,
-                            'is_followup' => $item->added_to_followup
+                            'is_followup' => $item->added_to_followup,
+                            'assgin_user_full_name' => $item->assgin_user_full_name
                         );
                     }
                 }
@@ -3827,6 +3847,7 @@ WHERE lead_id='" . $lead_id . "'
             $id = $this->input->post("id");
 
             $lead_detail = $this->Action_model->select_single('tbl_leads', "lead_id='" . $id . "' AND account_id='" . $account_id . "'");
+            
             if ($lead_detail) {
 
                 $where = "country_id='1'";
@@ -10072,8 +10093,6 @@ echo json_encode($array);
                         'user_id' => $transfer_to
                     );
 
-
-
                     $this->Action_model->update_data($record_array, 'tbl_leads', "lead_id='" . $transfer_lead_id . "' AND account_id='" . $account_id . "'");
 
                     $this->Action_model->update_data($record_array, 'tbl_followup', "lead_id='" . $transfer_lead_id . "' AND user_id='" . $record->user_id . "'");
@@ -10755,5 +10774,13 @@ echo json_encode($array);
         echo json_encode($array);
 
    }
+
+   # Lead
+   function lead($id){
+    if(!$id) return null;
+
+    return db_instance()->where("lead_id = $id")->get('tbl_leads')->row();
+}
+# Lead
 
 }

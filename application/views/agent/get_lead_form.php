@@ -53,22 +53,31 @@
 
             <div class="form-group col-md-4">
                 <label>Mobile:</label>
-                <input type="text" class="form-control" placeholder="" id="lead_mobile_no" name="lead_mobile_no" value="<?php if($id) { echo $lead_detail->lead_mobile_no; } ?>" required="" maxlength='10'>
+                <br>
+                <input type="text" class="form-control primary_mobile_number" placeholder="" id="lead_mobile_no" name="lead_mobile_no" value="<?php if($id) { echo $lead_detail->lead_mobile_no; } ?>" required="">
+                 <!-- Primary Mobile Number Country Code -->
+                 <input type="hidden" value='<?= $lead_detail->primary_mobile_number_country_data ?? '{ "name" : "India", "iso2" : "in", "dialCode" : "91" }' ?>' name="primary_mobile_number_country_data" data-iso2="<?= json_decode($lead_detail->primary_mobile_number_country_data)->iso2 ?? 'in' ?>">
+                      <!-- End Primary Mobile Number Country Code -->
             </div>
 
             <div class="form-group col-md-4">
                 <label>Other No:</label>
-                <input type="text" class="form-control" placeholder="" id="lead_mobile_no_2" name="lead_mobile_no_2" value="<?php if($id) { echo $lead_detail->lead_mobile_no_2; } ?>" maxlength='10'>
+                <br>
+                <input type="text" class="form-control secondary_mobile_number" placeholder="" id="lead_mobile_no_2" name="lead_mobile_no_2" value="<?php if($id) { echo $lead_detail->lead_mobile_no_2; } ?>">
+                <!-- Secondary Mobile Number Country Code -->
+
+                <input type="hidden" value='<?= $lead_detail->secondary_mobile_number_country_data ?? '{ "name" : "India", "iso2" : "in", "dialCode" : "91" }' ?>' name="secondary_mobile_number_country_data" data-iso2="<?= json_decode($lead_detail->secondary_mobile_number_country_data)->iso2 ?? 'in' ?>">
+                      <!-- End Secondary Mobile Number Country Code -->
             </div>
 
             <div class="form-group col-md-4">
                 <label>Email:</label>
-                <input type="text" class="form-control" placeholder="" id="lead_email" name="lead_email" value="<?php if($id) { echo $lead_detail->lead_email; } ?>" required="" <?php if($id) { echo 'disabled'; } ?>>
+                <input type="text" class="form-control" placeholder="Enter email" id="lead_email" name="lead_email" value="<?= $lead_detail->lead_email ?? '' ?>">
             </div>
 
             <div class="form-group col-md-4">
                 <label>Address:</label>
-                <input type="text" class="form-control" placeholder="" id="lead_address" name="lead_address" value="<?php if($id) { echo $lead_detail->lead_address; } ?>">
+                <input type="text" class="form-control" placeholder="Enter address" id="lead_address" name="lead_address" value="<?php if($id) { echo $lead_detail->lead_address; } ?>">
             </div>
 
             <div class="form-group col-md-4">
@@ -83,13 +92,24 @@
 
             <div class="form-group col-md-4">
                 <label>City:</label>
-                <select class="form-control" id="new_city_id" name="lead_city_id">
+                <select class="form-control get_locations" id="new_city_id" name="lead_city_id">
                      <option value="">Select City</option>
                       <?php foreach ($city_list as $city) { ?>
                     <option value="<?= $city->city_id ?>" <?php if($id && $lead_detail->lead_city_id==$city->city_id) { echo 'selected'; } ?>><?= $city->city_name ?></option>
                       <?php } ?>
                  </select>
             </div>
+
+            <!-- Location -->
+    <div class="col-md-4">
+      <div class="form-group">
+        <label for="">Location</label>
+        <select name="location_id" id="" class="form-control set_locations" data-selected_id="<?= $lead_detail->location_id ?? 0 ?>">
+          <option value="" selected disabled>Choose..</option>
+        </select>
+      </div>
+    </div>
+    <!-- End Location -->
 
             <div class="form-group col-md-4">
                 <label>Occupation:</label>
@@ -113,12 +133,12 @@
 
             <div class="form-group col-md-4">
                 <label>DOB:</label>
-                <input type="text" class="form-control mydatepicker" data-date-format='dd-mm-yyyy' placeholder="" id="lead_dob" name="lead_dob" value="<?php if($id) { echo $lead_detail->lead_dob; } ?>">
+                <input type="text" class="form-control mydatepicker" data-date-format='dd-mm-yyyy' placeholder="Enter date of birth" id="lead_dob" name="lead_dob" value="<?php if($id) { echo $lead_detail->lead_dob; } ?>">
             </div>
 
             <div class="form-group col-md-4">
                 <label>DOA:</label>
-                <input type="text" class="form-control mydatepicker" data-date-format='dd-mm-yyyy' placeholder="" id="lead_doa" name="lead_doa" value="<?php if($id) { echo $lead_detail->lead_doa; } ?>">
+                <input type="text" class="form-control mydatepicker" data-date-format='dd-mm-yyyy' placeholder="Enter DOA" id="lead_doa" name="lead_doa" value="<?php if($id) { echo $lead_detail->lead_doa; } ?>">
             </div>
 
             <div class="form-group col-md-4">
@@ -144,7 +164,7 @@
             </div>
 
 
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-4">
                 <label>Status:</label>
                 <select class="form-control" name="lead_status" required="">
                     <option value="" disabled="">Select Status</option>
@@ -154,7 +174,7 @@
                 </select>
             </div>
 
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-4">
             	<label>Gender:</label>
                 <select class="form-control" id="lead_gender" name="lead_gender">
                       <option value="">Select Gender</option>
@@ -162,7 +182,7 @@
                       <option value="Female" <?php if($id && $lead_detail->lead_gender=='Female') { echo 'selected'; } ?> >Female</option>
                 </select>
             </div>
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-4">
             	<label>Marital Status:</label>
                 <select class="form-control" id="lead_marital_status" name="lead_marital_status">
                       <option value="">Select Marital Status</option>
@@ -171,7 +191,7 @@
                 </select>
             </div>
 
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-4">
             	<label>Designation:</label>
                 <select class="form-control" id="lead_designation" name="lead_designation">
                 	<option value="">Select Designation</option>
@@ -180,13 +200,13 @@
                       <?php } ?>
                 </select>
             </div>
+            <div class="form-group col-md-4">
+              <label>Annual Income:</label>
+              <input type="text" class="form-control" id="lead_annual_income" name="lead_annual_income" value="<?php if($id) { echo $lead_detail->lead_annual_income; } ?>" placeholder="Enter annual income">
+            </div>
             <div class="form-group col-md-12">
             	<label>Name of Company:</label>
-            	<input type="text" class="form-control" id="lead_company" name="lead_company" value="<?php if($id) { echo $lead_detail->lead_company; } ?>">
-            </div>
-            <div class="form-group col-md-6">
-            	<label>Annual Income:</label>
-            	<input type="text" class="form-control" id="lead_annual_income" name="lead_annual_income" value="<?php if($id) { echo $lead_detail->lead_annual_income; } ?>">
+            	<input type="text" class="form-control" id="lead_company" name="lead_company" value="<?php if($id) { echo $lead_detail->lead_company; } ?>" placeholder="Enter company name">
             </div>
 
             <div class="form-group col-md-12">
@@ -194,19 +214,19 @@
             </div>
             <div class="form-group col-md-6">
             	<label>PAN No:</label>
-            	<input type="text" class="form-control" id="lead_pan_no" name="lead_pan_no" value="<?php if($id) { echo $lead_detail->lead_pan_no; } ?>">
+            	<input type="text" class="form-control" id="lead_pan_no" name="lead_pan_no" value="<?php if($id) { echo $lead_detail->lead_pan_no; } ?>" placeholder="Enter Pancard Number">
             </div>
             <div class="form-group col-md-6">
-            	<label>Adhar No:</label>
-            	<input type="text" class="form-control" id="lead_adhar_no" name="lead_adhar_no" value="<?php if($id) { echo $lead_detail->lead_adhar_no; } ?>">
+            	<label>Aadhar No:</label>
+            	<input type="text" class="form-control" id="lead_adhar_no" name="lead_adhar_no" value="<?php if($id) { echo $lead_detail->lead_adhar_no; } ?>"  placeholder="Enter Aadhar Number">
             </div>
             <div class="form-group col-md-6">
             	<label>Voter Id:</label>
-            	<input type="text" class="form-control" id="lead_voter_id" name="lead_voter_id" value="<?php if($id) { echo $lead_detail->lead_voter_id; } ?>">
+            	<input type="text" class="form-control" id="lead_voter_id" name="lead_voter_id" value="<?php if($id) { echo $lead_detail->lead_voter_id; } ?>"  placeholder="Enter Voter Number">
             </div>
             <div class="form-group col-md-6">
             	<label>Passport No:</label>
-            	<input type="text" class="form-control" id="lead_passport_no" name="lead_passport_no" value="<?php if($id) { echo $lead_detail->lead_passport_no; } ?>">
+            	<input type="text" class="form-control" id="lead_passport_no" name="lead_passport_no" value="<?php if($id) { echo $lead_detail->lead_passport_no; } ?>"  placeholder="Enter Passport Number">
             </div>
 
         </div>
@@ -229,18 +249,18 @@ $('.mydatepicker').bootstrapMaterialDatePicker({
 $("#form-modal").validate({
     rules: {
 
-        lead_email: {
-            required: true,
-            email:true
-        },
-        lead_mobile_no: {
-            minlength:10,
-            maxlength:10
-        },
-        lead_mobile_no_2: {
-            minlength:10,
-            maxlength:10
-        }
+        // lead_email: {
+        //     required: true,
+        //     email:true
+        // },
+        // lead_mobile_no: {
+        //     minlength:11,
+        //     maxlength:11
+        // },
+        // lead_mobile_no_2: {
+        //     minlength:11,
+        //     maxlength:11
+        // }
           
     },
     messages: {
@@ -285,11 +305,15 @@ $("#form-modal").validate({
                   //$(".error-msg").html(alertMessage('success',obj.message));
                 }
                 else if (obj.status=='updated') {
-                    window.location.href=''; 
+                    // window.location.href=''; 
+                    showToast('success', obj.message)
                   $(".error-msg").html(alertMessage('success',obj.message));
                   hideLeadEditModal(<?= $id ?>);
+
+                  
                 }
                 else {
+                  showToast('success', obj.message)
                   $(".error-msg").html(alertMessage('error',obj.message));
                 }
               }

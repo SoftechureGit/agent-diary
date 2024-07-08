@@ -20,12 +20,21 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id, $use
     <!-- Custom Stylesheet -->
     <link href="<?php echo base_url('public/admin/') ?>css/style.css" rel="stylesheet">
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@23.1.0/build/css/intlTelInput.css">
+
     <style>
         body {
             font-family: Roboto;
         }
 
-       
+        .form-control {
+    border-radius: 5px;
+  }
+
+  .iti.iti--allow-dropdown.iti--show-flags.iti--inline-dropdown {
+    width: 100%;
+  }
+
 
         /* Toast */
         #toast-container {
@@ -226,6 +235,10 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id, $use
         Main wrapper start
     ***********************************-->
     <div id="main-wrapper">
+
+    <!-- Toast -->
+<div id="toast-container"></div>
+<!-- End Toast -->
 
         <!--**********************************
             Nav header start

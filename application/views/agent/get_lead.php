@@ -596,9 +596,6 @@ $("#transfer-form-modal").validate({
                   $(".error-msg-right").html(alertMessage('success',obj.message));
                    $(".btn-add-followup").css("visibility","hidden");
                    $(".transfer_btn").css("visibility","hidden");
-                   setTimeout(function(){
-                    window.location.href="";
-                  },1000);
 
                 }
                 else {
