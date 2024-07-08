@@ -2043,10 +2043,6 @@
     rules: {},
     messages: {},
     submitHandler: function(form) {
-<<<<<<< HEAD
-
-=======
->>>>>>> 1b8910dc5814e19d823adbc849bd7984308f14eb
       var myform = document.getElementById("followup-form-modal");
       var fd = new FormData(myform);
       var fid = $("#followup_id").val();
