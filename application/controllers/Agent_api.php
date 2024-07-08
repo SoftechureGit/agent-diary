@@ -2307,8 +2307,10 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 //                                 WHERE ".(($user_ids)?"tbl_followup.followup_id in (select max(followup_id) from tbl_followup where ((tbl_followup.user_id='".implode("' OR tbl_followup.user_id='", $user_ids)."')  OR (tbl_followup.assign_user_id='".implode("' OR tbl_followup.assign_user_id='", $user_ids)."')) group by lead_id) AND ":"tbl_followup.followup_id in (select max(followup_id) from tbl_followup where lead_id=tbl_leads.lead_id group by lead_id) AND ")
                 //                                 ."".$where);
 
+                $this->db->select('tbl_leads.*, CONCAT(user.user_title, user.first_name, user.last_name) as assgin_user_full_name');
                 $this->db->where($where);
                 // $this->db->order_by('lead_id', 'desc');
+                $this->db->join('tbl_users as user', 'user.user_id = tbl_leads.user_id', 'left');
                 $query = $this->db->get('tbl_leads');
 
                 $record_data = $query->result();
@@ -2319,6 +2321,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 $records = array();
                 if ($record_data) {
                     foreach ($record_data as $item) {
+
 
                         $next_followup = "";
 
@@ -2344,14 +2347,16 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                             'lead_title' => $item->lead_title,
                             'lead_first_name' => $item->lead_first_name,
                             'lead_last_name' => $item->lead_last_name,
-                            'lead_date' => $item->lead_date,
+                            'lead_date' => $item->lead_date ? date('F d, Y', strtotime($item->lead_date)) : '',
+                            'lead_time' => $item->lead_time ? date('h:i a', strtotime($item->lead_time)) : '',
                             'next_followup_date' => $next_followup_date,
                             'lead_mobile_no' => $item->lead_mobile_no,
                             'lead_stage_name' => $item->lead_stage_name ?? '',
                             'lead_source_name' => $item->lead_source_name ?? '',
                             'lead_email' => $item->lead_email,
                             'next_followup' => $next_followup,
-                            'is_followup' => $item->added_to_followup
+                            'is_followup' => $item->added_to_followup,
+                            'assgin_user_full_name' => $item->assgin_user_full_name
                         );
                     }
                 }
@@ -10082,8 +10087,6 @@ echo json_encode($array);
                     $record_array = array(
                         'user_id' => $transfer_to
                     );
-
-
 
                     $this->Action_model->update_data($record_array, 'tbl_leads', "lead_id='" . $transfer_lead_id . "' AND account_id='" . $account_id . "'");
 
