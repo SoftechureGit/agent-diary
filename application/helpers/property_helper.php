@@ -23,7 +23,8 @@ if (!function_exists('db_instance')) {
 }
 # End Get DB Instance
 
-if (!function_exists('facings')) {
+    # Facings
+    if (!function_exists('facings')) {
     function facings(){
        
         $records    =   db_instance()
@@ -35,4 +36,18 @@ if (!function_exists('facings')) {
 
         return $records ?? [];
     }
+    # End Facings
+
+    # Lead Details
+    if(function_exists('lead')){
+        function lead($id){
+            echo $id;
+            die;
+
+            if(!$id) return null;
+
+            return db_instance()->where("lead_id = $id")->get('tbl_leads')->row();
+        }
+    }
+    # End Lead Details
 }

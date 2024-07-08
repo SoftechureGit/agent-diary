@@ -514,6 +514,73 @@
     // End Add More
     // ##########
   </script>
+
+<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@23.1.0/build/js/intlTelInput.min.js"></script>
+
+<script>
+  /** Primary Mobile Number With Dial Code */
+    function primary_mobile_number_with_dial_code(){
+    const primary_mobile_number = document.querySelector(".primary_mobile_number");
+
+    const initialCountry   = $('[name="primary_mobile_number_country_data"]').data('iso2') != 'undefined' ? $('[name="primary_mobile_number_country_data"]').data('iso2') : 'in';
+
+    const primary_mobile_number_iti = window.intlTelInput(primary_mobile_number, {
+      initialCountry: initialCountry,
+      separateDialCode: true,
+      autoPlaceholder:'polite',
+      customPlaceholder: function(selectedCountryPlaceholder, selectedCountryData) {
+    return "Enter Mobile Number";
+  },
+      utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@23.1.0/build/js/utils.js",
+    });
+
+    primary_mobile_number.addEventListener("countrychange", function() {
+      const country_data = primary_mobile_number_iti.getSelectedCountryData();
+      document.querySelector('[name="primary_mobile_number_country_data"]').value = JSON.stringify(country_data);
+    });
+
+    primary_mobile_number.addEventListener('input', function() {
+      // prevent changing the country automatically based on input
+      const currentCountry = primary_mobile_number_iti.getSelectedCountryData().iso2;
+      const currentNumber = primary_mobile_number_iti.getNumber();
+      if (currentCountry !== primary_mobile_number_iti.getSelectedCountryData().iso2) {
+        primary_mobile_number_iti.setCountry(currentCountry);
+      }
+    });
+  }
+    /** End Primary Mobile Number */
+
+    /** Secondary Mobile Number */
+    function secondary_mobile_number_with_dial_code(){
+    const secondary_mobile_number = document.querySelector(".secondary_mobile_number");
+    const initialCountry   = $('[name="secondary_mobile_number_country_data"]').data('iso2') != 'undefined' ? $('[name="secondary_mobile_number_country_data"]').data('iso2') : 'in';
+    
+    const secondary_mobile_number_iti = window.intlTelInput(secondary_mobile_number, {
+      initialCountry: initialCountry,
+      separateDialCode: true,
+      autoPlaceholder:'polite',
+      customPlaceholder: function(selectedCountryPlaceholder, selectedCountryData) {
+    return "Enter Mobile Number";
+  },
+      utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@23.1.0/build/js/utils.js",
+    });
+
+    secondary_mobile_number.addEventListener("countrychange", function() {
+      const country_data = secondary_mobile_number_iti.getSelectedCountryData();
+      document.querySelector('[name="secondary_mobile_number_country_data"]').value = JSON.stringify(country_data);
+    });
+
+    secondary_mobile_number.addEventListener('input', function() {
+      // prevent changing the country automatically based on input
+      const currentCountry = secondary_mobile_number_iti.getSelectedCountryData().iso2;
+      const currentNumber = secondary_mobile_number_iti.getNumber();
+      if (currentCountry !== secondary_mobile_number_iti.getSelectedCountryData().iso2) {
+        secondary_mobile_number_iti.setCountry(currentCountry);
+      }
+    });
+  }
+    /** End Primary Mobile Number */
+</script>
 <!--  -->
     
 </body>

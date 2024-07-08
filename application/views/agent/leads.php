@@ -168,7 +168,8 @@
               <div class="col-md-5">
                 <div class="row">
                   <div class="col-md-6">
-                    <h4 class="card-title">Leads</h4>
+                    <h4 class="card-title">Leads ( <span class="total_records">0</span> )</h4>
+                    <a class="btn btn-dark btn-sm  " href="<?= base_url(AGENT_URL . 'lead-detail/') ?>"> Add New </a>
                   </div>
                   <div class="col-md-6" align="right">
                     <select class="form-control" style="height: 30px !important;min-height: 30px;padding: 0px 5px;width: 155px;" id="filter_by" onchange="filterData()">
@@ -177,10 +178,6 @@
                     </select>
                   </div>
 
-                  <div class="col-md-12">
-                    <p>Total Leads: <span class="total_records">0</span></p>
-                    <a class="btn btn-dark btn-sm  " href="<?= base_url(AGENT_URL . 'lead-detail/') ?>"> Add New </a>
-                  </div>
 
                   <div class="col-md-12">
 
@@ -2033,25 +2030,15 @@
     rules: {},
     messages: {},
     submitHandler: function(form) {
-
- 
-
       var myform = document.getElementById("followup-form-modal");
       var fd = new FormData(myform);
       var fid = $("#followup_id").val();
       var lid = $("#followup_lead_id").val();
       var btn_label = "Save";
 
-      var base_url_of_followup = 'followup_save';
-
-      if($('#followup_id').val() == 0){
-        var base_url_of_followup = 'add_to_followup';
-      }
-
-
       $.ajax({
         type: "POST",
-        url: "<?= base_url(AGENT_URL . 'api/') ?>"+base_url_of_followup,
+        url: "<?= base_url(AGENT_URL . 'api/followup_save') ?>",
         data: fd,
         cache: false,
         processData: false,
@@ -2209,6 +2196,11 @@
               keyboard: false
             });
             $(".lead_form").html(response);
+            
+            primary_mobile_number_with_dial_code();
+            secondary_mobile_number_with_dial_code();
+            $('.get_locations').trigger('change')
+
           } else {
             //$(".customer_detail").html("");
             //$(".error-msg-right").html(alertMessage('error','Some error occurred, please try again.'));
