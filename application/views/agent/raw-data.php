@@ -189,7 +189,7 @@
               <div class="col-md-3">
 
                 <!-- <label for="">File Name</label> -->
-                <select name="" class="form-control" id="file_name">
+                <select name="" class="form-control select-2-file-with-search" id="file_name">
                   <option value="" disabled selected> -- Choose File Name -- </option>
                   <?php foreach ($all_file_type as $file_type): ?>
                     <option value="<?= $file_type->file_name ?>"><?= $file_type->file_name ?></option>
@@ -199,7 +199,7 @@
                 <!-- <input type="text" id="searchBox" class="form-control" placeholder="Name or Mobile"> -->
               </div>
               <div class="col-md-3">
-                <select id="teamFilter" class="form-control">
+                <select id="teamFilter" class="form-control select-2-team-with-search">
                   <option value="" >All Team Member</option>
                   <?php foreach ($user_list as $item) {
                   if ($record->user_id != $item->user_id) { ?>
@@ -211,14 +211,14 @@
                 </select>
               </div>
               <div class="col-md-3">
-                <select id="statusFilter" class="form-control">
+                <select id="statusFilter" class="form-control select-2-status-with-search">
                   <option value="">All Status</option>
                   <option value="1">Pending</option>
                   <option value="0">Rejected</option>
                 </select>
               </div>
               <div class="col-md-3">
-                <select id="reasonFilter" class="form-control">
+                <select id="reasonFilter" class="form-control select-2-reason-with-search">
                   <option value="">All Reasons</option>
                   <?php if( count($all_reasons) > 0) { ?>
                     <?php foreach ($all_reasons as $reason): ?>
@@ -240,7 +240,7 @@
                     <th style="width: 30px;">S.No</th>
                     <th>Name</th>
                     <th>Mobile No</th>
-                    <th>Added By</th>
+                    <th>Assign To</th>
                     <th class=" wd-50 text-center">Status</th>
                     <th>Reason</th>
                     <th class="nosort wd-100 text-center">Action</th>
@@ -447,7 +447,15 @@
           return '<input type="checkbox" class="lead_id_select" value="' + data.data_id + '">'
         }
       },
-      { data: 'data_id' },
+
+      {
+        'render':function(data,type,row,meta)
+        {
+           return meta.row + 1;
+        }
+      },
+
+      // { data: 'data_id' },
       { data: 'data_name' },
       { data: 'mobile' },
       { data: 'user_name' },
@@ -487,6 +495,14 @@
 
 
   $(document).ready(function () {
+
+    // select 2 
+
+    $('.select-2-file-with-search').select2();
+    $('.select-2-reason-with-search').select2();
+    $('.select-2-status-with-search').select2();
+    $('.select-2-team-with-search').select2();
+
 
     // Select All / Unselect All
     $('#select_all').on('change', function(){
@@ -679,6 +695,21 @@
    $file_name_d = $('#file_name').val();
 
 
+   var selected_ids = [];
+    var selected_id = $('#empTable tbody input[type="checkbox"].lead_id_select:checked').each(function () {
+      selected_ids.push($(this).val());
+    })
+
+    // var lead_ids = $('#selected_lead_ids').val();
+    var lead_ids = selected_ids.join(',');
+
+
+    if (lead_ids == '') {
+      alert('No Lead Selected ');
+      return 0;
+    }
+
+
   
   if($file_name_d == null){
 
@@ -696,7 +727,7 @@
     },
     type: "POST",
     url: "<?= base_url(AGENT_URL . 'api/data_delete') ?>",
-    data: {'file_name' : $file_name_d},
+    data: {'file_name' : $file_name_d , 'data_ids' : lead_ids},
     dataType: "json",
     beforeSend: function (data) {
         $(".transfer-error-msg").html('');

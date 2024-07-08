@@ -2537,10 +2537,12 @@ $writer->save('php://output');
     # changes 2024-06-28 add new method
 
     function data(){
- 
-        $all_file_type = $this->db->distinct()->select('file_name')->where('is_in_lead',0)->get('tbl_data')->result();
 
-        $all_reasons  =  $this->db->distinct()->select('data_reason')->where(['is_in_lead'=> 0 ])->where("data_reason IS NOT NULL")->get('tbl_data')->result();
+        $account_id = getAccountId();
+ 
+        $all_file_type = $this->db->distinct()->select('file_name')->where('is_in_lead',0)->where('added_by',$account_id)->get('tbl_data')->result();
+
+        $all_reasons  =  $this->db->distinct()->select('data_reason')->where(['is_in_lead'=> 0 ])->where("data_reason IS NOT NULL")->where('added_by',$account_id)->get('tbl_data')->result();
 
         $data['all_reasons'] = $all_reasons;
 
@@ -2577,7 +2579,7 @@ $writer->save('php://output');
         $budget_list = $this->Action_model->detail_result('tbl_budgets',$where,'budget_id,budget_name');
         $data['budget_list'] = $budget_list;
 
-        $account_id = getAccountId();
+       
         
         $where = "user_status='1' AND ((parent_id='".$account_id."') OR (user_id='".$account_id."' AND role_id='2'))";
         $where_ids = "";

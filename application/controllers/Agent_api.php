@@ -9993,11 +9993,15 @@ foreach(  $transfer_lead_ids as   $transfer_lead_id){
 
                   $data_array = array(
                      'lead_title'            =>  $raw_data->data_title,
+                     'data_id'               =>  $raw_data->data_id,
                      'lead_first_name'       =>  $raw_data->data_first_name,
                      'lead_last_name'        =>  $raw_data->data_last_name,
                      'lead_mobile_no'        =>  $raw_data->data_mobile,
-                     'lead_email'            =>  $raw_data->data_email
+                     'lead_email'            =>  $raw_data->data_email ,
+                     'lead_status'           =>  1,
+                     'lead_stage_id'         =>  1, 
                  );
+
                  $where          =   "lead_mobile_no='".$raw_data->data_mobile."' AND account_id='".$assign_to."'";
                  $lead_detail    =   $this->Action_model->select_single('tbl_leads',$where);
                  if ($lead_detail) {
@@ -10007,12 +10011,13 @@ foreach(  $transfer_lead_ids as   $transfer_lead_id){
                      $this->db->update('tbl_data', array('data_reason' => 'Already in Leads' , 'data_status' => 0));
                  }
                  else {
+
                      $data_array2 = array(
                          'user_id'           =>  $assign_to,
                          'account_id'        =>  $assign_to ,
                          'added_by'          =>  $account_id,
-                         'lead_status'       =>  1,
                      );
+
                      $data_array     =   array_merge($data_array,$data_array2);
                      $lead_id        =   $this->Action_model->insert_data($data_array,'tbl_leads');
                      $this->db->where('data_id', $raw_data->data_id);
@@ -10662,13 +10667,13 @@ echo json_encode($array);
         $where = '';
 
         $searchValue = $postData['search']['value'];
-        $searchQuery = 'is_in_lead=0';
+        $searchQuery = '';
 
 
         if ($this->input->post('file_name') != '') {
 
             $file_name = $this->input->post('file_name');
-                 $searchQuery .= " AND file_name= '$file_name'";
+            $searchQuery .= " file_name= '$file_name'";
 
         }
 
@@ -10715,9 +10720,30 @@ echo json_encode($array);
 
    public function data_delete(){
 
-    $file_name = $this->input->post('file_name');
 
-    $res =  $this->db->where('file_name' , $file_name)->delete('tbl_data');
+    // echo $this->input->post('data_ids'); die;
+
+
+    if($this->input->post('data_ids')){
+
+        $data_ids = explode(',' , $this->input->post('data_ids'));
+
+        foreach($data_ids as $data_id){
+
+            $file_name = $this->input->post('file_name');+
+        
+            $res =  $this->db->where('file_name' , $file_name)->where('data_id' , $data_id )->delete('tbl_data');
+        }
+
+    }
+    
+    else{
+         $file_name = $this->input->post('file_name');
+     
+         $res =  $this->db->where('file_name' , $file_name)->delete('tbl_data');
+
+     }
+
 
     if($res){
         $array = array('status'=>'success','message'=>'Data deleted ');

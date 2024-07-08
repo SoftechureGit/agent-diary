@@ -10943,7 +10943,227 @@ $property_list = $query->result();
         echo json_encode($array);
         
     }
+    
+
+    # start lead details
+
+    public function get_lead_details_with_p_c_n(){
+       
+        $previous_lead_id         = $this->input->post('previous_id');
+        $current_lead_id          = $this->input->post('current_id');
+        $next_lead_id             = $this->input->post('next_id');
+        
+        
+            if ($this->input->post()) {
+             $account_id = getAccountIdHash($this->input->post('user_hash'));
+     
+             if (!$account_id) {
+                 $array['data'] = array('status' => 'false', 'msg' => 'Some Error Occurred.');
+                 echo json_encode($array);
+                 exit;
+             }
+     
+             // $id = $this->input->post('lead_id');
+     
+             $where = "lead_id='" . $current_lead_id . "' AND account_id='" . $account_id . "'";
+     
+             $this->db->select("tbl_users.username as added_by_name, tbl_leads.*, tbl_states.*, tbl_city.*, tbl_occupations.*, tbl_lead_types.*, tbl_lead_stages.*, tbl_lead_sources.*, tbl_designations.*");
+             $this->db->from('tbl_leads');
+             $this->db->join('tbl_states', 'tbl_states.state_id = tbl_leads.lead_state_id', 'left');
+             $this->db->join('tbl_city', 'tbl_city.city_id = tbl_leads.lead_city_id', 'left');
+             $this->db->join('tbl_occupations', 'tbl_occupations.occupation_id = tbl_leads.lead_occupation_id', 'left');
+             $this->db->join('tbl_lead_types', 'tbl_lead_types.lead_type_id = tbl_leads.lead_status', 'left');
+             $this->db->join('tbl_lead_stages', 'tbl_lead_stages.lead_stage_id = tbl_leads.lead_stage_id', 'left');
+             $this->db->join('tbl_lead_sources', 'tbl_lead_sources.lead_source_id = tbl_leads.lead_source_id', 'left');
+             $this->db->join('tbl_designations', 'tbl_designations.designation_id = tbl_leads.lead_designation', 'left');
+             $this->db->join('tbl_users', 'tbl_leads.added_by = tbl_users.user_id', 'left');
+             $this->db->where($where);
+             $query = $this->db->get();
+             $record = $query->row();
+     
+             if ($record) {
+                 
+                 # start
+                 
+                 // Fetch previous lead ID
+                 $this->db->select('lead_id');
+                 $this->db->from('tbl_leads');
+                 $this->db->where('account_id', $account_id);
+                 $this->db->where('lead_id <', $current_lead_id);
+                 $this->db->order_by('lead_id', 'DESC');
+                 $this->db->limit(1);
+                 $previous_lead_query = $this->db->get();
+                 $previous_lead = $previous_lead_query->row();
+     
+                 // Fetch next lead ID
+                 $this->db->select('lead_id');
+                 $this->db->from('tbl_leads');
+                 $this->db->where('account_id', $account_id);
+                 $this->db->where('lead_id >', $current_lead_id);
+                 $this->db->order_by('lead_id', 'ASC');
+                 $this->db->limit(1);
+                 $next_lead_query = $this->db->get();
+                 $next_lead = $next_lead_query->row();
+                 
+                 // $next_lead_id = $next_lead ? $next_lead->lead_id : null;
+                 // $previous_lead_id = $previous_lead ? $previous_lead->lead_id : null;
+                 # end 
+                 
+                 
+     
+                 $where = "user_status='1' AND ((parent_id='" . $account_id . "') OR (user_id='" . $account_id . "' AND role_id='2'))";
+                 $where_ids = "";
+                 $user_ids = $this->get_level_user_ids($this->input->post('user_hash'));
+     
+                 if (count($user_ids)) {
+                     $where_ids .= " AND (tbl_users.user_id='" . implode("' OR tbl_users.user_id='", $user_ids) . "')";
+                 }
+                 
+                 
+                 $where .= $where_ids;
+     
+                 $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,user_title,first_name,last_name,parent_id,is_individual,firm_name');
+     
+                 $lead_data = array();
+                 foreach ($user_list as $row) {
+                     $row->is_individual = (($row->is_individual != '') ? $row->is_individual : "");
+                     $row->firm_name = (($row->firm_name != '') ? $row->firm_name : "");
+                     $row->parent_id = (($row->parent_id != '') ? $row->parent_id : "");
+                     $lead_data[] = $row;
+                 }
+     
+                 $where = "country_id='1'";
+                 $state_list = $this->Action_model->detail_result('tbl_states', $where);
+                 $where = "state_id='" . $record->lead_state_id . "'";
+                 $city_list = $this->Action_model->detail_result('tbl_city', $where);
+     
+                 $where = "occupation_status='1'";
+                 $occupation_list = $this->Action_model->detail_result('tbl_occupations', $where);
+     
+                 $where = "department_status='1'";
+                 $department_list = $this->Action_model->detail_result('tbl_departments', $where);
+     
+                 $where = "lead_source_status='1'";
+                 $lead_source_list = $this->Action_model->detail_result('tbl_lead_sources', $where);
+     
+                 $where = "lead_stage_status='1'";
+                 $lead_stage_list = $this->Action_model->detail_result('tbl_lead_stages', $where);
+     
+                 $where = "lead_type_status='1'";
+                 $lead_type_list = $this->Action_model->detail_result('tbl_lead_types', $where, 'lead_type_id,lead_type_name');
+                 $data['lead_type_list'] = (($lead_type_list) ? $lead_type_list : array());
+     
+                 $state_list = (($state_list) ? $state_list : array());
+                 $city_list = (($city_list) ? $city_list : array());
+                 $occupation_list = (($occupation_list) ? $occupation_list : array());
+                 $department_list = (($department_list) ? $department_list : array());
+                 $lead_source_list = (($lead_source_list) ? $lead_source_list : array());
+                 $lead_stage_list = (($lead_stage_list) ? $lead_stage_list : array());
+     
+                 foreach ($record as $k => $v) {
+                     $record->$k = ($v || $v == 0) ? $v : '';
+                 } 
+                 
+                 $record_p = '';
+                 
+                 if($previous_lead_id){
+                     
+                         $where = "lead_id='" . $previous_lead_id . "' AND account_id='" . $account_id . "'";
+     
+                         $this->db->select("tbl_users.username as added_by_name, tbl_leads.*, tbl_states.*, tbl_city.*, tbl_occupations.*, tbl_lead_types.*, tbl_lead_stages.*, tbl_lead_sources.*, tbl_designations.*");
+                         $this->db->from('tbl_leads');
+                         $this->db->join('tbl_states', 'tbl_states.state_id = tbl_leads.lead_state_id', 'left');
+                         $this->db->join('tbl_city', 'tbl_city.city_id = tbl_leads.lead_city_id', 'left');
+                         $this->db->join('tbl_occupations', 'tbl_occupations.occupation_id = tbl_leads.lead_occupation_id', 'left');
+                         $this->db->join('tbl_lead_types', 'tbl_lead_types.lead_type_id = tbl_leads.lead_status', 'left');
+                         $this->db->join('tbl_lead_stages', 'tbl_lead_stages.lead_stage_id = tbl_leads.lead_stage_id', 'left');
+                         $this->db->join('tbl_lead_sources', 'tbl_lead_sources.lead_source_id = tbl_leads.lead_source_id', 'left');
+                         $this->db->join('tbl_designations', 'tbl_designations.designation_id = tbl_leads.lead_designation', 'left');
+                         $this->db->join('tbl_users', 'tbl_leads.added_by = tbl_users.user_id', 'left');
+                         $this->db->where($where);
+                         $query = $this->db->get();
+                         $record_p = $query->row();
+                         
+                         if($record_p){
+                           foreach ($record_p as $k => $v) {
+                             $record_p->$k = ($v || $v == 0) ? $v : '';
+                             } 
+                         }
+                         
+                     
+                 }
+                 
+                 
+                 $record_n = '';
+                 
+                 if($next_lead_id){
+                     
+                     $where = "lead_id='" . $next_lead_id . "' AND account_id='" . $account_id . "'";
+     
+                         $this->db->select("tbl_users.username as added_by_name, tbl_leads.*, tbl_states.*, tbl_city.*, tbl_occupations.*, tbl_lead_types.*, tbl_lead_stages.*, tbl_lead_sources.*, tbl_designations.*");
+                         $this->db->from('tbl_leads');
+                         $this->db->join('tbl_states', 'tbl_states.state_id = tbl_leads.lead_state_id', 'left');
+                         $this->db->join('tbl_city', 'tbl_city.city_id = tbl_leads.lead_city_id', 'left');
+                         $this->db->join('tbl_occupations', 'tbl_occupations.occupation_id = tbl_leads.lead_occupation_id', 'left');
+                         $this->db->join('tbl_lead_types', 'tbl_lead_types.lead_type_id = tbl_leads.lead_status', 'left');
+                         $this->db->join('tbl_lead_stages', 'tbl_lead_stages.lead_stage_id = tbl_leads.lead_stage_id', 'left');
+                         $this->db->join('tbl_lead_sources', 'tbl_lead_sources.lead_source_id = tbl_leads.lead_source_id', 'left');
+                         $this->db->join('tbl_designations', 'tbl_designations.designation_id = tbl_leads.lead_designation', 'left');
+                         $this->db->join('tbl_users', 'tbl_leads.added_by = tbl_users.user_id', 'left');
+                         $this->db->where($where);
+                         $query = $this->db->get();
+                         $record_n = $query->row();
+                         
+                         if($record_n){
+                           foreach ($record_n as $k => $v) {
+                               
+                             $record_n->$k = ($v || $v == 0) ? $v : '';
+                             
+                             } 
+                         }
+                     
+                 }
+                 
+                 
+                 
+     
+                 $array['data'] = array(
+                     'status' => 'true',
+                     'msg' => 'Lead Found',
+                     'current_lead_data' => $record,
+                     'previous_lead_data' => $record_p ?? null ,
+                     'next_lead_data' => $record_n ?? null ,
+                     'records' => $lead_data,
+                     'state_list' => $state_list,
+                     'occupation_list' => $occupation_list,
+                     'department_list' => $department_list,
+                     'lead_source_list' => $lead_source_list,
+                     'lead_stage_list' => $lead_stage_list,
+                     'city_list' => $city_list,
+                     'next_lead_id' =>$previous_lead_id ?? '',
+                     'previous_lead_id' =>  $next_lead_id  ?? '' 
+                 );
+             } 
+             else 
+             {
+                 $array['data'] = array('status' => 'false', 'msg' => 'Record Not Found.');
+             }
+         } 
+         
+         else {
+             
+             $array['data'] = array('status' => 'false', 'msg' => 'Some error occurred, please try again.');
+             
+         }
+     
+         echo json_encode($array);
+        
+        
+        
+     }
 
   
 }
+
+   # end lead details
 ?>

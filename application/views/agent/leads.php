@@ -2034,8 +2034,6 @@
     messages: {},
     submitHandler: function(form) {
 
- 
-
       var myform = document.getElementById("followup-form-modal");
       var fd = new FormData(myform);
       var fid = $("#followup_id").val();
