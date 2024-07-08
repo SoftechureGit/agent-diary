@@ -1,5 +1,3 @@
-
-
 <?php include('include/header.php'); ?>
 
 <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.10/css/select2.min.css">
@@ -9,6 +7,23 @@
 <link href="<?php echo base_url('public/admin/') ?>plugins/bootstrap-material-datetimepicker/css/bootstrap-material-datetimepicker.css" rel="stylesheet">
 
 <style>
+  .lead-list .customer.active,
+  .lead-list .customer:hover {
+    background: #fff;
+    border: 1px solid #ffa96980 !important;
+  }
+
+  .lead-list {
+    margin: 2rem 0;
+  }
+
+  .lead-list .customer {
+    border: 1px solid transparent;
+    box-shadow: 2px 2px 10px #80808040;
+    border-radius: 8px;
+    margin: 1rem;
+  }
+
   .loader_progress {
     display: none;
     position: fixed;
@@ -126,14 +141,14 @@
 
   .lead-unit-form-view {
     margin: 0 1rem;
-}
+  }
 
-body {
+  body {
     overflow-y: hidden !important;
   }
 
-  .customer{
-    margin:5px;
+  .customer {
+    margin: 5px;
   }
 </style>
 <!--  -->
@@ -1036,8 +1051,8 @@ body {
                   next_followup_date = record.next_followup_date;
                 }
 
-                is_followup    = record.is_followup == 1 ? 'text-warning' : 'text-muted';
-                is_email    = record.lead_email == '' ? 'd-none' : '';
+                is_followup = record.is_followup == 1 ? 'text-warning' : 'text-muted';
+                is_email = record.lead_email == '' ? 'd-none' : '';
 
                 // html += "<div class='customer' onclick='showCustomer(" + record.lead_id + ",0)'>" +
                 //   "    <div class='row'>" +
@@ -1144,7 +1159,7 @@ body {
     return false;
   }
 
-  $(document).on('click', '.lead-list .customer', function(){
+  $(document).on('click', '.lead-list .customer', function() {
     $('.lead-list .customer').removeClass('active')
     $(this).addClass('active')
   })
@@ -2787,11 +2802,8 @@ body {
   }
 
   function add_to_followup_new(id) {
-  $(".error-msg-right").html('');
-  openFolloupModal(1,0,id);
-  nextAction();
-}
-
-
-
+    $(".error-msg-right").html('');
+    openFolloupModal(1, 0, id);
+    nextAction();
+  }
 </script>

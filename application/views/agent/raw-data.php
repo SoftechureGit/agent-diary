@@ -213,8 +213,8 @@
               <div class="col-md-3">
                 <select id="statusFilter" class="form-control">
                   <option value="">All Status</option>
-                  <option value="1">Active</option>
-                  <option value="0">Deactive</option>
+                  <option value="1">Pending</option>
+                  <option value="0">Rejected</option>
                 </select>
               </div>
               <div class="col-md-3">
@@ -455,9 +455,9 @@
         className: "text-center",
         'render': function (data, type, row) {
           if (row.status === '1') {
-            return "<span class='badge badge-success'>Active</span>";
+            return "<span class='badge p-2 text-white badge-warning'>Pending</span>";
           } else {
-            return "<span class='badge badge-danger'>Deactive</span>";
+            return "<span class='badge p-2 text-white badge-danger'>Rejected</span>";
           }
         },
         'orderable': false,
@@ -466,7 +466,7 @@
       {
         className: "text-center",
         'render': function (data, type, row) {
-          return "-";
+          return row.reason ?? '';
 
         },
         'orderable': false,
@@ -474,7 +474,7 @@
       },
       {
         data: null,
-        className: "text-center",
+        className: "text-center d-none",
         'orderable': false,
         'searchable': false,
         'render': function (data, type, row) {
@@ -547,7 +547,7 @@
                 if (obj.status == 'success') {
                   // location.reload();
 
-
+                  table.draw();
                   $("#transferModal").modal('hide');
                   $(".error-msg-right").html(` <div class="alert alert-success pd8">
                            Data Assigned

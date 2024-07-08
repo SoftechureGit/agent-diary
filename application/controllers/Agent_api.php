@@ -3777,6 +3777,9 @@ WHERE lead_id='" . $lead_id . "'
 
                 $array = array('status' => 'success', 'message' => 'Updated Successfully!!', 'next_followup' => $next_followup, 'next_followup_date' => $next_followup_date);
             } else {
+
+                
+
                 $array = array('status' => 'error', 'message' => 'Record Not Found!!');
             }
         } else {
@@ -9966,86 +9969,61 @@ WHERE lead_id='" . $lead_id . "'
     }
 
 
-    #  DATA ASSIGN 
-
-    public function data_assign()
-    {
-
-
-                $account_id     = 0;
-                $user_id        = 0;
-                $where          = "user_hash='".$this->session->userdata('agent_hash')."'";
-                $user_detail    = $this->Action_model->select_single('tbl_users',$where);
-
-                if ($user_detail) {
-                    $user_id    =   $user_detail->user_id;
-                    $account_id =   $user_detail->user_id;
-
-                    if ($user_detail->role_id!=2) {
-
-                        $account_id = $user_detail->parent_id;
-
-                    }
-            }
-            
-            $transfer_lead_ids=  $this->input->post('selected_lead_ids');
-
-        $transfer_lead_ids = explode(',', $transfer_lead_ids);
-
-            $assign_to = $this->input->post('transfer_to');
-
-
-            foreach(  $transfer_lead_ids as   $transfer_lead_id){
-
-             $raw_data =     $this->db->select('*')->where('data_id', $transfer_lead_id)->get('tbl_data')->row();
-
-             if( $raw_data){
-
-                              $data_array = array(
-                                 'lead_title'            =>  $raw_data->data_title,
-                                 'lead_first_name'       =>  $raw_data->data_first_name,
-                                 'lead_last_name'        =>  $raw_data->data_last_name,
-                                 'lead_mobile_no'        =>  $raw_data->data_mobile,
-                                 'lead_email'            =>  $raw_data->data_email
-                             );
-                 
-                             $where          =   "lead_mobile_no='".$raw_data->data_mobile."' AND account_id='".$assign_to."'";
-                             $lead_detail    =   $this->Action_model->select_single('tbl_leads',$where);
-                 
-                             if ($lead_detail) {
-                 
-                                 $this->Action_model->update_data($data_array,'tbl_leads',$where);
-                                 
-                             }
-                             else {
-                 
-                                 $data_array2 = array(
-                                     'user_id'           =>  $assign_to,
-                                     'account_id'        =>  $assign_to ,
-                                     'added_by'          =>  $account_id,
-                                     'lead_status'       =>  1,
-                                 );
-                 
-                                 $data_array     =   array_merge($data_array,$data_array2);
-                                 $lead_id        =   $this->Action_model->insert_data($data_array,'tbl_leads');
-
-                                 $this->db->where('data_id', $raw_data->data_id);
-                                 $this->db->update('tbl_data', array('is_in_lead' => 1));
-
-             }   
-            }
-
-            
-            
+#  DATA ASSIGN
+public function data_assign(){
+    $account_id     = 0;
+    $user_id        = 0;
+    $where          = "user_hash='".$this->session->userdata('agent_hash')."'";
+    $user_detail    = $this->Action_model->select_single('tbl_users',$where);
+    if ($user_detail) {
+        $user_id    =   $user_detail->user_id;
+        $account_id =   $user_detail->user_id;
+        if ($user_detail->role_id!=2) {
+            $account_id = $user_detail->parent_id;
         }
+}
+$transfer_lead_ids=  $this->input->post('selected_lead_ids');
+$transfer_lead_ids = explode(',', $transfer_lead_ids);
+$assign_to = $this->input->post('transfer_to');
+foreach(  $transfer_lead_ids as   $transfer_lead_id){
+ $raw_data =     $this->db->select('*')->where('data_id', $transfer_lead_id)->get('tbl_data')->row();
 
 
-        $array = array('status'=>'success','message'=>'Lead Transfered Successfully!!'); 
+ if( $raw_data){
 
-        echo json_encode($array);  
-        }
+                  $data_array = array(
+                     'lead_title'            =>  $raw_data->data_title,
+                     'lead_first_name'       =>  $raw_data->data_first_name,
+                     'lead_last_name'        =>  $raw_data->data_last_name,
+                     'lead_mobile_no'        =>  $raw_data->data_mobile,
+                     'lead_email'            =>  $raw_data->data_email
+                 );
+                 $where          =   "lead_mobile_no='".$raw_data->data_mobile."' AND account_id='".$assign_to."'";
+                 $lead_detail    =   $this->Action_model->select_single('tbl_leads',$where);
+                 if ($lead_detail) {
+                     $this->Action_model->update_data($data_array,'tbl_leads',$where);
 
-    # END DATA ASSIGN
+                     $this->db->where('data_id', $raw_data->data_id);
+                     $this->db->update('tbl_data', array('data_reason' => 'Already in Leads' , 'data_status' => 0));
+                 }
+                 else {
+                     $data_array2 = array(
+                         'user_id'           =>  $assign_to,
+                         'account_id'        =>  $assign_to ,
+                         'added_by'          =>  $account_id,
+                         'lead_status'       =>  1,
+                     );
+                     $data_array     =   array_merge($data_array,$data_array2);
+                     $lead_id        =   $this->Action_model->insert_data($data_array,'tbl_leads');
+                     $this->db->where('data_id', $raw_data->data_id);
+                     $this->db->update('tbl_data', array('is_in_lead' => 1));
+ }
+}
+}
+$array = array('status'=>'success','message'=>'Lead Transfered Successfully!!');
+echo json_encode($array);
+}
+# END DATA ASSIGN
 
 
 
@@ -10680,7 +10658,7 @@ WHERE lead_id='" . $lead_id . "'
 
         $postData = $this->input->post();
 
-        $select = "data_id,CONCAT(data_first_name,' ',data_last_name) as data_name, data_mobile as mobile  ,data_status as  status , CONCAT(first_name,' ',last_name) as user_name , 'file_name'";
+        $select = "data_id,CONCAT(data_first_name,' ',data_last_name) as data_name, data_mobile as mobile  ,data_status as  status , CONCAT(first_name,' ',last_name) as user_name , 'file_name' , data_reason as reason";
         $where = '';
 
         $searchValue = $postData['search']['value'];
@@ -10700,6 +10678,14 @@ WHERE lead_id='" . $lead_id . "'
             $searchQuery .= " AND account_id= '$account_id'";
         }
 
+        if($this->input->post('reason')){
+
+            $reason = $this->input->post('reason');
+            $searchQuery .= " AND data_reason= '$reason'";
+        }
+
+        
+
 
         if($this->input->post('status')!='') {
 
@@ -10707,7 +10693,6 @@ WHERE lead_id='" . $lead_id . "'
 
         }   
 
-            $searchQuery .= " AND data_status=".$this->input->post('status');
 
         if($searchValue != ''){
 

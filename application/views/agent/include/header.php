@@ -25,22 +25,7 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id, $use
             font-family: Roboto;
         }
 
-        .lead-list .customer.active,
-        .lead-list .customer:hover {
-            background: #fff;
-            border: 1px solid #ffa96980 !important;
-        }
-
-        .lead-list {
-            margin: 2rem 0;
-        }
-
-        .lead-list .customer {
-            border: 1px solid transparent;
-            box-shadow: 2px 2px 10px #80808040;
-            border-radius: 8px;
-            margin: 1rem;
-        }
+       
 
         /* Toast */
         #toast-container {

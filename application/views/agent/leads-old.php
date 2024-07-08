@@ -766,7 +766,7 @@ $("#followup-form-modal").validate({
                    $(".btn-add-followup").css("visibility","hidden");
                    $(".transfer_btn").css("visibility","hidden");
                    setTimeout(function(){
-                    window.location.href="<?= base_url(AGENT_URL.'followup') ?>";
+                    window.location.href="<?= base_url(AGENT_URL.'leads?page=old') ?>";
                   },1000);
 
                 }

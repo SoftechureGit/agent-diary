@@ -1497,7 +1497,11 @@ class Agent extends CI_Controller {
         $filter_user_list = $query->result();
         $data['filter_user_list'] = $filter_user_list;
 
-        $this->load->view(AGENT_URL.'leads',$data);
+        if($this->input->get('page') == 'old'):
+            $this->load->view(AGENT_URL.'leads-old',$data);
+        else:
+            $this->load->view(AGENT_URL.'leads',$data);
+        endif;
     }
 
     public function followup1()
@@ -2536,7 +2540,9 @@ $writer->save('php://output');
  
         $all_file_type = $this->db->distinct()->select('file_name')->where('is_in_lead',0)->get('tbl_data')->result();
 
-        $all_reasons  =  $this->db->distinct()->select('data_reason')->where('is_in_lead',0)->get('tbl_data')->result();
+        $all_reasons  =  $this->db->distinct()->select('data_reason')->where(['is_in_lead'=> 0 ])->where("data_reason IS NOT NULL")->get('tbl_data')->result();
+
+        $data['all_reasons'] = $all_reasons;
 
         $data['all_file_type'] = $all_file_type;
 
@@ -2902,7 +2908,16 @@ $writer->save('php://output');
         }
 	    
 		$data_excel = array();
-		$config['upload_path']        	 = FCPATH . './uploads/raw-data/';
+
+        $upload_path = FCPATH . './uploads/raw-data/';
+        # Create Folder if Folder Not Exits
+        if (!file_exists($upload_path)) {
+            mkdir($upload_path, 0777, true);
+        }
+        # End Create Folder if Folder Not Exits
+
+		$config['upload_path']        	 = $upload_path;
+
 		$config['allowed_types'] 		 =	'xlsx';
 		$this->load->library('upload', $config);
 			
