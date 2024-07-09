@@ -213,8 +213,11 @@
               <div class="col-md-3">
                 <select id="statusFilter" class="form-control select-2-status-with-search">
                   <option value="">All Status</option>
-                  <option value="1">Pending</option>
-                  <option value="0">Rejected</option>
+                  <?php if( count($all_status) > 0) { ?>
+                    <?php foreach ($all_status as $status): ?>
+                      <option value="<?= $status->lead_stage_id ?>"><?= $status->lead_stage_name ?></option>
+                    <?php endforeach; ?>
+                  <?php  } ?>  
                 </select>
               </div>
               <div class="col-md-3">
@@ -222,7 +225,7 @@
                   <option value="">All Reasons</option>
                   <?php if( count($all_reasons) > 0) { ?>
                     <?php foreach ($all_reasons as $reason): ?>
-                      <option value="<?= $reason->data_reason ?>"><?= $reason->data_reason ?></option>
+                      <option value="<?= $reason->comment ?>"><?= $reason->comment ?></option>
                     <?php endforeach; ?>
                   <?php  } ?>  
                 </select>
@@ -458,15 +461,11 @@
       // { data: 'data_id' },
       { data: 'data_name' },
       { data: 'mobile' },
-      { data: 'user_name' },
+      { data: 'assigned_user_full_name' },
       {
         className: "text-center",
         'render': function (data, type, row) {
-          if (row.status === '1') {
-            return "<span class='badge p-2 text-white badge-warning'>Pending</span>";
-          } else {
-            return "<span class='badge p-2 text-white badge-danger'>Rejected</span>";
-          }
+            return row.lead_stage_name  ?? '-'
         },
         'orderable': false,
         'searchable': false,
@@ -474,7 +473,7 @@
       {
         className: "text-center",
         'render': function (data, type, row) {
-          return row.reason ?? '';
+          return row.followup_comment ?? '-';
 
         },
         'orderable': false,
