@@ -1,23 +1,56 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 # Get Instance
-function CI()
-{
-    $CI          = &get_instance();
+if (!function_exists('CI')) {
+    function CI()
+    {
+        $CI          = &get_instance();
 
-    return $CI;
+        return $CI;
+    }
 }
 # End Get Instance
 
 # Get DB Instance
-function db_instance()
-{
-    $CI          = &get_instance();
-    $CI->load->database();
+if (!function_exists('db_instance')) {
+    function db_instance()
+    {
+        $CI          = &get_instance();
+        $CI->load->database();
 
-    return $CI->db;
+        return $CI->db;
+    }
 }
 # End Get DB Instance
+
+
+if (!function_exists('user')) {
+    function user()
+    {
+        $user_id    =    CI()->session->userdata('user_id');
+        if (!$user_id) return null;
+
+        return  db_instance()
+            ->select(
+                "
+                            user.user_id, 
+                            user.role_id, 
+                            user.username, 
+                            CONCAT(
+                                    IFNULL(user.user_title, ''), ' ', 
+                                    IFNULL(user.first_name, ''), ' ', 
+                                    IFNULL(user.last_name, '')
+                                ) AS full_name,
+                            user.email, 
+                            user.mobile,
+                            role.role_name"
+            )
+            ->join('tbl_roles as role', 'role.role_id = user.role_id', 'left')
+            ->where("user.user_id = $user_id")
+            ->get('tbl_users as user')->row();
+    }
+}
+
 
 # Upload File
 if (!function_exists('upload_file')) {
@@ -99,7 +132,7 @@ if (!function_exists('upload_files')) {
             if (!empty($_FILES[$name]['name'][$x])) {
                 if (!CI()->upload->do_upload('file')) {
                     $error = array('error' => CI()->upload->display_errors());
-                    $array = array('status' => false, 'message' => $error['error'].' * ( Photo Gallery ) ');
+                    $array = array('status' => false, 'message' => $error['error'] . ' * ( Photo Gallery ) ');
                     return (object) $array;
                 } else {
                     $images[] = CI()->upload->data('file_name');
@@ -403,20 +436,21 @@ if (!function_exists('getAccountId')) {
     # End Project Property Details
 
     ##### Gallery Images #####
-    function insert_or_update_gallery_images($gallery_images, $type, $parent_id){
+    function insert_or_update_gallery_images($gallery_images, $type, $parent_id)
+    {
         $data                           =   [];
-        
-        foreach($gallery_images ?? [] as $gallery_image):
+
+        foreach ($gallery_images ?? [] as $gallery_image) :
             $data[]                           =   [
-                                                    'name'              => $gallery_image,
-                                                    'type'              => $type,
-                                                    'parent_id'         => $parent_id,
-                                                    'updated_at'         => date('Y-m-d h:i:m:s'),
-                                                    'created_at'         => date('Y-m-d h:i:m:s'),
-                                                ];
+                'name'              => $gallery_image,
+                'type'              => $type,
+                'parent_id'         => $parent_id,
+                'updated_at'         => date('Y-m-d h:i:m:s'),
+                'created_at'         => date('Y-m-d h:i:m:s'),
+            ];
         endforeach;
 
-        if(count($data)):
+        if (count($data)) :
             db_instance()->insert_batch('tbl_gallery_images', $data);
         endif;
 

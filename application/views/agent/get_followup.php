@@ -126,14 +126,12 @@
 <div style="padding: 0px 15px 0px 15px;">
   <div class="row" style="border-bottom: 1px solid #0000000f;padding-bottom: 13px;margin-bottom: 10px;">
     <div class="col-md-2" align="center">
-      <img class="mr-3" src="<?= base_url('public/front/user.png') ?>" style="margin-top: 18px;border-radius:50%;" width="50" height="50" alt="">
+      <img class="mr-3" src="<?= $record->full_profile_url ?? base_url('public/front/user.png') ?>" style="margin-top: 18px;border-radius:50%;" width="50" height="50" alt="">
     </div>
     <div class="col-md-10">
 
       <div class="row">
-        <div class="col-md-6">
-          <h6 class="card-text text-muted ft-sm"><i class="fa fa-calendar"></i> <?= $record->lead_date ?></h6>
-        </div>
+      
         <div class="col-md-6" align="right">
           <!--<h6 class="card-text text-muted"><?= ucwords($record->user_title . ' ' . $record->first_name . ' ' . $record->last_name) ?></h6>-->
         </div>
@@ -144,7 +142,12 @@
           <h6 class="card-text text-muted ft-14"><i class="fa fa-user"></i> <?= ucwords($record->lead_title . ' ' . $record->lead_first_name . ' ' . $record->lead_last_name) ?></h6>
         </div>
 
-        <div class="col-md-6" align="right">
+        <div class="col-md-6">
+          <h6 class="card-text text-muted ft-sm text-right"><i class="fa fa-calendar"></i> <?= $record->lead_date ?></h6>
+        </div>
+        <div class="col-md-6 d-none">
+          </div>
+        <div class="col-md-6 d-none" align="right">
           <h6 class="card-text text-muted ft-sm">Matching Property</h6>
         </div>
       </div>
@@ -167,7 +170,15 @@
           <?php endif; ?>
           <!-- End Secondary Mobile Number -->
 
+          <!-- Email -->
+          <?php if($record->email): ?>
+              <h6 class="card-text text-muted ft-14"><i class="fa fa-envelope"></i> <?= $record->email ?></h6>
+          <?php endif; ?>
+          <!-- End Email -->
+
         </div>
+
+        
         <div class="col-md-6" align="right">
           <div class="card-text text-muted pt-1 ft-sm"><span><?php if ($record->lead_type_id == 1) {
                                                                 echo "<span style='padding:2px 10px;background:#4d7cff;color:white;border-radius:10px;'>" . $record->lead_type_name . "</span>";

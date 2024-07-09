@@ -1450,9 +1450,28 @@ class Agent extends CI_Controller {
         $where = "account_id='".$account_id."'";
         $tb_data = $this->Action_model->select_single('tbl_leads',$where,"COUNT(CASE WHEN added_to_followup = 1 THEN lead_id END) as total_followup,COUNT(CASE WHEN followup_date = '".date('d-m-Y')."' THEN lead_id END) as today_followup,COUNT(CASE WHEN added_to_followup = 0 THEN lead_id END) as missed_followup");  
 
-        $data['total_followup'] = $tb_data->total_followup;
-        $data['today_followup'] = $tb_data->today_followup;
-        $data['missed_followup'] = $tb_data->missed_followup;
+        $today_date                 = date('Y-m-d');
+        # Total New Leads
+        $total_new_leads            = $this->db->where("account_id = $account_id and DATE(STR_TO_DATE(`lead_date`, '%d-%m-%Y')) = '$today_date'")->get('tbl_leads')->num_rows();
+        # End Total New Leads
+        
+        # Today Followup 
+        $today_followups            = $this->db->where("account_id = $account_id and DATE(STR_TO_DATE(`followup_date`, '%d-%m-%Y')) = '$today_date'")->get('tbl_leads')->num_rows();
+        # Today Followup 
+        
+        # Total Followup 
+        $total_followups            = $this->db->where("account_id = $account_id and followup_date IS NOT NULL ")->get('tbl_leads')->num_rows();
+        # Total Followup 
+
+        # Missed Followup 
+        $missed_followups            =  $this->db->where("account_id = $account_id and DATE(STR_TO_DATE(`followup_date`, '%d-%m-%Y')) < '$today_date'")->get('tbl_leads')->num_rows();
+        # Missed Followup 
+      
+
+        $data['total_new_leads'] = $total_new_leads;
+        $data['total_followup'] = $total_followups;
+        $data['today_followup'] = $today_followups;
+        $data['missed_followup'] = $missed_followups;
 
         $where = "account_id='".$account_id."'";
         $chart_data = $this->Action_model->select_single('tbl_leads',$where,'COUNT(CASE WHEN lead_stage_id = 3 THEN lead_id END) as total_enquiry,COUNT(CASE WHEN lead_stage_id = 1 THEN lead_id END) as total_initial,COUNT(CASE WHEN lead_stage_id = 4 THEN lead_id END) as total_site_visit,COUNT(CASE WHEN added_to_followup = 1 THEN lead_id END) as total_followup');  

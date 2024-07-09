@@ -1564,6 +1564,11 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
             $primary_mobile_number_country_data                 =   $this->input->post('primary_mobile_number_country_data');
             $secondary_mobile_number_country_data               =   $this->input->post('secondary_mobile_number_country_data');
             $location_id                                        =   $this->input->post('location_id');
+            
+            # Profile
+            $profile     = upload_file('profile', 'profile', $this->input->post('old_profile'));
+            # End Profile
+
             # End Init
 
             $record_array           =   array(
@@ -1599,6 +1604,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                                                 'primary_mobile_number_country_data'         => $primary_mobile_number_country_data,
                                                 'secondary_mobile_number_country_data'       => $secondary_mobile_number_country_data,
                                                 'location_id'                                => $this->input->post('location_id'),
+                                                'profile'                                    => $profile->file_name ?? '',
                                             );
 
             if ($record) {
@@ -2160,8 +2166,20 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 $page = $this->input->post('page');
 
                 $search_text = $this->input->post('search_text');
+                
                 $search_date_from = $this->input->post('search_date_from');
                 $search_date_to = $this->input->post('search_date_to');
+                
+                # Lead Filter
+                $lead_from = $this->input->post('lead_from');
+                $lead_to = $this->input->post('lead_to');
+                # End Lead Filter
+
+                # Followup Filter
+                $followup_from = $this->input->post('followup_from');
+                $followup_to = $this->input->post('followup_to');
+                # End Followup Filter
+
                 $search_state_id = $this->input->post('search_state_id');
                 $search_city_id = $this->input->post('search_city_id');
                 $search_source_id = $this->input->post('search_source_id');
@@ -2221,7 +2239,8 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 }
 
                 if ($search_location_id) {
-                    $where_ext .= " AND FIND_IN_SET(" . $search_location_id . ",location)";
+                    $where_ext .= " AND tbl_leads.location_id='" . $search_location_id . "'";
+                    // $where_ext .= " AND FIND_IN_SET(" . $search_location_id . ",location)";
                 }
 
                 if ($search_budget_min && !$search_budget_max) {
@@ -2283,36 +2302,40 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 // } else {
                 //     $where .= " ORDER BY tbl_leads.lead_id DESC";
                 // }
-                $where .= " ORDER BY tbl_leads.lead_id DESC";
+                // $where .= " ORDER BY tbl_leads.lead_id DESC";
+
+
+                # Sorting
+                switch($filter_by):
+                    case 'due_followup':
+                        $where .= " ORDER BY DATE(STR_TO_DATE(`followup_date`, '%d-%m-%Y')) DESC";
+                        break;
+                        
+                    case 'new_leads':
+                        $where .= " ORDER BY DATE(STR_TO_DATE(`lead_date`, '%d-%m-%Y')) DESC, lead_time ASC";
+                        break;
+                endswitch;
+                # End Sorting
 
                 $where .= " limit " . $start . "," . $limit;
 
-                // $query=$this->db->query(
-                //                         "SELECT tbl_requirements.*,
-                //                                 tbl_leads.*,
-                //                                 tbl_lead_sources.*,
-                //                                 tbl_lead_stages.*,
-                //                                 `tbl_leads`.`lead_id` as `lead_id`, 
-                //                                 CONCAT(lead_first_name, ' ', lead_last_name) AS 'lead_name', 
-                //                                 `followup_date`, 
-                //                                 CONCAT(IFNULL(ft.next_followup_date,''), ' ', 
-                //                                 IFNULL(ft.next_followup_time,'')) AS 'next_followup_date', 
-                //                                 IFNULL(ft.next_followup_time,'') as next_followup_time FROM `tbl_followup`  
-                //                                 LEFT JOIN tbl_leads ON `tbl_leads`.`lead_id` = `tbl_followup`.`lead_id` 
-                //                                 LEFT JOIN `tbl_requirements` ON `tbl_requirements`.`lead_id` = `tbl_leads`.`lead_id` 
-                //                                 LEFT JOIN `tbl_lead_stages` ON `tbl_lead_stages`.`lead_stage_id` = `tbl_leads`.`lead_stage_id` 
-                //                                 LEFT JOIN `tbl_lead_sources` ON `tbl_lead_sources`.`lead_source_id` = `tbl_leads`.`lead_source_id` 
-                //                                 LEFT JOIN `tbl_followup` as ft ON `ft`.`lead_id` = `tbl_leads`.`lead_id` 
-                //                                 AND ft.followup_id= (select fs.followup_id from tbl_followup as fs where fs.lead_id=tbl_leads.lead_id order by fs.followup_id desc limit 1) 
-                //                                 WHERE ".(($user_ids)?"tbl_followup.followup_id in (select max(followup_id) from tbl_followup where ((tbl_followup.user_id='".implode("' OR tbl_followup.user_id='", $user_ids)."')  OR (tbl_followup.assign_user_id='".implode("' OR tbl_followup.assign_user_id='", $user_ids)."')) group by lead_id) AND ":"tbl_followup.followup_id in (select max(followup_id) from tbl_followup where lead_id=tbl_leads.lead_id group by lead_id) AND ")
-                //                                 ."".$where);
 
-                $this->db->select('tbl_leads.*, CONCAT(user.user_title, user.first_name, user.last_name) as assgin_user_full_name, state.state_name, lead_source.lead_source_name');
+                $profile_base_url           =   base_url('public/other/profile/');
+                $this->db->select(
+                                    "tbl_leads.*, 
+                                    CONCAT(user.user_title, user.first_name, user.last_name) as assgin_user_full_name, 
+                                    state.state_name, 
+                                    lead_source.lead_source_name,
+                                    concat('$profile_base_url' , tbl_leads.profile) as full_profile_url"
+                                );
+                
+
                 $this->db->where($where);
                 $this->db->join('tbl_lead_sources as lead_source', 'lead_source.lead_source_id = tbl_leads.lead_source_id', 'left');
                 $this->db->join('tbl_states as state', 'state.state_id = tbl_leads.lead_state_id', 'left');
                 $this->db->join('tbl_users as user', 'user.user_id = tbl_leads.user_id', 'left');
                 $this->db->join('tbl_followup', 'tbl_followup.followup_id = tbl_leads.user_id', 'left');
+
                 $query = $this->db->get('tbl_leads');
 
                 $record_data = $query->result();
@@ -2359,7 +2382,8 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                             'next_followup' => $next_followup,
                             'is_followup' => $item->added_to_followup,
                             'assgin_user_full_name' => $item->assgin_user_full_name,
-                            'state_name' => $item->state_name ?? 'N/A'
+                            'state_name' => $item->state_name ?? 'N/A',
+                            'full_profile_url' => $item->full_profile_url ?? base_url('public/front/user.png')
                         );
                     }
                 }
@@ -2387,8 +2411,8 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
             $id = $this->input->post('id');
 
             $where = "lead_id='" . $id . "' AND tbl_leads.account_id='" . $account_id . "'";
-
-            $this->db->select("*");
+            $profile_base_url           =   base_url('public/other/profile/');
+            $this->db->select("*, concat('$profile_base_url' , tbl_leads.profile) as full_profile_url");
             $this->db->from('tbl_leads');
             $this->db->join('tbl_states', 'tbl_states.state_id = tbl_leads.lead_state_id', 'left');
             $this->db->join('tbl_city', 'tbl_city.city_id = tbl_leads.lead_city_id', 'left');
@@ -3847,7 +3871,10 @@ WHERE lead_id='" . $lead_id . "'
         $account_id = getAccountId();
         if ($account_id && $this->input->post("id")) {
 
+            $profile_base_url           =   base_url('public/other/profile/');
+
             $id = $this->input->post("id");
+            $this->db->select("*, concat('$profile_base_url' , tbl_leads.profile) as profile_url");
 
             $lead_detail = $this->Action_model->select_single('tbl_leads', "lead_id='" . $id . "' AND account_id='" . $account_id . "'");
             

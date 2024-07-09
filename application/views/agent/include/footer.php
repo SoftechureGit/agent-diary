@@ -587,6 +587,35 @@
          });
        }
        /** End Primary Mobile Number */
+
+      /** Delete Lead */
+      $(document).on('click', '.delete-lead', function(){
+        if(confirm('Are you sure!')){
+          id           = $(this).data('id');
+          
+          // Ajax - Delete Lead
+          $.ajax({
+               type: "post",
+               url: "<?= base_url('helper/delete_lead') ?>",
+               dataType: 'json',
+               data: {
+                 id: id
+               },
+               success: (data) => {
+                 if (data.status) {
+                   showToast('success', data.message)
+                 } else {
+                   showToast('danger', data.message)
+                 }
+               },
+               error: function() {
+                 showToast('danger', 'Some Error Occured.')
+               }
+             });
+             // End Ajax - Delete Lead
+        }
+      })
+      /** End Delete Lead */
      </script>
      <!--  -->
 

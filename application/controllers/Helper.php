@@ -295,4 +295,49 @@ class Helper extends CI_Controller
     }
     # End Remove Add More Record
 
+    # Delete Lead
+    public function delete_lead(){
+        if(!$this->input->post()){
+            echo json_encode(['status' => false, 'message' => 'Request method not matched.']);
+            exit;
+        }
+
+            # Permission
+            if(user()->role_id != 1 || user()->role_id != 5):
+                echo json_encode(['status' => false, 'message' => 'Permission denied']);
+                exit;
+            endif;
+            # End Permission
+
+            $id                 =   $this->input->post('id');
+
+            if($id):
+                
+                # Fetch Record
+                    $record = $this->db->where("id = $id")->get('tbl_leads')->row();
+
+                    if($record):
+
+                        # Remove File From Folder
+                        $file_path = "./public/other/profile/".$record->profile;
+
+                        if(file_exists($file_path )):
+                            unlink($file_path );
+                        endif;
+                        # End Remove File From Folder
+                    endif;
+                # End Fetch Record
+
+                # Delete Record
+                $this->db->where("id = $id")->delete('tbl_leads');
+                # End Delete Record
+            endif;
+           
+
+            echo json_encode(['status' => true, 'message' => 'Successfully record deleted.']);
+
+
+    }
+    # End Delete Lead
+
 }

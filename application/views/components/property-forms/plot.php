@@ -17,8 +17,8 @@
                     <!-- Unit Code -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Unit Code <span class="text-danger">*</span></label>
-                            <input type="text" placeholder="Enter Unit Code" name="property_details[unit_code]" value="<?= $unit_code ?? $code ?? '' ?>" class="form-control" required>
+                            <label for="">Unit Code</label>
+                            <input type="text" placeholder="Enter Unit Code" name="property_details[unit_code]" value="<?= $unit_code ?? $code ?? '' ?>" class="form-control" >
                         </div>
                     </div>
                     <!-- End Unit Code -->
@@ -26,8 +26,8 @@
                     <!-- Referance No -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Referance Number <span class="text-danger">*</span></label>
-                            <input type="text" placeholder="Enter Referance Number" name="property_details[referance_number]" value="<?= $referance_number ?? '' ?>" class="form-control" required>
+                            <label for="">Referance Number</label>
+                            <input type="text" placeholder="Enter Referance Number" name="property_details[referance_number]" value="<?= $referance_number ?? '' ?>" class="form-control" >
                         </div>
                     </div>
                     <!-- End Referance No -->
@@ -35,8 +35,8 @@
                     <!-- Plot No -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Plot Number <span class="text-danger">*</span></label>
-                            <input type="text" placeholder="Enter Plot Number" name="property_details[plot_number]" value="<?= $plot_number ?? '' ?>" class="form-control" required>
+                            <label for="">Plot Number</label>
+                            <input type="text" placeholder="Enter Plot Number" name="property_details[plot_number]" value="<?= $plot_number ?? '' ?>" class="form-control" >
                         </div>
                     </div>
                     <!-- End Plot No -->
@@ -44,8 +44,8 @@
                     <!-- Plot Size (Sqyd) -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Plot Size (Sqyd) <span class="text-danger">*</span></label>
-                            <input type="text" placeholder="Enter Plot Size (Sqyd)" name="property_details[plot_size]" value="<?= $plot_size ?? '' ?>" class="form-control" required>
+                            <label for="">Plot Size (Sqyd)</label>
+                            <input type="text" placeholder="Enter Plot Size (Sqyd)" name="property_details[plot_size]" value="<?= $plot_size ?? '' ?>" class="form-control" >
                         </div>
                     </div>
                     <!-- End Plot Size (Sqyd) -->
@@ -53,8 +53,8 @@
                     <!-- Block -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Block <span class="text-danger">*</span></label>
-                            <input type="text" placeholder="Enter Block" name="property_details[block]" value="<?= $block ?? '' ?>" class="form-control" required>
+                            <label for="">Block</label>
+                            <input type="text" placeholder="Enter Block" name="property_details[block]" value="<?= $block ?? '' ?>" class="form-control" >
                         </div>
                     </div>
                     <!-- End Block -->
@@ -62,8 +62,8 @@
                     <!-- Applicable PLC -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Applicable PLC <span class="text-danger">*</span></label>
-                            <input type="text" placeholder="Enter Applicable PLC" name="property_details[applicable_plc]" value="<?= $applicable_plc ?? '' ?>" class="form-control" required>
+                            <label for="">Applicable PLC</label>
+                            <input type="text" placeholder="Enter Applicable PLC" name="property_details[applicable_plc]" value="<?= $applicable_plc ?? '' ?>" class="form-control" >
                         </div>
                     </div>
                     <!-- End Applicable PLC -->
@@ -71,8 +71,8 @@
                     <!-- Facing -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Facing <span class="text-danger">*</span></label>
-                            <select name="property_details[facing]" id="" class="form-control" required>
+                            <label for="">Facing</label>
+                            <select name="property_details[facing]" id="" class="form-control" >
                                 <option value="" disabled selected>Choose...</option>
                                 <?php 
                                     foreach(facings() ?? [] as $facing_item): 
@@ -88,8 +88,8 @@
                     <!-- Dimantion F x B x S1 x S2 -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Dimantion F x B x S1 x S2 <span class="text-danger">*</span></label>
-                            <input type="text" placeholder="Enter Dimantion F x B x S1 x S2" name="property_details[dimantion]" value="<?= $dimantion ?? $dimension ?? '' ?>" class="form-control" required>
+                            <label for="">Dimantion F x B x S1 x S2</label>
+                            <input type="text" placeholder="Enter Dimantion F x B x S1 x S2" name="property_details[dimantion]" value="<?= $dimantion ?? $dimension ?? '' ?>" class="form-control" >
                         </div>
                     </div>
                     <!-- End Dimantion F x B x S1 x S2 -->
