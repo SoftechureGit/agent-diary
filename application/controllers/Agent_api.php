@@ -2153,7 +2153,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
 
             $account_id = getAccountId();
             $agent = $this->getAgent();
-            $user_id = $agent->user_id;
+            $user_id = $agent->user_id ?? 0;
 
             if ($account_id) {
                 $filter_by = $this->input->post('filter_by');
@@ -2254,7 +2254,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 // $this->db->join('tbl_requirements', 'tbl_requirements.lead_id = tbl_leads.lead_id','left');
                 // $this->db->where($where);
                 // $query = $this->db->get();
-
+                $this->db->join('tbl_followup', 'tbl_followup.followup_id = tbl_leads.user_id', 'left');
                 $this->db->where($where);
                 $query = $this->db->get('tbl_leads');
                 $record_all = $query->result();
@@ -2307,10 +2307,12 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 //                                 WHERE ".(($user_ids)?"tbl_followup.followup_id in (select max(followup_id) from tbl_followup where ((tbl_followup.user_id='".implode("' OR tbl_followup.user_id='", $user_ids)."')  OR (tbl_followup.assign_user_id='".implode("' OR tbl_followup.assign_user_id='", $user_ids)."')) group by lead_id) AND ":"tbl_followup.followup_id in (select max(followup_id) from tbl_followup where lead_id=tbl_leads.lead_id group by lead_id) AND ")
                 //                                 ."".$where);
 
-                $this->db->select('tbl_leads.*, CONCAT(user.user_title, user.first_name, user.last_name) as assgin_user_full_name');
+                $this->db->select('tbl_leads.*, CONCAT(user.user_title, user.first_name, user.last_name) as assgin_user_full_name, state.state_name, lead_source.lead_source_name');
                 $this->db->where($where);
-                // $this->db->order_by('lead_id', 'desc');
+                $this->db->join('tbl_lead_sources as lead_source', 'lead_source.lead_source_id = tbl_leads.lead_source_id', 'left');
+                $this->db->join('tbl_states as state', 'state.state_id = tbl_leads.lead_state_id', 'left');
                 $this->db->join('tbl_users as user', 'user.user_id = tbl_leads.user_id', 'left');
+                $this->db->join('tbl_followup', 'tbl_followup.followup_id = tbl_leads.user_id', 'left');
                 $query = $this->db->get('tbl_leads');
 
                 $record_data = $query->result();
@@ -2347,16 +2349,17 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                             'lead_title' => $item->lead_title,
                             'lead_first_name' => $item->lead_first_name,
                             'lead_last_name' => $item->lead_last_name,
-                            'lead_date' => $item->lead_date ? date('F d, Y', strtotime($item->lead_date)) : '',
-                            'lead_time' => $item->lead_time ? date('h:i a', strtotime($item->lead_time)) : '',
+                            'lead_date' => $item->lead_date ? date('F d, Y', strtotime($item->lead_date)) : 'N/A',
+                            'lead_time' => $item->lead_time ? date('h:i a', strtotime($item->lead_time)) : 'N/A',
                             'next_followup_date' => $next_followup_date,
                             'lead_mobile_no' => $item->lead_mobile_no,
                             'lead_stage_name' => $item->lead_stage_name ?? '',
-                            'lead_source_name' => $item->lead_source_name ?? '',
+                            'lead_source_name' => $item->lead_source_name ?? 'N/A',
                             'lead_email' => $item->lead_email,
                             'next_followup' => $next_followup,
                             'is_followup' => $item->added_to_followup,
-                            'assgin_user_full_name' => $item->assgin_user_full_name
+                            'assgin_user_full_name' => $item->assgin_user_full_name,
+                            'state_name' => $item->state_name ?? 'N/A'
                         );
                     }
                 }

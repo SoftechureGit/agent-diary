@@ -1,6 +1,5 @@
 <?php include('include/header.php'); ?>
 <style>
-  
   @media only screen and (max-width : 576px) {
     .mg-10 {
       margin-top: 10px;
@@ -106,8 +105,8 @@
 
                   <div class="col-md-4">
                     <div class="form-group">
-                      <label>Department <span class="text-danger">*</span></label>
-                      <select class="form-control" id="department_id" name="lead_department_id" required>
+                      <label>Department</label>
+                      <select class="form-control" id="department_id" name="lead_department_id">
                         <option value="">Select Department</option>
                         <?php foreach ($department_list as $department) { ?>
                           <option value="<?= $department->department_id ?>" <?php if ($id && $lead_detail->lead_department_id == $department->department_id) {
@@ -155,7 +154,7 @@
 
                   <div class="col-md-4">
                     <div class="form-group">
-                      <label>Last Name <span class="text-danger">*</span></label>
+                      <label>Last Name</label>
                       <input type="text" class="form-control" placeholder="Enter last name" id="lead_last_name" name="lead_last_name" value="<?php if ($id) {
                                                                                                                                                 echo $lead_detail->lead_last_name;
                                                                                                                                               } ?>">
@@ -167,12 +166,12 @@
                       <label>Mobile <span class="text-danger">*</span></label>
                       <br>
                       <input type="text" class="form-control w-100 primary_mobile_number" placeholder="Enter mobile" id="primary_mobile_number" name="lead_mobile_no" value="<?php if ($id) {
-                                                                                                                                                          echo $lead_detail->lead_mobile_no;
-                                                                                                                                                        } ?>" required="" <?php if ($id) {
+                                                                                                                                                                                echo $lead_detail->lead_mobile_no;
+                                                                                                                                                                              } ?>" required="" <?php if ($id) {
                                                                                                                                                                             echo 'disabled';
                                                                                                                                                                           } ?>>
                       <!-- Primary Mobile Number Country Code -->
-                       <input type="hidden" value='{ "name" : "India", "iso2" : "in", "dialCode" : "91" }' name="primary_mobile_number_country_data" data-iso2="in">
+                      <input type="hidden" value='{ "name" : "India", "iso2" : "in", "dialCode" : "91" }' name="primary_mobile_number_country_data" data-iso2="in">
                       <!-- End Primary Mobile Number Country Code -->
                     </div>
                   </div>
@@ -180,16 +179,16 @@
                   <div class="form-group col-md-4">
                     <label>Other Mobile Number</label>
                     <input type="text" class="form-control secondary_mobile_number" placeholder="Enter other mobile number" id="secondary_mobile_number" name="lead_mobile_no_2" value="<?php if ($id) {
-                                                                                                                                                            echo $lead_detail->lead_mobile_no_2;
-                                                                                                                                                          } ?>">
+                                                                                                                                                                                          echo $lead_detail->lead_mobile_no_2;
+                                                                                                                                                                                        } ?>">
                     <!-- Secondary Mobile Number Country Code -->
                     <input type="hidden" value='{ "name" : "India", "iso2" : "in", "dialCode" : "91" }' name="secondary_mobile_number_country_data" data-iso2="in">
-                      <!-- End Secondary Mobile Number Country Code -->
+                    <!-- End Secondary Mobile Number Country Code -->
                   </div>
 
                   <div class="form-group col-md-4">
                     <label>Email</label>
-                    <input type="text" class="form-control" placeholder="Enter email" id="lead_email" name="lead_email" value="<?= $lead_detail->lead_email ?? '' ?>" >
+                    <input type="text" class="form-control" placeholder="Enter email" id="lead_email" name="lead_email" value="<?= $lead_detail->lead_email ?? '' ?>">
                   </div>
 
                   <div class="form-group col-md-4">
@@ -201,7 +200,7 @@
 
                   <div class="form-group col-md-4">
                     <label>State</label>
-                    <select class="form-control" id="state_id" name="lead_state_id" onchange="getCity(this.value)">
+                    <select class="form-control select2" id="state_id" name="lead_state_id" onchange="getCity(this.value)">
                       <option value="">Select State</option>
                       <?php foreach ($state_list as $state) { ?>
                         <option value="<?= $state->state_id ?>" <?php if ($id && $lead_detail->lead_state_id == $state->state_id) {
@@ -213,7 +212,7 @@
 
                   <div class="form-group col-md-4">
                     <label>City</label>
-                    <select class="form-control get_locations" id="city_id" name="lead_city_id" >
+                    <select class="form-control get_locations select2" id="city_id" name="lead_city_id">
                       <option value="">Select City</option>
                       <?php foreach ($city_list as $city) { ?>
                         <option value="<?= $city->city_id ?>" <?php if ($id && $lead_detail->lead_city_id == $city->city_id) {
@@ -224,15 +223,15 @@
                   </div>
 
                   <!-- Location -->
-    <div class="col-md-4">
-      <div class="form-group">
-        <label for="">Location</label>
-        <select name="location_id" id="" class="form-control set_locations" data-selected_id="<?= $record->location_id ?? 0 ?>">
-          <option value="" selected disabled>Choose..</option>
-        </select>
-      </div>
-    </div>
-    <!-- End Location -->
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="">Location</label>
+                      <select name="location_id" id="" class="form-control set_locations select2" data-selected_id="<?= $record->location_id ?? 0 ?>">
+                        <option value="" selected disabled>Choose..</option>
+                      </select>
+                    </div>
+                  </div>
+                  <!-- End Location -->
 
                   <div class="form-group col-md-4">
                     <label>Occupation</label>
