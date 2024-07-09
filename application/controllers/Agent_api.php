@@ -10045,11 +10045,11 @@ foreach(  $transfer_lead_ids as   $transfer_lead_id){
                      $lead_id        =   $this->Action_model->insert_data($data_array,'tbl_leads');
                      $this->db->where('data_id', $raw_data->data_id);
                      $this->db->update('tbl_data', array('is_in_lead' => 1));
- }
-}
-}
-$array = array('status'=>'success','message'=>'Lead Transfered Successfully!!');
-echo json_encode($array);
+                }
+                }
+                }
+                $array = array('status'=>'success','message'=>'Lead Transfered Successfully!!');
+                echo json_encode($array);
 }
 # END DATA ASSIGN
 
@@ -10684,7 +10684,8 @@ echo json_encode($array);
 
         $postData = $this->input->post();
 
-        $select = "data_id,CONCAT(data_first_name,' ',data_last_name) as data_name, data_mobile as mobile  ,data_status as  status , CONCAT(first_name,' ',last_name) as user_name , 'file_name' , data_reason as reason";
+        // $select = "data_id,CONCAT(data_first_name,' ',data_last_name) as data_name, data_mobile as mobile  ,data_status as  status , CONCAT(first_name,' ',last_name) as user_name , 'file_name' , data_reason as reason";
+        $select = "tbl_data.data_id,CONCAT(data_first_name,' ',data_last_name) as data_name, data_mobile as mobile  ,data_status as  status , 'file_name' , data_reason as reason , tbl_leads.lead_id, tbl_leads.lead_stage_id, , tbl_users.user_id, concat(tbl_users.user_title, tbl_users.first_name, tbl_users.last_name) as assigned_user_full_name,tbl_lead_stages.lead_stage_name,followup.comment as followup_comment";
         $where = '';
 
         $searchValue = $postData['search']['value'];
@@ -10701,13 +10702,13 @@ echo json_encode($array);
         if($this->input->post('account_id')){
 
             $account_id = $this->input->post('account_id');
-            $searchQuery .= " AND account_id= '$account_id'";
+            $searchQuery .= " AND tbl_leads.user_id= '$account_id'";
         }
 
         if($this->input->post('reason')){
 
             $reason = $this->input->post('reason');
-            $searchQuery .= " AND data_reason= '$reason'";
+            $searchQuery .= " AND followup.comment= '$reason'";
         }
 
         
@@ -10715,7 +10716,7 @@ echo json_encode($array);
 
         if($this->input->post('status')!='') {
 
-            $searchQuery .= " AND data_status=".$this->input->post('status');
+            $searchQuery .= " AND tbl_leads.lead_stage_id=".$this->input->post('status');
 
         }   
 
@@ -10724,17 +10725,17 @@ echo json_encode($array);
 
              if($this->input->post('status')!=''){
 
-                    $searchQuery .= " AND (data_first_name LIKE '%".$searchValue."%' OR data_mobile LIKE '%".$searchValue."%') ";
+                    $searchQuery .= " AND (tbl_data.data_first_name LIKE '%".$searchValue."%' OR tbl_data.data_mobile LIKE '%".$searchValue."%') ";
 
                 }
                 else{
 
-                    $searchQuery .= "(data_first_name LIKE '%".$searchValue."%' OR data_mobile LIKE '%".$searchValue."%') ";
+                    $searchQuery .= "(tbl_data.data_first_name LIKE '%".$searchValue."%' OR tbl_data.data_mobile LIKE '%".$searchValue."%') ";
 
              }
         }
 
-        $data = $this->Action_model->ajaxDatatable($postData, $searchQuery, 'tbl_data', $where, $select, array('tbl_users', 'tbl_users.user_id=tbl_data.account_id'));
+        $data = $this->Action_model->ajaxDatatableLeft($postData, $searchQuery, 'tbl_data', $where, $select, array('tbl_leads', 'tbl_leads.data_id=tbl_data.data_id' , 'tbl_users' , 'tbl_users.user_id=tbl_leads.user_id','tbl_lead_stages','tbl_lead_stages.lead_stage_id=tbl_leads.lead_stage_id', 'tbl_followup as followup', 'followup.lead_id = tbl_leads.lead_id'));
 
         echo json_encode($data);
    }

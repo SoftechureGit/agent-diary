@@ -2542,9 +2542,13 @@ $writer->save('php://output');
  
         $all_file_type = $this->db->distinct()->select('file_name')->where('is_in_lead',0)->where('added_by',$account_id)->get('tbl_data')->result();
 
-        $all_reasons  =  $this->db->distinct()->select('data_reason')->where(['is_in_lead'=> 0 ])->where("data_reason IS NOT NULL")->where('added_by',$account_id)->get('tbl_data')->result();
+        $all_status  =  $this->db->distinct()->select('lead_stage_id,lead_stage_name')->where(['lead_stage_status'=> 1 ])->get('tbl_lead_stages')->result();
+
+        $all_reasons  =  $this->db->distinct()->select('comment')->get('tbl_followup')->result();
 
         $data['all_reasons'] = $all_reasons;
+
+        $data['all_status'] = $all_status;
 
         $data['all_file_type'] = $all_file_type;
 
