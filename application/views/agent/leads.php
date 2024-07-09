@@ -1,6 +1,6 @@
 <?php include('include/header.php'); ?>
 
-<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.10/css/select2.min.css">
+
 <link href="<?php echo base_url('public/admin/') ?>plugins/tables/css/datatable/dataTables.bootstrap4.min.css" rel="stylesheet">
 <link href="<?php echo base_url('public/admin/') ?>plugins/bootstrap-datepicker/bootstrap-datepicker.min.css" rel="stylesheet">
 <link href="<?php echo base_url('public/admin/') ?>plugins/clockpicker/dist/jquery-clockpicker.min.css" rel="stylesheet">
@@ -115,7 +115,6 @@
   }
 </style>
 
-<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.10/css/select2.min.css">
 
 <!--  -->
 <style>
@@ -842,7 +841,7 @@
 <script src="<?php echo base_url('public/admin/') ?>plugins/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
 <script src="<?php echo base_url('public/admin/') ?>plugins/clockpicker/dist/jquery-clockpicker.min.js"></script>
 <script src="<?php echo base_url('public/admin/') ?>plugins/bootstrap-material-datetimepicker/js/bootstrap-material-datetimepicker.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.10/js/select2.min.js"></script>
+
 <script src="<?php echo base_url('public/admin/') ?>plugins/tables/js/jquery.dataTables.min.js"></script>
 <script src="<?php echo base_url('public/admin/') ?>plugins/tables/js/datatable/dataTables.bootstrap4.min.js"></script>
 <script src="<?php echo base_url('public/admin/') ?>plugins/tables/js/datatable-init/datatable-basic.min.js"></script>
@@ -1082,28 +1081,28 @@
                      </div>
                      <div class='col-md-10'>
                        <div class='row'>
-                         <div class='col-md-5'>
+                         <div class='col-md-6'>
                            <div class='card-text ${is_followup}'>
                            <i class='fa fa-user pr-2 d-none'></i> 
                            ${record.lead_title} ${record.lead_first_name} ${record.lead_last_name} </div>
                          </div>
 
+                          <div class='col-md-6'>
+                          <div class='card-text text-right text-muted'>
+                              ${record.state_name}
+                            </div>
+                          </div>
+
                           <div class='col-md-7'>
-                            <div class='card-text text-right text-muted'>
+                            <div class='card-text text-muted'>
                               ${record.lead_date}
                               ${lead_time} 
                             </div>
                           </div>
 
-                          <div class='col-md-6'>
-                            <div class='card-text text-muted'>
-              ${record.assgin_user_full_name}
-                           </div>
-                          </div>
-                          
-                          <div class='col-md-6'>
+                          <div class='col-md-5'>
                            <div class='card-text text-right text-muted'>
-                            Facebook
+                              ${record.lead_source_name}
                            </div>
                         </div>
                        </div>
@@ -2219,6 +2218,7 @@
             primary_mobile_number_with_dial_code();
             secondary_mobile_number_with_dial_code();
             $('.get_locations').trigger('change')
+            convertToSelect2()
 
           } else {
             //$(".customer_detail").html("");

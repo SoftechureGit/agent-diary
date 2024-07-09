@@ -180,9 +180,6 @@
                                                               } ?></span></div>
           <div class="card-text text-muted pt-1 ft-sm"><span><?= $record->lead_stage_name ?></span></div>
           <div class="card-text text-muted ft-sm"><span><?= $record->lead_source_name ?></span></div>
-          <?php if (!$record->added_to_followup) : ?>
-            <button type="button" class="btn btn-dark btn-sm btn-add-followup w-120 mt-1 ft-sm" style="color: white;" onclick="add_to_followup_new(<?= $record->lead_id ?>)"><i class="fa fa-pencil"></i> Add to Followup</button>
-          <?php endif; ?>
         </div>
       </div>
 
@@ -202,6 +199,12 @@
         <a href="javascript:void(0)" onclick="get_sms_form('2','<?= $record->lead_id ?>','<?= $record->lead_email ?>')"><button class="btn btn-warning btn-sm btn-rounded" style="margin-right: 8px;"><i class="fa fa-envelope" style="color: #fff;"></i></button></a>
 
         <button class="btn btn-dark btn-sm btn-rounded" style="margin-right: 8px;" onclick="transfer_lead(<?= $record->lead_id ?>)"><i class="fa fa-exchange" style="color: #fff;"></i></button>
+
+        <?php if (!$record->added_to_followup) : ?>
+            <button type="button" class="btn-add-followup w-120 mt-1 ft-sm bg-transparent border-0" style="color: white; width:fit-content; cursor:pointer; outline:none;" onclick="add_to_followup_new(<?= $record->lead_id ?>)" width="50px">
+              <img src="<?= base_url('public/assets/images/icons/follow-up.png') ?>" alt="" width="25px">
+            </button>
+          <?php endif; ?>
       </div>
 
     </div>

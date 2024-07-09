@@ -33,6 +33,7 @@
     <script src="<?php echo base_url('public/admin/') ?>plugins/moment/moment.min.js"></script>
     <script src="<?php echo base_url('public/admin/') ?>plugins/pg-calendar/js/pignose.calendar.min.js"></script>
     <script src="<?php echo base_url('public/admin/') ?>plugins/toast/js/jquery.toast.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.10/js/select2.min.js"></script>
     
         <!-- ChartistJS demo -->
 
@@ -45,6 +46,10 @@
 
 <!--  -->
 <script>
+  function convertToSelect2(){
+        $('select').select2();
+  }
+  convertToSelect2()
     // $('.select2').select2();
     /* Add or Edit Lead Unit */
     $(document).on('click', '.add-edit-new-unit-btn', function() {

@@ -21,6 +21,8 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id, $use
     <link href="<?php echo base_url('public/admin/') ?>css/style.css" rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@23.1.0/build/css/intlTelInput.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.10/css/select2.min.css">
+    
 
     <style>
         body {
@@ -34,6 +36,10 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id, $use
   .iti.iti--allow-dropdown.iti--show-flags.iti--inline-dropdown {
     width: 100%;
   }
+  .select2 {
+ width: 100% !important;
+ text-align: left;
+} 
 
 
         /* Toast */

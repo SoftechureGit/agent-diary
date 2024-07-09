@@ -1413,7 +1413,7 @@ class Agent extends CI_Controller {
         $accomodation_list = $this->Action_model->detail_result('tbl_accomodations',$where,'accomodation_id,accomodation_name');
         $data['accomodation_list'] = $accomodation_list;
 
-        $where = "lead_option_status='1'";
+        $where = "lead_option_status='1' and lead_option_id != 1";
         $lead_option_list = $this->Action_model->detail_result('tbl_lead_options',$where,'lead_option_id,lead_option_name');
         $data['lead_option_list'] = $lead_option_list;
 
