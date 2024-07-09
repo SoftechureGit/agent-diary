@@ -171,8 +171,8 @@
                   </div>
                   <div class="col-md-6" align="right">
                     <select class="form-control" style="height: 30px !important;min-height: 30px;padding: 0px 5px;width: 155px;" id="filter_by" onchange="filterData()">
-                      <option value="">SORT BY</option>
-                      <option value="1" selected>Date for Followup</option>
+                      <option value="due_followup" selected>Due Followup </option>
+                      <option value="new_leads">New Leads</option>
                     </select>
                   </div>
 
@@ -221,14 +221,53 @@
 
                       <div class="form-group advance_search" style="padding-bottom: 8px;">
                         <div class="row">
-                          <div class="col-md-6">
-                            <input type="text" class="form-control input-lg search_datepicker" data-date-format="dd-mm-yyyy" id="search_date_from" name="search_date_from" placeholder="From" style="height: 38px;border-radius: 6px;margin-top: 10px;">
+                        <!-- Lead Date Filter -->
+                         <div class="col-md-12">
+                          <div class="text-left">
+                            <h4>
+                              Leads
+                            </h4>
                           </div>
-                          <div class="col-md-6">
-                            <input type="text" class="form-control input-lg search_datepicker" data-date-format="dd-mm-yyyy" id="search_date_to" name="search_date_to" placeholder="To" style="height: 38px;border-radius: 6px;margin-top: 10px;">
+                         </div>
+                         <div class="col-md-6">
+                          <div class="form-group">
+                            <label for="">From</label>
+                            <input type="date" id="lead_from" class="form-control">
+                         </div>
+                         </div>
+                         <div class="col-md-6">
+                          <div class="form-group">
+                            <label for="">To</label>
+                            <input type="date" id="lead_to" class="form-control">
+                         </div>
+                         </div>
+                         <!-- End Lead Date Filter -->
+                         
+                         <!-- Followup Date Filter -->
+                         <div class="col-md-12">
+                          <div class="text-left">
+                          <h4>  
+                          Followup
+                          </h4>
+                        </div>
+                         </div>
+                         <div class="col-md-6">
+                          <div class="form-group">
+                            <label for="">From</label>
+                            <input type="date" id="followup_from" class="form-control">
+                         </div>
+                         </div>
+                         <div class="col-md-6">
+                          <div class="form-group">
+
+                            <label for="">From</label>
+                            <input type="date" id="followup_to" class="form-control">
                           </div>
+                         </div>
+                        <!-- End Followup Date Filter -->
 
                           <div class="col-md-6">
+                            <div class="form-group">
                             <select class="form-control" id="search_state_id" name="search_state_id" onchange="getCitySearch(this.value)" style="height: 38px;border-radius: 6px;margin-top: 10px;">
                               <option value="">Select State</option>
                               <?php foreach ($state_list as $state) { ?>
@@ -236,20 +275,26 @@
                               <?php } ?>
                             </select>
                           </div>
+                          </div>
 
                           <div class="col-md-6">
+                            <div class="form-group">
                             <select class="form-control" id="search_city_id" name="search_city_id" style="height: 38px;border-radius: 6px;margin-top: 10px;" onchange="getLocationSearch(this.value)">
                               <option value="">Select City</option>
                             </select>
                           </div>
+                          </div>
 
                           <div class="col-md-6">
+                            <div class="form-group">
                             <select class="form-control" id="search_location_id" name="search_location_id" style="height: 38px;border-radius: 6px;margin-top: 10px;">
                               <option value="">Select Location</option>
                             </select>
                           </div>
+                          </div>
 
                           <div class="col-md-6">
+                            <div class="form-group">
                             <select class="form-control" id="search_agent_id" name="search_agent_id" style="height: 38px;border-radius: 6px;margin-top: 10px;">
                               <option value="">Select Agent</option>
                               <?php foreach ($filter_user_list as $item) { ?>
@@ -257,45 +302,8 @@
                               <?php } ?>
                             </select>
                           </div>
-
-                          <div class="col-md-12">
-                            <div style="margin-top: 8px;margin-bottom:-5px;font-weight: bold;">Budget:</div>
-                            <div class="row">
-                              <div class="col-md-6">
-                                <select class="form-control" id="search_budget_min" name="search_budget_min" onchange="selectMaxBudgetSearch()" style="height: 38px;border-radius: 6px;margin-top: 10px;">
-                                  <option value="">Select Min</option>
-                                  <?php foreach ($budget_list as $item) { ?>
-                                    <option value="<?= $item->budget_id ?>"><?= $item->budget_name ?></option>
-                                  <?php } ?>
-                                </select>
-                              </div>
-                              <div class="col-md-6">
-                                <select class="form-control" id="search_budget_max" name="search_budget_max" style="height: 38px;border-radius: 6px;margin-top: 10px;">
-                                  <option value="">Select Max</option>
-                                </select>
-                              </div>
-                            </div>
                           </div>
 
-                          <div class="col-md-12">
-                            <div style="margin-top: 8px;margin-bottom:-5px;font-weight: bold;">Size:</div>
-                            <div class="row">
-                              <div class="col-md-4">
-                                <input type="text" class="form-control input-lg" id="search_size_min" name="search_size_min" placeholder="Min" style="height: 38px;border-radius: 6px;margin-top: 10px;">
-                              </div>
-                              <div class="col-md-4">
-                                <input type="text" class="form-control input-lg" id="search_size_max" name="search_size_max" placeholder="Max" style="height: 38px;border-radius: 6px;margin-top: 10px;">
-                              </div>
-                              <div class="col-md-4">
-                                <select class="form-control" id="search_size_unit" name="search_size_unit" style="height: 38px;border-radius: 6px;margin-top: 10px;">
-                                  <option value="">Select Unit</option>
-                                  <?php foreach ($unit_list as $item) { ?>
-                                    <option value="<?= $item->unit_id ?>"><?= $item->unit_name ?></option>
-                                  <?php } ?>
-                                </select>
-                              </div>
-                            </div>
-                          </div>
 
                           <div class="col-md-4">
                             <select class="form-control" id="search_source_id" name="search_source_id" style="height: 38px;border-radius: 6px;margin-top: 10px;">
@@ -314,7 +322,8 @@
                               <?php } ?>
                             </select>
                           </div>
-
+                            
+                          <?php if(user()->role_id == 1 || user()->role_id == 5 || true): ?>
                           <div class="col-md-4">
                             <select class="form-control" id="search_status" name="search_status" style="height: 38px;border-radius: 6px;margin-top: 10px;">
                               <option value="">Select Status</option>
@@ -323,16 +332,20 @@
                               <?php } ?>
                             </select>
                           </div>
+                          <?php endif; ?>
                         </div>
                       </div>
 
                       <div class="form-group text-right">
                       <a class="btn btn-dark text-white" href="<?= base_url(AGENT_URL . 'lead-detail/') ?>"> Add New </a>
                         <button type="submit" class="btn btn-dark search_btn">Search</button>&nbsp;&nbsp;
+
                         <?php if (isset($menu_item_array['followup_advance_search']) && $menu_item_array['followup_advance_search']['rr_view']) { ?>
                           <button type="button" class="btn btn-dark adv_btn">Advance Search</button>&nbsp;&nbsp;
-
+                          
+                          <?php if(user()->role_id == 1 || user()->role_id == 2): ?>
                           <button type="button" class="btn btn-info" onclick="downloadLeads()">Download</button>
+                          <?php endif; ?>
                         <?php } ?>
                         
                       </div>
@@ -340,7 +353,18 @@
 
                     <div class="search-overall pt-4">
                       <div class="row">
-                        <div class="col-lg-4 col-sm-6">
+                        <div class="col-lg-3 col-sm-6">
+                          <div class="card gradient-2">
+                            <div class="card-body" style="padding: 13px 10px 4px 10px !important;">
+                              <h3 class="card-title text-white" style="font-size: 14px;margin-bottom: 5px;">New Leads</h3>
+                              <div class="d-inline-block">
+                                <h2 class="text-white" style="font-size: 24px;"><?= $total_new_leads ?></h2>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="col-lg-3 col-sm-6">
                           <div class="card gradient-1">
                             <div class="card-body" style="padding: 13px 10px 4px 10px !important;">
                               <h3 class="card-title text-white" style="font-size: 14px;margin-bottom: 5px;">Total Followup</h3>
@@ -350,7 +374,7 @@
                             </div>
                           </div>
                         </div>
-                        <div class="col-lg-4 col-sm-6">
+                        <div class="col-lg-3 col-sm-6">
                           <div class="card gradient-2">
                             <div class="card-body" style="padding: 13px 10px 4px 10px !important;">
                               <h3 class="card-title text-white" style="font-size: 14px;margin-bottom: 5px;">Today Followup</h3>
@@ -360,7 +384,7 @@
                             </div>
                           </div>
                         </div>
-                        <div class="col-lg-4 col-sm-6">
+                        <div class="col-lg-3 col-sm-6">
                           <div class="card gradient-3">
                             <div class="card-body" style="padding: 13px 10px 4px 10px !important;">
                               <h3 class="card-title text-white" style="font-size: 14px;margin-bottom: 5px;">Missed Followup</h3>
@@ -538,7 +562,7 @@
 <!-- end requirement modal -->
 
 <!-- start followup status modal -->
-<div class="modal fade" id="followUpTabModal" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" id="followUpTabModal" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -642,7 +666,7 @@
 
 
 <!-- start lead form modal -->
-<div class="modal fade" id="leadFormModal" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" id="leadFormModal" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -985,6 +1009,17 @@
   function get_followup_list() {
     var filter_by = $("#filter_by").val();
     var search_text = $("#search_text").val();
+
+    /** Lead Filter */
+    var lead_from                 =   $("#lead_from").val();
+    var lead_to                   =   $("#lead_to").val();
+    /** End Lead Filter */
+    
+    /** Follow Up Filter */
+    var followup_from             =   $("#followup_from").val();
+    var followup_to               =   $("#followup_to").val();
+    /** End Follow Up Filter */
+
     var search_date_from = $("#search_date_from").val();
     var search_date_to = $("#search_date_to").val();
     var search_state_id = $("#search_state_id").val();
@@ -1003,23 +1038,23 @@
       type: "POST",
       url: "<?php echo base_url(AGENT_URL . 'api/get_followup_list'); ?>",
       data: {
-        page: page,
-        filter_by: filter_by,
-        search_text: search_text,
-        search_date_from: search_date_from,
-        search_date_to: search_date_to,
-        search_state_id: search_state_id,
-        search_city_id: search_city_id,
-        search_source_id: search_source_id,
-        search_stage_id: search_stage_id,
-        search_status: search_status,
-        search_location_id: search_location_id,
-        search_budget_min: search_budget_min,
-        search_budget_max: search_budget_max,
-        search_size_min: search_size_min,
-        search_size_max: search_size_max,
-        search_size_unit: search_size_unit,
-        search_agent_id: search_agent_id
+        page                    : page,
+        filter_by               : filter_by,
+        search_text             : search_text,
+        
+        lead_from               : lead_from,
+        lead_to                 : lead_to,
+
+        followup_from           : followup_from,
+        followup_to             : followup_to,
+
+        search_state_id         : search_state_id,
+        search_city_id          : search_city_id,
+        search_source_id        : search_source_id,
+        search_stage_id         : search_stage_id,
+        search_status           : search_status,
+        search_location_id      : search_location_id,
+        search_agent_id         : search_agent_id
       },
       beforeSend: function() {
         $(".error-msg-left").html('');
@@ -1073,11 +1108,13 @@
 
                 lead_time = record.lead_time ? `( ${record.lead_time} )` : '';
 
+                delete_lead_btn         =  <?php if(user()->role_id == 1 || user()->role_id == 5): ?> `<div class="delete-lead" data-id="${record.lead_id}"><i class="fa fa-times"></i></div>`<?php else: ?> '' <?php endif;?>;
                  
-                html += `<div class='customer' onclick='showCustomer(${record.lead_id},0)'>
-                     <div class='row'>
+                html += `<div class='customer position-relative'>
+                    ${delete_lead_btn}
+                     <div class='row' onclick='showCustomer(${record.lead_id},0)'>
                      <div class='col-md-2' style='' align='center'>
-                       <img class='mr-3' src='<?= base_url('public/front/user.png') ?>' style='border-radius:50%;' width='45' height='45' alt=''>
+                       <img class='mr-3' src='${record.full_profile_url}' style='border-radius:50%;' width='45' height='45' alt=''>
                      </div>
                      <div class='col-md-10'>
                        <div class='row'>

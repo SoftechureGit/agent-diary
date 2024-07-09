@@ -19,8 +19,8 @@ extract($property_details?? []);
                     <!-- Unit Code -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Unit Code <span class="text-danger">*</span></label>
-                            <input type="text" placeholder="Enter Unit Code" name="property_details[unit_code]" value="<?= $unit_code ?? '' ?>" class="form-control" required>
+                            <label for="">Unit Code</label>
+                            <input type="text" placeholder="Enter Unit Code" name="property_details[unit_code]" value="<?= $unit_code ?? '' ?>" class="form-control" >
                         </div>
                     </div>
                     <!-- End Unit Code -->
@@ -28,8 +28,8 @@ extract($property_details?? []);
                     <!-- Referance No -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Referance Number <span class="text-danger">*</span></label>
-                            <input type="text" placeholder="Enter Referance Number" name="property_details[referance_number]" value="<?= $referance_number ?? '' ?>" class="form-control" required>
+                            <label for="">Referance Number</label>
+                            <input type="text" placeholder="Enter Referance Number" name="property_details[referance_number]" value="<?= $referance_number ?? '' ?>" class="form-control" >
                         </div>
                     </div>
                     <!-- End Referance No -->
@@ -37,8 +37,8 @@ extract($property_details?? []);
                     <!-- Unit Number -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Unit Number <span class="text-danger">*</span></label>
-                            <input type="text" placeholder="Enter Unit Number" name="property_details[unit_number]" value="<?= $unit_number ?? '' ?>" class="form-control" required>
+                            <label for="">Unit Number</label>
+                            <input type="text" placeholder="Enter Unit Number" name="property_details[unit_number]" value="<?= $unit_number ?? '' ?>" class="form-control" >
                         </div>
                     </div>
                     <!-- End Unit Number -->
@@ -46,8 +46,8 @@ extract($property_details?? []);
                     <!-- Floor -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Floor <span class="text-danger">*</span></label>
-                            <input type="text" placeholder="Enter Floor" name="property_details[floor]" value="<?= $floor ?? '' ?>" class="form-control" required>
+                            <label for="">Floor</label>
+                            <input type="text" placeholder="Enter Floor" name="property_details[floor]" value="<?= $floor ?? '' ?>" class="form-control" >
                         </div>
                     </div>
                     <!-- End Floor -->
@@ -55,8 +55,8 @@ extract($property_details?? []);
                     <!-- Tower -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Tower <span class="text-danger">*</span></label>
-                            <input type="text" placeholder="Enter Tower" name="property_details[tower]" value="<?= $tower ?? '' ?>" class="form-control" required>
+                            <label for="">Tower</label>
+                            <input type="text" placeholder="Enter Tower" name="property_details[tower]" value="<?= $tower ?? '' ?>" class="form-control" >
                         </div>
                     </div>
                     <!-- End Tower -->
@@ -64,8 +64,8 @@ extract($property_details?? []);
                     <!-- Unit Type -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Unit Type <span class="text-danger">*</span></label>
-                            <select  class="form-control" name="property_details[unit_type]" required>
+                            <label for="">Unit Type</label>
+                            <select  class="form-control" name="property_details[unit_type]" >
                                 <option value="" selected disabled>Choose...</option>
                                 <option value="locable" <?= ($tower ?? '' == 'locable') ? 'selected' : '' ?>>Locable</option>
                                 <option value="virtual" <?= ($tower ?? '' == 'virtual') ? 'selected' : '' ?>>Virtual</option>
@@ -77,8 +77,8 @@ extract($property_details?? []);
                     <!-- Area (Sqft) -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Area (Sqft) <span class="text-danger">*</span></label>
-                            <input type="text" placeholder="Enter Area (Sqft)" name="property_details[area]" value="<?= $area ?? '' ?>" class="form-control" required>
+                            <label for="">Area (Sqft)</label>
+                            <input type="text" placeholder="Enter Area (Sqft)" name="property_details[area]" value="<?= $area ?? '' ?>" class="form-control" >
                         </div>
                     </div>
                     <!-- End Area (Sqft) -->
@@ -86,8 +86,8 @@ extract($property_details?? []);
                     <!-- Applicable PLC -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Applicable PLC <span class="text-danger">*</span></label>
-                            <input type="text" placeholder="Enter Applicable PLC" name="property_details[applicable_plc]" value="<?= $applicable_plc ?? '' ?>" class="form-control" required>
+                            <label for="">Applicable PLC</label>
+                            <input type="text" placeholder="Enter Applicable PLC" name="property_details[applicable_plc]" value="<?= $applicable_plc ?? '' ?>" class="form-control" >
                         </div>
                     </div>
                     <!-- End Applicable PLC -->
@@ -95,8 +95,8 @@ extract($property_details?? []);
                      <!-- Facing -->
                      <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Facing <span class="text-danger">*</span></label>
-                            <select name="property_details[facing]" id="" class="form-control" required>
+                            <label for="">Facing</label>
+                            <select name="property_details[facing]" id="" class="form-control" >
                             <option value="" disabled selected>Choose...</option>
                                 <?php 
                                     foreach(facings() ?? [] as $facing_item): 
@@ -112,8 +112,8 @@ extract($property_details?? []);
                     <!-- Parking -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Parking <span class="text-danger">*</span></label>
-                            <input type="text" placeholder="Enter Parking" name="property_details[parking]" value="<?= $parking ?? '' ?>" class="form-control" required>
+                            <label for="">Parking</label>
+                            <input type="text" placeholder="Enter Parking" name="property_details[parking]" value="<?= $parking ?? '' ?>" class="form-control" >
                         </div>
                     </div>
                     <!-- End Parking -->

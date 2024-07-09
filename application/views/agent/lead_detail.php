@@ -45,7 +45,7 @@
                 <?php } ?>
 
               </div>
-              <form method="post" id="form-modal" autocomplete="off">
+              <form method="post" id="form-modal" autocomplete="off" enctype="multipart/form-data">
                 <input type="hidden" class="form-control" id="fid" name="id" value="<?php if ($id) {
                                                                                       echo $id;
                                                                                     } ?>">
@@ -190,6 +190,16 @@
                     <label>Email</label>
                     <input type="text" class="form-control" placeholder="Enter email" id="lead_email" name="lead_email" value="<?= $lead_detail->lead_email ?? '' ?>">
                   </div>
+
+                  <!-- Profile -->
+                   <div class="col-md-4">
+                     <div class="form-group">
+                       <label>Profile</label>
+                       <input type="file" class="form-control p-1" name="profile" accept="image/*">
+                       <input type="hidden" name="old_profile" value="<?= $lead_detail->profile ?? '' ?>">
+                      </div>
+                    </div>
+                  <!-- End Profile -->
 
                   <div class="form-group col-md-4">
                     <label>Address </label>

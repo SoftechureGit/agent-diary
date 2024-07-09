@@ -75,6 +75,19 @@
                 <input type="text" class="form-control" placeholder="Enter email" id="lead_email" name="lead_email" value="<?= $lead_detail->lead_email ?? '' ?>">
             </div>
 
+             <!-- Profile -->
+             <div class="col-md-4">
+                     <div class="form-group">
+                       <label>Profile</label>
+                       <input type="file" class="form-control p-1" name="profile" accept="image/*">
+                       <input type="hidden" name="old_profile" value="<?= $lead_detail->profile ?? '' ?>">
+                       <?php if($lead_detail->profile ?? 0): ?>
+                        <a href="<?= $lead_detail->profile_url ?? '' ?>" target="_blank" class="text-primary">View</a>
+                        <?php endif; ?>
+                      </div>
+                    </div>
+                  <!-- End Profile -->
+
             <div class="form-group col-md-4">
                 <label>Address:</label>
                 <input type="text" class="form-control" placeholder="Enter address" id="lead_address" name="lead_address" value="<?php if($id) { echo $lead_detail->lead_address; } ?>">
@@ -306,6 +319,7 @@ $("#form-modal").validate({
                 }
                 else if (obj.status=='updated') {
                     // window.location.href=''; 
+                    
                     showToast('success', obj.message)
                   $(".error-msg").html(alertMessage('success',obj.message));
                   hideLeadEditModal(<?= $id ?>);
