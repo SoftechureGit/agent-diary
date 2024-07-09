@@ -538,7 +538,7 @@
 <!-- end requirement modal -->
 
 <!-- start followup status modal -->
-<div class="modal fade" id="followUpTabModal" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" id="followUpTabModal" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -642,7 +642,7 @@
 
 
 <!-- start lead form modal -->
-<div class="modal fade" id="leadFormModal" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" id="leadFormModal" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
