@@ -1679,4 +1679,12 @@ class Admin extends CI_Controller {
     {
         $this->load->view(ADMIN_URL.'templates',$data="");
     }
+
+    public function state_and_city(){
+        $where = "state_id!=''";
+        $state_list = $this->Action_model->detail_result('tbl_states',$where);
+        $data['state_list'] = $state_list;
+        $this->load->view(ADMIN_URL.'get_state_and_city',$data);
+    }
+
 }

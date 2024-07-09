@@ -9710,4 +9710,231 @@ https://www.agentdiary.com");
         }
     }
     /* product end */
+
+
+    # fetch state list
+
+        public function get_state(){
+
+             
+        $postData = $this->input->post();
+
+        $select = "*";
+        
+        $select = "";
+
+        $where = '';
+
+        $searchValue = $postData['search']['value'];
+        $searchQuery = '';
+
+
+        // if($this->input->post('status')!='') {
+
+        //     $searchQuery .= " AND tbl_leads.lead_stage_id=".$this->input->post('status');
+
+        // }   
+
+
+        if($searchValue != ''){
+
+             if($this->input->post('status')!=''){
+
+                    $searchQuery .= " AND (state_name LIKE '%".$searchValue."%') ";
+
+                }
+                else{
+
+                    $searchQuery .= "(state_name LIKE '%".$searchValue."%') ";
+
+             }
+        }
+
+        $data = $this->Action_model->ajaxDatatableLeft($postData, $searchQuery, 'tbl_states', $where, $select);
+
+        echo json_encode($data);   
+            
+        }
+        public function get_city_list(){
+
+             
+        $postData = $this->input->post();
+
+        $select = "*";
+        
+        $select = "";
+
+        $where = '';
+
+        $searchValue = $postData['search']['value'];
+        $searchQuery = '';
+
+
+        // if($this->input->post('status')!='') {
+
+        //     $searchQuery .= " AND tbl_leads.lead_stage_id=".$this->input->post('status');
+
+        // }   
+
+
+        if($searchValue != ''){
+
+            //  if($this->input->post('status')!=''){
+
+            //         $searchQuery .= " AND (city_name LIKE '%".$searchValue."%') ";
+
+            //     }
+            //     else{
+
+                    $searchQuery .="( city_name LIKE '%".$searchValue."%' OR state_name LIKE '%".$searchValue."%') ";
+
+            //  }
+        }
+
+        $join = array('tbl_states','tbl_states.state_id=tbl_city.state_id');     
+
+        $data = $this->Action_model->ajaxDatatableLeft($postData, $searchQuery, 'tbl_city', $where, $select , $join);
+
+        echo json_encode($data);   
+            
+        }
+
+    # end fetch state list
+
+    # edit state
+        
+      public function get_single_state(){
+
+        $array = array();
+
+        if ($this->input->post()) {
+            $id=$this->input->post('id');
+            $record = $this->Action_model->select_single('tbl_states',"state_id='".$id."'");
+            if ($record) {
+                $array = array('status'=>'success','message'=>'','record'=>$record );
+            }
+            else {
+                $array = array('status'=>'error','message'=>'Record Not Found.');
+            }
+        }
+        else { 
+           $array = array('status'=>'error','message'=>'Some error occurred, please try again.');
+        }
+
+        echo json_encode($array);
+
+      }
+        
+    # end edit state
+
+    # edit City
+        
+      public function get_single_city(){
+
+        $array = array();
+
+        if ($this->input->post()) {
+            $id=$this->input->post('id');
+            $record = $this->Action_model->select_single('tbl_city',"city_id='".$id."'");
+            if ($record) {
+                $state = $this->Action_model->select_single('tbl_states',"state_id='".$record->state_id."'");
+                $array = array('status'=>'success','message'=>'','record'=>$record , 'state' => $state );
+            }
+            else {
+                $array = array('status'=>'error','message'=>'Record Not Found.');
+            }
+        }
+        else { 
+           $array = array('status'=>'error','message'=>'Some error occurred, please try again.');
+        }
+
+        echo json_encode($array);
+
+      }
+        
+    # end edit City
+
+
+    # store state
+
+      public function state_process(){
+
+
+        $array = array();
+
+        if ($this->input->post()) {
+            
+            $id=$this->input->post('state_id');
+            $record = $this->Action_model->select_single('tbl_states',"state_id='".$id."'");
+
+            $record_array = array(
+                'state_name'   => $this->input->post('state_name'),
+                'state_status' => $this->input->post('state_status'),
+                'country_id'   => 1
+            );
+
+            if ($record) {
+               
+
+                if ($this->Action_model->select_single('tbl_states',"state_name='".$this->input->post('state_name')."' AND state_id!='".$id."'")) {
+                    $array = array('status'=>'error','message'=>'This State is already exist.');
+                }
+                else {
+                    $this->Action_model->update_data($record_array,'tbl_states',"state_id='".$id."'");
+                    $array = array('status'=>'added','message'=>'State Updated Successfully!!');
+                }
+            }
+            else {
+               
+
+                if ($this->Action_model->select_single('tbl_states',"state_name='".$this->input->post('state_name')."'")) {
+                    $array = array('status'=>'error','message'=>'This State is already exist.');
+                }
+                else {
+                    $this->Action_model->insert_data($record_array,'tbl_states');
+                    $array = array('status'=>'added','message'=>'State Added Successfully!!');
+                }
+            }
+        }
+        else { 
+           $array = array('status'=>'error','message'=>'Some error occurred, please try again.');
+        }
+
+        echo json_encode($array);    
+
+      }
+      
+    # end store state
+
+
+    # delete state
+    
+    public function delete_state()
+    {
+        $array = array();
+
+        if ($this->input->post()) {
+            
+            $id=$this->input->post('id');
+            $record = $this->Action_model->select_single('tbl_states',"state_id='".$id."'");
+
+            if ($record) {
+                $this->Action_model->delete_query('tbl_states',"state_id='".$id."'");
+                $array = array('status'=>'added','message'=>'State Deleted Successfully!!');
+            }
+            else {
+                $array = array('status'=>'added','message'=>'Record Not Found!!');
+            }
+        }
+        else { 
+           $array = array('status'=>'error','message'=>'Some error occurred, please try again.');
+        }
+
+        echo json_encode($array);
+        
+    }
+
+    
+    # end  delete state 
+
 }

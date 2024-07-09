@@ -17,6 +17,7 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id,$user
     <link rel="stylesheet" href="<?php echo base_url('public/admin/') ?>plugins/chartist/css/chartist.min.css">
     <link rel="stylesheet" href="<?php echo base_url('public/admin/') ?>plugins/chartist-plugin-tooltips/css/chartist-plugin-tooltip.css">
     <link rel="stylesheet" href="<?php echo base_url('public/admin/') ?>plugins/toast/css/jquery.toast.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.10/css/select2.min.css">
     <!-- Custom Stylesheet -->
     <link href="<?php echo base_url('public/admin/') ?>css/style.css" rel="stylesheet">
 
@@ -141,6 +142,11 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id,$user
     border-radius: 0px;
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
     background-color: transparent;
+}
+
+.select2 {
+ width: 100% !important;
+ text-align: left;
 }
 
 
