@@ -493,7 +493,7 @@ var table_city = $('#empTable-city').DataTable({
 
                     var record = obj.record;
 
-                    $("#city_state_id").val(obj.state.state_id).trigger('change');
+                    $("#city_state_id").val(obj.state.state_id);
                     $("#city_id").val(record.city_id);
 
 
@@ -579,7 +579,7 @@ $("#form-modal-state").validate({
 
                     setTimeout(function(){
                         $("#formModal").modal('hide');
-                    },2000);
+                    },1000);
 
                   $(".error-msg").html(alertMessage('success',obj.message));
                   table.draw();
@@ -587,9 +587,84 @@ $("#form-modal-state").validate({
                 else if (obj.status=='updated') {
                    setTimeout(function(){
                         $("#formModal").modal('hide');
-                    },2000);
+                    },1000);
                   $(".error-msg").html(alertMessage('success',obj.message));
                   table.draw();
+                }
+                else {
+                  $(".error-msg").html(alertMessage('error',obj.message));
+                }
+              }
+              catch(err) {
+                $(".form-btn").html(btn_label);
+                $(".error-msg").html(alertMessage('error','Some error occurred, please try again.'));
+              }
+          },500);
+        },
+        error: function () {
+            $(".form-btn").html(btn_label);
+          $(".error-msg").html(alertMessage('error','Some error occurred, please try again.'));
+           
+        }
+
+    });
+
+    }
+});
+
+//  end save state
+
+
+//  save state
+
+
+$("#form-modal-city").validate({
+    rules: {
+    },
+    messages: {
+    },
+    submitHandler: function(form) {
+      var myform = document.getElementById("form-modal-city");
+      var fd = new FormData(myform );
+      var fid = $("#city_id").val();
+      var btn_label = "Add New";
+      if (fid!="") {
+        btn_label = "Update";
+      }
+
+      $.ajax({
+        type: "POST",
+        url: "<?= base_url(ADMIN_URL.'api/city_process') ?>",
+        data: fd,
+        cache: false,
+        processData: false,
+        contentType: false,
+        beforeSend: function (data) {
+          $(".error-msg").html('');
+          $(".form-btn").html("<i class='fa fa-circle-o-notch fa-spin'></i>");
+        },
+        success: function (response) {
+          setTimeout(function(){
+            var obj;
+              try {
+                obj = JSON.parse(response);
+                $(".form-btn").html(btn_label);
+
+                if (obj.status=='added') {
+
+                    setTimeout(function(){
+                        $("#formModalCity").modal('hide');
+                    },1000);
+
+                  $(".error-msg").html(alertMessage('success',obj.message));
+                  table_city.draw();
+                }
+                else if (obj.status=='updated') {
+                   setTimeout(function(){
+                        $("#formModalCity").modal('hide');
+                    },1000);
+                  $(".error-msg").html(alertMessage('success',obj.message));
+                  table_city.draw();
                 }
                 else {
                   $(".error-msg").html(alertMessage('error',obj.message));

@@ -180,6 +180,10 @@
                                     <?php //  } ?>
                                     
                                     <?php // if(isset($menu_item_array['locations'])) { ?>
+                                    <li><a href="<?= base_url(ADMIN_URL.'state-and-city') ?>">State & City </a></li>
+                                    <?php //  } ?>
+
+                                    <?php // if(isset($menu_item_array['locations'])) { ?>
                                     <li><a href="<?= base_url(ADMIN_URL.'locations') ?>">Location </a></li>
                                     <?php //  } ?>
                                     
