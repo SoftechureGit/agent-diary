@@ -9903,6 +9903,52 @@ https://www.agentdiary.com");
         echo json_encode($array);    
 
       }
+
+      public function city_process(){
+
+         $array = array();
+
+        if ($this->input->post()) {
+            
+            $id=$this->input->post('city_id');
+            $record = $this->Action_model->select_single('tbl_city',"city_id='".$id."'");
+
+            $record_array = array(
+                'state_id'   => $this->input->post('city_state_id'),
+                'city_name'  => $this->input->post('city_name'),
+                'city_status' => $this->input->post('city_status'),
+            );
+
+            if ($record) {
+               
+
+                if ($this->Action_model->select_single('tbl_city',"city_name='".$this->input->post('city_name')."' AND city_id!='".$id."'")) {
+                    $array = array('status'=>'error','message'=>'This State is already exist.');
+                }
+                else {
+                    $this->Action_model->update_data($record_array,'tbl_city',"city_id='".$id."'");
+                    $array = array('status'=>'added','message'=>'State Updated Successfully!!');
+                }
+            }
+            else {
+               
+
+                if ($this->Action_model->select_single('tbl_city',"city_name='".$this->input->post('city_name')."'")) {
+                    $array = array('status'=>'error','message'=>'This State is already exist.');
+                }
+                else {
+                    $this->Action_model->insert_data($record_array,'tbl_city');
+                    $array = array('status'=>'added','message'=>'State Added Successfully!!');
+                }
+            }
+        }
+        else { 
+           $array = array('status'=>'error','message'=>'Some error occurred, please try again.');
+        }
+
+        echo json_encode($array);    
+
+      }
       
     # end store state
 
