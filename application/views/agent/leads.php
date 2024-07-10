@@ -1126,7 +1126,7 @@
 
                           <div class='col-md-6'>
                           <div class='card-text text-right text-muted'>
-                              ${record.state_name}
+                              ${record.stage_name}
                             </div>
                           </div>
 

@@ -2324,7 +2324,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 $this->db->select(
                                     "tbl_leads.*, 
                                     CONCAT(user.user_title, user.first_name, user.last_name) as assgin_user_full_name, 
-                                    state.state_name, 
+                                    stages.lead_stage_name as stage_name, 
                                     lead_source.lead_source_name,
                                     concat('$profile_base_url' , tbl_leads.profile) as full_profile_url"
                                 );
@@ -2332,7 +2332,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
 
                 $this->db->where($where);
                 $this->db->join('tbl_lead_sources as lead_source', 'lead_source.lead_source_id = tbl_leads.lead_source_id', 'left');
-                $this->db->join('tbl_states as state', 'state.state_id = tbl_leads.lead_state_id', 'left');
+                $this->db->join('tbl_lead_stages as stages', 'stages.lead_stage_id = tbl_leads.lead_stage_id', 'left');
                 $this->db->join('tbl_users as user', 'user.user_id = tbl_leads.user_id', 'left');
                 $this->db->join('tbl_followup', 'tbl_followup.followup_id = tbl_leads.user_id', 'left');
 
@@ -2372,8 +2372,8 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                             'lead_title' => $item->lead_title,
                             'lead_first_name' => $item->lead_first_name,
                             'lead_last_name' => $item->lead_last_name,
-                            'lead_date' => $item->lead_date ? date('F d, Y', strtotime($item->lead_date)) : 'N/A',
-                            'lead_time' => $item->lead_time ? date('h:i a', strtotime($item->lead_time)) : 'N/A',
+                            'lead_date' => $item->lead_date ? date('d F, Y', strtotime($item->lead_date)) : 'N/A',
+                            'lead_time' => $item->lead_time ? date('H:i', strtotime($item->lead_time)) : 'N/A',
                             'next_followup_date' => $next_followup_date,
                             'lead_mobile_no' => $item->lead_mobile_no,
                             'lead_stage_name' => $item->lead_stage_name ?? '',
@@ -2382,7 +2382,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                             'next_followup' => $next_followup,
                             'is_followup' => $item->added_to_followup,
                             'assgin_user_full_name' => $item->assgin_user_full_name,
-                            'state_name' => $item->state_name ?? 'N/A',
+                            'stage_name' => $item->stage_name ?? 'N/A',
                             'full_profile_url' => $item->full_profile_url ?? base_url('public/front/user.png')
                         );
                     }
@@ -10049,6 +10049,8 @@ foreach(  $transfer_lead_ids as   $transfer_lead_id){
                      'lead_last_name'        =>  $raw_data->data_last_name,
                      'lead_mobile_no'        =>  $raw_data->data_mobile,
                      'lead_email'            =>  $raw_data->data_email ,
+                     'lead_date'             =>  date("d-m-Y") ,
+                     'lead_time'             =>  date("h:i:s a") ,
                      'lead_status'           =>  1,
                      'lead_stage_id'         =>  1, 
                  );

@@ -68,14 +68,32 @@
                     </div>
                     <!-- End Unit Type -->
 
-                    <!-- Area (Sqft) -->
+                    <!-- SA -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Area (Sqft) - SA / BA/ CA</label>
-                            <input type="text" placeholder="Enter Area (Sqft)" name="property_details[area]" value="<?= $area ?? '' ?>" class="form-control" >
+                            <label for="">SA</label>
+                            <input type="text" placeholder="Enter SA" name="property_details[sa]" value="<?= $sa ?? '' ?>" class="form-control" >
                         </div>
                     </div>
-                    <!-- End Area (Sqft) -->
+                    <!-- End SA -->
+
+                    <!-- BA -->
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="">BA</label>
+                            <input type="text" placeholder="Enter BA" name="property_details[ba]" value="<?= $ba ?? '' ?>" class="form-control" >
+                        </div>
+                    </div>
+                    <!-- End SA -->
+
+                    <!-- CA -->
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="">CA</label>
+                            <input type="text" placeholder="Enter CA" name="property_details[ca]" value="<?= $ca ?? '' ?>" class="form-control" >
+                        </div>
+                    </div>
+                    <!-- End CA -->
 
                     <!-- Applicable PLC -->
                     <div class="col-md-4">

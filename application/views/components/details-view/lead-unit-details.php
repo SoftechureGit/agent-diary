@@ -34,6 +34,13 @@
                   <td><?= $record->booking_date ?? '' ?></td>
                 </tr>
 
+                <?php if($record->costing_price): ?>
+                <tr>
+                  <th>Costing Price</th>
+                  <td>₹ <?= $record->costing_price ?? '' ?></td>
+                </tr>
+                <?php endif; ?>
+
                 <tr>
                   <th>State</th>
                   <td><?= $record->state_name ?? '' ?></td>

@@ -58,7 +58,7 @@
     <div class="col-md-4">
       <div class="form-group">
         <label for="">Property Type <span class="text-danger">*</span></label>
-        <select name="property_type_id" id="" class="form-control set_property_types get_property_form" data-selected_id="<?= $record->property_type_id ?? 0 ?>" data-property_details='<?= json_encode($record->property_details ?? []) ?>' required>
+        <select name="property_type_id" id="" class="form-control set_property_types get_property_form" data-selected_id="<?= $record->property_type_id ?? 0 ?>" required>
           <option value="" selected disabled>Choose..</option>
         </select>
       </div>
@@ -148,9 +148,34 @@
     </div>
     <!-- End Layout Upload -->
 
+    <!-- Costing price  -->
+    <div class="col-md-4 costing-price-wrapper">
+      <div class="form-group">
+        <label for="">Costing price <span class="text-danger">*</span></label>
+        <input type="number" class="form-control" name="costing_price" value="<?= $record->costing_price ?? '' ?>" placeholder="Enter Costing price" min="1" required>
+      </div>
+    </div>
+    <!-- End Costing price -->
+
     <!-- Form View -->
     <div class="set_property_form w-100"></div>
     <!-- Form View -->
+
+    <!-- Youtube Links -->
+     <div class="col-md-12">
+      <details <?= isset($record) ? 'open' : '' ?>>
+        <summary>Youtube Links</summary>
+        <div class="youtube-links-container p-4">
+        <?php $this->view('components/other/add-more/youtube-data', [ 'youtube_data' => $record->youtube_data ?? [] ]) ?>
+
+        <div class="text-right">
+          <button type="button" class="btn btn-warning btn-sm text-white add-more-btn" onclick="add_more(this, 'youtube-data' ,'.youtube-links-container')">Add More</button>
+        </div>
+        </div>
+        
+      </details>
+     </div>
+    <!-- End Youtube Links -->
 
     <!-- Documents - Add More Functionality -->
      <div class="col-md-12 my-3">

@@ -70,13 +70,20 @@
                convertToSelect2()
                $('#unitModal').modal('show')
 
-               $('#lead-unit-form [name="project_type_id"]').trigger('change')
-               $('#lead-unit-form [name="state_id"]').trigger('change')
+               if($('#lead-unit-form [name="property_type_id"]').data('selected_id') != ''){
+                 $('#lead-unit-form [name="project_type_id"]').trigger('change')
+               }
 
-               setTimeout(function() {
-                 $('#lead-unit-form [name="property_id"]').trigger('change')
-               }, 500)
+               if($('#lead-unit-form [name="property_type_id"]').val() != ''){
+                setTimeout(function(){
 
+                  $('#lead-unit-form [name="property_type_id"]').trigger('change')
+                }, 500)
+                 
+                }
+                if($('#lead-unit-form [name="city_id"]').data('selected_id') != ''){
+                   $('#lead-unit-form [name="state_id"]').trigger('change')
+                }
 
                // 
                /*  Lead Unit Form */
@@ -191,9 +198,9 @@
            dataType: 'json',
            success: (res) => {
              if (res.status) {
-               $('.set_property_types').html(res.options_view).trigger('change')
+               $('.set_property_types').html(res.options_view)
                if (selected_id) {
-                 $('#lead-unit-form .get_property_form').trigger('change')
+                //  $('#lead-unit-form .get_property_form').trigger('change')
                }
              }
            }
@@ -202,27 +209,29 @@
        /* End Get Property Types */
 
        /* End Get Property Form */
-       $(document).on('change', '#lead-unit-form [name="property_type_id"], #lead-unit-form [name="project_id"], #lead-unit-form [name="property_id"]', function() {
+       $(document).on('change', '#lead-unit-form [name="project_type_id"], #lead-unit-form [name="property_type_id"],#lead-unit-form [name="property_id"]', function() {
          var property_type_id = $('#lead-unit-form .get_property_form').val();
          var project_id = $('#lead-unit-form [name="project_id"]').val();
          var property_id = project_id ? $('#lead-unit-form [name="property_id"]').val() : 0;
-         var property_details = $('#lead-unit-form .get_property_form').data(property_details);
 
          var selected_id = $('#lead-unit-form .get_property_form').data('selected_id');
          var selected_property_id = $('#lead-unit-form [name="property_id"]').data('selected_id');
 
-         getPropertyForm(property_type_id, property_id, selected_property_id, property_details, selected_id);
+         if(property_type_id){
+          id  = $('#lead-unit-form [name="id"]').val();
+           getPropertyForm(id, property_type_id, property_id, selected_property_id, selected_id);
+          }
        })
 
-       function getPropertyForm(property_type_id, property_id, selected_property_id, property_details, selected_id) {
+       function getPropertyForm(id, property_type_id, property_id, selected_property_id, selected_id) {
          $.ajax({
            method: 'GET',
            url: "<?= base_url('helper/get_property_form'); ?>",
            data: {
+            id: id,
              property_type_id: property_type_id,
              property_id: property_id,
              selected_property_id: selected_property_id,
-             property_details: property_type_id == selected_id ? property_details : null
            },
            dataType: 'json',
            success: (res) => {
@@ -286,7 +295,6 @@
            success: (res) => {
              if (res.status) {
                $('.set_locations').html(res.view)
-               $('#lead-unit-form [name="location_id"]').trigger('change')
              }
            }
          })
@@ -313,8 +321,20 @@
        }
        /*  End Lead Units */
 
+      /** Costing Validation */
+      $(document).on('change', '#lead-unit-form [name="looking_for"]', function() {
+        if(this.value == 'no_action'){
+            $('#lead-unit-form .costing-price-wrapper').find('span.text-danger').html('')
+            $('#lead-unit-form .costing-price-wrapper').find('[name="costing_price"]').prop('required', false)
+          }else{
+          $('#lead-unit-form .costing-price-wrapper').find('span.text-danger').html('*')
+          $('#lead-unit-form .costing-price-wrapper').find('[name="costing_price"]').prop('required', true)
+        }
+      });
+      /** Costing Validation */
+
        /*  Projects */
-       $(document).on('change', '#lead-unit-form [name="location_id"]', function() {
+       $(document).on('change', '#lead-unit-form [name="property_type_id"], #lead-unit-form [name="location_id"]', function() {
          project_type_id = $('#lead-unit-form [name="project_type_id"]').val();
          property_type_id = $('#lead-unit-form [name="property_type_id"]').val();
          state_id = $('#lead-unit-form [name="state_id"]').val();
@@ -323,7 +343,9 @@
 
          selected_id = $('#lead-unit-form [name="project_id"]').data('selected_id')
 
-         projects(project_type_id, property_type_id, state_id, city_id, location_id, selected_id)
+         if(project_type_id && property_type_id && state_id && city_id && location_id ){
+           projects(project_type_id, property_type_id, state_id, city_id, location_id, selected_id)
+          }
        })
 
        function projects(project_type_id = 0, property_type_id = 0, state_id = 0, city_id = 0, location_id = 0, selected_id = 0) {
@@ -342,11 +364,15 @@
            dataType: 'json',
            success: (res) => {
              if (res.status) {
+              console.log(res)
                $('#lead-unit-form [name="project_id"]').html(res.view)
-               if (!selected_id) {
-                 $('#lead-unit-form .project_name_wrapper').removeClass('d-none')
-               }
-               $('#lead-unit-form [name="project_id"]').trigger('change')
+              //  if (selected_id) {
+              //    $('#lead-unit-form .project_name_wrapper').addClass('d-none')
+              // }else{
+              //    $('#lead-unit-form .project_name_wrapper').removeClass('d-none')
+
+              //  }
+              //  $('#lead-unit-form [name="project_id"]').trigger('change')
 
              }
            }
@@ -393,7 +419,7 @@
            success: (res) => {
 
              if (res.status) {
-
+           
              }
            }
          })
@@ -513,6 +539,11 @@
              dublicate_clone_template.find('.document_file').attr('name', "property_documents[" + clone_template_id + "][document_file]").val('');
              dublicate_clone_template.find('.old_document_file').remove();
              dublicate_clone_template.find('.view-property-document').remove();
+             break;
+
+           case 'youtube-data':
+             dublicate_clone_template.find('.youtube-title').attr('name', "youtube_data[" + clone_template_id + "][title]").val('');
+             dublicate_clone_template.find('.link').attr('name', "youtube_data[" + clone_template_id + "][link]").val('');
              break;
          }
 

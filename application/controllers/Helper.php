@@ -82,9 +82,10 @@ class Helper extends CI_Controller
     # Get Property Form
     public function get_property_form()
     {
+        $id                             = $this->input->get('id');
         $property_type_id               = $this->input->get('property_type_id');
         $property_id                    = $this->input->get('property_id');
-        $selected_property_id                    = $this->input->get('selected_property_id');
+        $selected_property_id           = $this->input->get('selected_property_id');
         $property_details               = $this->input->get('property_details');
 
         if (!$property_type_id) :
@@ -94,10 +95,13 @@ class Helper extends CI_Controller
 
         if($property_id && $selected_property_id != $property_id ):
             $property_details               =   project_property_details($property_type_id, $property_id);
+        elseif($id):
+            $lead_unit_details               = lead_unit_details($id);
+            $property_details                = $lead_unit_details->property_details ?? null;
         endif;
+        
 
         $form_view                      =   property_form($property_type_id, $property_details);
-
 
         echo json_encode(['status' => true, 'message' => 'Successfully data fetched', 'form_view' => $form_view]);
     }
