@@ -2217,20 +2217,34 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 }
 
                 if ($lead_from && !$lead_to) {
-                    // $where_ext .= " AND DATE(STR_TO_DATE(`tbl_leads.lead_date`, '%d-%m-%Y') >='" . $lead_from . "'";
+                    $where_ext .= " AND DATE(STR_TO_DATE(tbl_leads.lead_date, '%d-%m-%Y')) >= '$lead_from'";
                 }
+                
                 if ($lead_from && $lead_to) {
-                    // $where_ext .= " AND (DATE(STR_TO_DATE(`tbl_leads.lead_date`, '%d-%m-%Y') BETWEEN '$lead_from' AND '$lead_to' )";
+                    $where_ext .= " AND DATE(STR_TO_DATE(tbl_leads.lead_date, '%d-%m-%Y')) BETWEEN '$lead_from' AND '$lead_to'";
                 }
+
+                if ($followup_from && !$followup_to) {
+                    $where_ext .= " AND DATE(STR_TO_DATE(tbl_leads.followup_date, '%d-%m-%Y')) >= '$followup_from'";
+                }
+                
+                if ($followup_from && $followup_to) {
+                    
+                    $where_ext .= " AND DATE(STR_TO_DATE(tbl_leads.followup_date, '%d-%m-%Y')) BETWEEN '$followup_from' AND '$followup_to'";
+                }
+
                 if ($search_state_id) {
                     $where_ext .= " AND lead_state_id='" . $search_state_id . "'";
                 }
+
                 if ($search_city_id) {
                     $where_ext .= " AND lead_city_id='" . $search_city_id . "'";
                 }
+
                 if ($search_source_id) {
                     $where_ext .= " AND tbl_leads.lead_source_id='" . $search_source_id . "'";
                 }
+
                 if ($search_stage_id) {
                     $where_ext .= " AND tbl_leads.lead_stage_id='" . $search_stage_id . "'";
                 }

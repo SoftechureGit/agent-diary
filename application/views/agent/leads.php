@@ -232,13 +232,13 @@
                          <div class="col-md-6">
                           <div class="form-group">
                             <label for="">From</label>
-                            <input type="date" id="lead_from" class="form-control">
+                            <input type="date" id="lead_from" name="lead_from" class="form-control">
                          </div>
                          </div>
                          <div class="col-md-6">
                           <div class="form-group">
                             <label for="">To</label>
-                            <input type="date" id="lead_to" class="form-control">
+                            <input type="date" id="lead_to" name="lead_to" class="form-control">
                          </div>
                          </div>
                          <!-- End Lead Date Filter -->
@@ -254,14 +254,14 @@
                          <div class="col-md-6">
                           <div class="form-group">
                             <label for="">From</label>
-                            <input type="date" id="followup_from" class="form-control">
+                            <input type="date" id="followup_from" name="followup_from" class="form-control">
                          </div>
                          </div>
                          <div class="col-md-6">
                           <div class="form-group">
 
                             <label for="">From</label>
-                            <input type="date" id="followup_to" class="form-control">
+                            <input type="date" id="followup_to" name="followup_to" class="form-control">
                           </div>
                          </div>
                         <!-- End Followup Date Filter -->
