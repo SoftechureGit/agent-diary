@@ -2216,11 +2216,11 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                     $where_ext .= " AND (lead_mobile_no LIKE '%" . $search_text . "%' OR lead_email LIKE '%" . $search_text . "%' OR CONCAT(lead_title, ' ', lead_first_name, ' ', lead_last_name) LIKE '%" . $search_text . "%')";
                 }
 
-                if ($search_date_from && !$search_date_to) {
-                    $where_ext .= " AND next_followup_date>='" . $search_date_from . "'";
+                if ($lead_from && !$lead_to) {
+                    // $where_ext .= " AND DATE(STR_TO_DATE(`tbl_leads.lead_date`, '%d-%m-%Y') >='" . $lead_from . "'";
                 }
-                if ($search_date_from && $search_date_to) {
-                    $where_ext .= " AND (next_followup_date BETWEEN '" . $search_date_from . "' AND '" . $search_date_to . "')";
+                if ($lead_from && $lead_to) {
+                    // $where_ext .= " AND (DATE(STR_TO_DATE(`tbl_leads.lead_date`, '%d-%m-%Y') BETWEEN '$lead_from' AND '$lead_to' )";
                 }
                 if ($search_state_id) {
                     $where_ext .= " AND lead_state_id='" . $search_state_id . "'";
