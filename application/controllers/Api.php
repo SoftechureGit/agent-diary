@@ -454,7 +454,7 @@ class Api extends CI_Controller {
             "total_conversion"=>(string)11,
             "total_site_visit"=>(string)172
           );
-       $where1 = "country_id='1'";
+       $where1 = "country_id='1' AND state_status=1";
         $state_list = $this->Action_model->detail_result('tbl_states',$where1);
         
         $data['state_list'] = $state_list;
@@ -1978,7 +1978,7 @@ class Api extends CI_Controller {
                     $lead_data[]=$row;
                 }
                 
-            $where = "country_id='1'";
+            $where = "country_id='1' AND state_status=1";
             $state_list = $this->Action_model->detail_result('tbl_states',$where);
             $where = "state_id='".$record->lead_state_id."'";
             $city_list = $this->Action_model->detail_result('tbl_city',$where);
@@ -2099,7 +2099,7 @@ class Api extends CI_Controller {
                     $lead_data[] = $row;
                 }
     
-                $where = "country_id='1'";
+                $where = "country_id='1' AND state_status=1";
                 $state_list = $this->Action_model->detail_result('tbl_states', $where);
                 $where = "state_id='" . $record->lead_state_id . "'";
                 $city_list = $this->Action_model->detail_result('tbl_city', $where);
@@ -3550,7 +3550,7 @@ class Api extends CI_Controller {
             $lead_detail = $this->Action_model->select_single('tbl_leads',"lead_id='".$id."' AND account_id='".$account_id."'");
             if($lead_detail) {
 
-                $where = "country_id='1'";
+                $where = "country_id='1' AND state_status=1";
                 $state_list = $this->Action_model->detail_result('tbl_states',$where);
 
                 $city_list = array();
@@ -8569,7 +8569,7 @@ class Api extends CI_Controller {
         $array=array();
         if($this->input->post()){
             
-        $where = "country_id='1'";
+        $where = "country_id='1' AND state_status=1";
         $state_list = $this->Action_model->detail_result('tbl_states',$where);
 
         // $city_list = array();
@@ -8611,7 +8611,7 @@ class Api extends CI_Controller {
         $array=array();
         if($this->input->post()){
             
-        $where = "country_id='1'";
+        $where = "country_id='1' AND state_status=1";
         $state_list = $this->Action_model->detail_result('tbl_states',$where,'state_id,state_name');
 
         // $city_list = array();
@@ -8667,7 +8667,7 @@ class Api extends CI_Controller {
         $array=array();
         if($this->input->post()){
             
-        $where = "country_id='1'";
+        $where = "country_id='1' AND state_status=1";
         $state_list = $this->Action_model->detail_result('tbl_states',$where,'state_id,state_name');
 
         // $city_list = array();
@@ -8848,7 +8848,7 @@ class Api extends CI_Controller {
 
 
             
-        $where = "country_id='".$user_detail->country_id."'";
+        $where = "state_status=1 AND country_id='".$user_detail->country_id."'";
         $state_list = $this->Action_model->detail_result('tbl_states',$where,'state_id,state_name');
 
         $where = "state_id='".$user_detail->state_id."'";
@@ -8923,7 +8923,7 @@ class Api extends CI_Controller {
         if ($this->input->post("country_id")) {
            $country_id = $this->input->post("country_id");
         }
-        $where = "country_id='".$country_id."'";
+        $where = "state_status=1 AND country_id='".$country_id."'";
         $state_list = array();
         $state_list_data = $this->Action_model->detail_result('tbl_states',$where);
         if ($state_list_data) {
@@ -8943,7 +8943,7 @@ class Api extends CI_Controller {
         $array=array();
         if($this->input->post()){
         
-        $where = "country_id='1'";
+        $where = "country_id='1' AND state_status=1";
         $state_list = $this->Action_model->detail_result('tbl_states',$where);
 
         
@@ -11032,7 +11032,7 @@ $property_list = $query->result();
                      $lead_data[] = $row;
                  }
      
-                 $where = "country_id='1'";
+                 $where = "country_id='1' AND state_status=1";
                  $state_list = $this->Action_model->detail_result('tbl_states', $where);
                  $where = "state_id='" . $record->lead_state_id . "'";
                  $city_list = $this->Action_model->detail_result('tbl_city', $where);

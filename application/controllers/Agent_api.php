@@ -2617,7 +2617,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
             $record = $this->Action_model->select_single('tbl_requirements', "requirement_id='" . $id . "' AND account_id='" . $account_id . "'");
             if ($record) {
 
-                $where = "state_id='" . $record->state_id . "'";
+                $where = "city_status=1 AND state_id='" . $record->state_id . "'";
                 $city_data = $this->Action_model->detail_result('tbl_city', $where, 'city_id,city_name');
                 $city_list = array();
                 if ($city_data) {
@@ -3894,12 +3894,12 @@ WHERE lead_id='" . $lead_id . "'
             
             if ($lead_detail) {
 
-                $where = "country_id='1'";
+                $where = "country_id='1' AND state_status=1";
                 $state_list = $this->Action_model->detail_result('tbl_states', $where);
 
                 $city_list = array();
                 if ($id) {
-                    $where = "state_id='" . $lead_detail->lead_state_id . "'";
+                    $where = "city_status=1 AND state_id='" . $lead_detail->lead_state_id . "'";
                     $city_list = $this->Action_model->detail_result('tbl_city', $where);
                 }
 
@@ -8739,12 +8739,12 @@ WHERE lead_id='" . $lead_id . "'
             if ($lead_data) {
                 $data['lead_data'] = $lead_data;
 
-                $where = "country_id='1'";
+                $where = "country_id='1' AND state_status=1";
                 $state_list = $this->Action_model->detail_result('tbl_states', $where);
                 $data['state_list'] = $state_list;
 
                 $city_list = array();
-                $where = "state_id='" . $lead_data->lead_state_id . "'";
+                $where = "city_status=1 AND state_id='" . $lead_data->lead_state_id . "'";
                 $city_list = $this->Action_model->detail_result('tbl_city', $where);
                 $data['city_list'] = $city_list;
 

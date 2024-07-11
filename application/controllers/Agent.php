@@ -910,7 +910,7 @@ class Agent extends CI_Controller
             $construction_age_list = $this->Action_model->detail_result('tbl_construction_ages', $where, 'construction_age_id,construction_age_name');
             $data['construction_age_list'] = $construction_age_list;
 
-            $where = "country_id='1'";
+            $where = "country_id='1' AND state_status=1";
             $state_list = $this->Action_model->detail_result('tbl_states', $where = "country_id='1'", 'state_id,state_name');
             $data['state_list'] = $state_list;
 
@@ -920,7 +920,7 @@ class Agent extends CI_Controller
             $unit_type_list = array();
 
             if ($id) {
-                $where = "state_id='" . $property_detail->state_id . "'";
+                $where = "city_status=1 AND state_id='" . $property_detail->state_id . "'";
                 $city_list = $this->Action_model->detail_result('tbl_city', $where, 'city_id,city_name');
 
                 $where = "city_id='" . $property_detail->city_id . "'";
@@ -957,7 +957,7 @@ class Agent extends CI_Controller
             $this->load->view(AGENT_URL . 'permission_denied');
         } else {
             //$this->load->view(AGENT_URL.'products',$data="");
-            $where = "country_id='1'";
+            $where = "country_id='1' AND state_status=1";
             $state_list = $this->Action_model->detail_result('tbl_states', $where = "country_id='1'", 'state_id,state_name');
             $data['state_list'] = $state_list;
 
@@ -1107,7 +1107,7 @@ class Agent extends CI_Controller
             $all_unit_type_list = $this->Action_model->detail_result('tbl_unit_types', "unit_type_status='1'", 'unit_type_id,unit_type_name,requirement_accomodation');
             $data['all_unit_type_list'] = $all_unit_type_list;
 
-            $where = "country_id='1'";
+            $where = "country_id='1' AND state_status=1";
             $state_list = $this->Action_model->detail_result('tbl_states', $where = "country_id='1'", 'state_id,state_name');
             $data['state_list'] = $state_list;
 
@@ -1240,7 +1240,7 @@ class Agent extends CI_Controller
         $lead_action_list = $this->Action_model->detail_result('tbl_lead_actions', $where, 'lead_action_id,lead_action_name');
         $data['lead_action_list'] = $lead_action_list;
 
-        $where = "country_id='1'";
+        $where = "country_id='1' AND state_status=1";
         $state_list = $this->Action_model->detail_result('tbl_states', $where);
         $data['state_list'] = $state_list;
 
@@ -1333,12 +1333,12 @@ class Agent extends CI_Controller
             }
         }
 
-        $where = "country_id='1'";
+        $where = "country_id='1' AND state_status=1";
         $state_list = $this->Action_model->detail_result('tbl_states', $where);
 
         $city_list = array();
         if ($id) {
-            $where = "state_id='" . $lead_detail->lead_state_id . "'";
+            $where = "city_status=1 AND state_id='" . $lead_detail->lead_state_id . "'";
             $city_list = $this->Action_model->detail_result('tbl_city', $where);
         }
 
@@ -1374,7 +1374,7 @@ class Agent extends CI_Controller
         $all_unit_type_list = $this->Action_model->detail_result('tbl_unit_types', "unit_type_status='1'", 'unit_type_id,unit_type_name,requirement_accomodation');
         $data['all_unit_type_list'] = $all_unit_type_list;
 
-        $where = "country_id='1'";
+        $where = "country_id='1' AND state_status=1";
         $state_list = $this->Action_model->detail_result('tbl_states', $where = "country_id='1'", 'state_id,state_name');
         $data['state_list'] = $state_list;
 
@@ -1567,7 +1567,7 @@ class Agent extends CI_Controller
             $unit_list = $this->Action_model->detail_result('tbl_units', $where);
             $data['unit_list'] = $unit_list;
 
-            $where = "state_id!=''";
+            $where = "state_id!='' AND state_status=1";
             $state_list = $this->Action_model->detail_result('tbl_states', $where);
             $data['state_list'] = $state_list;
 
@@ -1675,7 +1675,7 @@ class Agent extends CI_Controller
 
             $city_list = array();
             if ($id) {
-                $where = "state_id='" . $product_detail->state_id . "'";
+                $where = "city_status=1 AND state_id='" . $product_detail->state_id . "'";
                 $city_list = $this->Action_model->detail_result('tbl_city', $where);
             }
             $data['city_list'] = $city_list;
@@ -1687,7 +1687,7 @@ class Agent extends CI_Controller
     /* booking report */
     public function booking_report()
     {
-        $where = "state_id!=''";
+        $where = "state_id!='' AND state_status=1";
         $state_list = $this->Action_model->detail_result('tbl_states', $where);
         $data['state_list'] = $state_list;
 
@@ -1765,12 +1765,12 @@ class Agent extends CI_Controller
             $where = "lead_id='" . $booking_detail->lead_id . "'";
             $lead_detail = $this->Action_model->select_single('tbl_leads', $where);
 
-            $where = "country_id='1'";
+            $where = "country_id='1' AND state_status=1";
             $state_list = $this->Action_model->detail_result('tbl_states', $where);
 
             $city_list = array();
             if ($lead_detail) {
-                $where = "state_id='" . $lead_detail->lead_state_id . "'";
+                $where = "city_status=1 AND state_id='" . $lead_detail->lead_state_id . "'";
                 $city_list = $this->Action_model->detail_result('tbl_city', $where);
             }
             $data['state_list'] = $state_list;
@@ -1791,7 +1791,7 @@ class Agent extends CI_Controller
         $all_unit_type_list = $this->Action_model->detail_result('tbl_unit_types', "unit_type_status='1'", 'unit_type_id,unit_type_name,requirement_accomodation');
         $data['all_unit_type_list'] = $all_unit_type_list;
 
-        $where = "country_id='1'";
+        $where = "country_id='1' AND state_status=1";
         $state_list = $this->Action_model->detail_result('tbl_states', $where = "country_id='1'", 'state_id,state_name');
         $data['state_list'] = $state_list;
 
@@ -2540,7 +2540,7 @@ class Agent extends CI_Controller
         $lead_action_list = $this->Action_model->detail_result('tbl_lead_actions', $where, 'lead_action_id,lead_action_name');
         $data['lead_action_list'] = $lead_action_list;
 
-        $where = "country_id='1'";
+        $where = "country_id='1' AND state_status=1";
         $state_list = $this->Action_model->detail_result('tbl_states', $where);
         $data['state_list'] = $state_list;
 
