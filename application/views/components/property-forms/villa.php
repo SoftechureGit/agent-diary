@@ -44,9 +44,23 @@
                     <!-- Plot Size (Sqyd) -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Plot Size (Sqyd)</label>
+                            <label for="">Plot Size</label>
                             <input type="text" placeholder="Enter Plot Size (Sqyd)" name="unit_detials[plot_size]" value="<?= $plot_size ?? '' ?>" class="form-control" >
                         </div>
+                    </div>
+
+                    
+                    <div class="col-md-4">
+                        <label for="">Size Unit </label>
+                        <select class="form-control" id="" name="property_details[size_unit]">
+                                <option value="">Select Unit</option>
+                            <?php foreach (sizeUnits() ?? []  as $item) :
+                                
+                                $selected         = ( isset($size_unit) &&  $item->unit_id == size_unit ) ? 'selected' : '';
+                                ?>
+                             <option value="<?= $item->unit_id ?>"  <?=$selected?> ><?= $item->unit_name ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                     <!-- End Plot Size (Sqyd) -->
 

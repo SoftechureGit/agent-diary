@@ -117,7 +117,12 @@ class Helper extends CI_Controller
             exit;
         endif;
 
-        $view                =   $this->load->view('components/details-view/lead-units', ['lead_id' =>  $lead_id], true);
+        $where          = "user_hash='" . $this->session->userdata('agent_hash') . "'";
+        $user_detail    = $this->db->where($where)->get('tbl_users')->row();
+
+    
+    
+        $view          =   $this->load->view('components/details-view/lead-units', ['lead_id' =>  $lead_id , 'user_detail' =>  $user_detail ], true);
 
         echo json_encode(['status' => true, 'message' => 'Successfully data fetched', 'view' => $view]);
     }

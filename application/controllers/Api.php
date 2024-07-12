@@ -2174,7 +2174,7 @@ class Api extends CI_Controller {
         
         if ($user_detail && $this->input->post()) {
             
-            $id=$this->input->post('id');
+            $id=$this->input->post('lead_id');
             $record = $this->Action_model->select_single('tbl_leads',"lead_id='".$id."'");
 
             $record_array = array(

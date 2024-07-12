@@ -2,7 +2,7 @@
 
 
     # Facings
-    if (!function_exists('facings')) {
+    if (!function_exists('facings')) {  
     function facings(){
        
         $records    =   db_instance()
@@ -14,6 +14,7 @@
 
         return $records ?? [];
     }
+}
     # End Facings
 
     # Lead Details
@@ -28,4 +29,19 @@
         }
     }
     # End Lead Details
-}
+
+    # Lead Details
+
+    if(function_exists('facings')){
+        function sizeUnits(){
+            $records    =   db_instance()
+            ->select('*')
+            ->where("unit_status='1'")
+            ->get('tbl_units')
+            ->result();
+
+        return $records ?? [];
+        }
+    }
+
+    # End Lead Details

@@ -19,8 +19,6 @@ class Agent_api extends CI_Controller
     public function followup_property()
     {
 
-
-
         //$where="am.module_status='1' AND am.module_id IN (".implode(',', $perm_ids).")";
         //$this->db->select('pty.property_id');
         //$this->db->from('tbl_property as pty');
@@ -2161,6 +2159,13 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
             $agent = $this->getAgent();
             $user_id = $agent->user_id ?? 0;
 
+            $where          = "user_hash='" . $this->session->userdata('agent_hash') . "'";
+            $user_detail    = $this->Action_model->select_single('tbl_users', $where);
+            
+           
+            
+            $account_id = $user_detail->user_id;
+
             if ($account_id) {
                 $filter_by = $this->input->post('filter_by');
                 $page = $this->input->post('page');
@@ -2193,6 +2198,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 $search_size_unit = $this->input->post('search_size_unit');
                 $search_agent_id = $this->input->post('search_agent_id');
 
+            
                 $limit = 10;
                 $total_pages = 0;
                 $start = 0;
@@ -2200,16 +2206,30 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 $start = ($page - 1) * $limit;
 
                 // $where = "tbl_leads.account_id='".$account_id."' AND added_to_followup='1' AND tbl_leads.lead_status='1' AND is_customer='0'";
-                $where = "tbl_leads.account_id='" . $account_id . "' AND tbl_leads.lead_status='1' AND is_customer='0'";
+                
+                if($user_detail->role_id < 3){
+                    // echo 'hello'; die;
+
+                    $where = "tbl_leads.lead_status='1' AND is_customer ='0'";
+                }
+                else{
+                    $where = "tbl_leads.account_id='" . $account_id . "' AND tbl_leads.lead_status='1' AND is_customer='0'";
+
+                }
+
                 $where_ids = "";
                 $user_ids = $this->get_level_user_ids();
+                
+
                 if (count($user_ids)) {
                     $where_ids .= " AND ((tbl_followup.user_id='" . implode("' OR tbl_followup.user_id='", $user_ids) . "')  OR (tbl_followup.assign_user_id='" . implode("' OR tbl_followup.assign_user_id='", $user_ids) . "'))";
 
-                    if ($search_agent_id) {
-                        $where_ids .= " AND (tbl_followup.user_id='" . $search_agent_id . "')";
-                    }
                 }
+                
+                if ($search_agent_id) {
+                    $where_ids .= " AND (tbl_followup.user_id='" . $search_agent_id . "')";
+                }
+
                 $where .= $where_ids;
                 $where_ext = "";
                 if ($search_text) {
@@ -2405,6 +2425,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 if ($total_pages != $page) {
                     $next_page = $page + 1;
                 }
+                
                 $array = array('status' => 'success', 'message' => 'Lead Found', 'records' => $records, 'total_records' => $total_records, 'total_pages' => $total_pages, 'next_page' => $next_page, 'records' => $records);
             } else {
                 $array = array('status' => 'error', 'message' => 'No Leads');
@@ -2476,6 +2497,9 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
 
                 $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,user_title,first_name,last_name,parent_id,is_individual,firm_name');
                 $data['user_list'] = $user_list;
+
+                // echo '<pre>';
+                // print_r($data); die;
 
                 $this->load->view(AGENT_URL . 'get_followup', $data);
             } else {

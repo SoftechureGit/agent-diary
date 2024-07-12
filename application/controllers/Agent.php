@@ -2510,10 +2510,25 @@ class Agent extends CI_Controller
 
     function data()
     {
-
-        $account_id = getAccountId();
-
-        $all_file_type = $this->db->distinct()->select('file_name')->where('is_in_lead', 0)->where('added_by', $account_id)->get('tbl_data')->result();
+        
+        $where          = "user_hash='" . $this->session->userdata('agent_hash') . "'";
+        $user_detail    = $this->Action_model->select_single('tbl_users', $where);
+        
+       
+        
+        $account_id = $user_detail->user_id;
+      
+        
+        if($user_detail->role_id < 3){
+            $all_file_type = $this->db->distinct()->select('file_name')->where('is_in_lead', 0)->get('tbl_data')->result();
+        }
+        else{
+            $all_file_type = $this->db->distinct()->select('file_name')->where('is_in_lead', 0)->where('added_by', $account_id)->get('tbl_data')->result();
+            
+        }
+        
+        
+        // print_r($all_file_type) ; die;
 
         $all_status  =  $this->db->distinct()->select('lead_stage_id,lead_stage_name')->where(['lead_stage_status' => 1])->get('tbl_lead_stages')->result();
 

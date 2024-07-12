@@ -307,11 +307,26 @@ if (!function_exists('getAccountId')) {
     # End Get Locations
 
     # Lead Units
-    function lead_units($lead_id)
+    function lead_units($lead_id,$user_detail =[])
+    
     {
         if (!$lead_id) :
             return null;
         endif;
+   
+        
+        $account_id = $user_detail->user_id;
+
+        if($user_detail->role_id < 3 ){
+
+            $where =  "lead_unit.lead_id = $lead_id" ;
+
+        }
+        else{
+    
+            $where =  "added_by=$account_id AND  lead_unit.lead_id = $lead_id" ;
+        }
+      
 
         $records    =   db_instance()
             ->select('lead_unit.*, product_type.product_type_name as project_type_name, unit_type.unit_type_name as property_type_name, state.state_name, city.city_name, location.location_name')
@@ -320,7 +335,7 @@ if (!function_exists('getAccountId')) {
             ->join('tbl_states as state', 'state.state_id = lead_unit.state_id', 'left')
             ->join('tbl_city as city', 'city.city_id = lead_unit.city_id', 'left')
             ->join('tbl_locations as location', 'location.location_id = lead_unit.location_id', 'left')
-            ->where("lead_unit.lead_id = $lead_id")
+            ->where($where)
             ->order_by("lead_unit.id", "desc")
             ->get('tbl_lead_units as lead_unit')
             ->result();
@@ -457,5 +472,6 @@ if (!function_exists('getAccountId')) {
         return true;
     }
     ##### End Gallery Images #####
+    
 
 }

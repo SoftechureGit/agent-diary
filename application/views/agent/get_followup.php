@@ -172,7 +172,7 @@
 
           <!-- Email -->
           <?php if($record->email): ?>
-              <h6 class="card-text text-muted ft-14"><i class="fa fa-envelope"></i> <?= $record->email ?></h6>
+              <h6 class="card-text text-muted ft-14"><i class="fa fa-envelope"></i> <?= $record->lead_email ?></h6>
           <?php endif; ?>
           <!-- End Email -->
 

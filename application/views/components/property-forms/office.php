@@ -75,10 +75,31 @@
                     <!-- Area (Sqft) -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Area (Sqft)</label>
-                            <input type="text" placeholder="Enter Area (Sqft)" name="property_details[area]" value="<?= $area ?? '' ?>" class="form-control" >
+                            <label for="">Area 
+
+
+
+
+                            
+                            </label>
+                            <input type="text" placeholder="Enter Area " name="property_details[area]" value="<?= $area ?? '' ?>" class="form-control" >
                         </div>
                     </div>
+
+                   
+                    <div class="col-md-4">
+                        <label for="">Size Unit </label>
+                        <select class="form-control" id="" name="property_details[size_unit]">
+                                <option value="">Select Unit</option>
+                            <?php foreach (sizeUnits() ?? []  as $item) :
+                                
+                                $selected         = ( isset($size_unit) &&  $item->unit_id == size_unit ) ? 'selected' : '';
+                                ?>
+                             <option value="<?= $item->unit_id ?>"  <?=$selected?> ><?= $item->unit_name ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
                     <!-- End Area (Sqft) -->
 
                     <!-- Applicable PLC -->
