@@ -1864,7 +1864,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
 
         if ($user_detail && $this->input->post()) {
             $followup_lead_id = $this->input->post('followup_lead_id');
-            $record = $this->Action_model->select_single('tbl_leads', "lead_id='" . $followup_lead_id . "' AND account_id='" . $account_id . "'");
+            $record = $this->Action_model->select_single('tbl_leads', "lead_id=$followup_lead_id");
 
             if ($record) {
                 $record = $this->Action_model->select_single('tbl_leads', "lead_id='" . $followup_lead_id . "' AND added_to_followup='1' AND account_id='" . $account_id . "'");
@@ -2474,7 +2474,9 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
 
             $id = $this->input->post('id');
 
-            $where = "lead_id='" . $id . "' AND tbl_leads.account_id='" . $account_id . "'";
+            // echo $id ; die;
+
+            $where = "lead_id=$id";
             $profile_base_url           =   base_url('public/other/profile/');
             $this->db->select("*, concat('$profile_base_url' , tbl_leads.profile) as full_profile_url");
             $this->db->from('tbl_leads');
@@ -3914,7 +3916,7 @@ WHERE lead_id='" . $lead_id . "'
         if ($account_id && $this->input->post()) {
             $id = $this->input->post('id');
 
-            $where = "lead_id='" . $id . "' AND account_id='" . $account_id . "'";
+            $where = "lead_id=$id";
 
             $this->db->select("lead_stage_id,lead_status");
             $this->db->from('tbl_leads');
