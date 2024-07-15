@@ -5,12 +5,18 @@
             <div class="nk-nav-scroll" style="overflow: scroll;">
                 <ul class="metismenu" id="menu">
 
+
+                    <!--  Raw Data -->
+                    <?php if(isset($menu_item_array['raw_data']) && $menu_item_array['raw_data']['rr_view']) { ?>  
                     <li>
                         <a href="<?= base_url(AGENT_URL.'data/') ?>" aria-expanded="false">
                             <i class="icon-screen-tablet menu-icon"></i> <span class="nav-text">Data</span>
                         </a>
                        
                     </li>
+                    <?php } ?>
+                    <!-- End Raw Data  -->
+
 
                     <?php if(isset($menu_item_array['leads']) && $menu_item_array['leads']['rr_view']) { ?>
                     <!-- <li>

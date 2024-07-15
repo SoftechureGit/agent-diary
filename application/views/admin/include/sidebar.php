@@ -119,7 +119,7 @@
                             <li><a href="#">Payment API</a></li>
                             <?php //  } ?>
 
-                            <!--<?php // if(isset($menu_item_array['teams'])) { ?>
+                            <?php // if(isset($menu_item_array['teams'])) { ?>
                             <li>
                                 <a class="has-arrow" href="javascript:void()" aria-expanded="false"><span class="nav-text">Team</span>
                                 </a>
@@ -141,7 +141,7 @@
                                     <?php //  } ?>
                                 </ul>
                             </li>
-                            <?php //  } ?>-->
+                            <?php //  } ?>
 
                             <?php // if(isset($menu_item_array['sms_configration'])) { ?>
                             <li><a href="<?= base_url(ADMIN_URL.'sms-configration') ?>">SMS Configration</a></li>

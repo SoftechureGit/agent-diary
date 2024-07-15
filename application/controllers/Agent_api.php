@@ -2150,7 +2150,10 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
 
     /* followup start */
     public function get_followup_list()
-    {
+    {  
+
+        //  echo $menu_item_array['leads']['rr_view']; die;
+
         $array = array();
 
         if ($this->input->post()) {
@@ -2207,7 +2210,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
 
                 // $where = "tbl_leads.account_id='".$account_id."' AND added_to_followup='1' AND tbl_leads.lead_status='1' AND is_customer='0'";
                 
-                if($user_detail->role_id < 3){
+                if($user_detail->role_id < 3 || $user_detail->role_id == 5){
                     // echo 'hello'; die;
 
                     $where = "tbl_leads.lead_status='1' AND is_customer ='0'";
@@ -2221,10 +2224,10 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 $user_ids = $this->get_level_user_ids();
                 
 
-                if (count($user_ids)) {
-                    $where_ids .= " AND ((tbl_followup.user_id='" . implode("' OR tbl_followup.user_id='", $user_ids) . "')  OR (tbl_followup.assign_user_id='" . implode("' OR tbl_followup.assign_user_id='", $user_ids) . "'))";
+                // if (count($user_ids)) {
+                //     $where_ids .= " AND ((tbl_followup.user_id='" . implode("' OR tbl_followup.user_id='", $user_ids) . "')  OR (tbl_followup.assign_user_id='" . implode("' OR tbl_followup.assign_user_id='", $user_ids) . "'))";
 
-                }
+                // }
                 
                 if ($search_agent_id) {
                     $where_ids .= " AND (tbl_followup.user_id='" . $search_agent_id . "')";
@@ -2312,6 +2315,10 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 $query = $this->db->get('tbl_leads');
                 $record_all = $query->result();
 
+                // echo $where.'<br>';
+
+                // echo count($record_all); die;
+
                 $total_records = 0;
                 if ($record_all) {
                     $total_records = count($record_all); // $record_all->total_records;
@@ -2319,12 +2326,27 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 }
 
 
-                $where = "tbl_leads.account_id='" . $account_id . "'  AND tbl_leads.lead_status='1' AND is_customer='0'";
+                // $where = "tbl_leads.lead_status='1' AND is_customer='0'";
+
+                if($user_detail->role_id < 3 || $user_detail->role_id == 5){
+                    // echo 'hello'; die;
+
+                    $where = "tbl_leads.lead_status='1' AND is_customer ='0'";
+                }
+                else{
+                    $where = "tbl_leads.account_id='" . $account_id . "' AND tbl_leads.lead_status='1' AND is_customer='0'";
+
+                }
+
                 $where_ids = "";
                 $user_ids = $this->get_level_user_ids();
-                if (count($user_ids)) {
-                    $where_ids .= " AND ((tbl_followup.user_id='" . implode("' OR tbl_followup.user_id='", $user_ids) . "')  OR (tbl_followup.assign_user_id='" . implode("' OR tbl_followup.assign_user_id='", $user_ids) . "'))";
-                }
+                
+                // if (count($user_ids)) {
+                //     $where_ids .= " AND ((tbl_leads.account_id='" . implode("' OR tbl_leads.user_id='", $user_ids) . "')  OR (tbl_followup.assign_user_id='" . implode("' OR tbl_followup.assign_user_id='", $user_ids) . "'))";
+                // }
+
+                
+
                 $where .= $where_ids;
 
                 $where .= $where_ext;
@@ -2363,6 +2385,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                                     concat('$profile_base_url' , tbl_leads.profile) as full_profile_url"
                                 );
                 
+                //  echo $where; die;               
 
                 $this->db->where($where);
                 $this->db->join('tbl_lead_sources as lead_source', 'lead_source.lead_source_id = tbl_leads.lead_source_id', 'left');
@@ -2442,7 +2465,13 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
 
         $account_id = getAccountId();
 
+            $where          = "user_hash='" . $this->session->userdata('agent_hash') . "'";
+            $user_detail    = $this->Action_model->select_single('tbl_users', $where);
+
+            $account_id  =  $user_detail->user_id;
+
         if ($account_id && $this->input->post()) {
+
             $id = $this->input->post('id');
 
             $where = "lead_id='" . $id . "' AND tbl_leads.account_id='" . $account_id . "'";
@@ -2460,6 +2489,8 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
             $this->db->where($where);
             $query = $this->db->get();
             $record = $query->row();
+
+            // print_r($record); die;
 
             if ($record) {
                 $next_followup = "";
