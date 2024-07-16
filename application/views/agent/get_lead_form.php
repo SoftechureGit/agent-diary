@@ -320,8 +320,6 @@ $("#form-modal").validate({
                 else if (obj.status=='updated') {
                     // window.location.href=''; 
                     
-                    get_followup_list();
-
                     var record = obj.data;
 
                 $('.data-add-'+fid).html(`  <div class='col-md-2' style='' align='center'>
