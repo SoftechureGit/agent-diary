@@ -3947,7 +3947,7 @@ WHERE lead_id='" . $lead_id . "'
             $id = $this->input->post("id");
             $this->db->select("*, concat('$profile_base_url' , tbl_leads.profile) as profile_url");
 
-            $lead_detail = $this->Action_model->select_single('tbl_leads', "lead_id='" . $id . "' AND account_id='" . $account_id . "'");
+            $lead_detail = $this->Action_model->select_single('tbl_leads', "lead_id=$id" );
             
             if ($lead_detail) {
 
