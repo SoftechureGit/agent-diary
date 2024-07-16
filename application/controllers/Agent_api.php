@@ -1545,6 +1545,10 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
 
         $where = "user_hash='" . $this->session->userdata('agent_hash') . "'";
         $user_detail = $this->Action_model->select_single('tbl_users', $where);
+
+  
+
+
         if ($user_detail) {
             $user_id = $user_detail->user_id;
             $account_id = $user_detail->user_id;
@@ -2164,8 +2168,12 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
 
             $where          = "user_hash='" . $this->session->userdata('agent_hash') . "'";
             $user_detail    = $this->Action_model->select_single('tbl_users', $where);
+
+     
             
            
+            // echo '<pre>';
+            // print_r($user_detail); die;
             
             $account_id = $user_detail->user_id;
 
@@ -2207,18 +2215,30 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 $start = 0;
                 $next_page = 0;
                 $start = ($page - 1) * $limit;
+                
+                // echo '<pre>';
+                // print_r($user_detail); die;
 
                 // $where = "tbl_leads.account_id='".$account_id."' AND added_to_followup='1' AND tbl_leads.lead_status='1' AND is_customer='0'";
                 
                 if($user_detail->role_id < 3 || $user_detail->role_id == 5){
-                    // echo 'hello'; die;
+                    
+                    if($user_detail->parent_id == 0 ){
+                        $where = "tbl_leads.lead_status='1' AND is_customer ='0' AND tbl_leads.account_id='".$account_id."'";
+                    }
+                    else{
+                        $where = "tbl_leads.lead_status='1' AND is_customer ='0' AND tbl_leads.user_id='".$account_id."'";
+                    }
 
-                    $where = "tbl_leads.lead_status='1' AND is_customer ='0'";
+                   
                 }
                 else{
-                    $where = "tbl_leads.account_id='" . $account_id . "' AND tbl_leads.lead_status='1' AND is_customer='0'";
+
+                    $where = "tbl_leads.user_id='" . $account_id . "' AND tbl_leads.lead_status='1' AND is_customer='0'";
 
                 }
+
+                // echo $account_id; die;
 
                 $where_ids = "";
                 $user_ids = $this->get_level_user_ids();
@@ -2329,15 +2349,20 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 // $where = "tbl_leads.lead_status='1' AND is_customer='0'";
 
                 if($user_detail->role_id < 3 || $user_detail->role_id == 5){
-                    // echo 'hello'; die;
+                    
+                    if($user_detail->parent_id == 0 ){
+                        $where = "tbl_leads.lead_status='1' AND is_customer ='0' AND tbl_leads.account_id='".$account_id."'";
+                    }
+                    else{
+                        $where = "tbl_leads.lead_status='1' AND is_customer ='0' AND tbl_leads.user_id='".$account_id."'";
+                    }
 
-                    $where = "tbl_leads.lead_status='1' AND is_customer ='0'";
+                   
                 }
                 else{
-                    $where = "tbl_leads.account_id='" . $account_id . "' AND tbl_leads.lead_status='1' AND is_customer='0'";
+                    $where = "tbl_leads.user_id='" . $account_id . "' AND tbl_leads.lead_status='1' AND is_customer='0'";
 
                 }
-
                 $where_ids = "";
                 $user_ids = $this->get_level_user_ids();
                 
@@ -2415,7 +2440,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                         $query = $this->db->get();
                         $followup_detail = $query->row();
                         if ($followup_detail) {
-                            $next_followup = "<i class='fa fa-clock-o'></i> " . $followup_detail->next_followup_date . " & " . $followup_detail->next_followup_time . " &nbsp; <i class='fa fa-bookmark'></i> " . $followup_detail->au_first_name . ' ' . $followup_detail->au_last_name;
+                            $next_followup = "<i class='fa fa-clock-o'></i> " . $followup_detail->next_followup_date . " " . $followup_detail->next_followup_time . " &nbsp; <br>  " . $followup_detail->au_first_name . ' ' . $followup_detail->au_last_name;
                         }
 
                         $next_followup_date = "";
@@ -2430,7 +2455,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                             'lead_first_name' => $item->lead_first_name,
                             'lead_last_name' => $item->lead_last_name,
                             'lead_date' => $item->lead_date ? date('d F, Y', strtotime($item->lead_date)) : 'N/A',
-                            'lead_time' => $item->lead_time ? date('H:i', strtotime($item->lead_time)) : 'N/A',
+                            'lead_time' => $item->lead_time ? date('h:i a', strtotime($item->lead_time)) : 'N/A',
                             'next_followup_date' => $next_followup_date,
                             'lead_mobile_no' => $item->lead_mobile_no,
                             'lead_stage_name' => $item->lead_stage_name ?? '',
@@ -10097,6 +10122,11 @@ public function data_assign(){
     $user_id        = 0;
     $where          = "user_hash='".$this->session->userdata('agent_hash')."'";
     $user_detail    = $this->Action_model->select_single('tbl_users',$where);
+
+
+
+    
+
     if ($user_detail) {
         $user_id    =   $user_detail->user_id;
         $account_id =   $user_detail->user_id;
@@ -10104,6 +10134,9 @@ public function data_assign(){
             $account_id = $user_detail->parent_id;
         }
 }
+
+
+
 $transfer_lead_ids=  $this->input->post('selected_lead_ids');
 $transfer_lead_ids = explode(',', $transfer_lead_ids);
 $assign_to = $this->input->post('transfer_to');
@@ -10126,7 +10159,7 @@ foreach(  $transfer_lead_ids as   $transfer_lead_id){
                      'lead_stage_id'         =>  1, 
                  );
 
-                 $where          =   "lead_mobile_no='".$raw_data->data_mobile."' AND account_id='".$assign_to."'";
+                 $where          =   "lead_mobile_no='".$raw_data->data_mobile."' AND account_id='".$account_id."'";
                  $lead_detail    =   $this->Action_model->select_single('tbl_leads',$where);
                  if ($lead_detail) {
                      $this->Action_model->update_data($data_array,'tbl_leads',$where);
@@ -10137,9 +10170,9 @@ foreach(  $transfer_lead_ids as   $transfer_lead_id){
                  else {
 
                      $data_array2 = array(
-                         'user_id'           =>  $assign_to,
-                         'account_id'        =>  $assign_to ,
-                         'added_by'          =>  $account_id,
+                         'user_id'           =>  $user_detail->user_id,
+                         'account_id'        =>  $account_id ,
+                         'added_by'          =>  $user_detail->user_id,
                      );
 
                      $data_array     =   array_merge($data_array,$data_array2);

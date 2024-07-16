@@ -1105,8 +1105,18 @@
                 //   "  </div>" +
                 //   "</div>";
 
+                lead_time = record.lead_time ? ` ${record.lead_time}` : '';
 
-                lead_time = record.lead_time ? `( ${record.lead_time} )` : '';
+                if(record.next_followup ==""){
+                    lead_date =  `<i class='fa fa-clock-o'></i> ` + record.lead_date+lead_time;
+                }
+                else{
+                  lead_date  = record.next_followup;
+
+                }
+
+
+                
 
                 delete_lead_btn         =  <?php if(user()->role_id == 1 || user()->role_id == 5): ?> `<div class="delete-lead" data-id="${record.lead_id}"><i class="fa fa-times"></i></div>`<?php else: ?> '' <?php endif;?>;
                  
@@ -1134,8 +1144,7 @@
 
                           <div class='col-md-7'>
                             <div class='card-text text-muted'>
-                              ${record.lead_date}
-                              ${lead_time} 
+                ${lead_date}
                             </div>
                           </div>
 
