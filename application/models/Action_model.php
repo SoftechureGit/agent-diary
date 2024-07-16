@@ -82,10 +82,11 @@ class Action_model extends CI_Model {
     return $query->result_array();
     }
   
-  public function update_data($data, $table, $where)
+  public function update_data($data, $table, $where ,$join='')
     {
      $this->db->set($data); 
      $this->db->where($where);
+     $this->db->join($join,'left');
      $query= $this->db->update($table, $data);
      return $query;
   }

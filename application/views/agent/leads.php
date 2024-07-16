@@ -1112,10 +1112,12 @@
                  
                 html += `<div class='customer position-relative'>
                     ${delete_lead_btn}
-                     <div class='row' onclick='showCustomer(${record.lead_id},0)'>
+                     <div class='row data-add-${record.lead_id}'  onclick='showCustomer(${record.lead_id},0)'>
+
                      <div class='col-md-2' style='' align='center'>
                        <img class='mr-3' src='${record.full_profile_url}' style='border-radius:50%;' width='45' height='45' alt=''>
                      </div>
+                     
                      <div class='col-md-10'>
                        <div class='row'>
                          <div class='col-md-6'>

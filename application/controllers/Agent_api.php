@@ -10882,8 +10882,8 @@ foreach(  $transfer_lead_ids as   $transfer_lead_id){
    # Lead
    function lead($id){
     if(!$id) return null;
-
-    return db_instance()->where("lead_id = $id")->get('tbl_leads')->row();
+    $profile_base_url           =   base_url('public/other/profile/');
+    return db_instance()->select(  "*,concat('$profile_base_url' , tbl_leads.profile) as full_profile_url")->where("lead_id = $id")->join('tbl_lead_stages','tbl_lead_stages.lead_stage_id=tbl_leads.lead_stage_id','left')->join('tbl_lead_sources', 'tbl_lead_sources.lead_source_id=tbl_leads.lead_source_id','left')->get('tbl_leads')->row();
 }
 # Lead
 

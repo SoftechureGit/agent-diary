@@ -320,6 +320,45 @@ $("#form-modal").validate({
                 else if (obj.status=='updated') {
                     // window.location.href=''; 
                     
+                    get_followup_list();
+
+                    var record = obj.data;
+
+                $('.data-add-'+fid).html(`  <div class='col-md-2' style='' align='center'>
+                      <img class='mr-3' src='${record.full_profile_url}' style='border-radius:50%;' width='45' height='45' alt=''>
+                    </div>
+                    
+                    <div class='col-md-10'>
+                      <div class='row'>
+                        <div class='col-md-6'>
+                          <div class='card-text ${is_followup}'>
+                          <i class='fa fa-user pr-2 d-none'></i> 
+                          ${record.lead_title} ${record.lead_first_name} ${record.lead_last_name} </div>
+                        </div>
+
+                          <div class='col-md-6'>
+                          <div class='card-text text-right text-muted'>
+                              ${record.lead_stage_name ?? 'N/A'}
+                            </div>
+                          </div>
+
+                          <div class='col-md-7'>
+                            <div class='card-text text-muted'>
+                              ${record.lead_date}
+                              ${lead_time} 
+                            </div>
+                          </div>
+
+                          <div class='col-md-5'>
+                          <div class='card-text text-right text-muted'>
+                              ${record.lead_source_name ?? 'N/A'}
+                          </div>
+                        </div>
+                      </div>
+                    </div>`)
+
+
+
                     showToast('success', obj.message)
                   $(".error-msg").html(alertMessage('success',obj.message));
                   hideLeadEditModal(<?= $id ?>);
