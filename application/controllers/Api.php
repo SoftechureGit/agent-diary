@@ -2130,6 +2130,10 @@ class Api extends CI_Controller {
                 foreach ($record as $k => $v) {
                     $record->$k = ($v || $v == 0) ? $v : '';
                 }
+
+
+                $where = "designation_status='1'";
+                $designations_list = $this->Action_model->detail_result('tbl_designations', $where);
     
                 $array['data'] = array(
                     'status' => 'true',
@@ -2139,6 +2143,7 @@ class Api extends CI_Controller {
                     'state_list' => $state_list,
                     'occupation_list' => $occupation_list,
                     'department_list' => $department_list,
+                    'designations_list' => $designations_list,
                     'lead_source_list' => $lead_source_list,
                     'lead_stage_list' => $lead_stage_list,
                     'city_list' => $city_list,

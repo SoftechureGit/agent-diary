@@ -2330,6 +2330,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 // $this->db->join('tbl_requirements', 'tbl_requirements.lead_id = tbl_leads.lead_id','left');
                 // $this->db->where($where);
                 // $query = $this->db->get();
+                // $this->db->join("tbl_lead_transfer","tbl_lead_transfer.transfer_to=tbl_leads.user_id");
                 $this->db->join('tbl_followup', 'tbl_followup.followup_id = tbl_leads.user_id', 'left');
                 $this->db->where($where);
                 $query = $this->db->get('tbl_leads');
@@ -2439,6 +2440,9 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                         $this->db->where($where);
                         $query = $this->db->get();
                         $followup_detail = $query->row();
+
+                        // print_r($followup_detail); die;
+
                         if ($followup_detail) {
                             $next_followup = $followup_detail->next_followup_date."(".date('H:i',strtotime($followup_detail->next_followup_time)).")" ;
                         }
@@ -10118,13 +10122,17 @@ WHERE lead_id='" . $lead_id . "'
 
 #  DATA ASSIGN
 public function data_assign(){
+
+    // print_r($this->input->post()); die;
+
     $account_id     = 0;
     $user_id        = 0;
     $where          = "user_hash='".$this->session->userdata('agent_hash')."'";
     $user_detail    = $this->Action_model->select_single('tbl_users',$where);
 
 
-
+    // echo '<pre>';
+    // print_r($user_detail); die;  
     
 
     if ($user_detail) {
@@ -10140,6 +10148,8 @@ public function data_assign(){
 $transfer_lead_ids=  $this->input->post('selected_lead_ids');
 $transfer_lead_ids = explode(',', $transfer_lead_ids);
 $assign_to = $this->input->post('transfer_to');
+
+
 foreach(  $transfer_lead_ids as   $transfer_lead_id){
  $raw_data =     $this->db->select('*')->where('data_id', $transfer_lead_id)->get('tbl_data')->row();
 
@@ -10157,6 +10167,7 @@ foreach(  $transfer_lead_ids as   $transfer_lead_id){
                      'lead_time'             =>  date("h:i:s a") ,
                      'lead_status'           =>  1,
                      'lead_stage_id'         =>  1, 
+                     'user_id'               =>  $assign_to,
                  );
 
                  $where          =   "lead_mobile_no='".$raw_data->data_mobile."' AND account_id='".$account_id."'";
@@ -10170,7 +10181,6 @@ foreach(  $transfer_lead_ids as   $transfer_lead_id){
                  else {
 
                      $data_array2 = array(
-                         'user_id'           =>  $user_detail->user_id,
                          'account_id'        =>  $account_id ,
                          'added_by'          =>  $user_detail->user_id,
                      );

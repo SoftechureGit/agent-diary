@@ -2577,14 +2577,22 @@ class Agent extends CI_Controller
         $where_ids = "";
         $user_ids = $this->get_level_user_ids();
 
+
+        // print_r($user_ids); die;
+       
+
         if (count($user_ids)) {
 
-            $where_ids .= " AND (tbl_users.user_id='" . implode("' OR tbl_users.user_id='", $user_ids) . "')";
+            $where_ids .= " OR (tbl_users.user_id='" . implode("' OR tbl_users.user_id='", $user_ids) . "')";
         }
         $where .= $where_ids;
 
+        // echo $where;  die;
+
         $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,user_title,first_name,last_name,parent_id,is_individual,firm_name');
         $data['user_list'] = $user_list;
+
+        // print_r($data['user_list']); die;
 
         $where = "agent_id='" . $account_id . "' OR share_account_id='" . $account_id . "'";
         $this->db->select("product_id,project_name");
