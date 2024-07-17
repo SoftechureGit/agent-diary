@@ -1105,7 +1105,7 @@
                 //   "  </div>" +
                 //   "</div>";
 
-                lead_time = record.lead_time ? ` ${record.lead_time}` : '';
+                lead_time = record.lead_time ? `   ${record.lead_time}` : '';
 
                 if(record.next_followup ==""){
                     lead_date =   record.lead_date+'('+lead_time+')';
