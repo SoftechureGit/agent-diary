@@ -1108,7 +1108,7 @@
                 lead_time = record.lead_time ? ` ${record.lead_time}` : '';
 
                 if(record.next_followup ==""){
-                    lead_date =  `<i class='fa fa-clock-o'></i> ` + record.lead_date+lead_time;
+                    lead_date =   record.lead_date+'('+lead_time+')';
                 }
                 else{
                   lead_date  = record.next_followup;

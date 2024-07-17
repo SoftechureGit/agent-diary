@@ -2389,7 +2389,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 # Sorting
                 switch($filter_by):
                     case 'due_followup':
-                        $where .= " ORDER BY DATE(STR_TO_DATE(`followup_date`, '%d-%m-%Y')) DESC";
+                        $where .= " ORDER BY DATE(STR_TO_DATE(`followup_date`, '%d-%m-%Y')) DESC , next_followup_time DESC";
                         break;
                         
                     case 'new_leads':
@@ -2440,7 +2440,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                         $query = $this->db->get();
                         $followup_detail = $query->row();
                         if ($followup_detail) {
-                            $next_followup = "<i class='fa fa-clock-o'></i> " . $followup_detail->next_followup_date . " " . $followup_detail->next_followup_time . " &nbsp; <br>  " . $followup_detail->au_first_name . ' ' . $followup_detail->au_last_name;
+                            $next_followup = $followup_detail->next_followup_date."(".date('H:i',strtotime($followup_detail->next_followup_time)).")" ;
                         }
 
                         $next_followup_date = "";
@@ -2454,8 +2454,8 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                             'lead_title' => $item->lead_title,
                             'lead_first_name' => $item->lead_first_name,
                             'lead_last_name' => $item->lead_last_name,
-                            'lead_date' => $item->lead_date ? date('d F, Y', strtotime($item->lead_date)) : 'N/A',
-                            'lead_time' => $item->lead_time ? date('h:i a', strtotime($item->lead_time)) : 'N/A',
+                            'lead_date' => $item->lead_date ? date('d-m-Y', strtotime($item->lead_date)) : 'N/A',
+                            'lead_time' => $item->lead_time ? date('H:i', strtotime($item->lead_time)) : 'N/A',
                             'next_followup_date' => $next_followup_date,
                             'lead_mobile_no' => $item->lead_mobile_no,
                             'lead_stage_name' => $item->lead_stage_name ?? '',
@@ -2531,7 +2531,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 $query = $this->db->get();
                 $followup_detail = $query->row();
                 if ($followup_detail && $followup_detail->next_followup_date) {
-                    $next_followup = "<i class='fa fa-clock-o'></i> " . $followup_detail->next_followup_date . " & " . $followup_detail->next_followup_time . " &nbsp; <i class='fa fa-bookmark'></i> " . $followup_detail->au_first_name . ' ' . $followup_detail->au_last_name;
+                    $next_followup = "<i class='fa fa-clock-o'></i> " . $followup_detail->next_followup_date . "(" .date('H:i',strtotime($followup_detail->next_followup_time)). ") &nbsp; <i class='fa fa-bookmark'></i> " . $followup_detail->au_first_name . ' ' . $followup_detail->au_last_name;
                     $next_followup_date = $followup_detail->next_followup_date . "<br>" . $followup_detail->next_followup_time;
                 }
 
