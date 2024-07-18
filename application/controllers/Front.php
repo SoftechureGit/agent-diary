@@ -998,8 +998,10 @@ https://www.agentdiary.com");*/
 
 
                 if ($recordAccount->username == $username) {
-                    $record = $this->Action_model->select_single_join('tbl_users', "username='" . $username . "' AND password='" . $password . "' AND (tbl_users.role_id='2')", "", array("tbl_roles", "tbl_roles.role_id=tbl_users.role_id"));
+                    $record = $this->Action_model->select_single_join('tbl_users', "username='" . $username . "' AND password='" . $password . "' AND (tbl_users.role_id='2')", "tbl_users.*, tbl_roles.*, tbl_users.user_id as loged_user_id", array("tbl_roles", "tbl_roles.role_id=tbl_users.role_id"));
 
+                    // print_r( $record);
+                    // die;
 
                     if ($record) {
                         if ($record->email_verify == 0) {
@@ -1027,7 +1029,7 @@ https://www.agentdiary.com");*/
                             if ($record->role_id != 2) {
                                 $account_id = $record->parent_id;
                             }
-                            $this->session->set_userdata('user_id', $recordAccount->user_id);
+                            $this->session->set_userdata('user_id', $record->loged_user_id);
                             $this->session->set_userdata('agent_hash', $record->user_hash);
                             $this->session->set_userdata('agent_role_id', $record->role_id);
                             $this->session->set_userdata('agent_name', ($record->is_individual) ? $record->user_title . ' ' . $record->first_name . ' ' . $record->last_name : $record->firm_name);
@@ -1038,8 +1040,10 @@ https://www.agentdiary.com");*/
                         $array = array('status' => 'error', 'message' => 'Enter Valid User Id & Password.');
                     }
                 } else {
-                    $record = $this->Action_model->select_single_join('tbl_users', "parent_id='" . $recordAccount->user_id . "' AND username='" . $username . "' AND password='" . $password . "' AND (tbl_roles.is_agent_member='1')", "", array("tbl_roles", "tbl_roles.role_id=tbl_users.role_id"));
+                    $record = $this->Action_model->select_single_join('tbl_users', "parent_id='" . $recordAccount->user_id . "' AND username='" . $username . "' AND password='" . $password . "' AND (tbl_roles.is_agent_member='1')", "tbl_users.*, tbl_roles.*, tbl_users.user_id as loged_user_id", array("tbl_roles", "tbl_roles.role_id=tbl_users.role_id"));
 
+                    // print_r( $record);
+                    // die;
                     if ($record) {
 
                         $this->Action_model->update_data(array('last_visit' => time()), 'tbl_users', "user_id='" . $record->user_id . "'");
@@ -1049,7 +1053,7 @@ https://www.agentdiary.com");*/
                             $account_id = $record->parent_id;
                         }
 
-                        $this->session->set_userdata('user_id', $recordAccount->user_id);
+                        $this->session->set_userdata('user_id', $record->loged_user_id);
                         $this->session->set_userdata('agent_hash', $record->user_hash);
                         $this->session->set_userdata('agent_role_id', $record->role_id);
                         $this->session->set_userdata('agent_name', $record->first_name . ' ' . $record->last_name);

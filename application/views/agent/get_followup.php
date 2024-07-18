@@ -171,7 +171,7 @@
           <!-- End Secondary Mobile Number -->
 
           <!-- Email -->
-          <?php if($record->email): ?>
+          <?php if($record->lead_email): ?>
               <h6 class="card-text text-muted ft-14"><i class="fa fa-envelope"></i> <?= $record->lead_email ?></h6>
           <?php endif; ?>
           <!-- End Email -->

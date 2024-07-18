@@ -2510,31 +2510,42 @@ class Agent extends CI_Controller
 
     function data()
     {
-        
-        $where          = "user_hash='" . $this->session->userdata('agent_hash') . "'";
-        $user_detail    = $this->Action_model->select_single('tbl_users', $where);
-        
+        $user_detail    =       user();
        
-        
-        $account_id = $user_detail->user_id;
+        $account_id     = $user_detail->user_id;
+
+        $user_id        = user()->user_id;
       
-        
-        if($user_detail->role_id < 3){
-            $all_file_type = $this->db->distinct()->select('file_name')->where('is_in_lead', 0)->get('tbl_data')->result();
+        $where            = 'is_in_lead = 0 ';
+        if(user()->role_id == 2){
+            $where            .= " and account_id = $user_id";
         }
         else{
-            $all_file_type = $this->db->distinct()->select('file_name')->where('is_in_lead', 0)->where('added_by', $account_id)->get('tbl_data')->result();
-            
+            $where            .= " and  added_by = $user_id";
         }
+        
+        $all_file_type = $this->db->distinct()->select('file_name')->where($where)->get('tbl_data')->result();
+        
         
         
         // print_r($all_file_type) ; die;
 
         $all_status  =  $this->db->distinct()->select('lead_stage_id,lead_stage_name')->where(['lead_stage_status' => 1])->get('tbl_lead_stages')->result();
 
-        $all_reasons  =  $this->db->distinct()->select('comment')->get('tbl_followup')->result();
+        # Reasons
+        $reason_where           =   ' 1 = 1';
+        
+        if(user()->role_id == 2 ):
+            $reason_where           .=   " and account_id = $user_id ";
+        else:
+            $reason_where           .=   " and assign_user_id = $user_id or user_id =  $user_id";
+        endif;
+
+        $all_reasons  =  $this->db->distinct()->select('comment')->where($reason_where)->get('tbl_followup')->result();
 
         $data['all_reasons'] = $all_reasons;
+
+        # End Reasons
 
         $data['all_status'] = $all_status;
 
@@ -2587,11 +2598,14 @@ class Agent extends CI_Controller
         }
         $where .= $where_ids;
 
+        $where .= " and ( role_id = 2 or role_id = 5 )";
+
         // echo $where;  die;
 
-        $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,user_title,first_name,last_name,parent_id,is_individual,firm_name');
+        $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,user_title,first_name,last_name,parent_id,is_individual,firm_name, role_id');
         $data['user_list'] = $user_list;
 
+        // echo "<pre>";
         // print_r($data['user_list']); die;
 
         $where = "agent_id='" . $account_id . "' OR share_account_id='" . $account_id . "'";
