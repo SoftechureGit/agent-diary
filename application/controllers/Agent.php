@@ -2511,8 +2511,6 @@ class Agent extends CI_Controller
     function data()
     {
         $user_detail    =       user();
-
-        // print_r($user_detail); die;
        
         $account_id     = $user_detail->user_id;
 
@@ -2594,24 +2592,15 @@ class Agent extends CI_Controller
         // print_r($user_ids); die;
        
 
-        // if (count($user_ids)) {
+        if (count($user_ids)) {
 
-        //     $where_ids .= " OR (tbl_users.user_id='" . implode("' OR tbl_users.user_id='", $user_ids) . "')";
-        // }
+            $where_ids .= " OR (tbl_users.user_id='" . implode("' OR tbl_users.user_id='", $user_ids) . "')";
+        }
+        $where .= $where_ids;
 
-        // $where .= $where_ids;
+        $where .= " and ( role_id = 2 or role_id = 5 )";
 
-        
         // echo $where;  die;
-        
-        if($user_detail->parent_id == 0){
-        //    echo 'adf'; die;
-            $where  = "user_id=$user_detail->user_id OR parent_id=$user_detail->user_id";
-        }
-        else{
-            // echo $user_detail->parent_id; die;
-            $where = " user_id=$user_detail->user_id OR report_to=$user_detail->user_id";
-        }
 
         $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,user_title,first_name,last_name,parent_id,is_individual,firm_name, role_id');
         $data['user_list'] = $user_list;
