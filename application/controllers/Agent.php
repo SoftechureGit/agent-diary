@@ -2518,7 +2518,7 @@ class Agent extends CI_Controller
 
         $user_id        = user()->user_id;
       
-        $where            = 'is_in_lead = 0 ';
+        $where            = ' 1 = 1 ';
         if(user()->role_id == 2){
             $where            .= " and account_id = $user_id";
         }

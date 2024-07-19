@@ -1851,6 +1851,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
 
     public function add_to_followup()
     {
+      
         $array = array();
 
         $account_id = 0;
@@ -1917,7 +1918,8 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                         $next_followup_date = $this->input->post("next_followup_date");
                     }
                     if ($this->input->post("next_followup_time")) {
-                        $next_followup_time = $this->input->post("next_followup_time");
+                        // $next_followup_time = $this->input->post("next_followup_time");
+                        $next_followup_time = str_replace(['am', 'pm'], ['',''], $this->input->post('next_followup_time'));
                     }
                     if ($this->input->post("project_id")) {
                         $project_id = $this->input->post("project_id");
@@ -10814,7 +10816,7 @@ WHERE lead_id='" . $lead_id . "'
         $postData = $this->input->post();
 
         // $select = "data_id,CONCAT(data_first_name,' ',data_last_name) as data_name, data_mobile as mobile  ,data_status as  status , CONCAT(first_name,' ',last_name) as user_name , 'file_name' , data_reason as reason";
-        $select = "tbl_data.data_id,CONCAT(data_first_name,' ',data_last_name) as data_name, data_mobile as mobile  ,data_status as  status , 'file_name' , data_reason as reason , tbl_leads.lead_id, tbl_leads.lead_stage_id, , tbl_users.user_id, concat(tbl_users.user_title, tbl_users.first_name, tbl_users.last_name) as assigned_user_full_name,tbl_lead_stages.lead_stage_name,followup.comment as followup_comment";
+        $select = "tbl_data.data_id,CONCAT(data_first_name,' ',data_last_name) as data_name, data_mobile as mobile  ,data_status as  status , 'file_name' , data_reason as reason , tbl_leads.lead_id, tbl_leads.lead_stage_id, , tbl_users.user_id, concat(tbl_users.user_title, ' ',tbl_users.first_name, ' ',tbl_users.last_name) as assigned_user_full_name,tbl_lead_stages.lead_stage_name,followup.comment as followup_comment";
         $where = '';
 
         $searchValue = $postData['search']['value'];
