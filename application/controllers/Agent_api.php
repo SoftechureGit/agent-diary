@@ -1951,6 +1951,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                         "updated_at" => time()
                     );
 
+
                     $followup_id = $this->Action_model->insert_data($followup_array, 'tbl_followup');
 
                     $lead_history_array = array(
@@ -2352,6 +2353,8 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 $query = $this->db->get('tbl_leads');
                 $record_all = $query->result();
 
+                // print_r($record_all);
+                // die;
                 // echo $where.'<br>';
 
                 // echo count($record_all); die;
@@ -2385,10 +2388,10 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 # Sorting
                 switch ($filter_by):
                     case 'due_followup':
-                        $where .= " and tbl_leads.added_to_followup = 1";
+                        $where .= " and tbl_leads.added_to_followup = '1'";
                         $where .= " GROUP BY tbl_leads.lead_id";
+                        // $where .= " ORDER BY DATE(STR_TO_DATE(tbl_followup.next_followup_date, '%d-%m-%Y')) desc , tbl_followup.next_followup_time DESC";
                         $where .= " ORDER BY DATE(STR_TO_DATE(tbl_followup.next_followup_date, '%d-%m-%Y')) desc , tbl_followup.next_followup_time DESC";
-                        // $where .= " ORDER BY DATE(STR_TO_DATE(`followup_date`, '%d-%m-%Y')) asc";
                         break;
 
                     case 'new_leads':
@@ -2423,13 +2426,15 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 $this->db->join('tbl_lead_sources as lead_source', 'lead_source.lead_source_id = tbl_leads.lead_source_id', 'left');
                 $this->db->join('tbl_lead_stages as stages', 'stages.lead_stage_id = tbl_leads.lead_stage_id', 'left');
                 $this->db->join('tbl_users as user', 'user.user_id = tbl_leads.user_id', 'left');
-                $this->db->join('tbl_followup', 'tbl_followup.lead_id = tbl_leads.lead_id', 'left');
+                // $this->db->join('tbl_followup', 'tbl_followup.lead_id = tbl_leads.lead_id', 'left');
+                $this->db->join('(SELECT * FROM tbl_followup WHERE followup_id IN (SELECT MAX(followup_id) FROM tbl_followup GROUP BY lead_id)) as tbl_followup', 'tbl_followup.lead_id = tbl_leads.lead_id', 'left');
 
                 $query = $this->db->get('tbl_leads');
 
                 $record_data = $query->result();
 
-                // print_r($record_data);
+                // print_r($this->db->last_query());
+                // // print_r($record_data);
                 // die;
 
                 $records = array();
@@ -3663,7 +3668,8 @@ WHERE lead_id='" . $lead_id . "'
                     $next_followup_date = $this->input->post("next_followup_date");
                 }
                 if ($this->input->post("next_followup_time")) {
-                    $next_followup_time = $this->input->post("next_followup_time");
+                    // $next_followup_time = $this->input->post("next_followup_time");
+                    $next_followup_time = str_replace(['am', 'pm'], ['',''], $this->input->post('next_followup_time'));
                 }
                 if ($this->input->post("project_id")) {
                     $project_id = $this->input->post("project_id");
