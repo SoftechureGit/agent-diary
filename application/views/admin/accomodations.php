@@ -19,7 +19,7 @@
                                 <!--<a href="<?= base_url(ADMIN_URL.'accomodation-detail') ?>"><button type="button" class="btn btn-info btn-sm" >Add New</button></a><?php //  } ?>-->
                                 <a href="javascript:void()" onclick="formModal(0,1)"><button type="button" class="btn btn-info btn-sm" >Add New</button></a><?php //  } ?>
                                 
-                            </div> 
+                            </div>
                         </div>
 
                         <div class="table-responsive">

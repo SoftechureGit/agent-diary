@@ -28,6 +28,7 @@ if (!function_exists('user')) {
     function user()
     {
         $user_id    =    CI()->session->userdata('user_id');
+        
         if (!$user_id) return null;
 
         return  db_instance()
@@ -43,7 +44,8 @@ if (!function_exists('user')) {
                                 ) AS full_name,
                             user.email, 
                             user.mobile,
-                            role.role_name"
+                            role.role_name,
+                            parent_id"
             )
             ->join('tbl_roles as role', 'role.role_id = user.role_id', 'left')
             ->where("user.user_id = $user_id")

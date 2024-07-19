@@ -5,7 +5,6 @@
             <div class="nk-nav-scroll" style="overflow: scroll;">
                 <ul class="metismenu" id="menu">
 
-
                     <!--  Raw Data -->
                     <?php if(isset($menu_item_array['raw_data']) && $menu_item_array['raw_data']['rr_view']) { ?>  
                     <li>
