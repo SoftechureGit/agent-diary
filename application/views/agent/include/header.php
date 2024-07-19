@@ -314,7 +314,7 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id, $use
 
                 <div class="header-right">
                     <ul class="clearfix">
-                        <li class="icons dropdown username-desk"> Hi <?= user()->full_name ?? 'Guest' ?></li>
+                        <li class="icons dropdown username-desk"> Hi <?= $this->session->userdata('agent_name') ?></li>
 
                         <li class="icons dropdown"><a href="javascript:void(0)">
                                 <i class="fa fa-refresh" aria-hidden="true"></i>

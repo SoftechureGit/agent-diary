@@ -201,8 +201,8 @@
               <div class="col-md-3">
                 <select id="teamFilter" class="form-control select-2-team-with-search">
                   <option value="" >All Team Member</option>
-                  <?php foreach ($user_list ?? [] as $item) {
-                  if (($record->user_id ?? 0 ) != $item->user_id) { ?>
+                  <?php foreach ($user_list as $item) {
+                  if ($record->user_id != $item->user_id) { ?>
                     <option value="<?= $item->user_id ?>">
                       <?= (($item->parent_id == 0) ? (($item->is_individual) ? ucwords($item->user_title . ' ' . $item->first_name . ' ' . $item->last_name) : $item->firm_name) : ucwords($item->user_title . ' ' . $item->first_name . ' ' . $item->last_name)) ?>
                     </option>

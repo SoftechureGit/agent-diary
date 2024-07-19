@@ -28,7 +28,6 @@ if (!function_exists('user')) {
     function user()
     {
         $user_id    =    CI()->session->userdata('user_id');
-        
         if (!$user_id) return null;
 
         return  db_instance()
