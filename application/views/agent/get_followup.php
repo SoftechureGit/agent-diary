@@ -126,7 +126,7 @@
 <div style="padding: 0px 15px 0px 15px;">
   <div class="row" style="border-bottom: 1px solid #0000000f;padding-bottom: 13px;margin-bottom: 10px;">
     <div class="col-md-2" align="center">
-      <img class="mr-3" src="<?= $record->full_profile_url ?? base_url('public/front/user.png') ?>" style="margin-top: 18px;border-radius:50%;" width="50" height="50" alt="">
+      <img class="mr-3" src="<?= $record->profile ?  $record->full_profile_url : base_url('public/front/user.png') ?>" style="margin-top: 18px;border-radius:50%;" width="50" height="50" alt="">
     </div>
     <div class="col-md-10">
 

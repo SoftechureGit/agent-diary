@@ -2110,6 +2110,8 @@
               obj = JSON.parse(response);
               $(".followup-form-btn").html(btn_label);
               if (obj.status == 'success') {
+                $('.lead-list').html('');
+                get_followup_list();
                 $("#followUpTabModal input").val('');
                 $("#followUpTabModal select").val('');
                 $("#followUpTabModal textarea").val('');
