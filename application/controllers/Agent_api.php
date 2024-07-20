@@ -10200,72 +10200,66 @@ WHERE lead_id='" . $lead_id . "'
         $account_id = 0;
         $user_id = 0;
 
-        $where = "user_hash='" . $this->session->userdata('agent_hash') . "'";
-        $user_detail = $this->Action_model->select_single('tbl_users', $where);
+        $where = "user_hash='".$this->session->userdata('agent_hash')."'";
+        $user_detail = $this->Action_model->select_single('tbl_users',$where);
         if ($user_detail) {
-            $user_id = $user_detail->user_id;
+            $user_id=$user_detail->user_id;
             $account_id = $user_detail->user_id;
-            if ($user_detail->role_id != 2) {
+            if ($user_detail->role_id!=2) {
                 $account_id = $user_detail->parent_id;
             }
         }
 
         if ($user_detail && $this->input->post()) {
+            $transfer_lead_id=$this->input->post('transfer_lead_id');
+            $transfer_to=$this->input->post('transfer_to');
 
+            $record = $this->Action_model->select_single('tbl_leads',"lead_id='".$transfer_lead_id."' AND account_id='".$account_id."'");
 
+            if ($record) {
 
-            $transfer_lead_ids =  $this->input->post('selected_lead_ids');
+                $record_array = array(
+                    'user_id'=>$transfer_to
+                );
 
-            $transfer_lead_ids = explode(',', $transfer_lead_ids);
+                $this->Action_model->update_data($record_array,'tbl_leads',"lead_id='".$transfer_lead_id."' AND account_id='".$account_id."'");
 
-            $record_array = array();
+                $this->Action_model->update_data($record_array,'tbl_followup',"lead_id='".$transfer_lead_id."' AND user_id='".$record->user_id."'");
+                $this->Action_model->update_data($record_array,'tbl_requirements',"lead_id='".$transfer_lead_id."' AND user_id='".$record->user_id."'");
+                $this->Action_model->update_data($record_array,'tbl_site_visit',"lead_id='".$transfer_lead_id."' AND user_id='".$record->user_id."'");
 
-            foreach ($transfer_lead_ids as $transfer_lead_id) {
+                $record_array = array(
+                    'lead_id'=>$transfer_lead_id,
+                    'transfer_from'=>$record->user_id,
+                    'transfer_to'=>$transfer_to,
+                    'transfer_by'=>$user_id,
+                    'created_at'=>time()
+                );
 
-                $transfer_to = $this->input->post('transfer_to');
+                $this->Action_model->insert_data($record_array,'tbl_lead_transfer');
 
-                $record = $this->Action_model->select_single('tbl_leads', "lead_id='" . $transfer_lead_id . "' AND account_id='" . $account_id . "'");
+                $lead_history_array = array(
+                    'title' => 'Transfer Lead',
+                    'description' => 'Lead transfer to '.$this->Action_model->get_name($transfer_to).' by '.$this->Action_model->get_name($user_id),
+                    'lead_id' => $transfer_lead_id,
+                    'created_at' => time(),
+                    "account_id"=>$account_id,
+                    "user_id"=>$user_id
+                );
+                $this->Action_model->insert_data($lead_history_array,'tbl_lead_history');
 
-                if ($record) {
-
-                    $record_array = array(
-                        'user_id' => $transfer_to
-                    );
-
-                    $this->Action_model->update_data($record_array, 'tbl_leads', "lead_id='" . $transfer_lead_id . "' AND account_id='" . $account_id . "'");
-
-                    $this->Action_model->update_data($record_array, 'tbl_followup', "lead_id='" . $transfer_lead_id . "' AND user_id='" . $record->user_id . "'");
-                    $this->Action_model->update_data($record_array, 'tbl_requirements', "lead_id='" . $transfer_lead_id . "' AND user_id='" . $record->user_id . "'");
-                    $this->Action_model->update_data($record_array, 'tbl_site_visit', "lead_id='" . $transfer_lead_id . "' AND user_id='" . $record->user_id . "'");
-
-                    $record_array = array(
-                        'lead_id'           =>  $transfer_lead_id,
-                        'transfer_from'     =>  $record->user_id,
-                        'transfer_to'       =>  $transfer_to,
-                        'transfer_by'       =>  $user_id,
-                        'created_at'        =>  time()
-                    );
-
-                    $this->Action_model->insert_data($record_array, 'tbl_lead_transfer');
-
-                    $lead_history_array = array(
-                        'title'             => 'Transfer Lead',
-                        'description'       => 'Lead transfer to ' . $this->Action_model->get_name($transfer_to) . ' by ' . $this->Action_model->get_name($user_id),
-                        'lead_id'           => $transfer_lead_id,
-                        'created_at'        => time(),
-                        "account_id"        => $account_id,
-                        "user_id"           => $user_id
-                    );
-                    $this->Action_model->insert_data($lead_history_array, 'tbl_lead_history');
-                }
+                $array = array('status'=>'success','message'=>'Lead Transfered Successfully!!');
             }
-
-            $array = array('status' => 'success', 'message' => 'Lead Transfered Successfully!!');
-        } else {
-            $array = array('status' => 'error', 'message' => 'Some error occurred, please try again.');
+            else {
+                $array = array('status'=>'error','message'=>'Lead Not Found!!');
+            }
+        }
+        else { 
+           $array = array('status'=>'error','message'=>'Some error occurred, please try again.');
         }
 
         echo json_encode($array);
+        
     }
     /* lead end */
 
