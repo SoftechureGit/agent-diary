@@ -56,9 +56,14 @@ if (!function_exists('user')) {
 
 # Upload File
 if (!function_exists('upload_file')) {
-    function upload_file($name, $upload_folder, $old_file_name = null)
+    function upload_file($name, $upload_folder, $old_file_name = null, $is_new_upload_path = true)
     {
-        $upload_path                    = "./public/other/$upload_folder/";
+        if($is_new_upload_path):
+            $upload_path                    = "./public/other/$upload_folder/";
+        else:
+            
+            $upload_path                    =  $upload_folder;
+        endif;
 
         # Create Folder if Folder Not Exits
         if (!file_exists($upload_path)) {

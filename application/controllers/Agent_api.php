@@ -1851,7 +1851,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
 
     public function add_to_followup()
     {
-      
+
         $array = array();
 
         $account_id = 0;
@@ -1919,7 +1919,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                     }
                     if ($this->input->post("next_followup_time")) {
                         // $next_followup_time = $this->input->post("next_followup_time");
-                        $next_followup_time = str_replace(['am', 'pm'], ['',''], $this->input->post('next_followup_time'));
+                        $next_followup_time = str_replace(['am', 'pm'], ['', ''], $this->input->post('next_followup_time'));
                     }
                     if ($this->input->post("project_id")) {
                         $project_id = $this->input->post("project_id");
@@ -2411,7 +2411,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 $profile_base_url           =   base_url('public/other/profile/');
 
                 $this->db->select(
-                                    "tbl_leads.*, 
+                    "tbl_leads.*, 
                                     CONCAT(user.user_title, user.first_name, user.last_name) as assgin_user_full_name, 
                                     stages.lead_stage_name as stage_name, 
                                     lead_source.lead_source_name,
@@ -2441,8 +2441,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 if ($record_data) {
                     foreach ($record_data as $item) {
 
-                        $lead_or_next_followp_date                  =   $item->next_followup_date ? date('d-m-Y', strtotime($item->next_followup_date)) : 
-                                                                        ($item->lead_date ? date('d-m-Y', strtotime($item->lead_date)) : 'N/A');
+                        $lead_or_next_followp_date                  =   $item->next_followup_date ? date('d-m-Y', strtotime($item->next_followup_date)) : ($item->lead_date ? date('d-m-Y', strtotime($item->lead_date)) : 'N/A');
 
                         $lead_or_next_followp_time                  =   $item->next_followup_time ? $item->next_followup_time : ($item->lead_time ? date('H:i', strtotime($item->lead_time)) : 'N/A');
 
@@ -3669,7 +3668,7 @@ WHERE lead_id='" . $lead_id . "'
                 }
                 if ($this->input->post("next_followup_time")) {
                     // $next_followup_time = $this->input->post("next_followup_time");
-                    $next_followup_time = str_replace(['am', 'pm'], ['',''], $this->input->post('next_followup_time'));
+                    $next_followup_time = str_replace(['am', 'pm'], ['', ''], $this->input->post('next_followup_time'));
                 }
                 if ($this->input->post("project_id")) {
                     $project_id = $this->input->post("project_id");
@@ -4448,6 +4447,8 @@ WHERE lead_id='" . $lead_id . "'
     {
 
         $product_id = $this->input->post('product_id');
+
+
         $data['product_id'] = $product_id;
 
         $records = array();
@@ -4523,7 +4524,44 @@ WHERE lead_id='" . $lead_id . "'
 
         $data['floor_list'] = $this->Action_model->detail_result('tbl_floors', "floor_id!=''");
 
-        $this->load->view(AGENT_URL . 'ajax/get_project_inventory', $data);
+        # Table View
+        $table_view                 =   "<div class='table-responsive'>
+                                        <table class='table table-bordered'>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Unit Code</th>
+                                            <th>Referance Number</th>
+                                            <th class='text-center'>Action</th>
+                                        </tr>
+                                        ";
+        foreach ($records ?? [] as $inventory_key => $inventory) :
+            $inventory_id                   =   $inventory->inventory_id;
+            $inventory_key                  =   ++$inventory_key;
+            $property_details  = $inventory->property_details ? json_decode($inventory->property_details) : null;
+
+            $unit_code  = $property_details->unit_code ?? $inventory->unit_no ?? '';
+            $referance_number  = $property_details->referance_number ?? $inventory->reference ?? '';
+
+            // if ($inventory->property_details) :
+            $table_view             .=  "<tr>
+                                                <td>$inventory_key</td>
+                                                <td>$unit_code</td>
+                                                <td>$referance_number</td>
+                                                <td class='text-center'>
+                                                    <span class='text-primary px-2 view-inventory-record' data-id='$inventory_id'><i class='fa fa-eye'></i></span>
+                                                    <span class='text-success px-2 edit-inventory-record' data-id='$inventory_id'><i class='fa fa-edit'></i></span>
+                                                    <span class='text-danger px-2 delete-inventory-record' data-id='$inventory_id'><i class='fa fa-trash'></i></span>
+                                                </td>
+                                            </tr>
+                                        ";
+        // endif;
+        endforeach;
+        $table_view                 .=   "</table><div>";
+        # End Table View
+
+        $data_view    = $this->load->view(AGENT_URL . 'ajax/get_project_inventory', $data, true);
+
+        echo json_encode(['status' => true, 'message' => 'data fetched', 'data_view' => $data_view, 'table_view' => $table_view]);
     }
 
     public function project_inventory_update()
@@ -4738,7 +4776,7 @@ WHERE lead_id='" . $lead_id . "'
         if ($this->input->post()) {
             $builder_id = $this->input->post('builder_id');
             $where = "tbl_products.agent_id='" . $account_id . "' AND tbl_products.builder_id='" . $builder_id . "'";
-            $product_data = $this->Action_model->detail_result('tbl_products', $where, 'product_id,project_name');
+            $product_data = $this->Action_model->detail_result('tbl_products', $where, 'product_id,project_name, property_type as property_type_id');
             if ($product_data) {
                 $product_list = $product_data;
             }
@@ -10200,66 +10238,63 @@ WHERE lead_id='" . $lead_id . "'
         $account_id = 0;
         $user_id = 0;
 
-        $where = "user_hash='".$this->session->userdata('agent_hash')."'";
-        $user_detail = $this->Action_model->select_single('tbl_users',$where);
+        $where = "user_hash='" . $this->session->userdata('agent_hash') . "'";
+        $user_detail = $this->Action_model->select_single('tbl_users', $where);
         if ($user_detail) {
-            $user_id=$user_detail->user_id;
+            $user_id = $user_detail->user_id;
             $account_id = $user_detail->user_id;
-            if ($user_detail->role_id!=2) {
+            if ($user_detail->role_id != 2) {
                 $account_id = $user_detail->parent_id;
             }
         }
 
         if ($user_detail && $this->input->post()) {
-            $transfer_lead_id=$this->input->post('transfer_lead_id');
-            $transfer_to=$this->input->post('transfer_to');
+            $transfer_lead_id = $this->input->post('transfer_lead_id');
+            $transfer_to = $this->input->post('transfer_to');
 
-            $record = $this->Action_model->select_single('tbl_leads',"lead_id='".$transfer_lead_id."' AND account_id='".$account_id."'");
+            $record = $this->Action_model->select_single('tbl_leads', "lead_id='" . $transfer_lead_id . "' AND account_id='" . $account_id . "'");
 
             if ($record) {
 
                 $record_array = array(
-                    'user_id'=>$transfer_to
+                    'user_id' => $transfer_to
                 );
 
-                $this->Action_model->update_data($record_array,'tbl_leads',"lead_id='".$transfer_lead_id."' AND account_id='".$account_id."'");
+                $this->Action_model->update_data($record_array, 'tbl_leads', "lead_id='" . $transfer_lead_id . "' AND account_id='" . $account_id . "'");
 
-                $this->Action_model->update_data($record_array,'tbl_followup',"lead_id='".$transfer_lead_id."' AND user_id='".$record->user_id."'");
-                $this->Action_model->update_data($record_array,'tbl_requirements',"lead_id='".$transfer_lead_id."' AND user_id='".$record->user_id."'");
-                $this->Action_model->update_data($record_array,'tbl_site_visit',"lead_id='".$transfer_lead_id."' AND user_id='".$record->user_id."'");
+                $this->Action_model->update_data($record_array, 'tbl_followup', "lead_id='" . $transfer_lead_id . "' AND user_id='" . $record->user_id . "'");
+                $this->Action_model->update_data($record_array, 'tbl_requirements', "lead_id='" . $transfer_lead_id . "' AND user_id='" . $record->user_id . "'");
+                $this->Action_model->update_data($record_array, 'tbl_site_visit', "lead_id='" . $transfer_lead_id . "' AND user_id='" . $record->user_id . "'");
 
                 $record_array = array(
-                    'lead_id'=>$transfer_lead_id,
-                    'transfer_from'=>$record->user_id,
-                    'transfer_to'=>$transfer_to,
-                    'transfer_by'=>$user_id,
-                    'created_at'=>time()
+                    'lead_id' => $transfer_lead_id,
+                    'transfer_from' => $record->user_id,
+                    'transfer_to' => $transfer_to,
+                    'transfer_by' => $user_id,
+                    'created_at' => time()
                 );
 
-                $this->Action_model->insert_data($record_array,'tbl_lead_transfer');
+                $this->Action_model->insert_data($record_array, 'tbl_lead_transfer');
 
                 $lead_history_array = array(
                     'title' => 'Transfer Lead',
-                    'description' => 'Lead transfer to '.$this->Action_model->get_name($transfer_to).' by '.$this->Action_model->get_name($user_id),
+                    'description' => 'Lead transfer to ' . $this->Action_model->get_name($transfer_to) . ' by ' . $this->Action_model->get_name($user_id),
                     'lead_id' => $transfer_lead_id,
                     'created_at' => time(),
-                    "account_id"=>$account_id,
-                    "user_id"=>$user_id
+                    "account_id" => $account_id,
+                    "user_id" => $user_id
                 );
-                $this->Action_model->insert_data($lead_history_array,'tbl_lead_history');
+                $this->Action_model->insert_data($lead_history_array, 'tbl_lead_history');
 
-                $array = array('status'=>'success','message'=>'Lead Transfered Successfully!!');
+                $array = array('status' => 'success', 'message' => 'Lead Transfered Successfully!!');
+            } else {
+                $array = array('status' => 'error', 'message' => 'Lead Not Found!!');
             }
-            else {
-                $array = array('status'=>'error','message'=>'Lead Not Found!!');
-            }
-        }
-        else { 
-           $array = array('status'=>'error','message'=>'Some error occurred, please try again.');
+        } else {
+            $array = array('status' => 'error', 'message' => 'Some error occurred, please try again.');
         }
 
         echo json_encode($array);
-        
     }
     /* lead end */
 
@@ -10861,8 +10896,8 @@ WHERE lead_id='" . $lead_id . "'
             }
         }
 
-    //     print_r($searchQuery);
-    // die;
+        //     print_r($searchQuery);
+        // die;
         $data = $this->Action_model->ajaxDatatableLeft($postData, $searchQuery, 'tbl_data', $where, $select, array('tbl_leads', 'tbl_leads.data_id=tbl_data.data_id', 'tbl_users', 'tbl_users.user_id=tbl_leads.user_id', 'tbl_lead_stages', 'tbl_lead_stages.lead_stage_id=tbl_leads.lead_stage_id', 'tbl_followup as followup', 'followup.lead_id = tbl_leads.lead_id'));
 
         echo json_encode($data);
@@ -10909,4 +10944,56 @@ WHERE lead_id='" . $lead_id . "'
     }
     # Lead
 
+    # Store Inventory
+    function store_inventory()
+    {
+        if ($this->input->post()) :
+            if (!$this->input->post()) :
+                echo json_encode(['status' => false, 'message' => 'Reqeust method is not POST']);
+            endif;
+
+            $res_arr                                    =   [];
+
+            # Init
+            $id                                         =   $this->input->post('id');
+            $product_id                                 =   $this->input->post('product_id');
+            $builder_id                                 =   $this->input->post('builder_id');
+            $old_property_layout                        =   $this->input->post('old_property_layout');
+            $property_details                           =   $this->input->post('property_details');
+
+            # End Init
+
+            # File Upload
+            $upload_response            =   upload_file('property_layout', './uploads/images/property/unit', $old_property_layout, false);
+
+            if (!isset($upload_response) || !$upload_response->status) :
+                echo json_encode(['status' => false, 'message' => $upload_response->message]);
+                exit;
+            endif;
+
+            $property_layout                            =   $upload_response->file_name;
+            # End File Upload
+
+            # Db Data
+            $data                                   =   [
+                'product_id'            => $product_id,
+                'builder_id'            => $builder_id,
+                'property_details'      => $property_details ? json_encode($property_details) : NULL,
+                'property_layout'       => $property_layout,
+            ];
+            # End Db Data
+
+            if ($id) :
+                $result                             =   $this->Action_model->update_data($data, 'tbl_inventory', "id = $id");
+                $res_arr                            =   $result ? ['status' => true, 'message' => 'Successfully record updated'] : ['status' => false, 'message' => 'Some error occured'];
+            else :
+                $result                             =   $this->Action_model->insert_data($data, 'tbl_inventory');
+                $res_arr                            =   $result ? ['status' => true, 'message' => 'Successfully record inserted'] : ['status' => false, 'message' => 'Some error occured'];
+            endif;
+
+
+            echo json_encode($res_arr);
+        endif;
+    }
+    # End Store Inventory
 }

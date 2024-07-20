@@ -45,3 +45,14 @@
     }
 
     # End Lead Details
+
+    # Get Inventory Details
+    function get_product_details($product_id){
+        return db_instance()
+        ->select('product.product_id as id, product.project_name as name')
+        ->where("product.product_id='$product_id'")
+        // ->join('tbl_product_unit_details as product', "product.")
+        ->get('tbl_products as product')
+        ->result();
+    }
+    # End Get Inventory Details

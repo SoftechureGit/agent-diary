@@ -87,18 +87,28 @@ class Helper extends CI_Controller
         $property_id                    = $this->input->get('property_id');
         $selected_property_id           = $this->input->get('selected_property_id');
         $property_details               = $this->input->get('property_details');
+        $form_request_for               = $this->input->get('form_request_for');
 
         if (!$property_type_id) :
             return null;
         endif;
 
+        switch($form_request_for):
+            case 'inventory':
+                
+            break;
 
-        if($property_id && $selected_property_id != $property_id ):
-            $property_details               =   project_property_details($property_type_id, $property_id);
-        elseif($id):
-            $lead_unit_details               = lead_unit_details($id);
-            $property_details                = $lead_unit_details->property_details ?? null;
-        endif;
+            default:
+                if($property_id && $selected_property_id != $property_id ):
+                    $property_details               =   project_property_details($property_type_id, $property_id);
+                elseif($id):
+                    $lead_unit_details               = lead_unit_details($id);
+                    $property_details                = $lead_unit_details->property_details ?? null;
+                endif;
+            break;
+        endswitch;
+
+        
         
 
         $form_view                      =   property_form($property_type_id, $property_details);

@@ -223,7 +223,7 @@
           }
        })
 
-       function getPropertyForm(id, property_type_id, property_id, selected_property_id, selected_id) {
+       function getPropertyForm(id, property_type_id, property_id, selected_property_id, selected_id, form_request_for = '') {
          $.ajax({
            method: 'GET',
            url: "<?= base_url('helper/get_property_form'); ?>",
@@ -232,6 +232,7 @@
              property_type_id: property_type_id,
              property_id: property_id,
              selected_property_id: selected_property_id,
+             form_request_for: form_request_for,
            },
            dataType: 'json',
            success: (res) => {
