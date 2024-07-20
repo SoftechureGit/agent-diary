@@ -2978,18 +2978,19 @@ class Agent extends CI_Controller
                     $Reader = new SpreadsheetReader($data['full_path']);
                     $Sheets = $Reader->Sheets();
 
-
+                    
                     foreach ($Sheets as $Index => $Name) {
                         if ($Index == 0) {
                             $Reader->ChangeSheet($Index);
                             foreach ($Reader as $Key => $Row) {
+                              
                                 if ($Key  > 0) {
                                     $data_array = array(
-                                        'data_title'            =>  $Row[1],
-                                        'data_first_name'       =>  $Row[2],
-                                        'data_last_name'        =>  $Row[3],
-                                        'data_mobile'           =>  $Row[4],
-                                        'data_email'            =>  $Row[5]
+                                        'data_title'            =>  $Row[1] ?? '',
+                                        'data_first_name'       =>  $Row[2] ?? '',
+                                        'data_last_name'        =>  $Row[3] ?? '',
+                                        'data_mobile'           =>  $Row[4] ?? '',
+                                        'data_email'            =>  $Row[5] ?? ''
                                     );
 
                                     $where          =   "data_mobile='" . $Row[4] . "' AND account_id='" . $account_id . "'";
