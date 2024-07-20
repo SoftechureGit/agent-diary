@@ -2940,6 +2940,9 @@ class Agent extends CI_Controller
         $where          = "user_hash='" . $this->session->userdata('agent_hash') . "'";
         $user_detail    = $this->Action_model->select_single('tbl_users', $where);
 
+        $total_data_count    = 0;
+        $total_uploaded_data_count = 0;  
+
         if ($user_detail) {
             $user_id    =   $user_detail->user_id;
             $account_id =   $user_detail->user_id;
@@ -2985,6 +2988,7 @@ class Agent extends CI_Controller
                             foreach ($Reader as $Key => $Row) {
                               
                                 if ($Key  > 0) {
+                                    $total_data_count++;
                                     $data_array = array(
                                         'data_title'            =>  $Row[1] ?? '',
                                         'data_first_name'       =>  $Row[2] ?? '',
@@ -3000,7 +3004,7 @@ class Agent extends CI_Controller
 
                                         $this->Action_model->update_data($data_array, 'tbl_data', $where);
                                     } else {
-
+                                        $total_uploaded_data_count++;
                                         $data_array2 = array(
                                             'added_by'          =>  $user_id,
                                             'account_id'        =>  $account_id,
@@ -3020,7 +3024,7 @@ class Agent extends CI_Controller
                 }
             }
 
-            $this->session->set_flashdata('success_msg', 'Upload Successfully!!');
+            $this->session->set_flashdata('success_msg', "Data Uploaded  $total_uploaded_data_count out of $total_data_count (some data is already exist)");
             redirect(AGENT_URL . 'data');
         } else {
             redirect(AGENT_URL . 'data');
