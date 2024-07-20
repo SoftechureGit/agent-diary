@@ -10871,7 +10871,6 @@ WHERE lead_id='" . $lead_id . "'
     public function data_delete()
     {
 
-
         // echo $this->input->post('data_ids'); die;
 
 

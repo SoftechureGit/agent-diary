@@ -8,6 +8,7 @@ class Api extends CI_Controller {
  public function __construct() {
         parent::__construct();
          $this->load->model('Action_model');
+         $this->load->helpers('site_helper');
         header('Content-Type: application/json'); 
         
         if($this->input->post()){
@@ -11168,7 +11169,227 @@ $property_list = $query->result();
      }
 
   
+     # end lead details
+
+     # download sample excel file 
+
+        public function data_excel_sample(){  
+            
+            $res = array();
+           
+            $sample_file_url = base_url('public/other/sample-file/download-sample-leads.xlsx') ; 
+
+
+            if(file_exists('public/other/sample-file/download-sample-leads.xlsx')){
+
+                $res = array('status' => 'true' , 'msg' => 'File fetched file successfully' , 'sample_file_url' => $sample_file_url );
+
+            }
+            else{
+
+                $res = array('status' => 'false' , 'msg' => 'Some Error');
+
+            }
+
+            echo json_encode($res);
+
+        }
+
+     # download sample excel file 
+
+     # Upload Data File
+
+     public function data_upload(){
+
+        $res = array();
+
+
+        $account_id = getAccountIdHash($this->input->post('user_hash'));
+        
+        $account_id     = 0;
+        $user_id        = 0;
+        $where          = "user_hash='" . $this->input->post('user_hash') . "'";
+        $user_detail    = $this->Action_model->select_single('tbl_users', $where);
+
+        $total_data_count    = 0;
+        $total_uploaded_data_count = 0;  
+
+        if ($user_detail) {
+            $user_id    =   $user_detail->user_id;
+            $account_id =   $user_detail->user_id;
+
+            if ($user_detail->role_id != 2) {
+
+                $account_id = $user_detail->parent_id;
+            }
+        }
+
+
+        $data_excel = array();
+
+        
+        
+        if ($account_id) {
+
+                $upload_path = FCPATH . './uploads/raw-data/';
+                # Create Folder if Folder Not Exits
+                if (!file_exists($upload_path)) {
+                    mkdir($upload_path, 0777, true);
+                }
+                # End Create Folder if Folder Not Exits
+        
+                $config['upload_path']             = $upload_path;
+        
+                $config['allowed_types']          =    'xlsx';
+                $this->load->library('upload', $config);
+                if ($this->upload->do_upload('file')) {
+                    $data = $this->upload->data();
+
+                if ($data['file_ext'] == '.xlsx') {
+
+                    require('application/libraries/php-excel-reader/excel_reader2.php');
+                    require('application/libraries/SpreadsheetReader.php');
+
+
+                    $Reader = new SpreadsheetReader($data['full_path']);
+                    $Sheets = $Reader->Sheets();
+
+                    
+                    foreach ($Sheets as $Index => $Name) {
+                        if ($Index == 0) {
+                            $Reader->ChangeSheet($Index);
+                            foreach ($Reader as $Key => $Row) {
+                              
+                                if ($Key  > 0) {
+                                    $total_data_count++;
+                                    $data_array = array(
+                                        'data_title'            =>  $Row[1] ?? '',
+                                        'data_first_name'       =>  $Row[2] ?? '',
+                                        'data_last_name'        =>  $Row[3] ?? '',
+                                        'data_mobile'           =>  $Row[4] ?? '',
+                                        'data_email'            =>  $Row[5] ?? ''
+                                    );
+
+                                    $where          =   "data_mobile='" . $Row[4] . "' AND account_id='" . $account_id . "'";
+                                    $lead_detail    =   $this->Action_model->select_single('tbl_data', $where);
+
+                                    if ($lead_detail) {
+
+                                        $this->Action_model->update_data($data_array, 'tbl_data', $where);
+                                    } else {
+                                        $total_uploaded_data_count++;
+                                        $data_array2 = array(
+                                            'added_by'          =>  $user_id,
+                                            'account_id'        =>  $account_id,
+                                            'data_status'       =>  1,
+                                            'file_name'         =>  $this->input->post('lead_data_type'),
+                                        );
+
+                                        $data_array     =   array_merge($data_array, $data_array2);
+                                        $lead_id        =   $this->Action_model->insert_data($data_array, 'tbl_data');
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    unlink($data['full_path']);
+                }
+            }
+
+             $res = array('status'=>'true' , 'msg' => "Data Uploaded  $total_uploaded_data_count out of $total_data_count (some data is already exist)") ;  
+
+        } else {
+            $res = array('status'=>'false' , 'msg' => "Some Error") ;  
+        }
+        
+        echo  json_encode($res); 
+
+     }
+
+     # End  Upload Data File
+
+     # Data List
+
+     public function get_data_list(){
+
+        $res = array();
+        $filters = array();
+
+        $where          = "user_hash='" . $this->input->post('user_hash') . "'";
+        $user_detail    = $this->Action_model->select_single('tbl_users', $where);
+
+        // print_r($user_detail); die;
+       
+        $account_id     = $user_detail->user_id;
+
+        $user_id        = $user_detail->user_id;
+      
+        $where            = ' 1 = 1 ';
+        if( $user_detail->role_id == 2){
+            $where            .= " and account_id = $user_id";
+        }
+        else{
+            $where            .= " and  added_by = $user_id";
+        }
+        
+        $filters['all_file_type'] = $this->db->distinct()->select('file_name')->where($where)->get('tbl_data')->result();
+
+        $filters['all_status']  =  $this->db->distinct()->select('lead_stage_id,lead_stage_name')->where(['lead_stage_status' => 1])->get('tbl_lead_stages')->result();
+
+        
+
+        # Reasons
+
+        $reason_where           =   ' 1 = 1';
+        
+        if($user_detail->role_id == 2 ):
+            $reason_where           .=   " and account_id = $user_id ";
+        else:
+            $reason_where           .=   " and assign_user_id = $user_id or user_id =  $user_id";
+        endif;
+
+        $all_reasons  =  $this->db->distinct()->select('comment')->where($reason_where)->get('tbl_followup')->result();
+
+        $filters['all_reasons'] = $all_reasons;
+
+        # End Reasons
+
+        # All Team Member 
+
+        if($user_detail->parent_id == 0){
+        
+                $where  = "user_id=$user_detail->user_id OR parent_id=$user_detail->user_id";
+            }
+            else{
+        
+                $where = " user_id=$user_detail->user_id OR report_to=$user_detail->user_id";
+            }
+    
+            $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,user_title,first_name,last_name,parent_id,is_individual,firm_name, role_id');
+            $filterss['user_list'] = $user_list;
+            
+        # End Team Meber 
+
+
+        $res = array( 'status' => 'true' , 'msg' => 'Data fetched successfully ' , 'data_list' => 'Empty' , 'filters' => $filters );
+
+        echo json_encode($res);
+
+     }    
+
+     # End Data List
+
+
+     public function data_assign(){
+       
+        $res = array();
+
+        $res = array( 'status' => 'true' , 'msg' => 'Data fetched successfully ' , 'data_list' => 'Empty' , 'filters' => 'Empty' );
+
+        echo json_encoded($res);
+
+     }
+
 }
 
-   # end lead details
-?>

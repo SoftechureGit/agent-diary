@@ -2953,24 +2953,26 @@ class Agent extends CI_Controller
             }
         }
 
+
         $data_excel = array();
 
-        $upload_path = FCPATH . './uploads/raw-data/';
-        # Create Folder if Folder Not Exits
-        if (!file_exists($upload_path)) {
-            mkdir($upload_path, 0777, true);
-        }
-        # End Create Folder if Folder Not Exits
-
-        $config['upload_path']             = $upload_path;
-
-        $config['allowed_types']          =    'xlsx';
-        $this->load->library('upload', $config);
-
-
+        
+        
         if ($account_id) {
-            if ($this->upload->do_upload('file')) {
-                $data = $this->upload->data();
+
+                $upload_path = FCPATH . './uploads/raw-data/';
+                # Create Folder if Folder Not Exits
+                if (!file_exists($upload_path)) {
+                    mkdir($upload_path, 0777, true);
+                }
+                # End Create Folder if Folder Not Exits
+        
+                $config['upload_path']             = $upload_path;
+        
+                $config['allowed_types']          =    'xlsx';
+                $this->load->library('upload', $config);
+                if ($this->upload->do_upload('file')) {
+                    $data = $this->upload->data();
 
                 if ($data['file_ext'] == '.xlsx') {
 
