@@ -2415,7 +2415,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                                     CONCAT(user.user_title, user.first_name, user.last_name) as assgin_user_full_name, 
                                     stages.lead_stage_name as stage_name, 
                                     lead_source.lead_source_name,
-                                    concat('$profile_base_url' , tbl_leads.profile) as full_profile_url,
+                                    concat(tbl_leads.profile) as full_profile_url,
                                     tbl_followup.next_followup_date,
                                     tbl_followup.next_followup_time"
                 );
@@ -2457,7 +2457,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                             'is_followup'                           => $item->added_to_followup,
                             'assgin_user_full_name'                 => $item->assgin_user_full_name,
                             'stage_name'                            => $item->stage_name ?? 'N/A',
-                            'full_profile_url'                      => $item->full_profile_url ?? base_url('public/front/user.png'),
+                            'full_profile_url'                      => $item->full_profile_url ? (profile_base_url.$item->full_profile_url) : base_url('public/front/user.png'),
                             'lead_or_next_followp_date'             => $lead_or_next_followp_date,
                             'lead_or_next_followp_time'             => $lead_or_next_followp_time,
                             'lead_or_next_followp_date_and_time'    => $lead_or_next_followp_date . ' ( ' . $lead_or_next_followp_time . ' )'
@@ -2498,7 +2498,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
 
             $where = "lead_id=$id";
             $profile_base_url           =   base_url('public/other/profile/');
-            $this->db->select("*, concat('$profile_base_url' , tbl_leads.profile) as full_profile_url");
+            $this->db->select("*, concat('$profile_base_url' , tbl_leads.profile) as full_profile_url , tbl_leads.profile");
             $this->db->from('tbl_leads');
             $this->db->join('tbl_states', 'tbl_states.state_id = tbl_leads.lead_state_id', 'left');
             $this->db->join('tbl_city', 'tbl_city.city_id = tbl_leads.lead_city_id', 'left');
@@ -10906,7 +10906,6 @@ WHERE lead_id='" . $lead_id . "'
     public function data_delete()
     {
 
-
         // echo $this->input->post('data_ids'); die;
 
 
@@ -10940,7 +10939,12 @@ WHERE lead_id='" . $lead_id . "'
     {
         if (!$id) return null;
         $profile_base_url           =   base_url('public/other/profile/');
-        return db_instance()->select("*,concat('$profile_base_url' , tbl_leads.profile) as full_profile_url")->where("lead_id = $id")->join('tbl_lead_stages', 'tbl_lead_stages.lead_stage_id=tbl_leads.lead_stage_id', 'left')->join('tbl_lead_sources', 'tbl_lead_sources.lead_source_id=tbl_leads.lead_source_id', 'left')->get('tbl_leads')->row();
+        $record  =  db_instance()->select("*,concat('$profile_base_url' , tbl_leads.profile) as full_profile_url")->where("lead_id = $id")->join('tbl_lead_stages', 'tbl_lead_stages.lead_stage_id=tbl_leads.lead_stage_id', 'left')->join('tbl_lead_sources', 'tbl_lead_sources.lead_source_id=tbl_leads.lead_source_id', 'left')->get('tbl_leads')->row();
+
+        $record->full_profile_url = $record->profile ? $record->full_profile_url : base_url('public/front/user.png') ;
+
+        return $record ;
+
     }
     # Lead
 

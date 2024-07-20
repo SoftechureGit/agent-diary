@@ -343,7 +343,7 @@ $("#form-modal").validate({
                           <div class='col-md-7'>
                             <div class='card-text text-muted'>
                               ${record.lead_date}
-                              ${lead_time} 
+                              ${record.lead_time} 
                             </div>
                           </div>
 

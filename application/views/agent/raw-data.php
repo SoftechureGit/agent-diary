@@ -148,7 +148,7 @@
                           <input type="file" class="form-control p-1" id="file" name="file" accept=".xlsx" required="">
                         </div>
                         <div class="col-4">
-                          <button type="submit" onclick="uploadBtn()" id="upload_btn"
+                          <button type="submit"  id="upload_btn"
                             class="btn btn-dark btn-sm  form-btn"> Upload </button>
                         </div>
                       </div>
@@ -390,7 +390,7 @@
         return false;
       }
       else {
-        $(".upload-csv").html("Uploading...");
+        $("#upload_btn").html("Uploading...");
         $('#action-form-modal').submit();
         return false;
       }
@@ -684,9 +684,9 @@
 
 
 
-  function uploadBtn() {
+ /* function uploadBtn() {
     $('#upload_btn').text('Uploading..');
-  }
+  } */
 
  function deleteData()
 {

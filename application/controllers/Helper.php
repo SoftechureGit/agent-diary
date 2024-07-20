@@ -234,6 +234,7 @@ class Helper extends CI_Controller
         $data                =   project_property_details($property_type_id, $project_property_id);
 
         echo json_encode(['status' => true, 'message' => 'Successfully data fetched', 'data' => $data]);
+        
     }
      # End Fetch Project Properties
 
@@ -358,5 +359,8 @@ class Helper extends CI_Controller
 
     }
     # End Delete Lead
+
+
+
 
 }
