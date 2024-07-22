@@ -213,7 +213,7 @@
         </button>
       </div>
       <div class="modal-body">
-                    <div class="inventory-details-container"></div>
+        <div class="inventory-details-container"></div>
       </div>
     </div>
   </div>
@@ -244,7 +244,6 @@
         $(".loader_progress").show();
       },
       success: function(response) {
-        console.log(response);
         $(".loader_progress").hide();
         var obj;
         try {
@@ -252,7 +251,6 @@
           if (obj.status == 'success') {
             var product_list = obj.product_list;
 
-            console.log(product_list);
             var row = "<option value=''>Select Project</option>";
             for (var i = 0; i < product_list.length; i++) {
               row += "<option data-property-type-id='" + product_list[i].property_type_id + "' value='" + product_list[i].product_id + "'>" + product_list[i].project_name + "</option>";
@@ -412,6 +410,9 @@
           },
           success: function(res) {
             if (res.status) {
+              $('#modal-inventory-form')[0].reset()
+              $('#add-edit-inventory-Modal').modal('hide')
+              get_project_inventory()
               // $('.ajax-msg').html(`<div class="alert alert-success">${res.message}</div>`)
 
               showToast('success', res.message)
@@ -438,7 +439,9 @@
     var id = $(this).data('id')
     // alert(id)
 
-    // $('#view-inventory-details-Modal').modal('show')
+    get_inventory_details(id);
+    
+    $('#view-inventory-details-Modal').modal('show')
   })
 
   $(document).on('click', '.edit-inventory-record', function() {
@@ -450,8 +453,64 @@
     if (confirm('Are you sure!')) {
 
       var id = $(this).data('id')
-      // alert(id)
+      delete_inventory_details(id)
     }
   })
-  // 
+
+  /** Get Inventory Details */
+  function get_inventory_details(id){
+    // Fetch Data
+    $.ajax({
+      type: "GET",
+      url: "<?= base_url(AGENT_URL . '/api/get_inventory_details') ?>",
+      data: {
+        id:id 
+      },
+      dataType:'json',
+      beforeSend: function(data) {
+        $(".loader_progress").show();
+      },
+      success: function(res) {
+        if(res.status){
+          $('#view-inventory-details-Modal .inventory-details-container').html(res.detail_view)
+        }else{
+          showToast(res.message);
+        }
+
+        $(".loader_progress").hide();
+      },
+      error: function() {
+        $(".loader_progress").hide();
+
+      }
+
+    });
+    // End Fetch Data
+  }
+  /** End Get Inventory Details */
+
+  /** Delete Inventory Details */
+  function delete_inventory_details(id){
+    // Fetch Data
+    $.ajax({
+      type: "POST",
+      url: "<?= base_url(AGENT_URL . '/api/delete_inventory_details') ?>",
+      data: {
+        id:id 
+      },
+      dataType:'json',
+      success: function(res) {
+        if(res.status){
+          get_project_inventory()
+        }
+
+          showToast(res.message);
+      },
+      error: function() {
+        showToast('Some error occured');
+      }
+    });
+    // End Fetch Data
+  }
+  /** End Delete Inventory Details */
 </script>

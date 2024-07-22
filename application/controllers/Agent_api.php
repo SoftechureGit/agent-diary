@@ -10980,11 +10980,11 @@ WHERE lead_id='" . $lead_id . "'
 
             # Db Data
             $data                                   =   [
-                'product_id'            => $product_id,
-                'builder_id'            => $builder_id,
-                'property_details'      => $property_details ? json_encode($property_details) : NULL,
-                'property_layout'       => $property_layout,
-            ];
+                                                            'product_id'            => $product_id,
+                                                            'builder_id'            => $builder_id,
+                                                            'property_details'      => $property_details ? json_encode($property_details) : NULL,
+                                                            'property_layout'       => $property_layout,
+                                                        ];
             # End Db Data
 
             if ($id) :
@@ -11000,4 +11000,46 @@ WHERE lead_id='" . $lead_id . "'
         endif;
     }
     # End Store Inventory
+
+    # Get Inventory Details
+    public function get_inventory_details(){
+        $id     =   $this->input->get('id');
+        $arr    =   [];
+
+        $data             =   $this->db->where("inventory_id = $id")->get('tbl_inventory')->row();
+
+        $detail_view        = $this->load->view('components/details-view/inventory-details', ['data' => $data], true);
+
+        if ($data) :
+            $res_arr        =  ['status' => true, 'message' => 'Data fetched', 'detail_view' => $detail_view,'data' =>  $data ];
+        else :
+            $res_arr        =  ['status' => false, 'message' => 'Data not found'];
+        endif;
+
+
+        echo json_encode($res_arr);
+    }
+    # End Get Inventory Details
+
+    # Delete Inventory Details
+    public function delete_inventory_details(){
+        if(!$this->input->post()):
+            $res_arr        =  ['status' => false, 'message' => 'Reqeust method is not POST'];
+        endif;
+
+        $id     =   $this->input->post('id');
+        $arr    =   [];
+
+        $data             =   $this->db->where("inventory_id = $id")->delete('tbl_inventory');
+
+        if ($data) :
+            $res_arr        =  ['status' => true, 'message' => 'Data fetched'];
+        else :
+            $res_arr        =  ['status' => false, 'message' => 'Data not found'];
+        endif;
+
+
+        echo json_encode($res_arr);
+    }
+    # End Delete Inventory Details
 }
