@@ -2112,6 +2112,15 @@
               if (obj.status == 'success') {
                 $('.lead-list').html('');
                 get_followup_list();
+
+                // if($('#followup_id').val() == 0){
+                    $('.customer_detail').hide();
+                    $('.search_box').show();
+                // }
+                // else{
+                //   get_followup();
+                // }
+                
                 $("#followUpTabModal input").val('');
                 $("#followUpTabModal select").val('');
                 $("#followUpTabModal textarea").val('');
