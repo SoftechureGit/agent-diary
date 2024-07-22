@@ -2303,9 +2303,7 @@ class Api extends CI_Controller {
 
     public function get_lead_list()
     {
-        
-        
-        
+          
         $array = array();
         
         $account_id = getAccountIdHash($this->input->post('user_hash'));
@@ -2316,6 +2314,7 @@ class Api extends CI_Controller {
             $account_id = getAccountIdHash($this->input->post('user_hash'));
 
             if ($account_id) {
+
                 $filter_by = $this->input->post('filter_by');
                 $page=$this->input->post('page');
 
@@ -11282,7 +11281,7 @@ $property_list = $query->result();
                                             'added_by'          =>  $user_id,
                                             'account_id'        =>  $account_id,
                                             'data_status'       =>  1,
-                                            'file_name'         =>  $this->input->post('lead_data_type'),
+                                            'file_name'         =>  $this->input->post('file_name'),
                                         );
 
                                         $data_array     =   array_merge($data_array, $data_array2);
@@ -11313,19 +11312,18 @@ $property_list = $query->result();
 
      public function get_data_list(){
 
-        $res = array();
-        $filters = array();
+        $res            = array();
+        $filters        = array();
 
         $where          = "user_hash='" . $this->input->post('user_hash') . "'";
         $user_detail    = $this->Action_model->select_single('tbl_users', $where);
 
-        // print_r($user_detail); die;
        
-        $account_id     = $user_detail->user_id;
-
-        $user_id        = $user_detail->user_id;
+        $account_id     =   $user_detail->user_id;
+        $user_id        =   $user_detail->user_id;
       
         $where            = ' 1 = 1 ';
+
         if( $user_detail->role_id == 2){
             $where            .= " and account_id = $user_id";
         }
@@ -11355,24 +11353,91 @@ $property_list = $query->result();
 
         # End Reasons
 
+
         # All Team Member 
 
         if($user_detail->parent_id == 0){
         
                 $where  = "user_id=$user_detail->user_id OR parent_id=$user_detail->user_id";
             }
-            else{
+            else
+            {
         
                 $where = " user_id=$user_detail->user_id OR report_to=$user_detail->user_id";
             }
     
             $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,user_title,first_name,last_name,parent_id,is_individual,firm_name, role_id');
-            $filterss['user_list'] = $user_list;
+            $filters['user_list'] = $user_list;
             
         # End Team Meber 
 
 
-        $res = array( 'status' => 'true' , 'msg' => 'Data fetched successfully ' , 'data_list' => 'Empty' , 'filters' => $filters );
+       # data list 
+
+
+       $postData = $this->input->post();
+
+      
+       $searchValue = '';
+       $searchQuery = '';
+
+
+       if($this->input->post('search')){
+         $searchValue =  $this->input->post('search');
+       }
+
+
+       if ($this->input->post('file_name') != '') {
+
+           $file_name = $this->input->post('file_name');
+           $searchQuery .= " file_name= '$file_name'";
+       }
+
+       if ($this->input->post('user')) {
+
+           $account_id = $this->input->post('user');
+           $searchQuery .= " AND tbl_data.added_by= '$account_id'";
+
+       }
+
+       if ($this->input->post('reason')) {
+
+           $reason = $this->input->post('reason');
+           $searchQuery .= " AND followup.comment= '$reason'";
+       }
+
+
+       if ($this->input->post('status')) {
+        
+           $status      =  $this->input->post('status');
+        
+           $searchQuery .= " AND tbl_leads.lead_stage_id= '$status'";
+       }
+
+
+       if ($searchValue != '') {
+
+           if ($this->input->post('file_name') != '') {
+
+               $searchQuery .= " AND (tbl_data.data_first_name LIKE '%" . $searchValue . "%' OR tbl_data.data_mobile LIKE '%" . $searchValue . "%') ";
+           } else {
+
+               $searchQuery .= "(tbl_data.data_first_name LIKE '%" . $searchValue . "%' OR tbl_data.data_mobile LIKE '%" . $searchValue . "%') ";
+           }
+       }
+
+
+
+        $page   = 1 ;
+        $limit  = 10 ;
+        $join   = array('tbl_leads', 'tbl_leads.data_id=tbl_data.data_id', 'tbl_users', 'tbl_users.user_id=tbl_leads.user_id', 'tbl_lead_stages', 'tbl_lead_stages.lead_stage_id=tbl_leads.lead_stage_id', 'tbl_followup as followup', 'followup.lead_id = tbl_leads.lead_id');
+        $where  = $searchQuery;
+        $select = "tbl_data.data_id,CONCAT(data_first_name,' ',data_last_name) as data_name, data_mobile as mobile  ,data_status as  status , file_name , data_reason as reason , tbl_leads.lead_id, tbl_leads.lead_stage_id, , tbl_users.user_id, concat(tbl_users.user_title, ' ',tbl_users.first_name, ' ',tbl_users.last_name) as assigned_user_full_name,tbl_lead_stages.lead_stage_name,followup.comment as followup_comment";
+
+
+        $data = $this->Action_model->apiPagination($select,$page,$limit,$join,$where,'tbl_data');
+
+        $res = array( 'status' => 'true' , 'msg' => 'Data fetched successfully '  , 'filters' => $filters , 'data_list' =>  $data['data'] ,'pagination' => $data['pagination']);
 
         echo json_encode($res);
 

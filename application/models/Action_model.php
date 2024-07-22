@@ -663,4 +663,67 @@ public function sendEmailFromAgent($to,$subject,$mail_message,$user_id=null)
 return $status;
 }
 
+
+public function apiPagination($select='',$page,$limit,$join='',$where='',$table){
+
+   # for pagination  
+     $offset          =   ($page - 1) * $limit;
+     if($where){
+      $this->db->where($where);
+    }
+    if ($join) {
+      $count  = count($join);
+      $ct     = 0;
+      $ct1    = 0;
+   for ($i=0; $i <($count/2) ; $i++)
+    { 
+      $ct1=$ct+1 ;
+      $this->db->join($join[$ct],$join[$ct1],'left');  
+      $ct=$ct+2 ;
+    }
+  }
+     $total_records   =   $this->db->count_all_results($table);
+
+   # end for pagination 
+
+
+
+   # get data list
+     $this->db->select($select); 
+     if($where){
+       $this->db->where($where);
+     }
+     $this->db->limit($limit, $offset);
+     if ($join) {
+        $count  = count($join);
+        $ct     = 0;
+        $ct1    = 0;
+     for ($i=0; $i <($count/2) ; $i++)
+      { 
+        $ct1=$ct+1 ;
+        $this->db->join($join[$ct],$join[$ct1],'left');  
+        $ct=$ct+2 ;
+      }
+    }
+
+     $data                = $this->db->get($table)->result();
+
+     $total_pages         = ceil($total_records / $limit);
+
+     $pagination_metadata =   [
+                              'total_records' =>  $total_records,
+                              'total_pages'   =>  $total_pages,
+                              'current_page'  =>  $page,
+                              'limit'         =>  $limit
+                              ];
+
+  # end get data list
+
+
+  return ['data' => $data , 'pagination' => $pagination_metadata] ;
+
+
+
+}
+
 }

@@ -10887,7 +10887,7 @@ WHERE lead_id='" . $lead_id . "'
 
         if ($searchValue != '') {
 
-            if ($this->input->post('status') != '') {
+            if ($this->input->post('file_name') != '') {
 
                 $searchQuery .= " AND (tbl_data.data_first_name LIKE '%" . $searchValue . "%' OR tbl_data.data_mobile LIKE '%" . $searchValue . "%') ";
             } else {
