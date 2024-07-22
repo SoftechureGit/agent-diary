@@ -2957,7 +2957,6 @@ class Agent extends CI_Controller
         $data_excel = array();
 
         
-        
         if ($account_id) {
 
                 $upload_path = FCPATH . './uploads/raw-data/';
@@ -3006,16 +3005,18 @@ class Agent extends CI_Controller
 
                                         $this->Action_model->update_data($data_array, 'tbl_data', $where);
                                     } else {
-                                        $total_uploaded_data_count++;
-                                        $data_array2 = array(
-                                            'added_by'          =>  $user_id,
-                                            'account_id'        =>  $account_id,
-                                            'data_status'       =>  1,
-                                            'file_name'         =>  $this->input->post('lead_data_type'),
-                                        );
-
-                                        $data_array     =   array_merge($data_array, $data_array2);
-                                        $lead_id        =   $this->Action_model->insert_data($data_array, 'tbl_data');
+                                        if( $Row[4] && $Row[2]){
+                                            $total_uploaded_data_count++;
+                                            $data_array2 = array(
+                                                'added_by'          =>  $user_id,
+                                                'account_id'        =>  $account_id,
+                                                'data_status'       =>  1,
+                                                'file_name'         =>  $this->input->post('lead_data_type'),
+                                            );
+    
+                                            $data_array     =   array_merge($data_array, $data_array2);
+                                            $lead_id        =   $this->Action_model->insert_data($data_array, 'tbl_data');
+                                        }
                                     }
                                 }
                             }
