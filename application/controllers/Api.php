@@ -11447,13 +11447,109 @@ $property_list = $query->result();
 
 
      public function data_assign(){
-       
-        $res = array();
+            // print_r($this->input->post()); die;
 
-        $res = array( 'status' => 'true' , 'msg' => 'Data fetched successfully ' , 'data_list' => 'Empty' , 'filters' => 'Empty' );
+            $account_id     = 0;
+            $user_id        = 0;
+            $where          = "user_hash='" .$this->input->post('user_hash') . "'";
+            $user_detail    = $this->Action_model->select_single('tbl_users', $where);
+    
+    
+            // echo '<pre>';
+            // print_r($user_detail); die;  
+    
+    
+            if ($user_detail) {
+                $user_id    =   $user_detail->user_id;
+                $account_id =   $user_detail->user_id;
+                if ($user_detail->role_id != 2) {
+                    $account_id = $user_detail->parent_id;
+                }
+            }
+    
+    
+    
+            $transfer_lead_ids =  $this->input->post('selected_lead_ids');
+            $transfer_lead_ids = explode(',', $transfer_lead_ids);
+            $assign_to = $this->input->post('transfer_to');
 
-        echo json_encoded($res);
 
+            if($this->input->post('selected_lead_ids') && count($transfer_lead_ids) > 0 ){
+            foreach ($transfer_lead_ids as   $transfer_lead_id) {
+                $raw_data =     $this->db->select('*')->where('data_id', $transfer_lead_id)->get('tbl_data')->row();
+    
+    
+                if ($raw_data) {
+    
+                    $data_array = array(
+                        'lead_title'            =>  $raw_data->data_title,
+                        'data_id'               =>  $raw_data->data_id,
+                        'lead_first_name'       =>  $raw_data->data_first_name,
+                        'lead_last_name'        =>  $raw_data->data_last_name,
+                        'lead_mobile_no'        =>  $raw_data->data_mobile,
+                        'lead_email'            =>  $raw_data->data_email,
+                        'lead_date'             =>  date("d-m-Y"),
+                        'lead_time'             =>  date("h:i:s a"),
+                        'lead_status'           =>  1,
+                        'lead_stage_id'         =>  1,
+                        'user_id'               =>  $assign_to,
+                    );
+    
+                    $where          =   "lead_mobile_no='" . $raw_data->data_mobile . "' AND account_id='" . $account_id . "'";
+                    $lead_detail    =   $this->Action_model->select_single('tbl_leads', $where);
+                    if ($lead_detail) {
+                        $this->Action_model->update_data($data_array, 'tbl_leads', $where);
+    
+                        $this->db->where('data_id', $raw_data->data_id);
+                        $this->db->update('tbl_data', array('data_reason' => 'Already in Leads', 'data_status' => 0));
+                    } else {
+    
+                        $data_array2 = array(
+                            'account_id'        =>  $account_id,
+                            'added_by'          =>  $user_detail->user_id,
+                        );
+    
+                        $data_array     =   array_merge($data_array, $data_array2);
+                        $lead_id        =   $this->Action_model->insert_data($data_array, 'tbl_leads');
+                        $this->db->where('data_id', $raw_data->data_id);
+                        $this->db->update('tbl_data', array('is_in_lead' => 1));
+                    }
+                }
+            }
+            $array = array('status' => 'true',  'msg' => 'Lead Transfered Successfully!!');
+        }
+        else{
+            $array = array('status' => 'false', 'msg' => 'No Data Selected');
+        }
+            echo json_encode($array);
+
+     }
+
+     public  function delete_data(){
+        
+        if ($this->input->post('data_ids')) {
+
+            $data_ids = explode(',', $this->input->post('data_ids'));
+
+            foreach ($data_ids as $data_id) {
+
+                $file_name = $this->input->post('file_name');
+                +$res =  $this->db->where('file_name', $file_name)->where('data_id', $data_id)->delete('tbl_data');
+            }
+        } else {
+            $file_name = $this->input->post('file_name');
+
+            $res =  $this->db->where('file_name', $file_name)->delete('tbl_data');
+        }
+
+
+        if ($res) {
+            $array = array('status' => 'true', 'message' => 'Data deleted ');
+        } else {
+            $array = array('status' => 'false', 'message' => 'Some error occurred, please try again.');
+        }
+
+        echo json_encode($array);
      }
 
 }
