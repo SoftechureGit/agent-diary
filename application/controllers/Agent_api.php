@@ -10898,7 +10898,7 @@ WHERE lead_id='" . $lead_id . "'
 
         //     print_r($searchQuery);
         // die;
-        $data = $this->Action_model->ajaxDatatableLeft($postData, $searchQuery, 'tbl_data', $where, $select, array('tbl_leads', 'tbl_leads.data_id=tbl_data.data_id', 'tbl_users', 'tbl_users.user_id=tbl_leads.user_id', 'tbl_lead_stages', 'tbl_lead_stages.lead_stage_id=tbl_leads.lead_stage_id', 'tbl_followup as followup', 'followup.lead_id = tbl_leads.lead_id'));
+        $data = $this->Action_model->ajaxDatatableLeft($postData, $searchQuery, 'tbl_data', $where, $select, array('tbl_leads', 'tbl_leads.data_id=tbl_data.data_id', 'tbl_users', 'tbl_users.user_id=tbl_leads.user_id', 'tbl_lead_stages', 'tbl_lead_stages.lead_stage_id=tbl_leads.lead_stage_id', '(SELECT * FROM tbl_followup WHERE followup_id IN (SELECT MAX(followup_id) FROM tbl_followup GROUP BY lead_id))  as followup', 'followup.lead_id = tbl_leads.lead_id'));
 
         echo json_encode($data);
     }
