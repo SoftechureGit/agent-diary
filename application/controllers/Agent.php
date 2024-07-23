@@ -2968,7 +2968,7 @@ class Agent extends CI_Controller
         
                 $config['upload_path']             = $upload_path;
         
-                $config['allowed_types']          =    'xlsx';
+                $config['allowed_types']          =    'xlsx';  
                 $this->load->library('upload', $config);
                 if ($this->upload->do_upload('file')) {
                     $data = $this->upload->data();
