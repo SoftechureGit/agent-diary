@@ -2531,4 +2531,16 @@ https://www.agentdiary.com");*/
             redirect(ADMIN_URL);
         }
     }
+
+    
+    #  Fetch lead from facebook 
+
+    public function fetch_lead_from_api(){
+
+        
+
+   }
+
+    #  End  lead from facebook 
+
 }
