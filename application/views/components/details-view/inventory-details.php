@@ -1,7 +1,6 @@
 <?php
 extract((array) $data ?? []);
 extract((array) json_decode($property_details ?? ''));
-
 $property_layout_url        =   $property_layout ? base_url("uploads/images/property/unit/$property_layout") : null;
 
 ?>
@@ -93,7 +92,15 @@ $property_layout_url        =   $property_layout ? base_url("uploads/images/prop
                 <?php if ($applicable_plc ?? 0) : ?>
                 <tr>
                     <th>Applicable plc</th>
-                    <td><?= $applicable_plc ?? '' ?></td>
+                    <td>
+                        <ul style="margin: 0; padding-left: 1rem;">
+                        <?php   
+                            foreach(getPlcs($applicable_plc ?? []) as $applicable_plc_item):
+                                 echo "<li style='list-style: auto;'>$applicable_plc_item->name</li>";
+                            endforeach;    
+                        ?>
+                        </ul>
+                    </td>
                 </tr>
                 <?php endif; ?>
                 <!-- End applicable plc -->

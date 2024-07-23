@@ -18,6 +18,13 @@
     cursor: pointer;
   }
 
+  #view-inventory-details-Modal .inventory-details-container table tr, 
+  #view-inventory-details-Modal .inventory-details-container table th, 
+  #view-inventory-details-Modal .inventory-details-container table td {
+    border-color: #00000075 !important;
+    color: #000000;
+  }
+
   /*  */
 
 
@@ -121,7 +128,7 @@
                     <div class="add-inventory-container d-none">
                       <div class="text-right">
 
-                        <button type="button" class="btn btn-primary show-add-edit-inventory-modal">
+                        <button type="button" class="btn btn-primary add-edit-inventory">
                           Add Inventory
                         </button>
                       </div>
@@ -160,8 +167,9 @@
       </div>
       <div class="modal-body">
         <form action="{{ base_url('agent/store-inventory') }}" method="post" id="modal-inventory-form">
-          <input type="hidden" name="product_id" value="1" class="product_id">
-          <input type="hidden" name="builder_id" value="1" class="builder_id">
+          <input type="hidden" name="id" value="0" class="id">
+          <input type="hidden" name="product_id" value="0" class="product_id">
+          <input type="hidden" name="builder_id" value="0" class="builder_id">
           <!-- Form View -->
           <div class="set_property_form w-100"></div>
           <!-- Form View -->
@@ -173,10 +181,8 @@
                 <div class="form-group">
                   <label for="">Layout Upload</label>
                   <input type="file" name="property_layout" value="" class="form-control p-1">
-                  <input type="hidden" name="old_property_layout" value="<?= $record->property_layout ?? '' ?>">
-                  <?php if ($record->property_layout_url ?? 0) : ?>
-                    <a href="<?= $record->property_layout_url; ?>" class="nav-link property-layout-anchor text-primary" target="_blank">View</a>
-                  <?php endif; ?>
+                  <input type="hidden" name="old_property_layout" class="old_property_layout" value="">
+                    <a href="#" class="nav-link property-layout-anchor text-primary d-none px-0" target="_blank">View</a>
                 </div>
               </div>
               <!-- End Layout Upload -->
@@ -375,18 +381,20 @@
     }
   });
 
-  // show-add-edit-inventory-modal
-  $(document).on('click', '.show-add-edit-inventory-modal', function() {
+  // add-edit-inventory
+  $(document).on('click', '.add-edit-inventory', function() {
+    var id = $(this).data('id');
     var builder_id = $('#builder_id').val();
     var property_id = $('#product_id').val();
     var property_type_id = $('#product_id option:selected').data('property-type-id');
 
     $('#add-edit-inventory-Modal').modal('show')
-    getPropertyForm(0, property_type_id, 0, 0, 0, 'inventory');
+    getPropertyForm(id, property_type_id, 0, 0, 0, 'inventory');
 
     setTimeout(function() {
       $('#modal-inventory-form .product_id').val(property_id)
       $('#modal-inventory-form .builder_id').val(builder_id)
+      $('#modal-inventory-form .id').val(id)
     }, 100)
     /*  Lead Unit Form */
     $('#modal-inventory-form').validate({
@@ -432,7 +440,7 @@
     });
     /*  End Lead Unit Form */
   })
-  // End show-add-edit-inventory-modal
+  // End add-edit-inventory
 
   // 
   $(document).on('click', '.view-inventory-record', function() {
@@ -440,7 +448,7 @@
     // alert(id)
 
     get_inventory_details(id);
-    
+
     $('#view-inventory-details-Modal').modal('show')
   })
 
@@ -450,30 +458,41 @@
   })
 
   $(document).on('click', '.delete-inventory-record', function() {
-    if (confirm('Are you sure!')) {
+    var id = $(this).data('id')
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        delete_inventory_details(id)
 
-      var id = $(this).data('id')
-      delete_inventory_details(id)
-    }
+      }
+    });
+
   })
 
   /** Get Inventory Details */
-  function get_inventory_details(id){
+  function get_inventory_details(id) {
     // Fetch Data
     $.ajax({
       type: "GET",
       url: "<?= base_url(AGENT_URL . '/api/get_inventory_details') ?>",
       data: {
-        id:id 
+        id: id
       },
-      dataType:'json',
+      dataType: 'json',
       beforeSend: function(data) {
         $(".loader_progress").show();
       },
       success: function(res) {
-        if(res.status){
+        if (res.status) {
           $('#view-inventory-details-Modal .inventory-details-container').html(res.detail_view)
-        }else{
+        } else {
           showToast(res.message);
         }
 
@@ -490,21 +509,26 @@
   /** End Get Inventory Details */
 
   /** Delete Inventory Details */
-  function delete_inventory_details(id){
+  function delete_inventory_details(id) {
     // Fetch Data
     $.ajax({
       type: "POST",
       url: "<?= base_url(AGENT_URL . '/api/delete_inventory_details') ?>",
       data: {
-        id:id 
+        id: id
       },
-      dataType:'json',
+      dataType: 'json',
       success: function(res) {
-        if(res.status){
+        if (res.status) {
           get_project_inventory()
         }
 
-          showToast(res.message);
+        Swal.fire({
+          title: "Deleted!",
+          text: "Your file has been deleted.",
+          icon: "success"
+        });
+        // showToast(res.message);
       },
       error: function() {
         showToast('Some error occured');

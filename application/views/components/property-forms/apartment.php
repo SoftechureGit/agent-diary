@@ -17,8 +17,8 @@
                     <!-- Unit Code -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Unit Code</label>
-                            <input type="text" placeholder="Enter Unit Code" name="property_details[unit_code]" value="<?= $unit_code ?? '' ?>" class="form-control" >
+                            <label for="">Unit Code <span class="text-danger">*</span></label>
+                            <input type="text" placeholder="Enter Unit Code" name="property_details[unit_code]" value="<?= $unit_code ?? '' ?>" class="form-control" required>
                         </div>
                     </div>
                     <!-- End Unit Code -->
@@ -99,7 +99,14 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Applicable PLC</label>
-                            <input type="text" placeholder="Enter Applicable PLC" name="property_details[applicable_plc]" value="<?= $applicable_plc ?? '' ?>" class="form-control" >
+                            <select name="property_details[applicable_plc][]" id="" class="form-control" multiple>
+                                <?php 
+                                    foreach(getPlcs() ?? [] as $plc): 
+                                    $selected         = in_array($plc->id, $applicable_plc ?? []) ? 'selected' : '';
+                                ?>
+                                    <option value=<?= $plc->id ?>  <?= $selected ?>><?= $plc->name ?></option>   
+                                    <?php endforeach; ?>
+                                </select>
                         </div>
                     </div>
                     <!-- End Applicable PLC -->

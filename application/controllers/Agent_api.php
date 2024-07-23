@@ -4445,9 +4445,7 @@ WHERE lead_id='" . $lead_id . "'
     /* manage inventory */
     public function get_project_inventory()
     {
-
         $product_id = $this->input->post('product_id');
-
 
         $data['product_id'] = $product_id;
 
@@ -4549,7 +4547,7 @@ WHERE lead_id='" . $lead_id . "'
                                                 <td>$referance_number</td>
                                                 <td class='text-center'>
                                                     <span class='text-primary px-2 view-inventory-record' data-id='$inventory_id'><i class='fa fa-eye'></i></span>
-                                                    <span class='text-success px-2 edit-inventory-record' data-id='$inventory_id'><i class='fa fa-edit'></i></span>
+                                                    <span class='text-success px-2 add-edit-inventory' data-id='$inventory_id'><i class='fa fa-edit'></i></span>
                                                     <span class='text-danger px-2 delete-inventory-record' data-id='$inventory_id'><i class='fa fa-trash'></i></span>
                                                 </td>
                                             </tr>
@@ -10988,7 +10986,7 @@ WHERE lead_id='" . $lead_id . "'
             # End Db Data
 
             if ($id) :
-                $result                             =   $this->Action_model->update_data($data, 'tbl_inventory', "id = $id");
+                $result                             =   $this->Action_model->update_data($data, 'tbl_inventory', "inventory_id = $id");
                 $res_arr                            =   $result ? ['status' => true, 'message' => 'Successfully record updated'] : ['status' => false, 'message' => 'Some error occured'];
             else :
                 $result                             =   $this->Action_model->insert_data($data, 'tbl_inventory');

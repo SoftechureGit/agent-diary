@@ -31,6 +31,7 @@
      <script src="<?php echo base_url('public/admin/') ?>plugins/moment/moment.min.js"></script>
      <script src="<?php echo base_url('public/admin/') ?>plugins/pg-calendar/js/pignose.calendar.min.js"></script>
      <script src="<?php echo base_url('public/admin/') ?>plugins/toast/js/jquery.toast.js"></script>
+     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
      <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.10/js/select2.min.js"></script>
 
      <!-- ChartistJS demo -->
@@ -239,6 +240,18 @@
              if (res.status) {
                $('.set_property_form').html(res.form_view)
                convertToSelect2()
+
+              //  
+              if(form_request_for == 'inventory'){
+                if(res.property_layout){
+                  $('.old_property_layout').val(res.property_layout)
+                  $('.property-layout-anchor').attr('href', res.property_layout_url).removeClass('d-none')
+                }else{
+                  $('.old_property_layout').val('')
+                  $('.property-layout-anchor').attr('href', '#').addClass('d-none')
+                }
+              }
+              //  
              }
            }
          })

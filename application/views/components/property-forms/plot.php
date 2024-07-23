@@ -17,8 +17,8 @@
                     <!-- Unit Code -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Unit Code</label>
-                            <input type="text" placeholder="Enter Unit Code" name="property_details[unit_code]" value="<?= $unit_code ?? $code ?? '' ?>" class="form-control" >
+                            <label for="">Unit Code <span class="text-danger">*</span></label>
+                            <input type="text" placeholder="Enter Unit Code" name="property_details[unit_code]" value="<?= $unit_code ?? $code ?? '' ?>" class="form-control" required>
                         </div>
                     </div>
                     <!-- End Unit Code -->
