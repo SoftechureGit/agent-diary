@@ -141,7 +141,7 @@
                       enctype="multipart/form-data">
                       <div class="row align-items-center">
                         <div class="col-4">
-                          <input type="text" name="lead_data_type" class="form-control" placeholder="Enter File Name">
+                          <input type="text" name="lead_data_type" class="form-control" placeholder="Enter File Name" required>
                         </div>
 
                         <div class="col-4">

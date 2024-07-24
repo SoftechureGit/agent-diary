@@ -89,13 +89,19 @@ class Helper extends CI_Controller
         $property_details               = $this->input->get('property_details');
         $form_request_for               = $this->input->get('form_request_for');
 
+        $property_layout            =   null;
+        $property_layout_url            =   null;
+
         if (!$property_type_id) :
             return null;
         endif;
 
         switch($form_request_for):
             case 'inventory':
-                
+                $inventory               =  getInventory($id);
+                $property_layout            =  $inventory->property_layout ?? null;
+                $property_layout_url     =  ( $inventory->property_layout ?? 0 ) ? base_url("/uploads/images/property/unit/$inventory->property_layout") : null;;
+                $property_details        =  ( $inventory->property_details ?? 0 ) ? json_decode($inventory->property_details ?? []) : $inventory;      
             break;
 
             default:
@@ -108,12 +114,11 @@ class Helper extends CI_Controller
             break;
         endswitch;
 
-        
-        
+
 
         $form_view                      =   property_form($property_type_id, $property_details);
 
-        echo json_encode(['status' => true, 'message' => 'Successfully data fetched', 'form_view' => $form_view]);
+        echo json_encode(['status' => true, 'message' => 'Successfully data fetched', 'form_view' => $form_view, 'property_layout_url' => $property_layout_url, 'property_layout' => $property_layout]);
     }
     # End Get Property Form
 

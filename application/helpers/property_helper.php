@@ -56,3 +56,35 @@
         ->result();
     }
     # End Get Inventory Details
+
+    # Get Inventory Details
+    function getInventory($id){
+        return db_instance()
+        ->select('*')
+        ->where("inventory_id = $id")
+        ->get('tbl_inventory')
+        ->row();
+    }
+    # End Get Inventory Details
+
+    # Get Inventory Details
+    function getPlcs($ids = [], $group_id = 0){
+        $where   = ' 1 = 1';
+        
+        if ($ids) {
+            $ids_list = implode(',', array_map('intval', $ids)); // Ensure $ids is properly formatted
+            $where .= " AND price_component_id IN ($ids_list)";
+        }
+        
+        if($group_id):
+            $group_id = intval($group_id);
+            $where   .= " and price_group_id = $group_id";
+        endif;
+
+        return db_instance()
+        ->select('price_component_id as id, price_component_name as name')
+        ->where($where)
+        ->get('tbl_price_components')
+        ->result();
+    }
+    # End Get Inventory Details

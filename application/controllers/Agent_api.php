@@ -4445,9 +4445,7 @@ WHERE lead_id='" . $lead_id . "'
     /* manage inventory */
     public function get_project_inventory()
     {
-
         $product_id = $this->input->post('product_id');
-
 
         $data['product_id'] = $product_id;
 
@@ -4549,7 +4547,7 @@ WHERE lead_id='" . $lead_id . "'
                                                 <td>$referance_number</td>
                                                 <td class='text-center'>
                                                     <span class='text-primary px-2 view-inventory-record' data-id='$inventory_id'><i class='fa fa-eye'></i></span>
-                                                    <span class='text-success px-2 edit-inventory-record' data-id='$inventory_id'><i class='fa fa-edit'></i></span>
+                                                    <span class='text-success px-2 add-edit-inventory' data-id='$inventory_id'><i class='fa fa-edit'></i></span>
                                                     <span class='text-danger px-2 delete-inventory-record' data-id='$inventory_id'><i class='fa fa-trash'></i></span>
                                                 </td>
                                             </tr>
@@ -10980,15 +10978,15 @@ WHERE lead_id='" . $lead_id . "'
 
             # Db Data
             $data                                   =   [
-                'product_id'            => $product_id,
-                'builder_id'            => $builder_id,
-                'property_details'      => $property_details ? json_encode($property_details) : NULL,
-                'property_layout'       => $property_layout,
-            ];
+                                                            'product_id'            => $product_id,
+                                                            'builder_id'            => $builder_id,
+                                                            'property_details'      => $property_details ? json_encode($property_details) : NULL,
+                                                            'property_layout'       => $property_layout,
+                                                        ];
             # End Db Data
 
             if ($id) :
-                $result                             =   $this->Action_model->update_data($data, 'tbl_inventory', "id = $id");
+                $result                             =   $this->Action_model->update_data($data, 'tbl_inventory', "inventory_id = $id");
                 $res_arr                            =   $result ? ['status' => true, 'message' => 'Successfully record updated'] : ['status' => false, 'message' => 'Some error occured'];
             else :
                 $result                             =   $this->Action_model->insert_data($data, 'tbl_inventory');
@@ -11001,6 +10999,45 @@ WHERE lead_id='" . $lead_id . "'
     }
     # End Store Inventory
 
+    # Get Inventory Details
+    public function get_inventory_details(){
+        $id     =   $this->input->get('id');
+        $arr    =   [];
+
+        $data             =   $this->db->where("inventory_id = $id")->get('tbl_inventory')->row();
+
+        $detail_view        = $this->load->view('components/details-view/inventory-details', ['data' => $data], true);
+
+        if ($data) :
+            $res_arr        =  ['status' => true, 'message' => 'Data fetched', 'detail_view' => $detail_view,'data' =>  $data ];
+        else :
+            $res_arr        =  ['status' => false, 'message' => 'Data not found'];
+        endif;
 
 
+        echo json_encode($res_arr);
+    }
+    # End Get Inventory Details
+
+    # Delete Inventory Details
+    public function delete_inventory_details(){
+        if(!$this->input->post()):
+            $res_arr        =  ['status' => false, 'message' => 'Reqeust method is not POST'];
+        endif;
+
+        $id     =   $this->input->post('id');
+        $arr    =   [];
+
+        $data             =   $this->db->where("inventory_id = $id")->delete('tbl_inventory');
+
+        if ($data) :
+            $res_arr        =  ['status' => true, 'message' => 'Data fetched'];
+        else :
+            $res_arr        =  ['status' => false, 'message' => 'Data not found'];
+        endif;
+
+
+        echo json_encode($res_arr);
+    }
+    # End Delete Inventory Details
 }
