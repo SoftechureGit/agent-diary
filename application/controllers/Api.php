@@ -11333,7 +11333,7 @@ $property_list = $query->result();
         
         $filters['all_file_type'] = $this->db->distinct()->select('file_name')->where($where)->get('tbl_data')->result();
 
-        $filters['all_status']  =  $this->db->distinct()->select('lead_stage_id,lead_stage_name')->where(['lead_stage_status' => 1])->get('tbl_lead_stages')->result();
+        $filters['all_status']  =  $this->db->distinct()->select('lead_stage_id as lead_status_id,lead_stage_name as lead_status_name')->where(['lead_stage_status' => 1])->get('tbl_lead_stages')->result();
 
         
 
@@ -11366,7 +11366,7 @@ $property_list = $query->result();
                 $where = " user_id=$user_detail->user_id OR report_to=$user_detail->user_id";
             }
     
-            $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,user_title,first_name,last_name,parent_id,is_individual,firm_name, role_id');
+            $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,CONCAT(user_title," ",first_name," ",last_name) as user_full_name ,parent_id,is_individual,firm_name, role_id');
             $filters['user_list'] = $user_list;
             
         # End Team Meber 
