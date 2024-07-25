@@ -11529,9 +11529,9 @@ $property_list = $query->result();
         
         if ($this->input->post('data_ids')) {
 
-            $data_ids = explode(',', $this->input->post('data_ids'));
+            // $data_ids = explode(',', $this->input->post('data_ids'));
 
-            foreach ($data_ids as $data_id) {
+            foreach ($this->input->post('data_ids') as $data_id) {
 
                 $file_name = $this->input->post('file_name');
                 +$res =  $this->db->where('file_name', $file_name)->where('data_id', $data_id)->delete('tbl_data');
