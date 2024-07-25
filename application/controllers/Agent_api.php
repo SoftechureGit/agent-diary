@@ -1859,6 +1859,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
 
         $where = "user_hash='" . $this->session->userdata('agent_hash') . "'";
         $user_detail = $this->Action_model->select_single('tbl_users', $where);
+        
         if ($user_detail) {
             $user_id = $user_detail->user_id;
             $account_id = $user_detail->user_id;
@@ -1935,7 +1936,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                     $followup_array = array(
                         "lead_stage_id" => $this->input->post("lead_stage_id"),
                         "lead_status_id" => $lead_status_id,
-                        "comment" => '',
+                        "comment" => null,
                         "next_followup_date" => $next_followup_date,
                         "next_followup_time" => $next_followup_time,
                         "project_id" => $project_id,
@@ -10903,10 +10904,7 @@ WHERE lead_id='" . $lead_id . "'
 
     public function data_delete()
     {
-
         // echo $this->input->post('data_ids'); die;
-
-
         if ($this->input->post('data_ids')) {
 
             $data_ids = explode(',', $this->input->post('data_ids'));

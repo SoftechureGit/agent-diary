@@ -11342,9 +11342,9 @@ $property_list = $query->result();
         $reason_where           =   ' 1 = 1';
         
         if($user_detail->role_id == 2 ):
-            $reason_where           .=   " and account_id = $user_id ";
+            $reason_where           .=   " and account_id = $user_id  AND  comment IS NOT NULL AND  comment != '' ";
         else:
-            $reason_where           .=   " and assign_user_id = $user_id or user_id =  $user_id";
+            $reason_where           .=   " and assign_user_id = $user_id or user_id =  $user_id  AND (comment IS NOT NULL AND  comment != '') ";
         endif;
 
         $all_reasons  =  $this->db->distinct()->select('comment')->where($reason_where)->get('tbl_followup')->result();
@@ -11366,7 +11366,7 @@ $property_list = $query->result();
                 $where = " user_id=$user_detail->user_id OR report_to=$user_detail->user_id";
             }
     
-            $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,CONCAT(user_title," ",first_name," ",last_name) as user_full_name ,parent_id,is_individual,firm_name, role_id');
+            $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,CONCAT(user_title," ",first_name," ",last_name) as user_full_name');
             $filters['user_list'] = $user_list;
             
         # End Team Meber 
