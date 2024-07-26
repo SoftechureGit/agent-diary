@@ -3,6 +3,9 @@ extract($property_details?? []);
 ?>
 <!-- Shop Details -->
 <section id="shop-property-form" class="theme-form">
+<input type="hidden" name="property_details[id]" value="{{ $id ?? 0 }}" class="id">
+<input type="hidden" name="property_details[product_id]" value="{{ $product_id ?? 0 }}" class="product_id">
+
     <div class="container">
         <div class="card mt-4">
             <div class="card-body">
@@ -16,15 +19,23 @@ extract($property_details?? []);
                     </div>
                     <!-- End Form Name -->
 
-                    <!-- Unit Code -->
-                    <div class="col-md-4">
+                  <!-- Unit Code -->
+                  <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Unit Code <span class="text-danger">*</span></label>
-                            <input type="text" placeholder="Enter Unit Code" name="property_details[unit_code]" value="<?= $unit_code ?? '' ?>" class="form-control" required>
-                        </div>
+                            <label for="">Unit Code ( with Accomodations ) <span class="text-danger">*</span></label>
+                            <select name="property_details[unit_code]" id="" class="form-control" required>
+                                <option value="" disabled selected>Choose...</option>
+                                <?php 
+                                    foreach($unit_code_with_accomodations ?? [] as $unit_code_with_accomodation): 
+                                    $selected         = (($unit_code ?? 0 ) == $unit_code_with_accomodation->id ) ? 'selected' : '';
+                                ?>
+                                    <option value="<?= $unit_code_with_accomodation->id ?>"   <?= $selected ?>><?= $unit_code_with_accomodation->unit_code_with_accomodation_name ?? $unit_code_with_accomodation->inventory_unit_code ?? '' ?></option>   
+                                    <?php endforeach; ?>
+                                </select>
+                                <!-- <label id="property_details[unit_code]-error" class="error" for="property_details[unit_code]"></label> -->
+                            </div>
                     </div>
                     <!-- End Unit Code -->
-
                     <!-- Referance No -->
                     <div class="col-md-4">
                         <div class="form-group">
@@ -101,7 +112,14 @@ extract($property_details?? []);
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Applicable PLC</label>
-                            <input type="text" placeholder="Enter Applicable PLC" name="property_details[applicable_plc]" value="<?= $applicable_plc ?? '' ?>" class="form-control" >
+                            <select name="property_details[applicable_plc][]" id="" class="form-control" multiple>
+                                <?php 
+                                    foreach(getPropertyApplicablePlcs($product_id ?? 0) ?? [] as $plc): 
+                                    $selected         = in_array($plc->price_component_id, $applicable_plc ?? []) ? 'selected' : '';
+                                ?>
+                                    <option value=<?= $plc->price_component_id ?>  <?= $selected ?>><?= $plc->price_component_name ?></option>   
+                                    <?php endforeach; ?>
+                                </select>
                         </div>
                     </div>
                     <!-- End Applicable PLC -->

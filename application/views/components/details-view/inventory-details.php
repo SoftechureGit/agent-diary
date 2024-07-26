@@ -8,10 +8,10 @@ $property_layout_url        =   $property_layout ? base_url("uploads/images/prop
     <div class="table-responsive">
         <table class="table table-bordered">
                 <!-- Unit Code -->
-                <?php if ($unit_code ?? 0) : ?>
+                <?php if ($unit_code_name ?? 0) : ?>
                 <tr>
                     <th>Unit Code</th>
-                    <td><?= $unit_code ?? '' ?></td>
+                    <td><?= $unit_code_name ?? '' ?></td>
                 </tr>
                 <?php endif; ?>
                 <!-- End Unit Code -->
@@ -61,32 +61,34 @@ $property_layout_url        =   $property_layout ? base_url("uploads/images/prop
                 <?php endif; ?>
                 <!-- End Unit Type -->
 
-                <!-- sa -->
+                <!-- SA -->
                 <?php if ($sa ?? 0) : ?>
                 <tr>
-                    <th>sa</th>
-                    <td><?= $sa ?? '' ?></td>
+                    <th>SA</th>
+                    <td><?= $sa ?? '' ?> <?= sizeUnits($sa_size_unit)->unit_name ?? '' ?></td>
                 </tr>
                 <?php endif; ?>
-                <!-- End sa -->
+                <!-- End SA -->
 
-                <!-- ba -->
+                <!-- BA -->
                 <?php if ($ba ?? 0) : ?>
                 <tr>
-                    <th>ba</th>
-                    <td><?= $ba ?? '' ?></td>
+                    <th>BA</th>
+                    <td><?= $ba ?? '' ?> <?= sizeUnits($ba_size_unit)->unit_name ?? '' ?></td>
                 </tr>
                 <?php endif; ?>
-                <!-- End ba -->
+                <!-- End BA -->
 
-                <!-- ca -->
+
+                <!-- CA -->
                 <?php if ($ca ?? 0) : ?>
                 <tr>
-                    <th>ca</th>
-                    <td><?= $ca ?? '' ?></td>
+                    <th>CA</th>
+                    <td><?= $ca ?? '' ?> <?= sizeUnits($ca_size_unit)->unit_name ?? '' ?></td>
                 </tr>
                 <?php endif; ?>
-                <!-- End ca -->
+                <!-- End CA -->
+
 
                 <!-- Applicable plc -->
                 <?php if ($applicable_plc ?? 0) : ?>
@@ -95,8 +97,8 @@ $property_layout_url        =   $property_layout ? base_url("uploads/images/prop
                     <td>
                         <ul style="margin: 0; padding-left: 1rem;">
                         <?php   
-                            foreach(getPlcs($applicable_plc ?? []) as $applicable_plc_item):
-                                 echo "<li style='list-style: auto;'>$applicable_plc_item->name</li>";
+                            foreach(getPropertyApplicablePlcs($product_id ?? 0, $applicable_plc ?? null) as $applicable_plc_item):
+                                 echo "<li style='list-style: auto;'>$applicable_plc_item->price_component_name</li>";
                             endforeach;    
                         ?>
                         </ul>
