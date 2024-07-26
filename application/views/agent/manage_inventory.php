@@ -205,28 +205,7 @@
                     End Form
                 ***********************************-->
 
-<!--**********************************
-                    Form
-                ***********************************-->
-<!-- Modal -->
-<div class="modal fade" id="view-inventory-details-Modal" tabindex="-1" role="dialog" aria-labelledby="view-inventory-details-ModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="view-inventory-details-ModalLabel">Inventory Details</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="inventory-details-container"></div>
-      </div>
-    </div>
-  </div>
-</div>
-<!--**********************************
-                    End Form
-                ***********************************-->
+
 
 
 
@@ -280,40 +259,7 @@
     });
   }
 
-  function get_project_inventory() {
-
-    var product_id = $("#product_id").val();
-    if (product_id == "") {
-      $(".project_inventory").html("");
-      $('.inventory-list-container').html('')
-      $('.add-inventory-container').addClass('d-none')
-    } else {
-
-      $('.add-inventory-container').removeClass('d-none')
-
-      $.ajax({
-        type: "POST",
-        url: "<?= base_url(AGENT_URL . 'api/get_project_inventory') ?>",
-        data: {
-          product_id: product_id
-        },
-        dataType: 'json',
-        beforeSend: function(data) {
-          // $(".project_inventory").html("<div style='padding:50px;' align='center'><img src='<?= base_url('public/front/ajax-loader.gif') ?>' style='height:60px;'></div>");
-        },
-        success: function(response) {
-          setTimeout(function() {
-            // $(".project_inventory").html(response.data_view);
-            $(".inventory-list-container").html(response.table_view);
-          }, 100);
-        },
-        error: function() {
-          $(".project_inventory").html("<div class=' alert alert-danger'>Some error occurred, please try again.</div>");
-
-        }
-      });
-    }
-  }
+ 
 
   function alertMessage(type, message) {
     if (type == 'error') {
@@ -443,15 +389,7 @@
   })
   // End add-edit-inventory
 
-  // 
-  $(document).on('click', '.view-inventory-record', function() {
-    var id = $(this).data('id')
-    // alert(id)
 
-    get_inventory_details(id);
-
-    $('#view-inventory-details-Modal').modal('show')
-  })
 
   $(document).on('click', '.edit-inventory-record', function() {
     var id = $(this).data('id')
@@ -477,37 +415,7 @@
 
   })
 
-  /** Get Inventory Details */
-  function get_inventory_details(id) {
-    // Fetch Data
-    $.ajax({
-      type: "GET",
-      url: "<?= base_url(AGENT_URL . '/api/get_inventory_details') ?>",
-      data: {
-        id: id
-      },
-      dataType: 'json',
-      beforeSend: function(data) {
-        $(".loader_progress").show();
-      },
-      success: function(res) {
-        if (res.status) {
-          $('#view-inventory-details-Modal .inventory-details-container').html(res.detail_view)
-        } else {
-          showToast(res.message);
-        }
-
-        $(".loader_progress").hide();
-      },
-      error: function() {
-        $(".loader_progress").hide();
-
-      }
-
-    });
-    // End Fetch Data
-  }
-  /** End Get Inventory Details */
+  
 
   /** Delete Inventory Details */
   function delete_inventory_details(id) {

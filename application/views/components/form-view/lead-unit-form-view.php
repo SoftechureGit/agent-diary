@@ -116,9 +116,9 @@
     <!-- End List of Project -->
 
     <!-- Project Name -->
-    <div class="col-md-4 project_name_wrapper d-none">
+    <div class="col-md-4 project_name_wrapper">
       <div class="form-group">
-        <label for="">Project Name <span class="text-danger">*</span></label>
+        <label for="">Project Name</label>
         <input name="project_name" id="" class="form-control" placeholder="Enter project name" value="<?= $record->project_name ?? $record->lead_unit_project_name ?? '' ?>" required>
       </div>
     </div>

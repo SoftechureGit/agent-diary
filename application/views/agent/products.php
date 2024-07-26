@@ -52,6 +52,9 @@
   background: url("<?= base_url('public/front/ajax-loader.gif') ?>") 
               50% 50% no-repeat #fff3f38f;
 }
+.inventory-list-container .add-edit-inventory, .inventory-list-container  .delete-inventory-record {
+            display: none;
+        }
 </style>
 <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.10/css/select2.min.css">
 <div class="loader_progress"></div>
@@ -739,6 +742,10 @@ function getSpecificationList(id) {
 }
 
 function getInventoryList(id,product_unit_detail_id) {
+  get_project_inventory();
+}
+
+function getInventoryListOld(id,product_unit_detail_id) {
   $.ajax({
         type: "POST",
         url: "<?= base_url(AGENT_URL.'api/get_product_inventory_list') ?>",
