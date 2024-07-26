@@ -11438,7 +11438,7 @@ $property_list = $query->result();
 
         $data = $this->Action_model->apiPagination($select,$page,$limit,$join,$where,'tbl_data');
 
-        if($this->input->post('file_name') && $data ){
+        if($this->input->post('file_name') && count($data['data']) > 0 ){
             $res = array( 'status' => 'true' , 'msg' =>   'Data fetched successfully '  , 'filters' => $filters , 'data_list' =>  $data['data'] ,'pagination' => $data['pagination']);
         }
         elseif(count($data['data']) == 0){
