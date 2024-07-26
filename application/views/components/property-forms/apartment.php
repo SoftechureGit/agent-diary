@@ -68,19 +68,37 @@ extract($property_details ?? []);
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Floor</label>
-                            <input type="text" placeholder="Enter Floor" name="property_details[floor]" value="<?= $floor ?? '' ?>" class="form-control" >
+                            <!-- <input type="text" placeholder="Enter Floor" name="property_details[floor]" value="<?= $floor ?? '' ?>" class="form-control" > -->
+                            <select name="property_details[floor_id]" id="" class="form-control">
+                                <option value="" disabled selected>Choose...</option>
+                                <?php 
+                                    foreach(getFloors() ?? [] as $floor): 
+                                    $selected         = (($floor_id ?? 0 ) == $floor->id ) ? 'selected' : '';
+                                ?>
+                                    <option value="<?= $floor->id ?>"   <?= $selected ?>><?= $floor->name ?? '' ?></option>   
+                                    <?php endforeach; ?>
+                                </select>
                         </div>
                     </div>
                     <!-- End Floor -->
 
-                    <!-- Tower -->
+                    <!-- Block Or Floor -->
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Tower</label>
-                            <input type="text" placeholder="Enter Tower" name="property_details[tower]" value="<?= $tower ?? '' ?>" class="form-control" >
+                            <!-- <input type="text" placeholder="Enter Tower" name="property_details[tower]" value="<?= $tower ?? '' ?>" class="form-control" > -->
+                            <select name="property_details[block_or_tower_id]" id="" class="form-control">
+                                <option value="" disabled selected>Choose...</option>
+                                <?php 
+                                    foreach(getBlocksOrTowers() ?? [] as $block_or_tower): 
+                                    $selected         = (($block_or_tower_id ?? 0 ) == $block_or_tower->id ) ? 'selected' : '';
+                                ?>
+                                    <option value="<?= $block_or_tower->id ?>"   <?= $selected ?>><?= $block_or_tower->name ?? '' ?></option>   
+                                    <?php endforeach; ?>
+                                </select>
                         </div>
                     </div>
-                    <!-- End Tower -->
+                    <!-- End Block Or Floor -->
 
                     <!-- Unit Type -->
                     <div class="col-md-4">

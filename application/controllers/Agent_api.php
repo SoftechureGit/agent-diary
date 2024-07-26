@@ -4534,6 +4534,7 @@ WHERE lead_id='" . $lead_id . "'
 
         $data['floor_list'] = $this->Action_model->detail_result('tbl_floors', "floor_id!=''");
 
+
         # Table View
         $table_view                 =   "<div class='table-responsive'>
                                         <table class='table table-bordered'>
@@ -4541,9 +4542,14 @@ WHERE lead_id='" . $lead_id . "'
                                             <th>#</th>
                                             <th>Unit Code</th>
                                             <th>Referance Number</th>
+                                            <th>Unit no</th>
                                             <th class='text-center'>Action</th>
                                         </tr>
                                         ";
+
+        if(!count($records ?? [])):
+             $table_view                     .= "<tr><td colspan='4' class='text-center'>No inventory found</td></tr>";
+        endif;
 
         foreach ($records ?? [] as $inventory_key => $inventory) :
 
@@ -4563,13 +4569,15 @@ WHERE lead_id='" . $lead_id . "'
             endif;
             #
 
-            $unit_code                      =   $property_details->unit_code ?? $inventory->unit_no ?? '';
+            $unit_code                      =   $property_details->unit_code ?? '';
+            $unit_no                        =    $property_details->unit_no ?? '';
             $referance_number               =   $property_details->referance_number ?? $inventory->reference ?? '';
 
             $table_view                     .=  "<tr>
                                                         <td>$inventory_key</td>
                                                         <td>$unit_code_name</td>
                                                         <td>$referance_number</td>
+                                                        <td>$unit_no</td>
                                                         <td class='text-center'>
                                                             <span class='text-primary px-2 view-inventory-record' data-id='$inventory_id'><i class='fa fa-eye'></i></span>
                                                             <span class='text-success px-2 add-edit-inventory' data-id='$inventory_id'><i class='fa fa-edit'></i></span>

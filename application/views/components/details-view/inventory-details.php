@@ -35,19 +35,19 @@ $property_layout_url        =   $property_layout ? base_url("uploads/images/prop
                 <!-- End Unit No -->
 
                 <!-- Floor -->
-                <?php if ($floor ?? 0) : ?>
+                <?php if ($floor_id ?? 0) : ?>
                 <tr>
                     <th>Floor</th>
-                    <td><?= $floor ?? '' ?></td>
+                    <td><?= getFloors($floor_id)->name ?? '' ?></td>
                 </tr>
                 <?php endif; ?>
                 <!-- End Floor -->
 
                 <!-- Tower -->
-                <?php if ($tower ?? 0) : ?>
+                <?php if ($block_or_tower_id ?? 0) : ?>
                 <tr>
                     <th>Tower</th>
-                    <td><?= $tower ?? '' ?></td>
+                    <td><?= getBlocksOrTowers($block_or_tower_id)->name ?? '' ?></td>
                 </tr>
                 <?php endif; ?>
                 <!-- End Tower -->
