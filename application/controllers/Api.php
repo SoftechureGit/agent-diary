@@ -11446,7 +11446,7 @@ $property_list = $query->result();
         }
         else{
 
-            $res = array( 'status' => 'false' , 'msg' =>   'Please select file name '  , 'filters' => $filters , 'data_list' =>  [] ,'pagination' => $data['pagination']);
+            $res = array( 'status' => 'false' , 'msg' =>   'Please select file name '  , 'filters' => $filters , 'data_list' =>  [] ,'pagination' => []);
 
         }
 
