@@ -18,8 +18,8 @@
     cursor: pointer;
   }
 
-  #view-inventory-details-Modal .inventory-details-container table tr, 
-  #view-inventory-details-Modal .inventory-details-container table th, 
+  #view-inventory-details-Modal .inventory-details-container table tr,
+  #view-inventory-details-Modal .inventory-details-container table th,
   #view-inventory-details-Modal .inventory-details-container table td {
     border-color: #00000075 !important;
     color: #000000;
@@ -107,7 +107,7 @@
                     </select>
                   </div>
 
-                  <div class="project_inventory"></div>
+                  <!-- <div class="project_inventory"></div> -->
 
 
                 </div>
@@ -156,7 +156,7 @@
                     Form
                 ***********************************-->
 <!-- Modal -->
-<div class="modal fade" id="add-edit-inventory-Modal" tabindex="-1" role="dialog" aria-labelledby="add-edit-inventory-ModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+<div class="modal fade" id="add-edit-inventory-Modal" role="dialog" aria-labelledby="add-edit-inventory-ModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
   <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -182,7 +182,7 @@
                   <label for="">Layout Upload</label>
                   <input type="file" name="property_layout" value="" class="form-control p-1">
                   <input type="hidden" name="old_property_layout" class="old_property_layout" value="">
-                    <a href="#" class="nav-link property-layout-anchor text-primary d-none px-0" target="_blank">View</a>
+                  <a href="#" class="nav-link property-layout-anchor text-primary d-none px-0" target="_blank">View</a>
                 </div>
               </div>
               <!-- End Layout Upload -->
@@ -264,6 +264,7 @@
             $("#product_id").html(row);
 
             $("#product_id").prop("disabled", false);
+            get_project_inventory()
           } else {
             $("#product_id").html("<option value=''>Select Project</option>");
           }
@@ -302,7 +303,7 @@
         },
         success: function(response) {
           setTimeout(function() {
-            $(".project_inventory").html(response.data_view);
+            // $(".project_inventory").html(response.data_view);
             $(".inventory-list-container").html(response.table_view);
           }, 100);
         },
@@ -389,7 +390,7 @@
     var property_type_id = $('#product_id option:selected').data('property-type-id');
 
     $('#add-edit-inventory-Modal').modal('show')
-    getPropertyForm(id, property_type_id, 0, 0, 0, 'inventory');
+    getPropertyForm(id, property_type_id, property_id, 0, 0, 'inventory');
 
     setTimeout(function() {
       $('#modal-inventory-form .product_id').val(property_id)

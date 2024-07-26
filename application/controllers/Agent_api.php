@@ -1859,7 +1859,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
 
         $where = "user_hash='" . $this->session->userdata('agent_hash') . "'";
         $user_detail = $this->Action_model->select_single('tbl_users', $where);
-        
+
         if ($user_detail) {
             $user_id = $user_detail->user_id;
             $account_id = $user_detail->user_id;
@@ -2458,7 +2458,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                             'is_followup'                           => $item->added_to_followup,
                             'assgin_user_full_name'                 => $item->assgin_user_full_name,
                             'stage_name'                            => $item->stage_name ?? 'N/A',
-                            'full_profile_url'                      => $item->full_profile_url ? ($profile_base_url.$item->full_profile_url) : base_url('public/front/user.png'),
+                            'full_profile_url'                      => $item->full_profile_url ? ($profile_base_url . $item->full_profile_url) : base_url('public/front/user.png'),
                             'lead_or_next_followp_date'             => $lead_or_next_followp_date,
                             'lead_or_next_followp_time'             => $lead_or_next_followp_time,
                             'lead_or_next_followp_date_and_time'    => $lead_or_next_followp_date . ' ( ' . $lead_or_next_followp_time . ' )'
@@ -4444,6 +4444,17 @@ WHERE lead_id='" . $lead_id . "'
     /* property end */
 
     /* manage inventory */
+    /**
+     * Table Used
+     * - tbl_inventory - m
+     * - tbl_product_plc_details
+     * - tbl_price_components
+     * - tbl_product_additional_details
+     * - tbl_product_unit_details
+     * - tbl_accomodations
+     * - tbl_product_block_details
+     * - tbl_floors
+     */
     public function get_project_inventory()
     {
         $product_id = $this->input->post('product_id');
@@ -4517,11 +4528,12 @@ WHERE lead_id='" . $lead_id . "'
         }
         $data['block_list'] = $block_list;
 
-        $data['unit_code_list'] = $unit_code_list;
+        $data['unit_code_list']             = $unit_code_list;
         $data['columns'] = $columns;
 
 
         $data['floor_list'] = $this->Action_model->detail_result('tbl_floors', "floor_id!=''");
+
 
         # Table View
         $table_view                 =   "<div class='table-responsive'>
@@ -4530,32 +4542,53 @@ WHERE lead_id='" . $lead_id . "'
                                             <th>#</th>
                                             <th>Unit Code</th>
                                             <th>Referance Number</th>
+                                            <th>Unit no</th>
                                             <th class='text-center'>Action</th>
                                         </tr>
                                         ";
+
+        if(!count($records ?? [])):
+             $table_view                     .= "<tr><td colspan='4' class='text-center'>No inventory found</td></tr>";
+        endif;
+
         foreach ($records ?? [] as $inventory_key => $inventory) :
+
+
             $inventory_id                   =   $inventory->inventory_id;
             $inventory_key                  =   ++$inventory_key;
-            $property_details  = $inventory->property_details ? json_decode($inventory->property_details) : null;
+            $property_details               =   $inventory->property_details ? json_decode($inventory->property_details) : null;
 
-            $unit_code  = $property_details->unit_code ?? $inventory->unit_no ?? '';
-            $referance_number  = $property_details->referance_number ?? $inventory->reference ?? '';
+            #
+            if ($inventory->product_id) :
+                $property               = get_product_details($inventory->product_id);
+                if ($property_details->unit_code ?? 0) :
+                    $property_accomodation  = getPropertyAccomodations($property->project_type_id, $property->property_type_id, $inventory->product_id, $property_details->unit_code);
+                endif;
 
-            // if ($inventory->property_details) :
-            $table_view             .=  "<tr>
-                                                <td>$inventory_key</td>
-                                                <td>$unit_code</td>
-                                                <td>$referance_number</td>
-                                                <td class='text-center'>
-                                                    <span class='text-primary px-2 view-inventory-record' data-id='$inventory_id'><i class='fa fa-eye'></i></span>
-                                                    <span class='text-success px-2 add-edit-inventory' data-id='$inventory_id'><i class='fa fa-edit'></i></span>
-                                                    <span class='text-danger px-2 delete-inventory-record' data-id='$inventory_id'><i class='fa fa-trash'></i></span>
-                                                </td>
-                                            </tr>
-                                        ";
-        // endif;
+                $unit_code_name  = $property_accomodation->unit_code_with_accomodation_name ?? $property_accomodation->inventory_unit_code ?? '';
+            endif;
+            #
+
+            $unit_code                      =   $property_details->unit_code ?? '';
+            $unit_no                        =    $property_details->unit_no ?? '';
+            $referance_number               =   $property_details->referance_number ?? $inventory->reference ?? '';
+
+            $table_view                     .=  "<tr>
+                                                        <td>$inventory_key</td>
+                                                        <td>$unit_code_name</td>
+                                                        <td>$referance_number</td>
+                                                        <td>$unit_no</td>
+                                                        <td class='text-center'>
+                                                            <span class='text-primary px-2 view-inventory-record' data-id='$inventory_id'><i class='fa fa-eye'></i></span>
+                                                            <span class='text-success px-2 add-edit-inventory' data-id='$inventory_id'><i class='fa fa-edit'></i></span>
+                                                            <span class='text-danger px-2 delete-inventory-record' data-id='$inventory_id'><i class='fa fa-trash'></i></span>
+                                                        </td>
+                                                    </tr>
+                                                ";
         endforeach;
-        $table_view                 .=   "</table><div>";
+
+        $table_view                         .=   "</table><div>";
+
         # End Table View
 
         $data_view    = $this->load->view(AGENT_URL . 'ajax/get_project_inventory', $data, true);
@@ -10937,10 +10970,9 @@ WHERE lead_id='" . $lead_id . "'
         $profile_base_url           =   base_url('public/other/profile/');
         $record  =  db_instance()->select("*,concat('$profile_base_url' , tbl_leads.profile) as full_profile_url")->where("lead_id = $id")->join('tbl_lead_stages', 'tbl_lead_stages.lead_stage_id=tbl_leads.lead_stage_id', 'left')->join('tbl_lead_sources', 'tbl_lead_sources.lead_source_id=tbl_leads.lead_source_id', 'left')->get('tbl_leads')->row();
 
-        $record->full_profile_url = $record->profile ? $record->full_profile_url : base_url('public/front/user.png') ;
+        $record->full_profile_url = $record->profile ? $record->full_profile_url : base_url('public/front/user.png');
 
-        return $record ;
-
+        return $record;
     }
     # Lead
 
@@ -10976,11 +11008,11 @@ WHERE lead_id='" . $lead_id . "'
 
             # Db Data
             $data                                   =   [
-                                                            'product_id'            => $product_id,
-                                                            'builder_id'            => $builder_id,
-                                                            'property_details'      => $property_details ? json_encode($property_details) : NULL,
-                                                            'property_layout'       => $property_layout,
-                                                        ];
+                'product_id'            => $product_id,
+                'builder_id'            => $builder_id,
+                'property_details'      => $property_details ? json_encode($property_details) : NULL,
+                'property_layout'       => $property_layout,
+            ];
             # End Db Data
 
             if ($id) :
@@ -10998,16 +11030,31 @@ WHERE lead_id='" . $lead_id . "'
     # End Store Inventory
 
     # Get Inventory Details
-    public function get_inventory_details(){
-        $id     =   $this->input->get('id');
-        $arr    =   [];
+    public function get_inventory_details()
+    {
+        $id                 =   $this->input->get('id');
+        $arr                =   [];
 
-        $data             =   $this->db->where("inventory_id = $id")->get('tbl_inventory')->row();
+        $data               =   $this->db->where("inventory_id = $id")->get('tbl_inventory')->row();
+
+        if ($data->property_details ?? 0) :
+
+            $property_details = json_decode($data->property_details);
+            $property_id = $property_details->product_id ?? 0;
+            $unit_code = $property_details->unit_code ?? 0;
+
+            if ($property_id) :
+                $property  = get_product_details($property_id);
+                $property_accomodation  = getPropertyAccomodations($property->project_type_id ?? 0, $property->property_type_id ?? 0, $property_id, $property_details->unit_code);
+                $data->unit_code_name  = $property_accomodation->unit_code_with_accomodation_name ?? $property_accomodation->inventory_unit_code ?? '';
+            endif;
+
+        endif;
 
         $detail_view        = $this->load->view('components/details-view/inventory-details', ['data' => $data], true);
 
         if ($data) :
-            $res_arr        =  ['status' => true, 'message' => 'Data fetched', 'detail_view' => $detail_view,'data' =>  $data ];
+            $res_arr        =  ['status' => true, 'message' => 'Data fetched', 'detail_view' => $detail_view, 'data' =>  $data];
         else :
             $res_arr        =  ['status' => false, 'message' => 'Data not found'];
         endif;
@@ -11018,8 +11065,9 @@ WHERE lead_id='" . $lead_id . "'
     # End Get Inventory Details
 
     # Delete Inventory Details
-    public function delete_inventory_details(){
-        if(!$this->input->post()):
+    public function delete_inventory_details()
+    {
+        if (!$this->input->post()) :
             $res_arr        =  ['status' => false, 'message' => 'Reqeust method is not POST'];
         endif;
 

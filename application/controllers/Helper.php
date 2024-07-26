@@ -86,7 +86,6 @@ class Helper extends CI_Controller
         $property_type_id               = $this->input->get('property_type_id');
         $property_id                    = $this->input->get('property_id');
         $selected_property_id           = $this->input->get('selected_property_id');
-        $property_details               = $this->input->get('property_details');
         $form_request_for               = $this->input->get('form_request_for');
 
         $property_layout            =   null;
@@ -96,27 +95,58 @@ class Helper extends CI_Controller
             return null;
         endif;
 
-        switch($form_request_for):
+        switch ($form_request_for):
             case 'inventory':
                 $inventory               =  getInventory($id);
                 $property_layout            =  $inventory->property_layout ?? null;
-                $property_layout_url     =  ( $inventory->property_layout ?? 0 ) ? base_url("/uploads/images/property/unit/$inventory->property_layout") : null;;
-                $property_details        =  ( $inventory->property_details ?? 0 ) ? json_decode($inventory->property_details ?? []) : $inventory;      
-            break;
+                $property_layout_url     =  ($inventory->property_layout ?? 0) ? base_url("/uploads/images/property/unit/$inventory->property_layout") : null;;
+                $property_details        =  ($inventory->property_details ?? 0) ? json_decode($inventory->property_details ?? []) : $inventory;
+                break;
 
             default:
-                if($property_id && $selected_property_id != $property_id ):
+                if ($property_id && $selected_property_id != $property_id) :
                     $property_details               =   project_property_details($property_type_id, $property_id);
-                elseif($id):
+                elseif ($id) :
                     $lead_unit_details               = lead_unit_details($id);
                     $property_details                = $lead_unit_details->property_details ?? null;
                 endif;
-            break;
+                break;
         endswitch;
 
+        # Additional
+        if ($id ?? 0) :
+            $property_details->id                           =   $id;
+        endif;
+        if ($property_id ?? 0) :
+            if ($property_details) :
+                $property_details->product_id                     =   $property_id;
+                $property_details->product_details                =   get_product_details($property_id);
+
+                if ($property_details->product_details ?? 0) :
+                    $project_type_id                                    =   $property_details->product_details->project_type_id;
+                    $property_type_id                                    =   $property_details->product_details->property_type_id;
+                    $property_id                                        =   $property_id;
+                    $property_details->unit_code_with_accomodations   =   getPropertyAccomodations($project_type_id, $property_type_id, $property_id);
+                endif;
+            else :
+                $property_details['product_id']                         =   $property_id;
+                $property_details['product_details']                    =   get_product_details($property_id);
+                if ($property_details['product_details'] ?? 0) :
+                    $project_type_id                                    =   $property_details['product_details']->project_type_id;
+                    $property_type_id                                    =   $property_details['product_details']->property_type_id;
+                    $property_id                                        =   $property_id;
 
 
-        $form_view                      =   property_form($property_type_id, $property_details);
+                    $property_details['unit_code_with_accomodations']   =  getPropertyAccomodations($project_type_id, $property_type_id, $property_id);
+                endif;
+            endif;
+        endif;
+        # Additional
+
+        // print_r($property_details);
+        // die;
+
+        $form_view                      =   property_form($property_type_id, $property_details ?? null);
 
         echo json_encode(['status' => true, 'message' => 'Successfully data fetched', 'form_view' => $form_view, 'property_layout_url' => $property_layout_url, 'property_layout' => $property_layout]);
     }
@@ -135,9 +165,9 @@ class Helper extends CI_Controller
         $where          = "user_hash='" . $this->session->userdata('agent_hash') . "'";
         $user_detail    = $this->db->where($where)->get('tbl_users')->row();
 
-    
-    
-        $view          =   $this->load->view('components/details-view/lead-units', ['lead_id' =>  $lead_id , 'user_detail' =>  $user_detail ], true);
+
+
+        $view          =   $this->load->view('components/details-view/lead-units', ['lead_id' =>  $lead_id, 'user_detail' =>  $user_detail], true);
 
         echo json_encode(['status' => true, 'message' => 'Successfully data fetched', 'view' => $view]);
     }
@@ -192,7 +222,7 @@ class Helper extends CI_Controller
 
         if ($is_view) :
             $view                   =   "<option value='' selected>Choose...</option>";
-            
+
             foreach ($records ?? [] as $record) :
                 $selected            =  $selected_id == $record->product_id ? 'selected' : '';
                 $view                .=   "<option value='$record->product_id' $selected>$record->project_name</option>";
@@ -204,8 +234,9 @@ class Helper extends CI_Controller
     }
     # End Get Lead Units
 
-     # Fetch Project Properties
-     public function project_properties(){
+    # Fetch Project Properties
+    public function project_properties()
+    {
         $project_id                     = $this->input->get('project_id');
         $selected_id            = $this->input->get('selected_id');
 
@@ -224,14 +255,15 @@ class Helper extends CI_Controller
         endforeach;
 
         echo json_encode(['status' => true, 'message' => 'Successfully data fetched', 'data' => $records, 'view' => $options]);
-     }
-     # End Fetch Project Properties
-     
-     # Fetch Project Properties
-    public function project_property_details(){
+    }
+    # End Fetch Project Properties
+
+    # Fetch Project Properties
+    public function project_property_details()
+    {
         $property_type_id            = $this->input->get('property_type_id');
         $project_property_id            = $this->input->get('project_property_id');
-      
+
         if (!$project_property_id) :
             return null;
         endif;
@@ -239,129 +271,125 @@ class Helper extends CI_Controller
         $data                =   project_property_details($property_type_id, $project_property_id);
 
         echo json_encode(['status' => true, 'message' => 'Successfully data fetched', 'data' => $data]);
-        
     }
-     # End Fetch Project Properties
+    # End Fetch Project Properties
 
     # Remove Gallery Image
-    public function remove_gallery_image(){
-        if(!$this->input->post()){
+    public function remove_gallery_image()
+    {
+        if (!$this->input->post()) {
             echo json_encode(['status' => false, 'message' => 'Request method not matched.']);
             exit;
         }
-            $id                     =   $this->input->post('id');
-            $type                   =   $this->input->post('type');
+        $id                     =   $this->input->post('id');
+        $type                   =   $this->input->post('type');
 
-            if($id):
-                
-                # Fetch Record
-                    $record = $this->db->where("id = $id")->get('tbl_gallery_images')->row();
+        if ($id) :
 
-                    if($record):
+            # Fetch Record
+            $record = $this->db->where("id = $id")->get('tbl_gallery_images')->row();
 
-                        # Remove Image From Folder
-                        switch($record->type):
-                            case 'lead_unit';
-                                $file_path = "./public/other/gallery-images/lead-units/".$record->name;
-                                if(file_exists($file_path )):
-                                    unlink($file_path );
-                                endif;
-                            break;
-                        endswitch;
-                        # End Remove Image From Folder
-                    endif;
-                # End Fetch Record
+            if ($record) :
 
-                # Delete Record
-                $this->db->where("id = $id and type = '$type'")->delete('tbl_gallery_images');
-                # End Delete Record
+                # Remove Image From Folder
+                switch ($record->type):
+                    case 'lead_unit';
+                        $file_path = "./public/other/gallery-images/lead-units/" . $record->name;
+                        if (file_exists($file_path)) :
+                            unlink($file_path);
+                        endif;
+                        break;
+                endswitch;
+            # End Remove Image From Folder
             endif;
+            # End Fetch Record
 
-            echo json_encode(['status' => true, 'message' => 'Successfully image removed.']);
+            # Delete Record
+            $this->db->where("id = $id and type = '$type'")->delete('tbl_gallery_images');
+        # End Delete Record
+        endif;
 
-
+        echo json_encode(['status' => true, 'message' => 'Successfully image removed.']);
     }
     # End Remove Gallery Image
 
     # Remove Add More Record
-    public function remove_add_more_record_file(){
-        if(!$this->input->post()){
+    public function remove_add_more_record_file()
+    {
+        if (!$this->input->post()) {
             echo json_encode(['status' => false, 'message' => 'Request method not matched.']);
             exit;
         }
-            $id                 =   $this->input->post('id');
+        $id                 =   $this->input->post('id');
 
-            if($id):
-                
-                # Fetch Record
-                    $record = $this->db->where("id = $id")->get('tbl_property_documents')->row();
+        if ($id) :
 
-                    if($record):
+            # Fetch Record
+            $record = $this->db->where("id = $id")->get('tbl_property_documents')->row();
 
-                        # Remove File From Folder
-                        $file_path = "./public/other/property-documents/".$record->document;
+            if ($record) :
 
-                        if(file_exists($file_path )):
-                            unlink($file_path );
-                        endif;
-                        # End Remove File From Folder
-                    endif;
-                # End Fetch Record
+                # Remove File From Folder
+                $file_path = "./public/other/property-documents/" . $record->document;
 
-                # Delete Record
-                $this->db->where("id = $id")->delete('tbl_property_documents');
-                # End Delete Record
+                if (file_exists($file_path)) :
+                    unlink($file_path);
+                endif;
+            # End Remove File From Folder
             endif;
-           
+            # End Fetch Record
 
-            echo json_encode(['status' => true, 'message' => 'Successfully record removed.']);
+            # Delete Record
+            $this->db->where("id = $id")->delete('tbl_property_documents');
+        # End Delete Record
+        endif;
 
 
+        echo json_encode(['status' => true, 'message' => 'Successfully record removed.']);
     }
     # End Remove Add More Record
 
     # Delete Lead
-    public function delete_lead(){
-        if(!$this->input->post()){
+    public function delete_lead()
+    {
+        if (!$this->input->post()) {
             echo json_encode(['status' => false, 'message' => 'Request method not matched.']);
             exit;
         }
 
-            # Permission
-            if(user()->role_id != 1 || user()->role_id != 5):
-                echo json_encode(['status' => false, 'message' => 'Permission denied']);
-                exit;
+        # Permission
+        if (user()->role_id != 1 || user()->role_id != 5) :
+            echo json_encode(['status' => false, 'message' => 'Permission denied']);
+            exit;
+        endif;
+        # End Permission
+
+        $id                 =   $this->input->post('id');
+
+        if ($id) :
+
+            # Fetch Record
+            $record = $this->db->where("id = $id")->get('tbl_leads')->row();
+
+            if ($record) :
+
+                # Remove File From Folder
+                $file_path = "./public/other/profile/" . $record->profile;
+
+                if (file_exists($file_path)) :
+                    unlink($file_path);
+                endif;
+            # End Remove File From Folder
             endif;
-            # End Permission
+            # End Fetch Record
 
-            $id                 =   $this->input->post('id');
-
-            if($id):
-                
-                # Fetch Record
-                    $record = $this->db->where("id = $id")->get('tbl_leads')->row();
-
-                    if($record):
-
-                        # Remove File From Folder
-                        $file_path = "./public/other/profile/".$record->profile;
-
-                        if(file_exists($file_path )):
-                            unlink($file_path );
-                        endif;
-                        # End Remove File From Folder
-                    endif;
-                # End Fetch Record
-
-                # Delete Record
-                $this->db->where("id = $id")->delete('tbl_leads');
-                # End Delete Record
-            endif;
-           
-
-            echo json_encode(['status' => true, 'message' => 'Successfully record deleted.']);
+            # Delete Record
+            $this->db->where("id = $id")->delete('tbl_leads');
+        # End Delete Record
+        endif;
 
 
+        echo json_encode(['status' => true, 'message' => 'Successfully record deleted.']);
     }
     # End Delete Lead
 
