@@ -11125,13 +11125,9 @@ $property_list = $query->result();
                              $record_n->$k = ($v || $v == 0) ? $v : '';
                              
                              } 
-                         }
-                     
+                         }        
                  }
                  
-                 
-                 
-     
                  $array['data'] = array(
                      'status' => 'true',
                      'msg' => 'Lead Found',
@@ -11162,9 +11158,7 @@ $property_list = $query->result();
          }
      
          echo json_encode($array);
-        
-        
-        
+                
      }
 
   
@@ -11237,23 +11231,25 @@ $property_list = $query->result();
                 }
                 # End Create Folder if Folder Not Exits
         
-                $config['upload_path']             = $upload_path;
-        
-                $config['allowed_types']          =    'xlsx';
+                $config['upload_path']             =  $upload_path;
+                $config['allowed_types']           = 'xlsx';
+
                 $this->load->library('upload', $config);
-                if ($this->upload->do_upload('file')) {
+
+                if ($this->upload->do_upload('file')) 
+                {
+
                     $data = $this->upload->data();
 
-                if ($data['file_ext'] == '.xlsx') {
-
+                  if ($data['file_ext'] == '.xlsx') {
+                    
                     require('application/libraries/php-excel-reader/excel_reader2.php');
                     require('application/libraries/SpreadsheetReader.php');
 
 
                     $Reader = new SpreadsheetReader($data['full_path']);
                     $Sheets = $Reader->Sheets();
-
-                    
+     
                     foreach ($Sheets as $Index => $Name) {
                         if ($Index == 0) {
                             $Reader->ChangeSheet($Index);
@@ -11291,12 +11287,17 @@ $property_list = $query->result();
                             }
                         }
                     }
-
                     unlink($data['full_path']);
+                    $res = array('status'=>'true' , 'msg' => "Data Uploaded  $total_uploaded_data_count out of $total_data_count") ;  
+                      
                 }
-            }
+                else{
+                    $res = array('status'=>'false' , 'msg' => "Please upload only xlsx file") ;
+                }
+                }else{
 
-             $res = array('status'=>'true' , 'msg' => "Data Uploaded  $total_uploaded_data_count out of $total_data_count (some data is already exist)") ;  
+                    $res = array('status'=>'false' , 'msg' => "No file selected") ;    
+            }
 
         } else {
             $res = array('status'=>'false' , 'msg' => "Some Error") ;  
