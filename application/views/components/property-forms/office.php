@@ -2,8 +2,8 @@
 <!-- Office Details -->
 <section id="office-property-form" class="theme-form">
 
-<input type="hidden" name="property_details[id]" value="{{ $id ?? 0 }}" class="id">
-<input type="hidden" name="property_details[product_id]" value="{{ $product_id ?? 0 }}" class="product_id">
+<input type="hidden" name="property_details[id]" value="<?= $id ?? 0 ?>" class="id">
+<input type="hidden" name="property_details[product_id]" value="<?= $product_id ?? 0 ?>" class="product_id">
 
     <div class="container">
         <div class="card mt-4">
