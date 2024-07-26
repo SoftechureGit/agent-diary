@@ -251,6 +251,11 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id, $use
             -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
             background-color: transparent;
         }
+
+        .inventory-list-container table .fa {
+            cursor: pointer;
+        }
+
     </style>
 
 </head>

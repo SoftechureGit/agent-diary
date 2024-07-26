@@ -1,4 +1,5 @@
 <div style="padding: 0px 15px 20px 15px;">
+  <input type="hidden" id="product_id" value="<?= $record->product_id ?>">
   <div class="row" style="border: 1px solid #0000000f;padding: 20px 10px;margin-bottom: 10px;">
     <div class="col-md-12">
       <h3 class="text-center"><?= $record->project_name ?></h3>
@@ -78,7 +79,8 @@
         </div>
       </div>
       <div id="navtabs-inventory" class="tab-pane">
-        <div class="table-responsive">
+        <div class="inventory-list-container"></div>
+        <div class="table-responsive d-none">
           <table class="table table-bordered">
             <thead>
               <tr>

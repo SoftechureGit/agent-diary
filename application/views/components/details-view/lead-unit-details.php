@@ -34,7 +34,7 @@
                   <td><?= $record->booking_date ?? '' ?></td>
                 </tr>
 
-                <?php if($record->costing_price): ?>
+                <?php if($record->costing_price ?? 0): ?>
                 <tr>
                   <th>Costing Price</th>
                   <td>₹ <?= $record->costing_price ?? '' ?></td>

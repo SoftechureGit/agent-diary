@@ -3298,7 +3298,7 @@ WHERE lead_id='" . $lead_id . "'
                                 //echo $item->project_type."#";
                             }
 
-                            if ($current_rate) {
+                            if ($current_rate ?? 0) {
                                 $amount_array[] = $current_rate;
                             }
                         }
@@ -4548,7 +4548,7 @@ WHERE lead_id='" . $lead_id . "'
                                         ";
 
         if(!count($records ?? [])):
-             $table_view                     .= "<tr><td colspan='4' class='text-center'>No inventory found</td></tr>";
+             $table_view                     .= "<tr><td colspan='5' class='text-center'>No inventory found</td></tr>";
         endif;
 
         foreach ($records ?? [] as $inventory_key => $inventory) :
@@ -7543,6 +7543,7 @@ WHERE lead_id='" . $lead_id . "'
 
     public function get_product_inventory_list()
     {
+        
         $array = array();
         $items = array();
         $account_id = getAccountId();

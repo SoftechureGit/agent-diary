@@ -52,6 +52,8 @@
   background: url("<?= base_url('public/front/ajax-loader.gif') ?>") 
               50% 50% no-repeat #fff3f38f;
 }
+
+
 </style>
 <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.10/css/select2.min.css">
 <div class="loader_progress"></div>
