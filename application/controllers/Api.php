@@ -11438,7 +11438,18 @@ $property_list = $query->result();
 
         $data = $this->Action_model->apiPagination($select,$page,$limit,$join,$where,'tbl_data');
 
-        $res = array( 'status' => 'true' , 'msg' =>   'Data fetched successfully '  , 'filters' => $filters , 'data_list' =>  $data['data'] ,'pagination' => $data['pagination']);
+        if($this->input->post('file_name') && count($data['data']) > 0 ){
+            $res = array( 'status' => 'true' , 'msg' =>   'Record fetched successfully '  , 'filters' => $filters , 'data_list' =>  $data['data'] ,'pagination' => $data['pagination']);
+        }
+        elseif(count($data['data']) == 0){
+            $res = array( 'status' => 'false' , 'msg' =>   'Record not found'  , 'filters' => $filters , 'data_list' =>  [] ,'pagination' => $data['pagination']);
+        }
+        else{
+
+            $res = array( 'status' => 'false' , 'msg' =>   'Please select file name '  , 'filters' => $filters , 'data_list' =>  [] ,'pagination' => []);
+
+        }
+
 
         echo json_encode($res);
 
