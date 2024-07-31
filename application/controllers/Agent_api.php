@@ -4457,12 +4457,18 @@ WHERE lead_id='" . $lead_id . "'
      */
     public function get_project_inventory()
     {
-        $product_id = $this->input->post('product_id');
+        $product_id             = $this->input->post('product_id');
+        $property_unit_code_id  = $this->input->post('property_unit_code_id');
 
         $data['product_id'] = $product_id;
 
         $records = array();
         $where = "product_id='" . $product_id . "'";
+        
+        if($property_unit_code_id):
+            $where .= " and unit_code='" . $property_unit_code_id . "'";
+        endif;
+
         $record_data = $this->Action_model->detail_result('tbl_inventory', $where);
         if ($record_data) {
             $records = $record_data;
@@ -4472,6 +4478,7 @@ WHERE lead_id='" . $lead_id . "'
         $columns = array();
 
         $where = "product_id='" . $product_id . "'";
+        
         $this->db->select('*');
         $this->db->from('tbl_product_plc_details');
         $this->db->join('tbl_price_components', 'tbl_price_components.price_component_id = tbl_product_plc_details.price_comp_id');
@@ -6836,7 +6843,24 @@ WHERE lead_id='" . $lead_id . "'
                 }
 
                 $where .= " limit " . $start . "," . $limit;
-                $this->db->select("pud.product_unit_detail_id,tbl_product_types.product_type_name,tbl_unit_types.unit_type_name,tbl_city.city_name,tbl_states.state_name,tbl_locations.location_name,tbl_accomodations.accomodation_name,pud.project_type,pud.property_type,pud.sa,pud.plot_size,pud.plot_unit,punit.unit_name as plot_unit_name,sa_unit.unit_name as sa_unit_name,pud.basic_cost,p.b_cost_unit");
+                $this->db->select("
+                                    pud.product_unit_detail_id,
+                                    pud.created_at,
+                                    tbl_product_types.product_type_name,
+                                    tbl_unit_types.unit_type_name,
+                                    tbl_city.city_name,
+                                    tbl_states.state_name,
+                                    tbl_locations.location_name,
+                                    tbl_accomodations.accomodation_name,
+                                    pud.project_type,
+                                    pud.property_type,
+                                    pud.sa,
+                                    pud.plot_size,
+                                    pud.plot_unit,
+                                    punit.unit_name as plot_unit_name,
+                                    sa_unit.unit_name as sa_unit_name,
+                                    pud.basic_cost,
+                                    p.b_cost_unit");
                 $this->db->from('tbl_product_unit_details as pud');
                 $this->db->join('tbl_products as p', 'p.product_id = pud.product_id', 'left');
                 $this->db->join('tbl_product_types', 'tbl_product_types.product_type_id=p.project_type', 'left');
@@ -7182,6 +7206,7 @@ WHERE lead_id='" . $lead_id . "'
                         $bottom_label = $size . (($size) ? ', ' : ' ') . $budget;
 
                         $records[] = array(
+                            'created_at'                => date('d F, Y', $item->created_at),
                             'product_unit_detail_id' => $item->product_unit_detail_id,
                             "accomodation_name" => (!$item->accomodation_name) ? '' : $item->accomodation_name,
                             'product_type_name' => ($item->product_type_name) ? $item->product_type_name : '',
@@ -10993,7 +11018,7 @@ WHERE lead_id='" . $lead_id . "'
             $builder_id                                 =   $this->input->post('builder_id');
             $old_property_layout                        =   $this->input->post('old_property_layout');
             $property_details                           =   $this->input->post('property_details');
-
+            $unit_code                                  =   $property_details['unit_code'];
             # End Init
 
             # File Upload
@@ -11011,6 +11036,7 @@ WHERE lead_id='" . $lead_id . "'
             $data                                   =   [
                 'product_id'            => $product_id,
                 'builder_id'            => $builder_id,
+                'unit_code'             => $unit_code,
                 'property_details'      => $property_details ? json_encode($property_details) : NULL,
                 'property_layout'       => $property_layout,
             ];
