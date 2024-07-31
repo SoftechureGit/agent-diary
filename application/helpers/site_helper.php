@@ -813,6 +813,14 @@ if (!function_exists('getAccountId')) {
             ->get('tbl_product_unit_details')
             ->row();
 
+        # Parkings
+        CI()->db->select('product_id as id, parking_open, parking_stilt, parking_basment');
+        CI()->db->from('tbl_products');
+        CI()->db->where("product_id = $record->property_id");
+        $parkings        = CI()->db->get()->row();
+        $record->parkings        = $parkings;
+        # End Parkings
+
         # PLC
         CI()->db->select('pc.price_component_id as id, pc.price_component_name as name');
         CI()->db->from('tbl_product_plc_details');

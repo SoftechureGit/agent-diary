@@ -44,32 +44,32 @@
 
                     <li>
                         <a class="has-arrow" href="javascript:void()" aria-expanded="false">
-                            <i class="icon-graph menu-icon"></i><span class="nav-text">Product</span>
+                            <i class="icon-graph menu-icon"></i><span class="nav-text">Inventory</span>
                         </a>
                         <ul aria-expanded="false">
                             <?php if(isset($menu_item_array['product_list']) && $menu_item_array['product_list']['rr_view']) { ?>
-                            <li><a href="<?= base_url(AGENT_URL.'products/') ?>">Product List</a></li>
+                            <li><a href="<?= base_url(AGENT_URL.'products/') ?>">Inventory</a></li>
                             <?php } ?>
                             <?php if(isset($menu_item_array['product_project']) && $menu_item_array['product_project']['rr_view']) { ?>
-                            <li><a href="<?= base_url(AGENT_URL.'projects/') ?>">Project</a></li>
+                            <li><a class="d-none" href="<?= base_url(AGENT_URL.'projects/') ?>">Project</a></li>
                             <?php } ?>
                             <?php if(isset($menu_item_array['product_property']) && $menu_item_array['product_property']['rr_create']) { ?>
-                            <li><a href="<?= base_url(AGENT_URL.'property-detail/') ?>">Add Project</a></li>
+                            <li><a class="d-none" href="<?= base_url(AGENT_URL.'property-detail/') ?>">Add Project</a></li>
                             <?php } ?>
                             <?php if(isset($menu_item_array['product_property']) && $menu_item_array['product_property']['rr_view']) { ?>
-                            <li><a href="<?= base_url(AGENT_URL.'property/') ?>">Properties</a></li>
+                            <li><a class="d-none" href="<?= base_url(AGENT_URL.'property/') ?>">Properties</a></li>
                             <?php } ?>
                             <?php if(isset($menu_item_array['product_manage_inventory']) && $menu_item_array['product_manage_inventory']['rr_view']) { ?>
                             <li><a href="<?= base_url(AGENT_URL.'manage-inventory/') ?>">Manage Inventory</a></li>
                             <?php } ?>
                             <?php if(isset($menu_item_array['product_update_inventory']) && $menu_item_array['product_update_inventory']['rr_view']) { ?>
-                            <li><a href="<?= base_url(AGENT_URL.'update-inventory-status/') ?>">Update Inventory Status</a></li>
+                            <li><a class="d-none" href="<?= base_url(AGENT_URL.'update-inventory-status/') ?>">Update Inventory Status</a></li>
                             <?php } ?>
                             <?php if(isset($menu_item_array['product_update_ad_cost']) && $menu_item_array['product_update_ad_cost']['rr_view']) { ?>
-                            <li><a href="<?= base_url(AGENT_URL.'update-additional-cost/') ?>">Update Aditional Charges</a></li>
+                            <li><a class="d-none" href="<?= base_url(AGENT_URL.'update-additional-cost/') ?>">Update Aditional Charges</a></li>
                             <?php } ?>
                             <?php if(isset($menu_item_array['product_update_basic_cost']) && $menu_item_array['product_update_basic_cost']['rr_view']) { ?>
-                            <li><a href="<?= base_url(AGENT_URL.'update-basic-cost/') ?>">Update Baisc Cost</a></li>
+                            <li><a class="d-none" href="<?= base_url(AGENT_URL.'update-basic-cost/') ?>">Update Baisc Cost</a></li>
                             <?php } ?>
 
                         </ul>

@@ -73,18 +73,13 @@
                               <div class="col-md-5">
                                 <div class="row">
                                   <div class="col-md-6">
-                                      <h4 class="card-title">Products</h4>
+                                      <h4 class="card-title">Inventory ( <span class="total_records">0</span> )</h4>
                                   </div>
                                   <div class="col-md-6" align="right">
                                       <select class="form-control" style="height: 30px !important;min-height: 30px;padding: 0px 10px;width: 145px;" id="filter_by" onchange="filterData()">
                                             <option value="">SORT BY</option>
                                           </select>
                                   </div>
-
-                                  <div class="col-md-12">
-                                      <p>Total Products: <span class="total_records">0</span></p>
-                                  </div>
-
                                   <div class="col-md-12" style="height: 450px;overflow-y: auto;">
                                     
                                     <div class="lead-list"></div>

@@ -1,26 +1,26 @@
      <!--**********************************
                     Form
                 ***********************************-->
-<!-- Modal -->
-<div class="modal fade" id="view-inventory-details-Modal" tabindex="-1" role="dialog" aria-labelledby="view-inventory-details-ModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="view-inventory-details-ModalLabel">Inventory Details</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="inventory-details-container"></div>
-      </div>
-    </div>
-  </div>
-</div>
-<!--**********************************
+     <!-- Modal -->
+     <div class="modal fade" id="view-inventory-details-Modal" tabindex="-1" role="dialog" aria-labelledby="view-inventory-details-ModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+       <div class="modal-dialog modal-lg" role="document">
+         <div class="modal-content">
+           <div class="modal-header">
+             <h5 class="modal-title" id="view-inventory-details-ModalLabel">Inventory Details</h5>
+             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+               <span aria-hidden="true">&times;</span>
+             </button>
+           </div>
+           <div class="modal-body">
+             <div class="inventory-details-container"></div>
+           </div>
+         </div>
+       </div>
+     </div>
+     <!--**********************************
                     End Form
                 ***********************************-->
-                
+
      <!--**********************************
             Footer start
         ***********************************-->
@@ -684,47 +684,47 @@
        })
        /** End Delete Lead */
 
-         // 
-  $(document).on('click', '.view-inventory-record', function() {
-    var id = $(this).data('id')
-    // alert(id)
+       // 
+       $(document).on('click', '.view-inventory-record', function() {
+         var id = $(this).data('id')
+         // alert(id)
 
-    get_inventory_details(id);
+         get_inventory_details(id);
 
-    $('#view-inventory-details-Modal').modal('show')
-  })
+         $('#view-inventory-details-Modal').modal('show')
+       })
 
        /** Get Inventory Details */
-  function get_inventory_details(id) {
-    // Fetch Data
-    $.ajax({
-      type: "GET",
-      url: "<?= base_url(AGENT_URL . '/api/get_inventory_details') ?>",
-      data: {
-        id: id
-      },
-      dataType: 'json',
-      beforeSend: function(data) {
-        $(".loader_progress").show();
-      },
-      success: function(res) {
-        if (res.status) {
-          $('#view-inventory-details-Modal .inventory-details-container').html(res.detail_view)
-        } else {
-          showToast(res.message);
-        }
+       function get_inventory_details(id) {
+         // Fetch Data
+         $.ajax({
+           type: "GET",
+           url: "<?= base_url(AGENT_URL . '/api/get_inventory_details') ?>",
+           data: {
+             id: id
+           },
+           dataType: 'json',
+           beforeSend: function(data) {
+             $(".loader_progress").show();
+           },
+           success: function(res) {
+             if (res.status) {
+               $('#view-inventory-details-Modal .inventory-details-container').html(res.detail_view)
+             } else {
+               showToast(res.message);
+             }
 
-        $(".loader_progress").hide();
-      },
-      error: function() {
-        $(".loader_progress").hide();
+             $(".loader_progress").hide();
+           },
+           error: function() {
+             $(".loader_progress").hide();
 
-      }
+           }
 
-    });
-    // End Fetch Data
-  }
-  /** End Get Inventory Details */
+         });
+         // End Fetch Data
+       }
+       /** End Get Inventory Details */
 
        function get_project_inventory() {
 
@@ -761,68 +761,97 @@
        }
 
 
-      //  
-        $(document).on('change', '[name="property_details[unit_code]"]', function(){
-          if($('#modal-inventory-form [name="property_details[id]"]').val() != ''){
-            return false;
-          }
-          getPropertyUnitDetails({'id' : this.value})
-        })
+       //  
+       $(document).on('change', '[name="property_details[unit_code]"]', function() {
+         if ($('#modal-inventory-form [name="property_details[id]"]').val() != '') {
+           return false;
+         }
+         getPropertyUnitDetails({
+           'id': this.value
+         })
+       })
 
-          function getPropertyUnitDetails({id = 0}){
-            $.ajax({
-              post:'GET',
-              url: "<?= base_url('helper/get_property_unit_details'); ?>",
-              data:{id:id},
-              dataType:'json',
-              success: (res) => {
-                if(res.status){
+       function getPropertyUnitDetails({
+         id = 0
+       }) {
+         $.ajax({
+             post: 'GET',
+             url: "<?= base_url('helper/get_property_unit_details'); ?>",
+             data: {
+               id: id
+             },
+             dataType: 'json',
+             success: (res) => {
+               if (res.status) {
 
-                  var additional_plc_ids = null;
+                 /** Additional PLC */
+                 var additional_plc_ids = null;
 
-                  if(res.data['additional_plc'].length){
-                    additional_plc_ids = $.map(res.data['additional_plc'], function(item) {
-                      return item.id;
-                    });
+                 if (res.data['additional_plc'].length) {
+                   additional_plc_ids = $.map(res.data['additional_plc'], function(item) {
+                     return item.id;
+                   });
 
-                    if(additional_plc_ids){
-                      $(`#modal-inventory-form select[name="property_details[applicable_plc][]"]`).val(additional_plc_ids).trigger('change');
-                    }
-                  }
+                   if (additional_plc_ids) {
+                     $(`#modal-inventory-form select[name="property_details[applicable_plc][]"]`).val(additional_plc_ids).trigger('change');
+                   }
+                 }
+                 /** End Additional PLC */
 
-                  
-                  $.each(res.data, function(key, value){
-                    
-                    /** Size Unit */
-                    if(key == 'size_unit' && value != ''){
-                      $(`#modal-inventory-form select[name="property_details[${key}]"]`).val(value).trigger('change');
-                      $(`#modal-inventory-form select[name="property_details[sa_size_unit]"]`).val(value).trigger('change');
-                      $(`#modal-inventory-form select[name="property_details[ba_size_unit]"]`).val(value).trigger('change');
-                      $(`#modal-inventory-form select[name="property_details[ca_size_unit]"]`).val(value).trigger('change');
-                    }else{
-                      $(`#modal-inventory-form input[name="property_details[${key}]"]`).val(value);
-                    }
-                    /** End Size Unit */
+                 /** Parking */
+                 var parkings  = [];
 
-                    /** Property Layout */
-                    if(key == 'image_url' && value != ''){
-                      $('.property-layout-anchor').removeClass('d-none').attr('href', value)
-                      $('.old_property_layout').val(value.split('/').pop())
-                    }else if(key != 'image_url' && value == ''){
-                      $('.property-layout-anchor').addClass('d-none').attr('href', '#')
-                      $('.old_property_layout').val('')
-                    }
-                    /** End Property Layout */
-                  })
-                }
-                },
-                error: (res) => {
-                console.log(res)
+                 if (res.data['parkings'].parking_open) {
+                   parkings[0] = 'open';
+                 }
 
-              }
-            })
-          }
-      //  
+                 if (res.data['parkings'].parking_stilt) {
+                   parkings[1] = 'stilt';
+                 }
+
+                 if (res.data['parkings'].parking_basement) {
+                   parkings[1] = 'basement';
+                 }
+                 if (parkings.length){
+                   $(`#modal-inventory-form select[name="property_details[parking][]"]`).val(parkings).trigger('change');
+               }
+               /** End Parking */
+
+
+               $.each(res.data, function(key, value) {
+
+                 /** Size Unit */
+                 if (key == 'size_unit' && value != '') {
+                   $(`#modal-inventory-form select[name="property_details[${key}]"]`).val(value).trigger('change');
+                   $(`#modal-inventory-form select[name="property_details[sa_size_unit]"]`).val(value).trigger('change');
+                   $(`#modal-inventory-form select[name="property_details[ba_size_unit]"]`).val(value).trigger('change');
+                   $(`#modal-inventory-form select[name="property_details[ca_size_unit]"]`).val(value).trigger('change');
+                 } else {
+                   if (key != 'id') {
+                     $(`#modal-inventory-form input[name="property_details[${key}]"]`).val(value);
+                   }
+                 }
+                 /** End Size Unit */
+
+                 /** Property Layout */
+                 if (key == 'image_url' && value != '') {
+                   $('.property-layout-anchor').removeClass('d-none').attr('href', value)
+                   $('.old_property_layout').val(value.split('/').pop())
+                 } else if (key != 'image_url' && value == '') {
+                   $('.property-layout-anchor').addClass('d-none').attr('href', '#')
+                   $('.old_property_layout').val('')
+                 }
+                 /** End Property Layout */
+               })
+             }
+           },
+           error: (res) => {
+             console.log(res)
+
+           }
+         })
+       }
+       //  
      </script>
      <!--  -->
 
