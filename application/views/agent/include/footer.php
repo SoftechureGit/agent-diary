@@ -759,6 +759,70 @@
            });
          }
        }
+
+
+      //  
+        $(document).on('change', '[name="property_details[unit_code]"]', function(){
+          if($('#modal-inventory-form [name="property_details[id]"]').val() != ''){
+            return false;
+          }
+          getPropertyUnitDetails({'id' : this.value})
+        })
+
+          function getPropertyUnitDetails({id = 0}){
+            $.ajax({
+              post:'GET',
+              url: "<?= base_url('helper/get_property_unit_details'); ?>",
+              data:{id:id},
+              dataType:'json',
+              success: (res) => {
+                if(res.status){
+
+                  var additional_plc_ids = null;
+
+                  if(res.data['additional_plc'].length){
+                    additional_plc_ids = $.map(res.data['additional_plc'], function(item) {
+                      return item.id;
+                    });
+
+                    if(additional_plc_ids){
+                      $(`#modal-inventory-form select[name="property_details[applicable_plc][]"]`).val(additional_plc_ids).trigger('change');
+                    }
+                  }
+
+                  
+                  $.each(res.data, function(key, value){
+                    
+                    /** Size Unit */
+                    if(key == 'size_unit' && value != ''){
+                      $(`#modal-inventory-form select[name="property_details[${key}]"]`).val(value).trigger('change');
+                      $(`#modal-inventory-form select[name="property_details[sa_size_unit]"]`).val(value).trigger('change');
+                      $(`#modal-inventory-form select[name="property_details[ba_size_unit]"]`).val(value).trigger('change');
+                      $(`#modal-inventory-form select[name="property_details[ca_size_unit]"]`).val(value).trigger('change');
+                    }else{
+                      $(`#modal-inventory-form input[name="property_details[${key}]"]`).val(value);
+                    }
+                    /** End Size Unit */
+
+                    /** Property Layout */
+                    if(key == 'image_url' && value != ''){
+                      $('.property-layout-anchor').removeClass('d-none').attr('href', value)
+                      $('.old_property_layout').val(value.split('/').pop())
+                    }else if(key != 'image_url' && value == ''){
+                      $('.property-layout-anchor').addClass('d-none').attr('href', '#')
+                      $('.old_property_layout').val('')
+                    }
+                    /** End Property Layout */
+                  })
+                }
+                },
+                error: (res) => {
+                console.log(res)
+
+              }
+            })
+          }
+      //  
      </script>
      <!--  -->
 

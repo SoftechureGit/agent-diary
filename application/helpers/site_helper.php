@@ -458,6 +458,63 @@ if (!function_exists('getAccountId')) {
     }
     # End Project Property Details
 
+    # get_property_unit_details
+    function get_property_unit_details($id)
+    {
+        if (!$id) :
+            return null;
+        endif;
+
+        $image_base_url             =   base_url('uploads/images/property/unit/');
+
+        $record    =   db_instance()
+            ->select("
+                        product_unit_detail_id as id, 
+                        product_id as property_id, 
+                        code as unit_code, 
+                        no_of_unit as unit_no,
+                        ba, sa, ca,
+                        dimension,
+                        plot_size,
+                        unit as size_unit,
+                        concat('$image_base_url', image) as image_url   
+                    ")
+            ->where("product_unit_detail_id = $id")
+            ->order_by("code", "asc")
+            ->get('tbl_product_unit_details')
+            ->row();
+
+        # PLC
+        CI()->db->select('pc.price_component_id as id, pc.price_component_name as name');
+        CI()->db->from('tbl_product_plc_details');
+        CI()->db->join('tbl_price_components as pc', 'pc.price_component_id = tbl_product_plc_details.price_comp_id');
+        CI()->db->where("product_id = $record->property_id");
+        $plc_records    = CI()->db->get()->result();
+        $record->plc        = $plc_records;
+        # End PLC
+
+        # Additional PLC
+        CI()->db->select('pc.price_component_id as id, pc.price_component_name as name');
+        CI()->db->from('tbl_product_additional_details');
+        CI()->db->join('tbl_price_components as pc', 'pc.price_component_id = tbl_product_additional_details.price_comp_id');
+        CI()->db->where("product_id = $record->property_id");
+        $additional_plc_records = CI()->db->get()->result();
+        $record->additional_plc        = $additional_plc_records;
+        # End Additional PLC
+
+        # Accomodations
+        CI()->db->select('ac.accomodation_id as id, ac.accomodation_name as name');
+        CI()->db->from('tbl_product_unit_details');
+        CI()->db->join('tbl_accomodations as ac', 'ac.accomodation_id = tbl_product_unit_details.accomodation', 'left');
+        CI()->db->where("product_id = $record->property_id");
+        $accomodations = CI()->db->get()->result();
+        $record->accomodations        = $accomodations;
+        # End Accomodations
+
+        return $record ?? null;
+    }
+    # End Project Property Details
+
     ##### Gallery Images #####
     function insert_or_update_gallery_images($gallery_images, $type, $parent_id)
     {

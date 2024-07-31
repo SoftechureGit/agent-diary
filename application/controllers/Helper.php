@@ -393,7 +393,22 @@ class Helper extends CI_Controller
     }
     # End Delete Lead
 
+    # Get Property Unit Details
+    public function get_property_unit_details(){
+        $arr        =   [];
+        $id         = $this->input->get('id');
+        
 
+        $data           =   get_property_unit_details($id);
+        if($id):
+            $arr        =   ['status' => true, 'message' => 'Data Fetched successfully', 'data' => $data];
+        else:
+            $arr        =   ['status' => false, 'message' => 'Some error occured'];
+        endif;
+
+        echo json_encode($arr);
+    }
+    # End Get Property Unit Details
 
 
 }
