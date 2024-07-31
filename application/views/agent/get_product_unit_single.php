@@ -1,11 +1,12 @@
 <div style="padding: 0px 15px 20px 15px;">
   <input type="hidden" id="product_id" value="<?= $record->product_id ?>">
+  <input type="hidden" id="property_unit_code_id" value="<?= $record->product_unit_detail_id ?>">
   <div class="row" style="border: 1px solid #0000000f;padding: 20px 10px;margin-bottom: 10px;">
     <div class="col-md-12">
       <h3 class="text-center"><?= $record->project_name ?></h3>
       <div class="text-center" style="font-size: 11px;"><span><?= ($record->b_firm_name)?'By '.$record->b_firm_name:'' ?></span></div>
-      <div class="text-center" style="font-size: 13px;margin-top: 3px;"><span>@<?= $record->location_name.', '.$record->city_name.', '.$record->state_name ?></span></div>
-      <div class="row" style="margin-top: 15px;">
+      <div class="text-center" style="font-size: 13px;margin-top: 3px;"><span><i class="fa fa-map-marker"></i> <?= $record->location_name.', '.$record->city_name.', '.$record->state_name ?></span></div>
+      <div class="row d-none" style="margin-top: 15px;">
         <div class="col-md-6 col-xs-6"><label>Size:</label> <strong><?= ($size)?$size:'' ?></strong></div>
         <div class="col-md-6 col-xs-6" align="right"><label>Budget:</label> <strong><?= ($budget)?$budget:'' ?></strong></div>
       </div>
@@ -30,6 +31,41 @@
     </ul>
     <div class="tab-content br-n pn">
       <div id="navtabs-overview" class="tab-pane active">
+        <!-- Table View -->
+         <div class="table-responsive d-none">
+          <table class="table table-bordered">
+            <!-- About Project -->
+            <tr>
+              <th width="20%">About Project</th>
+              <td><?= $record->description ?></td>
+            </tr>
+            <!-- End About Project -->
+
+            <!-- Project Type -->
+            <tr>
+              <th width="20%">Project Type</th>
+              <td><?= $record->description ?></td>
+            </tr>
+            <!-- End Project Type -->
+
+            <!-- Property Type -->
+            <tr>
+              <th width="20%">Property Type</th>
+              <td><?= $record->description ?></td>
+            </tr>
+            <!-- End Property Type -->
+
+            <!-- Unit Type -->
+            <tr>
+              <th width="20%">Unit Type</th>
+              <td><?= $record->accomodation_name ?></td>
+            </tr>
+            <!-- End Unit Type -->
+
+          </table>
+         </div>
+        <!-- End Table View -->
+
         <div class="row">
           <div class="col-md-6">
             <label>Accomodation:</label> <strong><?= $record->accomodation_name ?></strong>

@@ -728,7 +728,9 @@
 
        function get_project_inventory() {
 
-         var product_id = $("#product_id").val();
+         var product_id               = $("#product_id").val();
+         var property_unit_code_id    = $("#property_unit_code_id").val();
+
          if (product_id == "") {
            $(".project_inventory").html("");
            $('.inventory-list-container').html('')
@@ -740,7 +742,8 @@
              type: "POST",
              url: "<?= base_url(AGENT_URL . 'api/get_project_inventory') ?>",
              data: {
-               product_id: product_id
+               product_id: product_id,
+               property_unit_code_id  : property_unit_code_id
              },
              dataType: 'json',
              beforeSend: function(data) {

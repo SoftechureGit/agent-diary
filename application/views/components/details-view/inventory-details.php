@@ -117,10 +117,10 @@ $property_layout_url        =   $property_layout ? base_url("uploads/images/prop
                 <!-- End Facing -->
 
                 <!-- Parking -->
-                <?php if ($parking ?? 0) : ?>
+                <?php if (is_array($parking ?? [])) : ?>
                 <tr>
                     <th>Parking</th>
-                    <td><?= implode(',', $parking ?? [] ) ?></td>
+                    <td><?= implode(', ', array_map('ucwords', $parking) ) ?></td>
                 </tr>
                 <?php endif; ?>
                 <!-- End Parking -->

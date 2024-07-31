@@ -582,7 +582,7 @@ function get_product_list() {
               if (record.product_type_name!="") { action += ((action!='')?', ':'')+record.product_type_name; }
               if (record.unit_type_name!="") { action += ((action!='')?', ':'')+record.unit_type_name; }
 
-              var location = "@ ";
+              var location = "<i class='fa fa-map-marker'></i> ";
               if (record.location_name!="") { location += record.location_name; }
               if (record.city_name!="") { location += ((location!='')?', ':'')+record.city_name; }
               if (record.state_name!="") { location += ((location!='')?', ':'')+record.state_name; }
@@ -596,8 +596,11 @@ html += "<div class='customer' style='border-bottom: 1px solid rgba(0, 0, 0, 0.1
 "    <div class='col-md-12'>"+
 "          <div class='card-text text-muted'>"+location+"</div>"+
 "   </div>"+
-"    <div class='col-md-12'>"+
+"    <div class='col-md-6'>"+
 "          <div class='card-text text-muted'>"+record.bottom_label+"</div>"+
+"   </div>"+
+"    <div class='col-md-6 text-right'>"+
+"          <div class='card-text text-muted'>"+record.created_at+"</div>"+
 "   </div>"+
 "   </div>"+
 "   </div>"+
