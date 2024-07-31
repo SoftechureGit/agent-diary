@@ -153,7 +153,18 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Parking</label>
-                            <input type="text" placeholder="Enter Parking" name="property_details[parking]" value="<?= $parking ?? '' ?>" class="form-control" >
+                            <select name="property_details[parking][]" id="" class="form-select" multiple>
+                                <?php if ($parking_open ?? 0) : ?>
+                                    <option value="open" <?= in_array('open', $parking ?? []) ? 'selected' : '' ?>>Open</option>
+                                <?php endif; ?>
+                                <?php if ($parking_stilt ?? 0) : ?>
+                                    <option value="stilt" <?= in_array('stilt', $parking ?? []) == 'stilt' ? 'selected' : '' ?>>Stilt</option>
+                                <?php endif; ?>
+                                <?php if ($parking_basment ?? 0) : ?>
+                                    <option value="basement" <?= in_array('basement', $parking ?? []) == 'basement' ? 'selected' : '' ?>>Basement</option>
+                                <?php endif; ?>
+
+                            </select>
                         </div>
                     </div>
                     <!-- End Parking -->

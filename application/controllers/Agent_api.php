@@ -4560,7 +4560,7 @@ WHERE lead_id='" . $lead_id . "'
 
             #
             if ($inventory->product_id) :
-                $property               = get_product_details($inventory->product_id);
+                $property               = property($inventory->product_id);
                 if ($property_details->unit_code ?? 0) :
                     $property_accomodation  = getPropertyAccomodations($property->project_type_id, $property->property_type_id, $inventory->product_id, $property_details->unit_code);
                 endif;
@@ -11045,7 +11045,7 @@ WHERE lead_id='" . $lead_id . "'
             $unit_code = $property_details->unit_code ?? 0;
 
             if ($property_id) :
-                $property  = get_product_details($property_id);
+                $property  = property($property_id);
                 $property_accomodation  = getPropertyAccomodations($property->project_type_id ?? 0, $property->property_type_id ?? 0, $property_id, $property_details->unit_code);
                 $data->unit_code_name  = $property_accomodation->unit_code_with_accomodation_name ?? $property_accomodation->inventory_unit_code ?? '';
             endif;

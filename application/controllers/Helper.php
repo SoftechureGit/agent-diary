@@ -98,6 +98,7 @@ class Helper extends CI_Controller
         switch ($form_request_for):
             case 'inventory':
                 $inventory               =  getInventory($id);
+
                 $property_layout            =  $inventory->property_layout ?? null;
                 $property_layout_url     =  ($inventory->property_layout ?? 0) ? base_url("/uploads/images/property/unit/$inventory->property_layout") : null;;
                 $property_details        =  ($inventory->property_details ?? 0) ? json_decode($inventory->property_details ?? []) : $inventory;
@@ -120,20 +121,20 @@ class Helper extends CI_Controller
         if ($property_id ?? 0) :
             if ($property_details) :
                 $property_details->product_id                     =   $property_id;
-                $property_details->product_details                =   get_product_details($property_id);
+                $property_details->product_details                =   property($property_id);
 
                 if ($property_details->product_details ?? 0) :
                     $project_type_id                                    =   $property_details->product_details->project_type_id;
                     $property_type_id                                   =   $property_details->product_details->property_type_id;
                     $property_id                                        =   $property_id;
-                    $property_details->unit_code_with_accomodations   =   getPropertyAccomodations($project_type_id, $property_type_id, $property_id);
+                    $property_details->unit_code_with_accomodations     =   getPropertyAccomodations($project_type_id, $property_type_id, $property_id);
                 endif;
             else :
                 $property_details['product_id']                         =   $property_id;
-                $property_details['product_details']                    =   get_product_details($property_id);
-                if ($property_details['product_details'] ?? 0) :
-                    $project_type_id                                    =   $property_details['product_details']->project_type_id;
-                    $property_type_id                                    =   $property_details['product_details']->property_type_id;
+                $property_details['property_details']                   =   property($property_id);
+                if ($property_details['property_details'] ?? 0) :
+                    $project_type_id                                    =   $property_details['property_details']->project_type_id;
+                    $property_type_id                                    =   $property_details['property_details']->property_type_id;
                     $property_id                                        =   $property_id;
 
 

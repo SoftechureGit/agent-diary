@@ -5,7 +5,6 @@
 if (!function_exists('facings')) {
     function facings()
     {
-
         $records    =   db_instance()
             ->select('*')
             ->where("facing_status = 1")
@@ -58,13 +57,23 @@ if (function_exists('facings')) {
 # End Lead Details
 
 # Get Inventory Details
-function get_product_details($product_id)
+function property($id)
 {
     return db_instance()
-        ->select('product.product_id as id, product.project_name as name, property_type as property_type_id, project_type as project_type_id')
-        ->where("product.product_id='$product_id'")
+        ->select(
+                    'property.product_id as id, 
+                    property.project_name as name, 
+                    property.property_type as property_type_id, 
+                    property.project_type as project_type_id,
+                    property.project_type as project_type_id,
+                    property.parking_open,
+                    property.parking_stilt,
+                    property.parking_basment as parking_basement
+                    '
+                )
+        ->where("property.product_id='$id'")
         // ->join('tbl_product_unit_details as product', "product.")
-        ->get('tbl_products as product')
+        ->get('tbl_products as property')
         ->row();
 }
 # End Get Inventory Details
