@@ -430,7 +430,7 @@ if (!function_exists('getAccountId')) {
         // print_r(sizeUnit()); die;
 
        # Get property information
-            $property_details = get_product_details($property_id);
+            $property_details = property($property_id);
             // print_r($property_details); die;
        # End  Get property information  
 
@@ -562,12 +562,179 @@ if (!function_exists('getAccountId')) {
                 break;
             case '4':
                 $form          =   'shop';
+
+                $excel_sheet[0]['title']                    =  'Shop';
+                $excel_sheet[0]['headers']                  =  ['S.N.', 'Unit Code ( with Accomodations )', 'Referance Number', 'Unit no', 'Floor ', 'Tower' ,'Unit Type' ,'Area' , 'Size Unit' ,'Applicable PLC' , 'Facing' ,'Parking' , 'Layout upload'];
+                $excel_sheet[0]['data'][]                   =  ['', '', '', '', '', ''];
+
+                # unit code
+                   $excel_sheet[1]['title']      = 'Unit Code';  
+                   $excel_sheet[1]['headers']    = ['S.N' ,'Unit Code', 'Code Id' ];  
+                   
+                   $count = 1;
+                   foreach($unit_codes as $unit_code){
+                      $excel_sheet[1]['data'][] = [$count,$unit_code->inventory_unit_code , $unit_code->id] ;
+                      $count++;
+                   } 
+                # end unit code
+
+                # size unit 
+                    $excel_sheet[2]['title']         = 'Size Unit';  
+                    $excel_sheet[2]['headers']       =  ['S.N.', 'Unit', 'Unit Id' ];
+                    $count = 1;
+
+                    foreach(sizeUnits() as $size_unit){
+                    $excel_sheet[2]['data'][] = [$count,$size_unit->unit_name , $size_unit->unit_id] ;
+                    $count++;
+                    } 
+                # end size  unit 
+
+                # facing
+                   $excel_sheet[3]['title']         = 'Facing';
+                   $excel_sheet[3]['headers']       =  ['S.N', 'Title', 'Facing Id'];
+
+                   $count = 1; 
+
+                   foreach(facings() as $facing){
+
+                    $excel_sheet[3]['data'][] = [$count,$facing->title , $facing->facing_id] ;
+                    $count++;
+
+                 } 
+                # end facing   
+
+                      # Applicable PLC
+                  
+                      $excel_sheet[4]['title']         = 'Applicable PLC';  
+                      $excel_sheet[4]['headers']       =  ['S.N.', 'Title', 'PLC ID' ];
+                      $count = 1;
+  
+                      foreach(getPropertyApplicablePlcs($property_id ?? 0) as $ApplicablePlc){
+                      $excel_sheet[4]['data'][] = [$count,$ApplicablePlc->price_component_name , $ApplicablePlc->price_component_id] ;
+                      $count++;
+                      } 
+                      if(count(getPropertyApplicablePlcs($property_id ?? 0)) == 0){
+                          $excel_sheet[4]['data'][] = ['','',''];
+                      }
+                    # end Applicable PLC
+
                 break;
-            case '5':
+            case '5': # Office
                 $form          =   'office';
+                $excel_sheet[0]['title']                    =  'Office';
+                $excel_sheet[0]['headers']                  =  ['S.N.', 'Unit Code ( with Accomodations )', 'Referance Number', 'Unit no', 'Floor ', 'Tower' ,'Unit Type' ,'Area' , 'Size Unit' , 'Facing' ,'Parking' ,'Pentry' , 'Washroom' , 'Layout upload'];
+                $excel_sheet[0]['data'][]                   =  ['', '', '', '', '', ''];
+
+                # unit code
+                   $excel_sheet[1]['title']      = 'Unit Code';  
+                   $excel_sheet[1]['headers']    = ['S.N' ,'Unit Code', 'Code Id' ];  
+                   
+                   $count = 1;
+                   foreach($unit_codes as $unit_code){
+                      $excel_sheet[1]['data'][] = [$count,$unit_code->inventory_unit_code , $unit_code->id] ;
+                      $count++;
+                   } 
+                # end unit code
+
+                # size unit 
+                    $excel_sheet[2]['title']         = 'Size Unit';  
+                    $excel_sheet[2]['headers']       =  ['S.N.', 'Unit', 'Unit Id' ];
+                    $count = 1;
+
+                    foreach(sizeUnits() as $size_unit){
+                    $excel_sheet[2]['data'][] = [$count,$size_unit->unit_name , $size_unit->unit_id] ;
+                    $count++;
+                    } 
+                # end size  unit 
+
+                # facing
+                   $excel_sheet[3]['title']         = 'Facing';
+                   $excel_sheet[3]['headers']       =  ['S.N', 'Title', 'Facing Id'];
+
+                   $count = 1; 
+
+                   foreach(facings() as $facing){
+
+                    $excel_sheet[3]['data'][] = [$count,$facing->title , $facing->facing_id] ;
+                    $count++;
+
+                 } 
+                # end facing   
+
+                      # Applicable PLC
+                  
+                      $excel_sheet[4]['title']         = 'Applicable PLC';  
+                      $excel_sheet[4]['headers']       =  ['S.N.', 'Title', 'PLC ID' ];
+                      $count = 1;
+  
+                      foreach(getPropertyApplicablePlcs($property_id ?? 0) as $ApplicablePlc){
+                      $excel_sheet[4]['data'][] = [$count,$ApplicablePlc->price_component_name , $ApplicablePlc->price_component_id] ;
+                      $count++;
+                      } 
+                      if(count(getPropertyApplicablePlcs($property_id ?? 0)) == 0){
+                          $excel_sheet[4]['data'][] = ['','',''];
+                      }
+                  # end Applicable PLC
+
                 break;
             case '7':
                 $form          =   'builder-floor';
+
+                $excel_sheet[0]['title']                    =  'Builder Floor';
+                $excel_sheet[0]['headers']                  =  ['S.N.', 'Unit Code', 'Referance Number', 'Plot Number', 'Plot Size', 'Size Unit' ,'Floor', 'Block' ,'Applicable PLC' , 'Facing' , 'Dimantion F x B x S1 x S2' ,'Tarrace' , 'Basment' , 'Parking', 'Layout Upload'];
+                $excel_sheet[0]['data'][]                   =  ['', '', '', '', '', ''];
+
+                # unit code
+                   $excel_sheet[1]['title']      = 'Unit Code';  
+                   $excel_sheet[1]['headers']    = ['S.N' ,'Unit Code', 'Code Id' ];  
+                   
+                   $count = 1;
+                   foreach($unit_codes as $unit_code){
+                      $excel_sheet[1]['data'][] = [$count,$unit_code->inventory_unit_code , $unit_code->id] ;
+                      $count++;
+                   } 
+                # end unit code
+
+                # size unit 
+                    $excel_sheet[2]['title']        = 'Size Unit';  
+                    $excel_sheet[2]['headers']       =  ['S.N.', 'Unit', 'Unit Id' ];
+                    $count = 1;
+
+                    foreach(sizeUnits() as $size_unit){
+                    $excel_sheet[2]['data'][] = [$count,$size_unit->unit_name , $size_unit->unit_id] ;
+                    $count++;
+                    } 
+                # end size  unit 
+
+                # facing
+                   $excel_sheet[3]['title']         = 'Facing';
+                   $excel_sheet[3]['headers']       =  ['S.N', 'Title', 'Facing Id'];
+
+                   $count = 1; 
+
+                   foreach(facings() as $facing){
+
+                    $excel_sheet[3]['data'][] = [$count,$facing->title , $facing->facing_id] ;
+                    $count++;
+
+                 } 
+                # end facing   
+
+                      # Applicable PLC
+                  
+                      $excel_sheet[4]['title']         = 'Applicable PLC';  
+                      $excel_sheet[4]['headers']       =  ['S.N.', 'Title', 'PLC ID' ];
+                      $count = 1;
+  
+                      foreach(getPropertyApplicablePlcs($property_id ?? 0) as $ApplicablePlc){
+                      $excel_sheet[4]['data'][] = [$count,$ApplicablePlc->price_component_name , $ApplicablePlc->price_component_id] ;
+                      $count++;
+                      } 
+                      if(count(getPropertyApplicablePlcs($property_id ?? 0)) == 0){
+                          $excel_sheet[4]['data'][] = ['','',''];
+                      }
+                  # end Applicable PLC
+
                 break;
             case '1':
                 $form          =   'apartment';

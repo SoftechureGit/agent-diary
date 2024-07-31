@@ -11558,7 +11558,7 @@ $property_list = $query->result();
                     $Reader = new SpreadsheetReader($data['full_path']);
                     $Sheets = $Reader->Sheets();
 
-                    print_r($Sheets) ; die; 
+                    // print_r($Sheets) ; die; 
 
             
                     foreach ($Sheets as $Index => $Name) {

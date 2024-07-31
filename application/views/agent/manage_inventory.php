@@ -86,9 +86,7 @@
 
                 </div>
               </div>
-
-          
-
+    
               <form method="post" id="inventory-form" enctype="multipart/form-data" autocomplete="off">
                 <div class="form-row">
 
