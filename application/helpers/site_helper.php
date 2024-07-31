@@ -388,7 +388,7 @@ if (!function_exists('getAccountId')) {
     function property_form($property_id, $property_details = null)
     {
         $form          =   '';
-
+        
         switch ($property_id):
             case '2':
                 $form          =   'villa';
@@ -420,7 +420,47 @@ if (!function_exists('getAccountId')) {
             return "<div class='text-center my-3'><h4>Form not available.</h4></div>";
         endif;
     }
+
     # End Get Property Form
+
+    # Get Invetory Excel Form
+
+    function property_excel($property_id){
+
+        $form          =   '';
+
+        switch ($property_id):
+            case '2':
+                $form          =   'villa';
+                break;
+            case '3':
+                $form          =   'plot';
+                break;
+            case '4':
+                $form          =   'shop';
+                break;
+            case '5':
+                $form          =   'office';
+                break;
+            case '7':
+                $form          =   'builder-floor';
+                break;
+            case '1':
+                $form          =   'apartment';
+                break;
+            case '9':
+                $form          =   'apartment';
+                break;
+        endswitch;
+
+        if ($form) :  
+            return inventory_create_sample_file();
+        else :
+            return "<div class='text-center my-3'><h4>Form not available.</h4></div>";
+        endif;
+    }
+
+    # End Invetory Excel Form 
 
     # Project Properties
     function project_properties($project_id)
@@ -481,5 +521,87 @@ if (!function_exists('getAccountId')) {
     }
     ##### End Gallery Images #####
     
+
+     function inventory_create_sample_file(){
+        
+        require_once(APPPATH . 'third_party/PHPExcel/Classes/PHPExcel.php');
+        require_once(APPPATH . 'third_party/PHPExcel/Classes/PHPExcel/IOFactory.php');
+        
+        /* Create new PHPExcel object*/
+        $objPHPExcel = new PHPExcel();
+        $writer = PHPExcel_IOFactory::createWriter($objPHPExcel, "Excel2007");
+        
+        // Function to create a new sheet with specified headers and data
+        function createSheet($objPHPExcel, $index, $title, $headers, $data) {
+            // Create a new sheet
+            $objPHPExcel->createSheet($index);
+            $objPHPExcel->setActiveSheetIndex($index);
+        
+            // Set column dimensions and headers
+            $columnIndex = 'A';
+            foreach ($headers as $header) {
+                $objPHPExcel->getActiveSheet()->getColumnDimension($columnIndex)->setAutoSize(true);
+                $objPHPExcel->getActiveSheet()->setCellValue($columnIndex . '1', $header);
+                $columnIndex++;
+            }
+        
+            // Insert data
+            $row = 2; // Starting row for data
+            foreach ($data as $rowData) {
+                $columnIndex = 'A';
+                foreach ($rowData as $cellData) {
+                    $objPHPExcel->getActiveSheet()->setCellValue($columnIndex . $row, $cellData);
+                    $columnIndex++;
+                }
+                $row++;
+            }
+        
+            // Set sheet title
+            $objPHPExcel->getActiveSheet()->setTitle($title);
+        }
+        
+        // Sheet 1: Leads
+        $headers1 = ['S.N.', 'Unit Code', 'Referance Number', 'Plot Number', 'Plot Size', 'Size Unit' ,'Block' ,'Applicable PLC' , 'Facing' , 'Dimantion F x B x S1 x S2' ,'Layout Upload'];
+        $data1 = [
+            ['', '', '', '', '', ''], // Add your data here
+        ];
+        createSheet($objPHPExcel, 0, 'Plot', $headers1, $data1);
+        
+        // Sheet 2: Sales
+        $headers2 = ['S.N.', 'Unit', 'Unit Id' ];
+
+        $size_units =     sizeUnits();
+
+        // print_r($size_units); die;
+
+        $count = 1;
+        foreach($size_units as $size_unit){
+           $data2[] = [$count,$size_unit->unit_name , $size_unit->unit_id] ;
+           $count++;
+        }    
+
+        createSheet($objPHPExcel, 1, 'Size Unit', $headers2, $data2);
+        
+        // Sheet 3: Inventory
+        $headers3 = ['S.N', 'Title', 'Facing Id'];   
+
+        $count = 1;
+        foreach(facings() as $facing){
+           $data3[] = [$count,$facing->title , $facing->facing_id] ;
+           $count++;
+        } 
+
+        createSheet($objPHPExcel, 2, 'Facing', $headers3, $data3);
+        
+        // Set active sheet back to the first sheet
+        $objPHPExcel->setActiveSheetIndex(0);
+        
+        // Save the spreadsheet
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="download-sample.xlsx"');
+        header('Cache-Control: max-age=0');
+        $writer->save('php://output');
+
+    }
 
 }

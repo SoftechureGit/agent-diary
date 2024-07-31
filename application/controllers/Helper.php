@@ -124,7 +124,7 @@ class Helper extends CI_Controller
 
                 if ($property_details->product_details ?? 0) :
                     $project_type_id                                    =   $property_details->product_details->project_type_id;
-                    $property_type_id                                    =   $property_details->product_details->property_type_id;
+                    $property_type_id                                   =   $property_details->product_details->property_type_id;
                     $property_id                                        =   $property_id;
                     $property_details->unit_code_with_accomodations   =   getPropertyAccomodations($project_type_id, $property_type_id, $property_id);
                 endif;
@@ -394,6 +394,18 @@ class Helper extends CI_Controller
     # End Delete Lead
 
 
+    # get invetory file sample 
+        public function get_invetory_sample_file(){
+
+            # post data
+                $property_id                    = $this->input->get('property_id');
+           # end post data
+
+          echo  property_excel($property_id);
+           
+
+        }
+    # end  get invetory file sample 
 
 
 }

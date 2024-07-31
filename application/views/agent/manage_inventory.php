@@ -87,6 +87,8 @@
                 </div>
               </div>
 
+          
+
               <form method="post" id="inventory-form" enctype="multipart/form-data" autocomplete="off">
                 <div class="form-row">
 
@@ -113,6 +115,26 @@
                 </div>
               </form>
 
+              <div class="col-md-12">
+
+                <!-- Add Inventory -->
+                <div class="add-inventory-container d-none">
+                  <div class="text-right">
+
+                    <button type="button" class="btn btn-success" onclick="downloadSample()">
+                        Download Sample File
+                    </button>
+                    <button type="button" class="btn btn-dark">
+                        Upload Excel File
+                    </button>
+                    <button type="button" class="btn btn-primary add-edit-inventory">
+                        Add Inventory
+                    </button>
+
+                  </div>
+                </div>
+                <!-- End Add Inventory -->
+                </div>
 
               <!-- Add Inventory -->
               <div class="add-inventory-container">
@@ -122,19 +144,7 @@
 
                     </div>
                   </div>
-                  <div class="col-md-12">
-
-                    <!-- Add Inventory -->
-                    <div class="add-inventory-container d-none">
-                      <div class="text-right">
-
-                        <button type="button" class="btn btn-primary add-edit-inventory">
-                          Add Inventory
-                        </button>
-                      </div>
-                    </div>
-                    <!-- End Add Inventory -->
-                  </div>
+            
                 </div>
               </div>
               <!-- End Add Inventory -->
@@ -446,4 +456,20 @@
     // End Fetch Data
   }
   /** End Delete Inventory Details */
+
+  // download sample file 
+
+  function downloadSample(){
+
+    var id = $(this).data('id');
+    var builder_id = $('#builder_id').val();
+    var property_id = $('#product_id').val();
+    var property_type_id = $('#product_id option:selected').data('property-type-id');
+   
+    window.location.href = "<?= base_url('helper/get_invetory_sample_file') ?>" +'?property_id='+property_id;
+    
+  }
+
+  // end download sample file 
+
 </script>
