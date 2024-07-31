@@ -2544,9 +2544,9 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 $user_ids = $this->get_level_user_ids();
 
                 if (count($user_ids)) {
-
                     $where_ids .= " AND (tbl_users.user_id='" . implode("' OR tbl_users.user_id='", $user_ids) . "')";
                 }
+                
                 $where .= $where_ids;
 
                 $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,user_title,first_name,last_name,parent_id,is_individual,firm_name');
