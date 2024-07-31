@@ -2038,6 +2038,8 @@ class Api extends CI_Controller {
                 echo json_encode($array);
                 exit;
             }
+
+            $profile_base_url           =   base_url('public/other/profile/');
     
             $id = $this->input->post('lead_id');
     
@@ -2058,6 +2060,7 @@ class Api extends CI_Controller {
             $record = $query->row();
     
             if ($record) {
+                $record->full_profile_url = $record->profile ? $profile_base_url.$record->profile : base_url('public/front/user.png');
                 // Fetch previous lead ID
                 $this->db->select('lead_id');
                 $this->db->from('tbl_leads');
@@ -2764,12 +2767,12 @@ class Api extends CI_Controller {
                        $next_page = $page + 1;
                    }
    
-                   $array = array('status' => 'success', 'message' => 'Lead Found', 'records' => $records, 'total_records' => $total_records, 'total_pages' => $total_pages, 'next_page' => $next_page, 'records' => $records);
+                   $array = array('status' => 'true', 'message' => 'Lead Found', 'records' => $records, 'total_records' => $total_records, 'total_pages' => $total_pages, 'next_page' => $next_page, 'records' => $records);
                } else {
-                   $array = array('status' => 'error', 'message' => 'No Leads');
+                   $array = array('status' => 'false', 'message' => 'No Leads');
                }
            } else {
-               $array = array('status' => 'error', 'message' => 'Some error occurred, please try again.');
+               $array = array('status' => 'false', 'message' => 'Some error occurred, please try again.');
            }
    
            echo json_encode($array);
@@ -11266,8 +11269,10 @@ $property_list = $query->result();
              // $id = $this->input->post('lead_id');
      
              $where = "lead_id='" . $current_lead_id . "' AND account_id='" . $account_id . "'";
+
+             $profile_base_url     =   base_url('public/other/profile/');
      
-             $this->db->select("tbl_users.username as added_by_name, tbl_leads.*, tbl_states.*, tbl_city.*, tbl_occupations.*, tbl_lead_types.*, tbl_lead_stages.*, tbl_lead_sources.*, tbl_designations.*");
+             $this->db->select("tbl_users.username as added_by_name, tbl_leads.* ,tbl_states.*, tbl_city.*, tbl_occupations.*, tbl_lead_types.*, tbl_lead_stages.*, tbl_lead_sources.*, tbl_designations.*");
              $this->db->from('tbl_leads');
              $this->db->join('tbl_states', 'tbl_states.state_id = tbl_leads.lead_state_id', 'left');
              $this->db->join('tbl_city', 'tbl_city.city_id = tbl_leads.lead_city_id', 'left');
@@ -11282,8 +11287,8 @@ $property_list = $query->result();
              $record = $query->row();
      
              if ($record) {
-                 
-                 # start
+                 # start   
+                 $record->full_profile_url = $record->profile ? $profile_base_url.$record->profile : base_url('public/front/user.png'); 
                  
                  // Fetch previous lead ID
                  $this->db->select('lead_id');
@@ -11310,7 +11315,6 @@ $property_list = $query->result();
                  # end 
                  
                  
-     
                  $where = "user_status='1' AND ((parent_id='" . $account_id . "') OR (user_id='" . $account_id . "' AND role_id='2'))";
                  $where_ids = "";
                  $user_ids = $this->get_level_user_ids($this->input->post('user_hash'));
@@ -11325,6 +11329,7 @@ $property_list = $query->result();
                  $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,user_title,first_name,last_name,parent_id,is_individual,firm_name');
      
                  $lead_data = array();
+
                  foreach ($user_list as $row) {
                      $row->is_individual = (($row->is_individual != '') ? $row->is_individual : "");
                      $row->firm_name = (($row->firm_name != '') ? $row->firm_name : "");
@@ -11388,7 +11393,10 @@ $property_list = $query->result();
                            foreach ($record_p as $k => $v) {
                              $record_p->$k = ($v || $v == 0) ? $v : '';
                              } 
+                             $record_p->full_profile_url = $record_p->profile ? $profile_base_url.$record_p->profile : base_url('public/front/user.png');
                          }
+
+
                          
                      
                  }
@@ -11415,11 +11423,13 @@ $property_list = $query->result();
                          $record_n = $query->row();
                          
                          if($record_n){
-                           foreach ($record_n as $k => $v) {
-                               
-                             $record_n->$k = ($v || $v == 0) ? $v : '';
-                             
+
+                           foreach ($record_n as $k => $v) {     
+                                $record_n->$k = ($v || $v == 0) ? $v : '';   
                              } 
+
+                             $record_n->full_profile_url = $record_n->profile ? $profile_base_url.$record_n->profile : base_url('public/front/user.png');
+
                          }        
                  }
                  

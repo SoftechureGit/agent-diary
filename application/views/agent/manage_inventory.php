@@ -115,13 +115,13 @@
                 </div>
               </form>
 
-              <div class="col-md-12">
+              <div class="col-md-12 mb-4 px-0">
 
                 <!-- Add Inventory -->
                 <div class="add-inventory-container d-none">
                   <div class="text-right">
 
-                    <button type="button" class="btn btn-success" onclick="downloadSample()">
+                    <button type="button" class="btn btn-success text-white" onclick="downloadSample()">
                         Download Sample File
                     </button>
                     <button type="button" class="btn btn-dark">
