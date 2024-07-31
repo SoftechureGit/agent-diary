@@ -122,14 +122,14 @@
                     </div>
                     <!-- End Facing -->
 
-                    <!-- Dimantion F x B x S1 x S2 -->
+                    <!-- dimension F x B x S1 x S2 -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Dimantion F x B x S1 x S2</label>
-                            <input type="text" placeholder="Enter Dimantion F x B x S1 x S2" name="property_details[dimantion]" value="<?= $dimantion ?? '' ?>" class="form-control" >
+                            <label for="">dimension F x B x S1 x S2</label>
+                            <input type="text" placeholder="Enter dimension F x B x S1 x S2" name="property_details[dimension]" value="<?= $dimension ?? '' ?>" class="form-control" >
                         </div>
                     </div>
-                    <!-- End Dimantion F x B x S1 x S2 -->
+                    <!-- End dimension F x B x S1 x S2 -->
 
                     <!-- Tarrace -->
                     <div class="col-md-4">

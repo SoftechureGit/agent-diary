@@ -120,7 +120,7 @@ $property_layout_url        =   $property_layout ? base_url("uploads/images/prop
                 <?php if ($parking ?? 0) : ?>
                 <tr>
                     <th>Parking</th>
-                    <td><?= $parking ?? '' ?></td>
+                    <td><?= implode(',', $parking ?? [] ) ?></td>
                 </tr>
                 <?php endif; ?>
                 <!-- End Parking -->
