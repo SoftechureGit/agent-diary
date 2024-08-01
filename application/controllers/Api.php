@@ -11741,7 +11741,7 @@ $property_list = $query->result();
 
 
 
-        $page   = 1 ;
+        $page   = $this->input()->post('page') ?? 1 ;
         $limit  = 10 ;
         $join   = array('tbl_leads', 'tbl_leads.data_id=tbl_data.data_id', 'tbl_users', 'tbl_users.user_id=tbl_leads.user_id', 'tbl_lead_stages', 'tbl_lead_stages.lead_stage_id=tbl_leads.lead_stage_id', 'tbl_followup as followup', 'followup.lead_id = tbl_leads.lead_id');
         $where  = $searchQuery;
