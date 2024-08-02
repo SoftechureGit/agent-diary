@@ -82,7 +82,7 @@ class Helper extends CI_Controller
     # Get Property Form
     public function get_property_form()
     {
-        $id                             = $this->input->get('id');
+        $lead_or_inventory_id                             = $this->input->get('id');
         $property_type_id               = $this->input->get('property_type_id');
         $property_id                    = $this->input->get('property_id');
         $selected_property_id           = $this->input->get('selected_property_id');
@@ -97,26 +97,27 @@ class Helper extends CI_Controller
 
         switch ($form_request_for):
             case 'inventory':
-                $inventory               =  getInventory($id);
+                $inventory               =  getInventory($lead_or_inventory_id);
 
                 $property_layout            =  $inventory->property_layout ?? null;
                 $property_layout_url     =  ($inventory->property_layout ?? 0) ? base_url("/uploads/images/property/unit/$inventory->property_layout") : null;;
                 $property_details        =  ($inventory->property_details ?? 0) ? json_decode($inventory->property_details ?? []) : $inventory;
+
                 break;
 
             default:
                 if ($property_id && $selected_property_id != $property_id) :
                     $property_details               =   project_property_details($property_type_id, $property_id);
-                elseif ($id) :
-                    $lead_unit_details               = lead_unit_details($id);
+                elseif ($lead_or_inventory_id) :
+                    $lead_unit_details               = lead_unit_details($lead_or_inventory_id);
                     $property_details                = $lead_unit_details->property_details ?? null;
                 endif;
                 break;
         endswitch;
 
         # Additional
-        if ($id ?? 0) :
-            $property_details->id                           =   $id;
+        if ($lead_or_inventory_id ?? 0) :
+            $property_details->lead_or_inventory_id                           =   $lead_or_inventory_id;
         endif;
         if ($property_id ?? 0) :
             if ($property_details) :
@@ -143,9 +144,6 @@ class Helper extends CI_Controller
             endif;
         endif;
         # Additional
-
-        // print_r($property_details);
-        // die;
 
         $form_view                      =   property_form($property_type_id, $property_details ?? null);
 
