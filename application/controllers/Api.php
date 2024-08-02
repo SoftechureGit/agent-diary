@@ -11794,11 +11794,12 @@ $property_list = $query->result();
     
     
             $transfer_lead_ids =  $this->input->post('selected_lead_ids');
-            $transfer_lead_ids = explode(',', $transfer_lead_ids);
+            // $transfer_lead_ids = explode(',', $transfer_lead_ids);
             $assign_to = $this->input->post('transfer_to');
 
+            
 
-            if($this->input->post('selected_lead_ids') && count($transfer_lead_ids) > 0 ){
+            if( count($transfer_lead_ids) > 0 ){
             foreach ($transfer_lead_ids as   $transfer_lead_id) {
                 $raw_data =     $this->db->select('*')->where('data_id', $transfer_lead_id)->get('tbl_data')->row();
     
