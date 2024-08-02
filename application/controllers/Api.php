@@ -11743,7 +11743,7 @@ $property_list = $query->result();
 
         $page   = $this->input->post('page') ?? 1 ;
         $limit  = 10 ;
-        $join   = array('tbl_leads', 'tbl_leads.data_id=tbl_data.data_id', 'tbl_users', 'tbl_users.user_id=tbl_leads.user_id', 'tbl_lead_stages', 'tbl_lead_stages.lead_stage_id=tbl_leads.lead_stage_id', 'tbl_followup as followup', 'followup.lead_id = tbl_leads.lead_id');
+        $join   = array('tbl_leads', 'tbl_leads.data_id=tbl_data.data_id', 'tbl_users', 'tbl_users.user_id=tbl_leads.user_id', 'tbl_lead_stages', 'tbl_lead_stages.lead_stage_id=tbl_leads.lead_stage_id', '(SELECT * FROM tbl_followup WHERE followup_id IN (SELECT MAX(followup_id) FROM tbl_followup GROUP BY lead_id))  as followup', 'followup.lead_id = tbl_leads.lead_id');
         $where  = $searchQuery;
         $select = "tbl_data.data_id,CONCAT(data_first_name,' ',data_last_name) as data_name, data_mobile as mobile  ,data_status as  status , file_name , data_reason as reason , tbl_leads.lead_id, tbl_leads.lead_stage_id, , tbl_users.user_id, concat(tbl_users.user_title, ' ',tbl_users.first_name, ' ',tbl_users.last_name) as assigned_user_full_name,tbl_lead_stages.lead_stage_name,followup.comment as followup_comment";
 
