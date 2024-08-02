@@ -1,4 +1,10 @@
-<?php extract($property_details?? []); ?>
+<?php
+if(is_object($property_details ?? null)):
+    extract((array) $property_details ?? []);
+elseif(is_array($property_details ?? null)):
+    extract($property_details ?? []);
+endif;
+?>
 <!-- Builder Floor Details -->
 <section id="builder-floor-property-form" class="theme-form">
 <input type="hidden" name="property_details[id]" value="<?= $id ?? 0 ?>" class="id">

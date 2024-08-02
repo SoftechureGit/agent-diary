@@ -1,5 +1,9 @@
 <?php
-extract($property_details?? []);
+if(is_object($property_details ?? null)):
+    extract((array) $property_details ?? []);
+elseif(is_array($property_details ?? null)):
+    extract($property_details ?? []);
+endif;
 ?>
 <!-- Shop Details -->
 <section id="shop-property-form" class="theme-form">

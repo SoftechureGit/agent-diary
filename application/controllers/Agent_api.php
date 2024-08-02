@@ -4815,6 +4815,7 @@ WHERE lead_id='" . $lead_id . "'
         if ($this->input->post()) {
             $builder_id = $this->input->post('builder_id');
             $where = "tbl_products.agent_id='" . $account_id . "' AND tbl_products.builder_id='" . $builder_id . "'";
+            
             $product_data = $this->Action_model->detail_result('tbl_products', $where, 'product_id,project_name, property_type as property_type_id');
             if ($product_data) {
                 $product_list = $product_data;

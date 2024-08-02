@@ -1,4 +1,10 @@
-<?php extract($property_details?? []); ?>
+<?php
+if(is_object($property_details ?? null)):
+    extract((array) $property_details ?? []);
+elseif(is_array($property_details ?? null)):
+    extract($property_details ?? []);
+endif;
+?>
 <!-- Office Details -->
 <section id="office-property-form" class="theme-form">
 

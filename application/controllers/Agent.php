@@ -1014,12 +1014,15 @@ class Agent extends CI_Controller
 
             $builder_list = array();
             $where = "tbl_products.agent_id='" . $account_id . "'";
+            // $this->db->distinct();
             $this->db->select("tbl_builders.builder_id,tbl_builders.firm_name");
             $this->db->from('tbl_products');
             $this->db->join('tbl_builders', 'tbl_builders.builder_id = tbl_products.builder_id');
             $this->db->where($where);
             $query = $this->db->get();
+
             $builder_data = $query->result();
+            
             if ($builder_data) {
                 $builder_list  = $builder_data;
             }
