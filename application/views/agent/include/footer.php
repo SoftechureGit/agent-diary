@@ -766,7 +766,6 @@
 
        //  
        $(document).on('change', '[name="property_details[unit_code]"]', function() {
-        console.log($('#modal-inventory-form [name="property_details[id]"]').val())
          if ($('#modal-inventory-form [name="property_details[id]"]').val() != '') {
            return false;
          }
