@@ -11782,6 +11782,13 @@ $property_list = $query->result();
 
             $this->db->insert('tbl_get_all_data_json' , $data);
 
+
+            // $old_data = $this->db->get('tbl_get_all_data_json')->row();  
+            
+          
+
+            // print_r(json_decode(explode(',' ,json_decode($old_data->json_data)->selected_lead_ids)[0])); die;
+
         
             // echo '<pre>';
             // print_r($user_detail); die;  
@@ -11805,7 +11812,7 @@ $property_list = $query->result();
 
             if( count($transfer_lead_ids) > 0 ){
             foreach ($transfer_lead_ids as   $transfer_lead_id) {
-                $raw_data =     $this->db->select('*')->where('data_id', $transfer_lead_id)->get('tbl_data')->row();
+                $raw_data =     $this->db->select('*')->where('data_id', json_decode($transfer_lead_id))->get('tbl_data')->row();
     
     
                 if ($raw_data) {
