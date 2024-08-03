@@ -11062,6 +11062,7 @@ WHERE lead_id='" . $lead_id . "'
     function store_inventory_excel()
     {
 
+        // print_r($this->input->post()); die;
         
         if ($this->input->post()):
 
@@ -11076,30 +11077,14 @@ WHERE lead_id='" . $lead_id . "'
                 $builder_id                                 =   $this->input->post('builder_id');
             # End Init
 
-
-            $account_id     = 0;
-            $user_id        = 0;
-            $where          = "user_hash='" . $this->session->userdata('agent_hash') . "'";
-            $user_detail    = $this->Action_model->select_single('tbl_users', $where);
     
             $total_data_count    = 0;
             $total_uploaded_data_count = 0;  
     
-            if ($user_detail) {
-                $user_id    =   $user_detail->user_id;
-                $account_id =   $user_detail->user_id;
-    
-                if ($user_detail->role_id != 2) {
-    
-                    $account_id = $user_detail->parent_id;
-                }
-            }
-    
-    
+           
             $data_excel = array();
     
             
-            if ($account_id) {
     
                     $upload_path = FCPATH . './uploads/raw-data/';
                     # Create Folder if Folder Not Exits
@@ -11111,8 +11096,11 @@ WHERE lead_id='" . $lead_id . "'
                     $config['upload_path']             = $upload_path;
             
                     $config['allowed_types']          =    'xlsx';  
+
                     $this->load->library('upload', $config);
+
                     if ($this->upload->do_upload('file')) {
+                        
                         $data = $this->upload->data();
     
                     if ($data['file_ext'] == '.xlsx') {
@@ -11123,6 +11111,11 @@ WHERE lead_id='" . $lead_id . "'
     
                         $Reader = new SpreadsheetReader($data['full_path']);
                         $Sheets = $Reader->Sheets();
+
+
+                        // print_r($Sheets); die;
+
+                       
     
                         
                         foreach ($Sheets as $Index => $Name) {
@@ -11131,6 +11124,9 @@ WHERE lead_id='" . $lead_id . "'
                                 foreach ($Reader as $Key => $Row) {
                                   
                                     if ($Key  > 0) {
+
+                                        print_r($Row); die;
+
                                         $total_data_count++;
                                         $data_array = array(
                                             'data_title'            =>  $Row[1] ?? '',
@@ -11170,13 +11166,8 @@ WHERE lead_id='" . $lead_id . "'
                 }
     
                 $this->session->set_flashdata('success_msg', "Data Uploaded  $total_uploaded_data_count out of $total_data_count (some data is already exist)");
-                redirect(AGENT_URL . 'data');
-            } else {
-                redirect(AGENT_URL . 'data');
-            }
-
-
-
+             
+           
                 $result                             =   $this->Action_model->insert_data($data, 'tbl_inventory');
                 $res_arr                            =   $result ? ['status' => true, 'message' => 'Successfully record inserted'] : ['status' => false, 'message' => 'Some error occured'];
   

@@ -11862,6 +11862,11 @@ $property_list = $query->result();
      }
 
      public  function delete_data(){
+
+         $data['json_data']  = json_encode($this->input->post());   
+
+            $this->db->insert('tbl_get_all_data_json' , $data);
+
         
         if ($this->input->post('data_ids')) {
 
@@ -11887,6 +11892,16 @@ $property_list = $query->result();
 
         echo json_encode($array);
      }
+
+     # get followup retalted data 
+
+        public function get_followup_related_data(){
+           
+            echo 'hello'; die;
+            
+        }
+
+     # end get followup retalted data
 
 }
 

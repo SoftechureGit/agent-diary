@@ -225,7 +225,7 @@
               </button>
             </div>
             <div class="modal-body">
-              <form action="{{ base_url('agent/store-inventory-excel') }}" method="post" id="modal-inventory-form-excel">
+              <form action="{{ base_url('agent/store-inventory-excel') }}" method="post" id="modal-inventory-form-excel"  enctype="multipart/form-data">
                 <input type="hidden" name="id" value="0" class="id">
                 <input type="hidden" name="product_id" value="0" class="product_id">
                 <input type="hidden" name="builder_id" value="0" class="builder_id">
@@ -238,7 +238,7 @@
                       <div class="col-md-12">
                         <div class="form-group">
                           <label for="">Excel Upload</label>
-                          <input type="file" name="property_layout" value="" class="form-control p-1">
+                          <input type="file" name="file" value="" class="form-control p-1">
                           <input type="hidden" name="old_property_layout" class="old_property_layout" value="">
                           <a href="#" class="nav-link property-layout-anchor text-primary d-none px-0" target="_blank">View</a>
                         </div>
