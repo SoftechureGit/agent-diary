@@ -11057,6 +11057,30 @@ WHERE lead_id='" . $lead_id . "'
     }
     # End Store Inventory
 
+
+    # Upload Invetory by excel
+    function store_inventory_excel()
+    {
+        if ($this->input->post()) :
+            if (!$this->input->post()) :
+                echo json_encode(['status' => false, 'message' => 'Reqeust method is not POST']);
+            endif;
+
+            $res_arr                                    =   [];
+
+            # Init
+                $product_id                                 =   $this->input->post('product_id');
+                $builder_id                                 =   $this->input->post('builder_id');
+            # End Init
+
+                $result                             =   $this->Action_model->insert_data($data, 'tbl_inventory');
+                $res_arr                            =   $result ? ['status' => true, 'message' => 'Successfully record inserted'] : ['status' => false, 'message' => 'Some error occured'];
+  
+            echo json_encode($res_arr);
+        endif;
+    }
+    # End  Upload Invetory by excel
+
     # Get Inventory Details
     public function get_inventory_details()
     {

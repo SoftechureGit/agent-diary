@@ -122,7 +122,7 @@
                     <button type="button" class="btn btn-success text-white" onclick="downloadSample()">
                         Download Sample File
                     </button>
-                    <button type="button" class="btn btn-dark">
+                    <button type="button" class="btn btn-dark uplaod-excel-file-invetory">
                         Upload Excel File
                     </button>
                     <button type="button" class="btn btn-primary add-edit-inventory">
@@ -174,7 +174,7 @@
         </button>
       </div>
       <div class="modal-body">
-        <form action="{{ base_url('agent/store-inventory') }}" method="post" id="modal-inventory-form">
+        <form action="<?= base_url('agent/store-inventory') ?>" method="post" id="modal-inventory-form">
           <input type="hidden" name="id" value="0" class="id">
           <input type="hidden" name="product_id" value="0" class="product_id">
           <input type="hidden" name="builder_id" value="0" class="builder_id">
@@ -214,6 +214,53 @@
                 ***********************************-->
 
 
+ <!-- upload excel invetory  -->
+      <div class="modal fade" id="add-edit-inventory-Modal-excel" role="dialog" aria-labelledby="add-edit-inventory-ModalLabel-excel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-md" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="add-edit-inventory-ModalLabel-excel">Upload Inventory</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form action="{{ base_url('agent/store-inventory-excel') }}" method="post" id="modal-inventory-form">
+                <input type="hidden" name="id" value="0" class="id">
+                <input type="hidden" name="product_id" value="0" class="product_id">
+                <input type="hidden" name="builder_id" value="0" class="builder_id">
+               
+
+
+                <div class="row">
+                  <div class="container">
+                    <!-- Layout Upload -->
+                      <div class="col-md-12">
+                        <div class="form-group">
+                          <label for="">Excel Upload</label>
+                          <input type="file" name="property_layout" value="" class="form-control p-1">
+                          <input type="hidden" name="old_property_layout" class="old_property_layout" value="">
+                          <a href="#" class="nav-link property-layout-anchor text-primary d-none px-0" target="_blank">View</a>
+                        </div>
+                      </div>
+                    <!-- End Layout Upload -->
+
+                    <!-- Submit Button -->
+                    <div class="col-md-12">
+                      <div class="text-center mb-2">
+                        <button type="submit" class="btn btn-primary submit-btn">Uplaod</button>
+                      </div>
+                    </div>
+                    <!-- End Submit Button -->
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>               
+ 
+ <!-- end uplaod excel invetory -->
 
 
 
@@ -396,6 +443,70 @@
     /*  End Lead Unit Form */
   })
   // End add-edit-inventory
+
+
+   // upload excle-inventory
+   $(document).on('click', '.uplaod-excel-file-invetory', function() {
+    var id = $(this).data('id');
+    var builder_id = $('#builder_id').val();
+    var property_id = $('#product_id').val();
+    var property_type_id = $('#product_id option:selected').data('property-type-id');
+
+    $('#add-edit-inventory-Modal-excel').modal('show')
+    getPropertyForm(id, property_type_id, property_id, 0, 0, 'inventory');
+
+    setTimeout(function() {
+      $('#modal-inventory-form .product_id').val(property_id)
+      $('#modal-inventory-form .builder_id').val(builder_id)
+      $('#modal-inventory-form .id').val(id)
+    }, 100)
+
+    /*  Lead Unit Form */
+    $('#modal-inventory-form').validate({
+      rules: {},
+      messages: {},
+      submitHandler: function(form) {
+        var myform = document.getElementById("modal-inventory-form");
+        var fd = new FormData(myform);
+
+        $.ajax({
+          type: "POST",
+          url: "<?= base_url('agent_api/store_inventory') ?>",
+          data: fd,
+          dataType: 'json',
+          cache: false,
+          processData: false,
+          contentType: false,
+          beforeSend: function(data) {
+            $(".error-msg").html('');
+            $(".submit-btn").html("Please wait...").prop('disabled', true);
+          },
+          success: function(res) {
+            if (res.status) {
+              $('#modal-inventory-form')[0].reset()
+              $('#add-edit-inventory-Modal-excel').modal('hide')
+              get_project_inventory()
+              // $('.ajax-msg').html(`<div class="alert alert-success">${res.message}</div>`)
+
+              showToast('success', res.message)
+            } else {
+              // $('.ajax-msg').html(`<div class="alert alert-danger">${res.message}</div>`)
+              showToast('danger', res.message)
+            }
+            $(".submit-btn").html("Submit").prop('disabled', false);
+          },
+          error: function() {
+
+          }
+
+        });
+
+      }
+    });
+    /*  End Lead Unit Form */
+  })
+  // End add-edit-inventory
+
 
 
 
