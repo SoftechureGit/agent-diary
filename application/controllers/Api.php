@@ -11778,9 +11778,9 @@ $property_list = $query->result();
             $where          = "user_hash='" .$this->input->post('user_hash') . "'";
             $user_detail    = $this->Action_model->select_single('tbl_users', $where);
 
-            $data['json_data']  = json_encode($this->input->post());   
+            // $data['json_data']  = json_encode($this->input->post());   
 
-            $this->db->insert('tbl_get_all_data_json' , $data);
+            // $this->db->insert('tbl_get_all_data_json' , $data);
 
 
             // $old_data = $this->db->get('tbl_get_all_data_json')->row();  
