@@ -86,7 +86,7 @@
 
                 </div>
               </div>
-    
+
               <form method="post" id="inventory-form" enctype="multipart/form-data" autocomplete="off">
                 <div class="form-row">
 
@@ -120,19 +120,19 @@
                   <div class="text-right">
 
                     <button type="button" class="btn btn-success text-white" onclick="downloadSample()">
-                        Download Sample File
+                      Download Sample File
                     </button>
                     <button type="button" class="btn btn-dark">
-                        Upload Excel File
+                      Upload Excel File
                     </button>
                     <button type="button" class="btn btn-primary add-edit-inventory">
-                        Add Inventory
+                      Add Inventory
                     </button>
 
                   </div>
                 </div>
                 <!-- End Add Inventory -->
-                </div>
+              </div>
 
               <!-- Add Inventory -->
               <div class="add-inventory-container">
@@ -142,7 +142,7 @@
 
                     </div>
                   </div>
-            
+
                 </div>
               </div>
               <!-- End Add Inventory -->
@@ -174,7 +174,7 @@
         </button>
       </div>
       <div class="modal-body">
-        <form action="{{ base_url('agent/store-inventory') }}" method="post" id="modal-inventory-form">
+        <form action="#" method="post" id="modal-inventory-form">
           <input type="hidden" name="id" value="0" class="id">
           <input type="hidden" name="product_id" value="0" class="product_id">
           <input type="hidden" name="builder_id" value="0" class="builder_id">
@@ -267,7 +267,7 @@
     });
   }
 
- 
+
 
   function alertMessage(type, message) {
     if (type == 'error') {
@@ -423,7 +423,7 @@
 
   })
 
-  
+
 
   /** Delete Inventory Details */
   function delete_inventory_details(id) {
@@ -457,17 +457,16 @@
 
   // download sample file 
 
-  function downloadSample(){
+  function downloadSample() {
 
     var id = $(this).data('id');
     var builder_id = $('#builder_id').val();
     var property_id = $('#product_id').val();
     var property_type_id = $('#product_id option:selected').data('property-type-id');
-   
-    window.location.href = "<?= base_url('helper/get_invetory_sample_file') ?>" +'?property_id='+property_id;
-    
+
+    window.location.href = "<?= base_url('helper/get_invetory_sample_file') ?>" + '?property_id=' + property_id;
+
   }
 
   // end download sample file 
-
 </script>

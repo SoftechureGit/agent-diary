@@ -11048,6 +11048,19 @@ WHERE lead_id='" . $lead_id . "'
                 $res_arr                            =   $result ? ['status' => true, 'message' => 'Successfully record updated'] : ['status' => false, 'message' => 'Some error occured'];
             else :
                 $result                             =   $this->Action_model->insert_data($data, 'tbl_inventory');
+                    
+                if($result):
+                    $property_details['id']         =   $result;
+                   
+                    $property_details               =   $property_details ? json_encode($property_details) : NULL;
+
+                    $data                                   =   [
+                                                                    'property_details'      =>  $property_details,
+                                                                ];
+                    $result                             =   $this->Action_model->update_data($data, 'tbl_inventory', "inventory_id = $result");
+                endif;
+
+
                 $res_arr                            =   $result ? ['status' => true, 'message' => 'Successfully record inserted'] : ['status' => false, 'message' => 'Some error occured'];
             endif;
 

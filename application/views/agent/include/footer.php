@@ -728,8 +728,8 @@
 
        function get_project_inventory() {
 
-         var product_id               = $("#product_id").val();
-         var property_unit_code_id    = $("#property_unit_code_id").val();
+         var product_id = $("#product_id").val();
+         var property_unit_code_id = $("#property_unit_code_id").val();
 
          if (product_id == "") {
            $(".project_inventory").html("");
@@ -743,7 +743,7 @@
              url: "<?= base_url(AGENT_URL . 'api/get_project_inventory') ?>",
              data: {
                product_id: product_id,
-               property_unit_code_id  : property_unit_code_id
+               property_unit_code_id: property_unit_code_id
              },
              dataType: 'json',
              beforeSend: function(data) {
@@ -765,70 +765,133 @@
 
 
        //  
+
        $(document).on('change', '[name="property_details[unit_code]"]', function() {
-         if ($('#modal-inventory-form [name="property_details[id]"]').val() != '') {
+
+        if ($('#modal-inventory-form [name="property_details[id]"]').val() != '') {
            return false;
          }
-         getPropertyUnitDetails({
-           'id': this.value
-         })
+
+        //  if ($('#modal-inventory-form [name="property_details[unit_code]"]').data('selected_id') == this.value) {
+        //    var inventory_id = $('#modal-inventory-form [name="property_details[id]"]').val()
+
+        //    getInventory({
+        //      'id': inventory_id
+        //    })
+        //  } 
+        //  else {
+           getPropertyUnitDetails({
+             'id': this.value
+           })
+        //  }
        })
 
        function getPropertyUnitDetails({
          id = 0
        }) {
          $.ajax({
-             post: 'GET',
-             url: "<?= base_url('helper/get_property_unit_details'); ?>",
-             data: {
-               id: id
-             },
-             dataType: 'json',
-             success: (res) => {
-               if (res.status) {
+           post: 'GET',
+           url: "<?= base_url('helper/get_property_unit_details'); ?>",
+           data: {
+             id: id
+           },
+           dataType: 'json',
+           success: (res) => {
+             if (res.status) {
 
-                 /** Additional PLC */
-                 var additional_plc_ids = null;
+               /** Parking */
+               var parkings = [];
 
-                 if (res.data['additional_plc'].length) {
-                   additional_plc_ids = $.map(res.data['additional_plc'], function(item) {
-                     return item.id;
-                   });
-
-                   if (additional_plc_ids) {
-                     $(`#modal-inventory-form select[name="property_details[applicable_plc][]"]`).val(additional_plc_ids).trigger('change');
-                   }
-                 }
-                 /** End Additional PLC */
-
-                 /** Parking */
-                 var parkings  = [];
-
-                 if (res.data['parkings'].parking_open) {
-                   parkings[0] = 'open';
-                 }
-
-                 if (res.data['parkings'].parking_stilt) {
-                   parkings[1] = 'stilt';
-                 }
-
-                 if (res.data['parkings'].parking_basement) {
-                   parkings[1] = 'basement';
-                 }
-                 if (parkings.length){
-                   $(`#modal-inventory-form select[name="property_details[parking][]"]`).val(parkings).trigger('change');
+               if (res.data['parkings'].parking_open) {
+                 parkings[0] = 'open';
                }
+
+               if (res.data['parkings'].parking_stilt) {
+                 parkings[1] = 'stilt';
+               }
+
+               if (res.data['parkings'].parking_basement) {
+                 parkings[1] = 'basement';
+               }
+
+              $(`#modal-inventory-form select[name="property_details[parking][]"]`).val('').trigger('change');
+              $(`#modal-inventory-form select[name="property_details[applicable_plc][]"]`).val('').trigger('change');
+                 
                /** End Parking */
 
 
                $.each(res.data, function(key, value) {
 
                  /** Size Unit */
-                 if (key == 'size_unit' && value != '') {
-                   $(`#modal-inventory-form select[name="property_details[${key}]"]`).val(value).trigger('change');
+                 if ((key == 'size_unit' || key == 'plot_unit') && value != '') {
+                   $(`#modal-inventory-form select[name="property_details[size_unit]"]`).val(value).trigger('change');
                    $(`#modal-inventory-form select[name="property_details[sa_size_unit]"]`).val(value).trigger('change');
                    $(`#modal-inventory-form select[name="property_details[ba_size_unit]"]`).val(value).trigger('change');
                    $(`#modal-inventory-form select[name="property_details[ca_size_unit]"]`).val(value).trigger('change');
+                 } else if (key == 'facing') {
+                   $(`#modal-inventory-form select[name="property_details[facing_id]"]`).val(value).trigger('change');
+                 } else {
+                   if (key != 'id') {
+                     $(`#modal-inventory-form input[name="property_details[${key}]"]`).val(value);
+                   }
+                 }
+                 /** End Size Unit */
+
+                 /** Property Layout */
+                 if (key == 'image_url' && value != '') {
+                   $('.property-layout-anchor').removeClass('d-none').attr('href', value)
+                   $('.old_property_layout').val(value.split('/').pop())
+                 } else if (key != 'image_url' && value == '') {
+                   $('.property-layout-anchor').addClass('d-none').attr('href', '#')
+                   $('.old_property_layout').val('')
+                 }
+                 /** End Property Layout */
+               })
+             }
+           },
+           error: (res) => {
+             console.log(res)
+
+           }
+         })
+       }
+
+       function getInventory({
+         id = 0
+       }) {
+         $.ajax({
+           post: 'GET',
+           url: "<?= base_url('helper/get_inventory_details'); ?>",
+           data: {
+             id: id
+            },
+            dataType: 'json',
+            success: (res) => {
+             
+             if (res.status) {
+
+               /** End Parking */
+               
+               
+               $.each(res.data, function(key, value) {
+                $(`#modal-inventory-form input[name="property_details[${key}]"]`).val('');
+
+                if(key == 'applicable_plc' && value != ''){
+                  $(`#modal-inventory-form select[name="property_details[applicable_plc][]"]`).val(value).trigger('change');
+                }
+
+                if(key == 'parking' && value != ''){
+                  $(`#modal-inventory-form select[name="property_details[parking][]"]`).val(value).trigger('change');
+                }
+                 
+                 /** Size Unit */
+                 if ((key == 'size_unit' || key == 'plot_unit') && value != '') {
+                   $(`#modal-inventory-form select[name="property_details[size_unit]"]`).val(value).trigger('change');
+                   $(`#modal-inventory-form select[name="property_details[sa_size_unit]"]`).val(value).trigger('change');
+                   $(`#modal-inventory-form select[name="property_details[ba_size_unit]"]`).val(value).trigger('change');
+                   $(`#modal-inventory-form select[name="property_details[ca_size_unit]"]`).val(value).trigger('change');
+                 } else if (key == 'facing') {
+                   $(`#modal-inventory-form select[name="property_details[facing_id]"]`).val(value).trigger('change');
                  } else {
                    if (key != 'id') {
                      $(`#modal-inventory-form input[name="property_details[${key}]"]`).val(value);

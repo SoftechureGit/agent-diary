@@ -26,8 +26,8 @@ endif;
                   <!-- Unit Code -->
                   <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Unit Code ( with Accomodations ) <span class="text-danger">*</span></label>
-                            <select name="property_details[unit_code]" id="" class="form-control" required>
+                            <label for="">Unit Code  <span class="text-danger">*</span></label>
+                            <select name="property_details[unit_code]" id="" class="form-control" data-selected_id="<?= $unit_code ?? 0 ?>" required>
                                 <option value="" disabled selected>Choose...</option>
                                 <?php 
                                     foreach($unit_code_with_accomodations ?? [] as $unit_code_with_accomodation): 
@@ -118,7 +118,7 @@ endif;
                             <label for="">Applicable PLC</label>
                             <select name="property_details[applicable_plc][]" id="" class="form-control" multiple>
                                 <?php 
-                                    foreach(getPropertyApplicablePlcs($product_id ?? 0) ?? [] as $plc): 
+                                    foreach(getPropertyPlcs($product_id ?? 0) ?? [] as $plc): 
                                     $selected         = in_array($plc->price_component_id, $applicable_plc ?? []) ? 'selected' : '';
                                 ?>
                                     <option value=<?= $plc->price_component_id ?>  <?= $selected ?>><?= $plc->price_component_name ?></option>   
@@ -129,16 +129,16 @@ endif;
                     <!-- End Applicable PLC -->
 
                      <!-- Facing -->
-                     <div class="col-md-4">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Facing</label>
-                            <select name="property_details[facing]" id="" class="form-control" >
-                            <option value="" disabled selected>Choose...</option>
+                            <select name="property_details[facing_id]" id="" class="form-control" >
+                                <option value="" disabled selected>Choose...</option>
                                 <?php 
                                     foreach(facings() ?? [] as $facing_item): 
-                                    $selected         = $facing_item->facing_id == (( $facing ?? 0 ) ? str_before('|', $facing ) : '') ? 'selected' : '';
+                                    $selected         = $facing_item->facing_id == ( $facing_id ?? 0 ) ? 'selected' : '';
                                 ?>
-                                    <option <?=  ( $facing ?? 0 ) ? str_before('|', $facing ) : '' ?> value="<?= "$facing_item->facing_id | $facing_item->title" ?>"  <?= $selected ?>><?= $facing_item->title ?></option>   
+                                    <option value="<?= $facing_item->facing_id ?>"  <?= $selected ?>><?= $facing_item->title ?></option>   
                                     <?php endforeach; ?>
                                 </select>
                         </div>
