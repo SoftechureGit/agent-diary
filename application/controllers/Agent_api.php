@@ -1851,7 +1851,6 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
 
     public function add_to_followup()
     {
-
         $array = array();
 
         $account_id = 0;

@@ -11873,9 +11873,8 @@ $property_list = $query->result();
             $data_ids = explode(',', $this->input->post('data_ids'));
 
             foreach ($data_ids as $data_id) {
-
                 $file_name = $this->input->post('file_name');
-                $res =  $this->db->where('file_name', $file_name)->where('data_id', $data_id)->delete('tbl_data');
+                $res =  $this->db->where('file_name', $file_name)->where('data_id', json_decode($data_id))->delete('tbl_data');
             }
         } else {
             $file_name = $this->input->post('file_name');
@@ -11896,8 +11895,12 @@ $property_list = $query->result();
      # get followup retalted data 
 
         public function get_followup_related_data(){
-           
-            echo 'hello'; die;
+            
+            $where = "lead_stage_status='1'";
+            $lead_stage_list = $this->Action_model->detail_result('tbl_lead_stages', $where, 'lead_stage_id,lead_stage_name');
+            $data['lead_stage_list'] = $lead_stage_list;  
+            
+            
             
         }
 
