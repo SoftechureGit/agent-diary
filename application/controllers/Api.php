@@ -11793,7 +11793,14 @@ $property_list = $query->result();
     
     
     
-            $transfer_lead_ids =  $this->input->post('selected_lead_ids');
+            $transfer_lead_ids =  json_decode($this->input->post('selected_lead_ids'));
+
+            // echo $transfer_lead_ids; die;
+
+            
+            //  print_r()
+     
+
             // $transfer_lead_ids = explode(',', $transfer_lead_ids);
             $assign_to = $this->input->post('transfer_to');
 
