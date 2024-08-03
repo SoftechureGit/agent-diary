@@ -431,6 +431,8 @@ if (!function_exists('getAccountId')) {
 
        # Get property information
             $property_details = property($property_id);
+
+            
             // print_r($property_details); die;
        # End  Get property information  
 
@@ -442,7 +444,7 @@ if (!function_exists('getAccountId')) {
         $excel_sheet        =   [];
       
 
-        switch($property_id):
+        switch($property_details->property_type_id):
             case '2': #Villa
                 $form          =   'villa';
                 $excel_sheet[0]['title']                    =  'Villa';

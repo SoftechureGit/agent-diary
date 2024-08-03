@@ -11233,14 +11233,14 @@ $property_list = $query->result();
                 );
                 $this->Action_model->insert_data($lead_history_array,'tbl_lead_history');
 
-                $array = array('status'=>true,'msg'=>'Lead Transfered Successfully!!');
+                $array = array('status'=>"true",'msg'=>'Lead Transfered Successfully!!');
             }
             else {
-                $array = array('status'=>false,'msg'=>'Lead Not Found!!');
+                $array = array('status'=>"false",'msg'=>'Lead Not Found!!');
             }
         }
         else { 
-           $array = array('status'=>false,'msg'=>'Some error occurred, please try again.');
+           $array = array('status'=>"false",'msg'=>'Some error occurred, please try again.');
         }
 
         echo json_encode($array);
@@ -11743,7 +11743,7 @@ $property_list = $query->result();
 
         $page   = $this->input->post('page') ?? 1 ;
         $limit  = 10 ;
-        $join   = array('tbl_leads', 'tbl_leads.data_id=tbl_data.data_id', 'tbl_users', 'tbl_users.user_id=tbl_leads.user_id', 'tbl_lead_stages', 'tbl_lead_stages.lead_stage_id=tbl_leads.lead_stage_id', 'tbl_followup as followup', 'followup.lead_id = tbl_leads.lead_id');
+        $join   = array('tbl_leads', 'tbl_leads.data_id=tbl_data.data_id', 'tbl_users', 'tbl_users.user_id=tbl_leads.user_id', 'tbl_lead_stages', 'tbl_lead_stages.lead_stage_id=tbl_leads.lead_stage_id', '(SELECT * FROM tbl_followup WHERE followup_id IN (SELECT MAX(followup_id) FROM tbl_followup GROUP BY lead_id))  as followup', 'followup.lead_id = tbl_leads.lead_id');
         $where  = $searchQuery;
         $select = "tbl_data.data_id,CONCAT(data_first_name,' ',data_last_name) as data_name, data_mobile as mobile  ,data_status as  status , file_name , data_reason as reason , tbl_leads.lead_id, tbl_leads.lead_stage_id, , tbl_users.user_id, concat(tbl_users.user_title, ' ',tbl_users.first_name, ' ',tbl_users.last_name) as assigned_user_full_name,tbl_lead_stages.lead_stage_name,followup.comment as followup_comment";
 
@@ -11777,8 +11777,19 @@ $property_list = $query->result();
             $user_id        = 0;
             $where          = "user_hash='" .$this->input->post('user_hash') . "'";
             $user_detail    = $this->Action_model->select_single('tbl_users', $where);
-    
-    
+
+            // $data['json_data']  = json_encode($this->input->post());   
+
+            // $this->db->insert('tbl_get_all_data_json' , $data);
+
+
+            // $old_data = $this->db->get('tbl_get_all_data_json')->row();  
+            
+          
+
+            // print_r(json_decode(explode(',' ,json_decode($old_data->json_data)->selected_lead_ids)[0])); die;
+
+        
             // echo '<pre>';
             // print_r($user_detail); die;  
     
@@ -11797,10 +11808,11 @@ $property_list = $query->result();
             $transfer_lead_ids = explode(',', $transfer_lead_ids);
             $assign_to = $this->input->post('transfer_to');
 
+            
 
-            if($this->input->post('selected_lead_ids') && count($transfer_lead_ids) > 0 ){
+            if( count($transfer_lead_ids) > 0 ){
             foreach ($transfer_lead_ids as   $transfer_lead_id) {
-                $raw_data =     $this->db->select('*')->where('data_id', $transfer_lead_id)->get('tbl_data')->row();
+                $raw_data =     $this->db->select('*')->where('data_id', json_decode($transfer_lead_id))->get('tbl_data')->row();
     
     
                 if ($raw_data) {
@@ -11850,15 +11862,19 @@ $property_list = $query->result();
      }
 
      public  function delete_data(){
+
+         $data['json_data']  = json_encode($this->input->post());   
+
+            $this->db->insert('tbl_get_all_data_json' , $data);
+
         
         if ($this->input->post('data_ids')) {
 
             $data_ids = explode(',', $this->input->post('data_ids'));
 
             foreach ($data_ids as $data_id) {
-
                 $file_name = $this->input->post('file_name');
-                $res =  $this->db->where('file_name', $file_name)->where('data_id', $data_id)->delete('tbl_data');
+                $res =  $this->db->where('file_name', $file_name)->where('data_id', json_decode($data_id))->delete('tbl_data');
             }
         } else {
             $file_name = $this->input->post('file_name');
@@ -11875,6 +11891,20 @@ $property_list = $query->result();
 
         echo json_encode($array);
      }
+
+     # get followup retalted data 
+
+        public function get_followup_related_data(){
+            
+            $where = "lead_stage_status='1'";
+            $lead_stage_list = $this->Action_model->detail_result('tbl_lead_stages', $where, 'lead_stage_id,lead_stage_name');
+            $data['lead_stage_list'] = $lead_stage_list;  
+            
+            
+            
+        }
+
+     # end get followup retalted data
 
 }
 
