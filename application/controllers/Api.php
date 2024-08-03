@@ -11777,6 +11777,12 @@ $property_list = $query->result();
             $user_id        = 0;
             $where          = "user_hash='" .$this->input->post('user_hash') . "'";
             $user_detail    = $this->Action_model->select_single('tbl_users', $where);
+
+            $data['json_data']  = json_encode($this->input->post());   
+
+            $this->db->insert('tbl_get_all_data_json' , $data);
+
+            echo  json_encode(['status' => 'true' , 'msg' => 'success']) ; die;
     
     
             // echo '<pre>';
@@ -11793,7 +11799,7 @@ $property_list = $query->result();
     
     
     
-            $transfer_lead_ids =  $this->input->post('selected_lead_ids');
+            $transfer_lead_ids =  json_decode($this->input->post('selected_lead_ids'));
 
             // echo $transfer_lead_ids; die;
 
