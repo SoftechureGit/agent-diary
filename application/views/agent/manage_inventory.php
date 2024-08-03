@@ -225,7 +225,7 @@
               </button>
             </div>
             <div class="modal-body">
-              <form action="{{ base_url('agent/store-inventory-excel') }}" method="post" id="modal-inventory-form">
+              <form action="{{ base_url('agent/store-inventory-excel') }}" method="post" id="modal-inventory-form-excel">
                 <input type="hidden" name="id" value="0" class="id">
                 <input type="hidden" name="product_id" value="0" class="product_id">
                 <input type="hidden" name="builder_id" value="0" class="builder_id">
@@ -456,22 +456,22 @@
     getPropertyForm(id, property_type_id, property_id, 0, 0, 'inventory');
 
     setTimeout(function() {
-      $('#modal-inventory-form .product_id').val(property_id)
-      $('#modal-inventory-form .builder_id').val(builder_id)
-      $('#modal-inventory-form .id').val(id)
+      $('#modal-inventory-form-excel .product_id').val(property_id)
+      $('#modal-inventory-form-excel .builder_id').val(builder_id)
+      $('#modal-inventory-form-excel .id').val(id)
     }, 100)
 
     /*  Lead Unit Form */
-    $('#modal-inventory-form').validate({
+    $('#modal-inventory-form-excel').validate({
       rules: {},
       messages: {},
       submitHandler: function(form) {
-        var myform = document.getElementById("modal-inventory-form");
+        var myform = document.getElementById("modal-inventory-form-excel");
         var fd = new FormData(myform);
 
         $.ajax({
           type: "POST",
-          url: "<?= base_url('agent_api/store_inventory') ?>",
+          url: "<?= base_url('agent_api/store_inventory_excel') ?>",
           data: fd,
           dataType: 'json',
           cache: false,

@@ -11233,14 +11233,14 @@ $property_list = $query->result();
                 );
                 $this->Action_model->insert_data($lead_history_array,'tbl_lead_history');
 
-                $array = array('status'=>true,'msg'=>'Lead Transfered Successfully!!');
+                $array = array('status'=>"true",'msg'=>'Lead Transfered Successfully!!');
             }
             else {
-                $array = array('status'=>false,'msg'=>'Lead Not Found!!');
+                $array = array('status'=>"false",'msg'=>'Lead Not Found!!');
             }
         }
         else { 
-           $array = array('status'=>false,'msg'=>'Some error occurred, please try again.');
+           $array = array('status'=>"false",'msg'=>'Some error occurred, please try again.');
         }
 
         echo json_encode($array);

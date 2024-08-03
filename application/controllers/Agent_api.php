@@ -11061,7 +11061,10 @@ WHERE lead_id='" . $lead_id . "'
     # Upload Invetory by excel
     function store_inventory_excel()
     {
-        if ($this->input->post()) :
+
+        
+        if ($this->input->post()):
+
             if (!$this->input->post()) :
                 echo json_encode(['status' => false, 'message' => 'Reqeust method is not POST']);
             endif;
@@ -11072,6 +11075,107 @@ WHERE lead_id='" . $lead_id . "'
                 $product_id                                 =   $this->input->post('product_id');
                 $builder_id                                 =   $this->input->post('builder_id');
             # End Init
+
+
+            $account_id     = 0;
+            $user_id        = 0;
+            $where          = "user_hash='" . $this->session->userdata('agent_hash') . "'";
+            $user_detail    = $this->Action_model->select_single('tbl_users', $where);
+    
+            $total_data_count    = 0;
+            $total_uploaded_data_count = 0;  
+    
+            if ($user_detail) {
+                $user_id    =   $user_detail->user_id;
+                $account_id =   $user_detail->user_id;
+    
+                if ($user_detail->role_id != 2) {
+    
+                    $account_id = $user_detail->parent_id;
+                }
+            }
+    
+    
+            $data_excel = array();
+    
+            
+            if ($account_id) {
+    
+                    $upload_path = FCPATH . './uploads/raw-data/';
+                    # Create Folder if Folder Not Exits
+                    if (!file_exists($upload_path)) {
+                        mkdir($upload_path, 0777, true);
+                    }
+                    # End Create Folder if Folder Not Exits
+            
+                    $config['upload_path']             = $upload_path;
+            
+                    $config['allowed_types']          =    'xlsx';  
+                    $this->load->library('upload', $config);
+                    if ($this->upload->do_upload('file')) {
+                        $data = $this->upload->data();
+    
+                    if ($data['file_ext'] == '.xlsx') {
+    
+                        require('application/libraries/php-excel-reader/excel_reader2.php');
+                        require('application/libraries/SpreadsheetReader.php');
+    
+    
+                        $Reader = new SpreadsheetReader($data['full_path']);
+                        $Sheets = $Reader->Sheets();
+    
+                        
+                        foreach ($Sheets as $Index => $Name) {
+                            if ($Index == 0) {
+                                $Reader->ChangeSheet($Index);
+                                foreach ($Reader as $Key => $Row) {
+                                  
+                                    if ($Key  > 0) {
+                                        $total_data_count++;
+                                        $data_array = array(
+                                            'data_title'            =>  $Row[1] ?? '',
+                                            'data_first_name'       =>  $Row[2] ?? '',
+                                            'data_last_name'        =>  $Row[3] ?? '',
+                                            'data_mobile'           =>  $Row[4] ?? '',
+                                            'data_email'            =>  $Row[5] ?? ''
+                                        );
+    
+                                        $where          =   "data_mobile='" . $Row[4] . "' AND account_id='" . $account_id . "'";
+                                        $lead_detail    =   $this->Action_model->select_single('tbl_data', $where);
+    
+                                        if ($lead_detail) {
+    
+                                            $this->Action_model->update_data($data_array, 'tbl_data', $where);
+                                        } else {
+                                            if( $Row[4] && $Row[2]){
+                                                $total_uploaded_data_count++;
+                                                $data_array2 = array(
+                                                    'added_by'          =>  $user_id,
+                                                    'account_id'        =>  $account_id,
+                                                    'data_status'       =>  1,
+                                                    'file_name'         =>  $this->input->post('lead_data_type'),
+                                                );
+        
+                                                $data_array     =   array_merge($data_array, $data_array2);
+                                                $lead_id        =   $this->Action_model->insert_data($data_array, 'tbl_data');
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+    
+                        unlink($data['full_path']);
+                    }
+                }
+    
+                $this->session->set_flashdata('success_msg', "Data Uploaded  $total_uploaded_data_count out of $total_data_count (some data is already exist)");
+                redirect(AGENT_URL . 'data');
+            } else {
+                redirect(AGENT_URL . 'data');
+            }
+
+
 
                 $result                             =   $this->Action_model->insert_data($data, 'tbl_inventory');
                 $res_arr                            =   $result ? ['status' => true, 'message' => 'Successfully record inserted'] : ['status' => false, 'message' => 'Some error occured'];
