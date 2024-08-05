@@ -97,7 +97,7 @@ $property_layout_url        =   $property_layout ? base_url("uploads/images/prop
                     <td>
                         <ul style="margin: 0; padding-left: 1rem;">
                         <?php   
-                            foreach(getPropertyApplicablePlcs($product_id ?? 0, $applicable_plc ?? null) as $applicable_plc_item):
+                            foreach(getPropertyPlcs($product_id ?? 0, $applicable_plc ?? null) as $applicable_plc_item):
                                  echo "<li style='list-style: auto;'>$applicable_plc_item->price_component_name</li>";
                             endforeach;    
                         ?>

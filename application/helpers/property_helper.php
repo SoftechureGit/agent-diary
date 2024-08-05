@@ -90,7 +90,7 @@ function getInventory($id)
 # End Get Inventory Details
 
 # Get Inventory Details
-function getPropertyApplicablePlcs($property_id, $selected_applicable_plcs = null)
+function getPropertyPlcs($property_id, $selected_applicable_plcs = null)
 {
     $where   = ' 1 = 1';
 
@@ -108,10 +108,11 @@ function getPropertyApplicablePlcs($property_id, $selected_applicable_plcs = nul
     endif;
 
     db_instance()->select('*');
-    db_instance()->from('tbl_product_additional_details as p_ad');
-    db_instance()->join('tbl_price_components', 'tbl_price_components.price_component_id = p_ad.price_comp_id');
+    db_instance()->from('tbl_product_plc_details as plc');
+    db_instance()->join('tbl_price_components', 'tbl_price_components.price_component_id = plc.price_comp_id');
     db_instance()->where($where);
     return db_instance()->get()->result();
+    
 }
 # End Get Inventory Details
 

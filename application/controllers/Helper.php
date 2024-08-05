@@ -79,16 +79,34 @@ class Helper extends CI_Controller
     }
     # End Get Locations
 
+    # Get Inventory Details
+    public function get_inventory_details(){
+        $arr                        =   [];
+        $id                         =   $this->input->get('id');
+        $inventory                  =  getInventory($id);
+        $property_layout            =  $inventory->property_layout ?? null;
+        $property_layout_url        =  ($inventory->property_layout ?? 0) ? base_url("/uploads/images/property/unit/$inventory->property_layout") : null;;
+        $property_details           =  ($inventory->property_details ?? 0) ? json_decode($inventory->property_details ?? []) : $inventory;
+
+        if($inventory):
+            $arr                    =   [ 'status' => true, 'message' => 'Successfully data fetched', 'data' => $property_details ];
+        else:
+            $arr                    =   [ 'status' => true, 'message' => 'Inventory data not fetched'];
+        endif;
+        echo json_encode($arr);
+    }
+    # End Get Inventory Details
+
     # Get Property Form
     public function get_property_form()
     {
-        $lead_or_inventory_id                             = $this->input->get('id');
+        $lead_or_inventory_id           = $this->input->get('id');
         $property_type_id               = $this->input->get('property_type_id');
         $property_id                    = $this->input->get('property_id');
         $selected_property_id           = $this->input->get('selected_property_id');
         $form_request_for               = $this->input->get('form_request_for');
 
-        $property_layout            =   null;
+        $property_layout                =   null;
         $property_layout_url            =   null;
 
         if (!$property_type_id) :
@@ -144,6 +162,10 @@ class Helper extends CI_Controller
             endif;
         endif;
         # Additional
+
+        // echo "<pre>";
+        // print_r($property_details);
+        // die;
 
         $form_view                      =   property_form($property_type_id, $property_details ?? null);
 
@@ -397,6 +419,7 @@ class Helper extends CI_Controller
         $arr        =   [];
         $id         = $this->input->get('id');
         
+ 
 
         $data           =   get_property_unit_details($id);
         if($id):
