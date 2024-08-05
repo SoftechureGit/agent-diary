@@ -11914,9 +11914,9 @@ $property_list = $query->result();
             $lead_type_list = $this->Action_model->detail_result('tbl_lead_types', $where, 'lead_type_id,lead_type_name');
             $data['lead_type_list'] = $lead_type_list;
 
-            $where = "product_type_status='1'";
-            $project_type_list = $this->Action_model->detail_result('tbl_product_types', $where, 'product_type_id,product_type_name');
-            $data['project_type_list'] = $project_type_list;
+            // $where = "product_type_status='1'";
+            // $project_type_list = $this->Action_model->detail_result('tbl_product_types', $where, 'product_type_id,product_type_name');
+            // $data['project_type_list'] = $project_type_list;
 
             $where = "user_status='1' AND ((parent_id='" . $account_id . "') OR (user_id='" . $account_id . "' AND role_id='2'))";
             $where_ids = "";
@@ -11934,10 +11934,10 @@ $property_list = $query->result();
             $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,CONCAT(user_title," ",first_name," ",last_name) as user_full_name');
             $data['user_list'] = $user_list;
             
-            $where .= $where_ids;
+            // $where .= $where_ids;
 
-            $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,user_title,first_name,last_name,parent_id,is_individual,firm_name');
-            $data['user_list'] = $user_list;
+            // $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,user_title,first_name,last_name,parent_id,is_individual,firm_name');
+            // $data['user_list'] = $user_list;
 
 
             echo json_encode($data);
