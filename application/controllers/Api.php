@@ -11896,9 +11896,44 @@ $property_list = $query->result();
 
         public function get_followup_related_data(){
             
+            $where          = "user_hash='" .$this->input->post('user_hash') . "'";
+            $user_detail    = $this->Action_model->select_single('tbl_users', $where);
+
+            $account_id     = $user_detail->user_id ;
+
+
             $where = "lead_stage_status='1'";
             $lead_stage_list = $this->Action_model->detail_result('tbl_lead_stages', $where, 'lead_stage_id,lead_stage_name');
             $data['lead_stage_list'] = $lead_stage_list;  
+
+            $where = "lead_action_status='1'";
+            $lead_action_list = $this->Action_model->detail_result('tbl_lead_actions', $where, 'lead_action_id,lead_action_name');
+            $data['lead_action_list'] = $lead_action_list;
+
+            $where = "lead_type_status='1'";
+            $lead_type_list = $this->Action_model->detail_result('tbl_lead_types', $where, 'lead_type_id,lead_type_name');
+            $data['lead_type_list'] = $lead_type_list;
+
+            $where = "product_type_status='1'";
+            $project_type_list = $this->Action_model->detail_result('tbl_product_types', $where, 'product_type_id,product_type_name');
+            $data['project_type_list'] = $project_type_list;
+
+            $where = "user_status='1' AND ((parent_id='" . $account_id . "') OR (user_id='" . $account_id . "' AND role_id='2'))";
+            $where_ids = "";
+            $user_ids = $this->get_level_user_ids();
+
+            if (count($user_ids)) {
+
+                $where_ids .= " AND (tbl_users.user_id='" . implode("' OR tbl_users.user_id='", $user_ids) . "')";
+            }
+            
+            $where .= $where_ids;
+
+            $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,user_title,first_name,last_name,parent_id,is_individual,firm_name');
+            $data['user_list'] = $user_list;
+
+
+            echo josn_encode($data);
             
             
             
