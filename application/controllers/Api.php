@@ -11920,12 +11920,19 @@ $property_list = $query->result();
 
             $where = "user_status='1' AND ((parent_id='" . $account_id . "') OR (user_id='" . $account_id . "' AND role_id='2'))";
             $where_ids = "";
-            $user_ids = $this->get_level_user_ids();
-
-            if (count($user_ids)) {
-
-                $where_ids .= " AND (tbl_users.user_id='" . implode("' OR tbl_users.user_id='", $user_ids) . "')";
+            
+            if($user_detail->parent_id == 0){
+        
+                $where  = "user_id=$user_detail->user_id OR parent_id=$user_detail->user_id";
             }
+            else
+            {
+        
+                $where = " user_id=$user_detail->user_id OR report_to=$user_detail->user_id";
+            }
+    
+            $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,CONCAT(user_title," ",first_name," ",last_name) as user_full_name');
+            $data['user_list'] = $user_list;
             
             $where .= $where_ids;
 
@@ -11933,9 +11940,8 @@ $property_list = $query->result();
             $data['user_list'] = $user_list;
 
 
-            echo josn_encode($data);
-            
-            
+            echo json_encode($data);
+                
             
         }
 
