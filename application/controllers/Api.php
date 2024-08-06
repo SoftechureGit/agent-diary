@@ -2083,6 +2083,8 @@ class Api extends CI_Controller {
     
                 $next_lead_id = $next_lead ? $next_lead->lead_id : null;
                 $previous_lead_id = $previous_lead ? $previous_lead->lead_id : null;
+
+
     
                 $where = "user_status='1' AND ((parent_id='" . $account_id . "') OR (user_id='" . $account_id . "' AND role_id='2'))";
                 $where_ids = "";
@@ -2155,7 +2157,75 @@ class Api extends CI_Controller {
                     'previous_lead_id' =>  $next_lead_id  
                 );
             } else {
-                $array['data'] = array('status' => 'false', 'msg' => 'Record Not Found.');
+
+                $where = "user_status='1' AND ((parent_id='" . $account_id . "') OR (user_id='" . $account_id . "' AND role_id='2'))";
+                $where_ids = "";
+                $user_ids = $this->get_level_user_ids($this->input->post('user_hash'));
+    
+                if (count($user_ids)) {
+                    $where_ids .= " AND (tbl_users.user_id='" . implode("' OR tbl_users.user_id='", $user_ids) . "')";
+                }
+                $where .= $where_ids;
+    
+                $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,user_title,first_name,last_name,parent_id,is_individual,firm_name');
+    
+                $lead_data = array();
+                foreach ($user_list as $row) {
+                    $row->is_individual = (($row->is_individual != '') ? $row->is_individual : "");
+                    $row->firm_name = (($row->firm_name != '') ? $row->firm_name : "");
+                    $row->parent_id = (($row->parent_id != '') ? $row->parent_id : "");
+                    $lead_data[] = $row;
+                }
+    
+                $where = "country_id='1' AND state_status=1";
+                $state_list = $this->Action_model->detail_result('tbl_states', $where);
+
+              
+    
+                $where = "occupation_status='1'";
+                $occupation_list = $this->Action_model->detail_result('tbl_occupations', $where);
+    
+                $where = "department_status='1'";
+                $department_list = $this->Action_model->detail_result('tbl_departments', $where);
+    
+                $where = "lead_source_status='1'";
+                $lead_source_list = $this->Action_model->detail_result('tbl_lead_sources', $where);
+    
+                $where = "lead_stage_status='1'";
+                $lead_stage_list = $this->Action_model->detail_result('tbl_lead_stages', $where);
+    
+                $where = "lead_type_status='1'";
+                $lead_type_list = $this->Action_model->detail_result('tbl_lead_types', $where, 'lead_type_id,lead_type_name');
+                $data['lead_type_list'] = (($lead_type_list) ? $lead_type_list : array());
+    
+                $state_list = (($state_list) ? $state_list : array());
+                $occupation_list = (($occupation_list) ? $occupation_list : array());
+                $department_list = (($department_list) ? $department_list : array());
+                $lead_source_list = (($lead_source_list) ? $lead_source_list : array());
+                $lead_stage_list = (($lead_stage_list) ? $lead_stage_list : array());
+    
+          
+
+                $where = "designation_status='1'";
+                $designations_list = $this->Action_model->detail_result('tbl_designations', $where);
+    
+                $array['data'] = array(
+                    'status'            => 'true',
+                    'msg'               => 'Lead Not Found',
+                    'lead_data'         => [],
+                    'records'           => $lead_data,
+                    'state_list'        => $state_list,
+                    'occupation_list'   => $occupation_list,
+                    'department_list'   => $department_list,
+                    'designations_list' => $designations_list,
+                    'lead_source_list'  => $lead_source_list,
+                    'lead_stage_list'   => $lead_stage_list,
+                    'city_list'         =>  '',
+                    'next_lead_id'      =>'',
+                    'previous_lead_id'  =>  '' 
+                );
+
+                // $array['data'] = array('status' => 'false', 'msg' => 'Record Not Found.');
             }
         } else {
             $array['data'] = array('status' => 'false', 'msg' => 'Some error occurred, please try again.');
@@ -11938,7 +12008,6 @@ $property_list = $query->result();
 
             // $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,user_title,first_name,last_name,parent_id,is_individual,firm_name');
             // $data['user_list'] = $user_list;
-
 
             echo json_encode($data);
                 
