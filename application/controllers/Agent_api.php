@@ -11112,14 +11112,14 @@ WHERE lead_id='" . $lead_id . "'
     # Upload Invetory by excel
     function store_inventory_excel()
     {
+   
+        if ($this->input->post()):
 
-        // print_r($this->input->post()); die;
-
-        if ($this->input->post()) :
 
             if (!$this->input->post()) :
                 echo json_encode(['status' => false, 'message' => 'Reqeust method is not POST']);
             endif;
+
 
             $res_arr                                    =   [];
 
@@ -11128,101 +11128,186 @@ WHERE lead_id='" . $lead_id . "'
             $builder_id                                 =   $this->input->post('builder_id');
             # End Init
 
+            # propery details
+                $property_details = property($product_id);
 
+                print_r($property_details); die;
+            # End  propery details
+
+
+   
             $total_data_count    = 0;
-            $total_uploaded_data_count = 0;
-
-
+            $total_uploaded_data_count = 0;  
+    
             $data_excel = array();
-
-
-
-            $upload_path = FCPATH . './uploads/raw-data/';
-            # Create Folder if Folder Not Exits
-            if (!file_exists($upload_path)) {
-                mkdir($upload_path, 0777, true);
-            }
-            # End Create Folder if Folder Not Exits
-
-            $config['upload_path']             = $upload_path;
-
-            $config['allowed_types']          =    'xlsx';
+    
+                    $upload_path = FCPATH . './uploads/raw-data/';
+                    # Create Folder if Folder Not Exits
+                    if (!file_exists($upload_path)) {
+                        mkdir($upload_path, 0777, true);
+                    }
+                    # End Create Folder if Folder Not Exits
+            
+                    $config['upload_path']            = $upload_path;
+            
+                    $config['allowed_types']          =    'xlsx';  
 
             $this->load->library('upload', $config);
 
-            if ($this->upload->do_upload('file')) {
+                    if ($this->upload->do_upload('file')) {
+                        
+                        $data = $this->upload->data();
+    
+                    if ($data['file_ext'] == '.xlsx') {
+    
+                        require('application/libraries/php-excel-reader/excel_reader2.php');
+                        require('application/libraries/SpreadsheetReader.php');
+    
+                        $Reader = new SpreadsheetReader($data['full_path']);
+                        $Sheets = $Reader->Sheets();
+                     
+                        foreach ($Sheets as $Index => $Name) {
+                            if ($Index == 0) {
+                                $Reader->ChangeSheet($Index);
+                                foreach ($Reader as $Key => $Row) {
+                                  
+                                    if ($Key  > 0) {
 
-                $data = $this->upload->data();
+                                        $total_data_count++;
 
-                if ($data['file_ext'] == '.xlsx') {
-
-                    require('application/libraries/php-excel-reader/excel_reader2.php');
-                    require('application/libraries/SpreadsheetReader.php');
-
-
-                    $Reader = new SpreadsheetReader($data['full_path']);
-                    $Sheets = $Reader->Sheets();
-
-
-                    // print_r($Sheets); die;
-
-
-
-
-                    foreach ($Sheets as $Index => $Name) {
-                        if ($Index == 0) {
-                            $Reader->ChangeSheet($Index);
-                            foreach ($Reader as $Key => $Row) {
-
-                                if ($Key  > 0) {
-
-                                    print_r($Row);
-                                    die;
-
-                                    $total_data_count++;
-                                    $data_array = array(
-                                        'data_title'            =>  $Row[1] ?? '',
-                                        'data_first_name'       =>  $Row[2] ?? '',
-                                        'data_last_name'        =>  $Row[3] ?? '',
-                                        'data_mobile'           =>  $Row[4] ?? '',
-                                        'data_email'            =>  $Row[5] ?? ''
-                                    );
-
-                                    $where          =   "data_mobile='" . $Row[4] . "' AND account_id='" . $account_id . "'";
-                                    $lead_detail    =   $this->Action_model->select_single('tbl_data', $where);
-
-                                    if ($lead_detail) {
-
-                                        $this->Action_model->update_data($data_array, 'tbl_data', $where);
-                                    } else {
-                                        if ($Row[4] && $Row[2]) {
-                                            $total_uploaded_data_count++;
-                                            $data_array2 = array(
-                                                'added_by'          =>  $user_id,
-                                                'account_id'        =>  $account_id,
-                                                'data_status'       =>  1,
-                                                'file_name'         =>  $this->input->post('lead_data_type'),
+                                        switch($property_details->property_type_id):
+                                            case '2': #Villa
+                                                    $property_details = array(
+                                                        'id' => '',
+                                                        'product_id' => $product_id,
+                                                        'unit_code' => $Row[1],
+                                                        'referance_number' => $Row[2],
+                                                        'plot_number' => $Row[3],
+                                                        'plot_size' => $Row[4],
+                                                        'size_unit' => $Row[5],
+                                                        'block'   => $Row[6],
+                                                        'applicable_plc' => $Row[7],
+                                                        'facing' => $Row[8],
+                                                        'dimension' => $Row[9]
+                                                    );
+                                                break;
+                                            case '3': #Plot
+                                                    $property_details = array(
+                                                        'id' => '',
+                                                        'product_id' => $product_id,
+                                                        'unit_code' => $Row[1],
+                                                        'referance_number' => $Row[2],
+                                                        'plot_number' => $Row[3],
+                                                        'plot_size' => $Row[4],
+                                                        'size_unit' => $Row[5],
+                                                        'block'   => $Row[6],
+                                                        'applicable_plc' => $Row[7],
+                                                        'facing' => $Row[8],
+                                                        'dimension' => $Row[9]
+                                                    );            
+                                                break;
+                                            case '4':
+                                               
+                                                $property_details = array(
+                                                    'id' => '',
+                                                    'product_id' => $product_id,
+                                                    'unit_code' => $Row[1],
+                                                    'referance_number' => $Row[2],
+                                                    'plot_number' => $Row[3],
+                                                    'plot_size' => $Row[4],
+                                                    'size_unit' => $Row[5],
+                                                    'block'   => $Row[6],
+                                                    'applicable_plc' => $Row[7],
+                                                    'facing' => $Row[8],
+                                                    'dimension' => $Row[9]
+                                                );
+                                                break;
+                                            case '5': # Office
+                                               
+                                            $property_details = array(
+                                                'id' => '',
+                                                'product_id' => $product_id,
+                                                'unit_code' => $Row[1],
+                                                'referance_number' => $Row[2],
+                                                'plot_number' => $Row[3],
+                                                'plot_size' => $Row[4],
+                                                'size_unit' => $Row[5],
+                                                'block'   => $Row[6],
+                                                'applicable_plc' => $Row[7],
+                                                'facing' => $Row[8],
+                                                'dimension' => $Row[9]
                                             );
-
-                                            $data_array     =   array_merge($data_array, $data_array2);
-                                            $lead_id        =   $this->Action_model->insert_data($data_array, 'tbl_data');
-                                        }
+                                                break;
+                                            case '7':
+                                                $property_details = array(
+                                                    'id' => '',
+                                                    'product_id' => $product_id,
+                                                    'unit_code' => $Row[1],
+                                                    'referance_number' => $Row[2],
+                                                    'plot_number' => $Row[3],
+                                                    'plot_size' => $Row[4],
+                                                    'size_unit' => $Row[5],
+                                                    'block'   => $Row[6],
+                                                    'applicable_plc' => $Row[7],
+                                                    'facing' => $Row[8],
+                                                    'dimension' => $Row[9]
+                                                );
+                                
+                                                break;
+                                            case '1':
+                                                $property_details = array(
+                                                    'id' => '',
+                                                    'product_id' => $product_id,
+                                                    'unit_code' => $Row[1],
+                                                    'referance_number' => $Row[2],
+                                                    'plot_number' => $Row[3],
+                                                    'plot_size' => $Row[4],
+                                                    'size_unit' => $Row[5],
+                                                    'block'   => $Row[6],
+                                                    'applicable_plc' => $Row[7],
+                                                    'facing' => $Row[8],
+                                                    'dimension' => $Row[9]
+                                                );
+                                
+                                                break;
+                                            case '9':
+                                                $property_details = array(
+                                                    'id' => '',
+                                                    'product_id' => $product_id,
+                                                    'unit_code' => $Row[1],
+                                                    'referance_number' => $Row[2],
+                                                    'plot_number' => $Row[3],
+                                                    'plot_size' => $Row[4],
+                                                    'size_unit' => $Row[5],
+                                                    'block'   => $Row[6],
+                                                    'applicable_plc' => $Row[7],
+                                                    'facing' => $Row[8],
+                                                    'dimension' => $Row[9]
+                                                );
+                                                break;
+                                        endswitch;
+                                        
+                                       # Db Data
+                                            $data_excel                    =   [
+                                                'product_id'            => $product_id,
+                                                'builder_id'            => $builder_id,
+                                                'unit_code'             => $Row[1],
+                                                'property_details'      => $property_details ? json_encode($property_details) : NULL,
+                                            ];
+                                            # End Db Data
+                                    
+                                      $result =  $this->Action_model->insert_data($data_excel, 'tbl_inventory');
+    
                                     }
                                 }
                             }
                         }
+                        unlink($data['full_path']);
                     }
-
-                    unlink($data['full_path']);
                 }
-            }
-
-            $this->session->set_flashdata('success_msg', "Data Uploaded  $total_uploaded_data_count out of $total_data_count (some data is already exist)");
-
-
-            $result                             =   $this->Action_model->insert_data($data, 'tbl_inventory');
-            $res_arr                            =   $result ? ['status' => true, 'message' => 'Successfully record inserted'] : ['status' => false, 'message' => 'Some error occured'];
-
+    
+                $res_arr                            =   $result ? ['status' => true, 'message' => 'Successfully record inserted'] : ['status' => false, 'message' => 'Some error occured'];
+  
             echo json_encode($res_arr);
         endif;
     }
