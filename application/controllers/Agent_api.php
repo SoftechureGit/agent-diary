@@ -4475,7 +4475,11 @@ WHERE lead_id='" . $lead_id . "'
             $where                      .= " and unit_code='" . $property_unit_code_id . "'";
         endif;
 
-        $record_data                    = $this->Action_model->detail_result('tbl_inventory', $where);
+        $this->db->select('inventory.*, inventory_status.inventory_status_name');
+        $this->db->where($where);
+        $this->db->join('tbl_inventory_status as inventory_status', 'inventory_status.inventory_status_id = inventory.inventory_status');
+        $record_data = $this->db->from('tbl_inventory as inventory')->get()->result();
+        // $record_data                    = $this->Action_model->detail_result('tbl_inventory', $where);
 
         if ($record_data) {
             $records                    = $record_data;
@@ -4598,6 +4602,7 @@ WHERE lead_id='" . $lead_id . "'
             $inv_tower                              =   ( $inventory_details->block_or_tower_id ?? 0 ) ? ( getBlocksOrTowers($inventory_details->block_or_tower_id)->name ?? '-' ) : '';
             $inv_facing                             =   ( $inventory_details->facing_id ?? 0 ) ? ( facings($inventory_details->facing_id)->title ?? '-' ): '-';
             $inv_plot_size                          =   ( $inventory_details->plot_size ?? '-' ).' '. ( sizeUnits($inventory_details->size_unit ?? 0)->unit_name  ?? '-' ) ?? '-';
+            $inv_quote                              =   "<div class='text-center' onclick='getQuatation(".$inventory_details->id.")'><button class='btn btn-warning btn-sm' style='color:#fff;'><i class='fa fa-eye'></i></button></div>";
             # End Inventory Details Init
 
             $inventory_table_data                 =   (object) [
@@ -4608,12 +4613,12 @@ WHERE lead_id='" . $lead_id . "'
                                                                     'floor'                 =>   $inv_floor,
                                                                     'size'                  =>   $property->unit_size_name ?? '-',
                                                                     'tower'                 =>   $inv_tower,
-                                                                    'quote'                 =>   '-',
+                                                                    'quote'                 =>   $inv_quote,
                                                                     'facing'                =>   $inv_facing,
                                                                     'plot_size'             =>   $inv_plot_size,
                                                                     'unit_size'             =>   $inventory_details->size_unit ?? '-',
                                                                     'unit_type'             =>   $inventory_details->unit_type ?? '-',
-                                                                    'status'                =>   '-',
+                                                                    'status'                =>   $inventory->inventory_status_name ?? '-',
                                                                 ];
 
             $table_view                     .=  $this->inventory_table_heading_data($property->property_type_id, $inventory_table_data);
@@ -11384,7 +11389,7 @@ WHERE lead_id='" . $lead_id . "'
                                                                     <th>Floor</th>
                                                                     <th>Size</th>
                                                                     <th>Tower</th>
-                                                                    <th>QUT</th>
+                                                                    <th>Status</th>
                                                                     <th class='text-center'>Action</th>
                                                                 </tr>";
                 break;
@@ -11395,7 +11400,7 @@ WHERE lead_id='" . $lead_id . "'
                                                                     <th>Plot Size</th>
                                                                     <th>Unit Size</th>
                                                                     <th>Facing</th>
-                                                                    <th>Get Qut</th>
+                                                                    <th class='inv_quote'>Get Qut</th>
                                                                     <th>Status</th>
                                                                     <th class='text-center'>Action</th>
                                                                 </tr>";
@@ -11406,7 +11411,7 @@ WHERE lead_id='" . $lead_id . "'
                                                                         <th>Unit ref No</th>
                                                                         <th>Size</th>
                                                                         <th>Facing</th>
-                                                                        <th>Get Qut</th>
+                                                                        <th class='inv_quote'>Get Qut</th>
                                                                         <th>Status</th>
                                                                         <th class='text-center'>Action</th>
                                                                     </tr>";
@@ -11417,7 +11422,7 @@ WHERE lead_id='" . $lead_id . "'
                                                                         <th>Unit ref No</th>
                                                                         <th>Size</th>
                                                                         <th>Unit type</th>
-                                                                        <th>Get Qut</th>
+                                                                        <th class='inv_quote'>Get Qut</th>
                                                                         <th>Status</th>
                                                                         <th class='text-center'>Action</th>
                                                                     </tr>";
@@ -11428,7 +11433,7 @@ WHERE lead_id='" . $lead_id . "'
                                                                         <th>Unit ref No</th>
                                                                         <th>Size</th>
                                                                         <th>Unit type</th>
-                                                                        <th>Get Qut</th>
+                                                                        <th class='inv_quote'>Get Qut</th>
                                                                         <th>Status</th>
                                                                         <th class='text-center'>Action</th>
                                                                     </tr>";
@@ -11440,7 +11445,7 @@ WHERE lead_id='" . $lead_id . "'
                                                                         <th>Plot Size</th>
                                                                         <th>Unit Size</th>
                                                                         <th>Facing</th>
-                                                                        <th>Get Qut</th>
+                                                                        <th class='inv_quote'>Get Qut</th>
                                                                         <th>Status</th>
                                                                         <th class='text-center'>Action</th>
                                                                     </tr>";
@@ -11453,7 +11458,7 @@ WHERE lead_id='" . $lead_id . "'
                                                                     <th>Floor</th>
                                                                     <th>Size</th>
                                                                     <th>Tower</th>
-                                                                    <th>QUT</th>
+                                                                    <th>Status</th>
                                                                     <th class='text-center'>Action</th>
                                                                 </tr>";
                 break;
@@ -11491,7 +11496,7 @@ WHERE lead_id='" . $lead_id . "'
                                                                     <td>$inventory_table_data->plot_size</td>
                                                                     <td>$inventory_table_data->unit_size</td>
                                                                     <td>$inventory_table_data->facing</td>
-                                                                    <td>$inventory_table_data->quote</td>
+                                                                    <td class='inv_quote'>$inventory_table_data->quote</td>
                                                                     <td>$inventory_table_data->status</td>
                                                                     <td class='text-center'>
                                                                         <span class='text-primary px-2 view-inventory-record' data-id='$inventory_table_data->inventory_id'><i class='fa fa-eye'></i></span>
@@ -11506,7 +11511,7 @@ WHERE lead_id='" . $lead_id . "'
                                                                         <td>$inventory_table_data->referance_number</td>
                                                                         <td>$inventory_table_data->plot_size</td>
                                                                         <td>$inventory_table_data->facing</td>
-                                                                        <td>$inventory_table_data->quote</td>
+                                                                        <td class='inv_quote'>$inventory_table_data->quote</td>
                                                                         <td>$inventory_table_data->status</td>
                                                                         <td class='text-center'>
                                                                             <span class='text-primary px-2 view-inventory-record' data-id='$inventory_table_data->inventory_id'><i class='fa fa-eye'></i></span>
@@ -11521,7 +11526,7 @@ WHERE lead_id='" . $lead_id . "'
                                                                         <td>$inventory_table_data->referance_number</td>
                                                                         <td>$inventory_table_data->size</td>
                                                                         <td>$inventory_table_data->unit_type</td>
-                                                                        <td>$inventory_table_data->quote</td>
+                                                                        <td class='inv_quote'>$inventory_table_data->quote</td>
                                                                         <td>$inventory_table_data->status</td>
                                                                         <td class='text-center'>
                                                                             <span class='text-primary px-2 view-inventory-record' data-id='$inventory_table_data->inventory_id'><i class='fa fa-eye'></i></span>
@@ -11536,7 +11541,7 @@ WHERE lead_id='" . $lead_id . "'
                                                                         <td>$inventory_table_data->referance_number</td>
                                                                         <td>$inventory_table_data->size</td>
                                                                         <td>$inventory_table_data->unit_type</td>
-                                                                        <td>$inventory_table_data->quote</td>
+                                                                        <td class='inv_quote'>$inventory_table_data->quote</td>
                                                                         <td>$inventory_table_data->status</td>
                                                                         <td class='text-center'>
                                                                             <span class='text-primary px-2 view-inventory-record' data-id='$inventory_table_data->inventory_id'><i class='fa fa-eye'></i></span>
@@ -11552,7 +11557,7 @@ WHERE lead_id='" . $lead_id . "'
                                                                         <td>$inventory_table_data->plot_size</td>
                                                                         <td>$inventory_table_data->unit_size</td>
                                                                         <td>$inventory_table_data->facing</td>
-                                                                        <td>$inventory_table_data->quote</td>
+                                                                        <td class='inv_quote'>$inventory_table_data->quote</td>
                                                                         <td>$inventory_table_data->status</td>
                                                                         <td class='text-center'>
                                                                             <span class='text-primary px-2 view-inventory-record' data-id='$inventory_table_data->inventory_id'><i class='fa fa-eye'></i></span>
@@ -11569,7 +11574,7 @@ WHERE lead_id='" . $lead_id . "'
                                                                     <td>$inventory_table_data->floor</td>
                                                                     <td>$inventory_table_data->size</td>
                                                                     <td>$inventory_table_data->tower</td>
-                                                                    <td>$inventory_table_data->quote</td>
+                                                                    <td>$inventory_table_data->status</td>
                                                                     <td class='text-center'>
                                                                         <span class='text-primary px-2 view-inventory-record' data-id='$inventory_table_data->inventory_id'><i class='fa fa-eye'></i></span>
                                                                         <span class='text-success px-2 add-edit-inventory' data-id='$inventory_table_data->inventory_id'><i class='fa fa-edit'></i></span>

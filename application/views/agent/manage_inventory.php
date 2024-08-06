@@ -53,6 +53,9 @@
   .cp {
     cursor: pointer;
   }
+  .inv_quote{
+    display: none;
+  }
 </style>
 <?php include('include/sidebar.php'); ?>
 
