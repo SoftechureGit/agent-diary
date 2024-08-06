@@ -25,6 +25,33 @@ $property_layout_url        =   $property_layout ? base_url("uploads/images/prop
                 <?php endif; ?>
                 <!-- End Referance Number -->
 
+                <!-- Plot Number -->
+                <?php if ($plot_number ?? 0) : ?>
+                <tr>
+                    <th>Plot Number</th>
+                    <td><?= $plot_number ?? '' ?></td>
+                </tr>
+                <?php endif; ?>
+                <!-- End Plot Number -->
+
+                <!-- Plot Size -->
+                <?php if ($plot_size ?? 0) : ?>
+                <tr>
+                    <th>Plot Size</th>
+                    <td><?= $plot_size ?? '' ?></td>
+                </tr>
+                <?php endif; ?>
+                <!-- End Plot Size -->
+
+                <!-- Unit Size -->
+                <?php if ($size_unit ?? 0) : ?>
+                <tr>
+                    <th>Unit Size</th>
+                    <td><?= sizeUnits($size_unit)->unit_name ?? '' ?></td>
+                </tr>
+                <?php endif; ?>
+                <!-- End Unit Size -->
+
                 <!-- Unit No -->
                 <?php if ($unit_no ?? 0) : ?>
                 <tr>
@@ -51,6 +78,15 @@ $property_layout_url        =   $property_layout ? base_url("uploads/images/prop
                 </tr>
                 <?php endif; ?>
                 <!-- End Tower -->
+
+                <!-- Block -->
+                <?php if ($block ?? 0) : ?>
+                <tr>
+                    <th>Block</th>
+                    <td><?= $block ?? '' ?></td>
+                </tr>
+                <?php endif; ?>
+                <!-- End Block -->
 
                 <!-- Unit Type -->
                 <?php if ($unit_type ?? 0) : ?>
@@ -108,13 +144,22 @@ $property_layout_url        =   $property_layout ? base_url("uploads/images/prop
                 <!-- End applicable plc -->
 
                 <!-- Facing -->
-                <?php if ($facing ?? 0) : ?>
+                <?php if ($facing_id ?? 0) : ?>
                 <tr>
                     <th>Facing</th>
-                    <td><?= str_after('|', $facing ?? '') ?></td>
+                    <td><?= facings($facing_id)->title; ?></td>
                 </tr>
                 <?php endif; ?>
                 <!-- End Facing -->
+
+                <!-- Dimension -->
+                <?php if ($dimension ?? 0) : ?>
+                <tr>
+                    <th>Dimension</th>
+                    <td><?= $dimension ?></td>
+                </tr>
+                <?php endif; ?>
+                <!-- End Dimension -->
 
                 <!-- Parking -->
                 <?php if (is_array($parking ?? [])) : ?>

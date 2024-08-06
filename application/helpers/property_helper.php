@@ -3,14 +3,19 @@
 
 # Facings
 if (!function_exists('facings')) {
-    function facings()
+    function facings($id = '')
     {
         $records    =   db_instance()
             ->select('*')
             ->where("facing_status = 1")
             ->order_by("title", "asc")
-            ->get('tbl_facings')
-            ->result();
+            ->get('tbl_facings');
+
+        if ($id) :
+            $records    =   $records->row();
+        else :
+            $records    = $records->result();
+        endif;
 
         return $records ?? [];
     }
@@ -61,22 +66,79 @@ function property($id)
 {
     return db_instance()
         ->select(
-                    'property.product_id as id, 
+                    'property.product_id as id,
                     property.project_name as name, 
                     property.property_type as property_type_id, 
                     property.project_type as project_type_id,
-                    property.project_type as project_type_id,
-                    property.parking_open,
-                    property.parking_stilt,
-                    property.parking_basment as parking_basement
+                    project_type.product_type_name as project_type_name,
+                    property_type.unit_type_name as property_type_name,
+
+                    unit_size.unit_name as unit_size_name, 
+                    accomodation.accomodation_name, 
                     '
-                )
+        )
         ->where("property.product_id='$id'")
-        // ->join('tbl_product_unit_details as product', "product.")
+        ->join('tbl_product_types as project_type', "project_type.product_type_id = property.project_type", 'left')
+        ->join('tbl_unit_types as property_type', "property_type.unit_type_id = property.property_type", 'left')
+        ->join('tbl_product_unit_details as proptery_details', "proptery_details.product_id = property.product_id", 'left')
+
+        ->join('tbl_units as unit_size', "unit_size.unit_id = proptery_details.unit", 'left')
+        ->join('tbl_accomodations as accomodation', "accomodation.accomodation_id = proptery_details.accomodation", 'left')
         ->get('tbl_products as property')
         ->row();
 }
 # End Get Inventory Details
+
+# Get Property Parkings Details
+function parkings($id)
+{
+    $parkings                   =   [];
+    $parkings                   =   [];
+    $record                     =   db_instance()
+                                    ->select(
+                                                'property.product_id as id, 
+                                                property.project_name as name, 
+                                                property.parking_open,
+                                                property.parking_stilt,
+                                                property.parking_basment as parking_basement
+                                                '
+                                    )
+                                    ->where("property.product_id='$id'")
+                                    ->get('tbl_products as property')
+                                    ->row();
+    
+    if($record):
+
+            # Open Parking
+            if(( $record->parking_open ?? 0 )):
+                $parkings[]           = (object) [
+                                                    'label' => 'Open', 
+                                                    'value' => 'open'];
+            endif;
+            # End Open Parking
+
+            # Stilt Parking
+            if(( $record->parking_stilt ?? 0 )):
+                $parkings[]           = (object) [
+                                                    'label' => 'Stilt', 
+                                                    'value' => 'stilt'];
+            endif;
+            # End Stilt Parking
+
+            # Basement Parking
+            if(( $record->parking_basement ?? 0 )):
+                $parkings[]           = (object) [
+                                                    'label' => 'Basement', 
+                                                    'value' => 'basement'];
+            endif;
+            # End Basement Parking
+            
+    endif;
+
+    return (object) $parkings;
+    
+}
+# End Get Property Parkings Details
 
 # Get Inventory Details
 function getInventory($id)
@@ -112,7 +174,6 @@ function getPropertyPlcs($property_id, $selected_applicable_plcs = null)
     db_instance()->join('tbl_price_components', 'tbl_price_components.price_component_id = plc.price_comp_id');
     db_instance()->where($where);
     return db_instance()->get()->result();
-    
 }
 # End Get Inventory Details
 

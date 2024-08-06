@@ -32,33 +32,33 @@
     <div class="tab-content br-n pn">
       <div id="navtabs-overview" class="tab-pane active">
         <!-- Table View -->
-         <div class="table-responsive d-none">
+         <div class="table-responsive">
           <table class="table table-bordered">
             <!-- About Project -->
             <tr>
               <th width="20%">About Project</th>
-              <td><?= $record->description ?></td>
+              <td class="text-justify" style="line-height: 20px;"><?= $record->description ?? '-' ?></td>
             </tr>
             <!-- End About Project -->
 
             <!-- Project Type -->
             <tr>
               <th width="20%">Project Type</th>
-              <td><?= $record->description ?></td>
+              <td><?= $record->product_type_name ?? '-' ?></td>
             </tr>
             <!-- End Project Type -->
 
             <!-- Property Type -->
             <tr>
               <th width="20%">Property Type</th>
-              <td><?= $record->description ?></td>
+              <td><?= $record->unit_type_name ?? '-' ?></td>
             </tr>
             <!-- End Property Type -->
 
             <!-- Unit Type -->
             <tr>
               <th width="20%">Unit Type</th>
-              <td><?= $record->accomodation_name ?></td>
+              <td><?= $record->project_name ?? '-' ?></td>
             </tr>
             <!-- End Unit Type -->
 
@@ -66,7 +66,7 @@
          </div>
         <!-- End Table View -->
 
-        <div class="row">
+        <div class="row d-none">
           <div class="col-md-6">
             <label>Accomodation:</label> <strong><?= $record->accomodation_name ?></strong>
           </div>

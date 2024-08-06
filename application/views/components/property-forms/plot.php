@@ -123,23 +123,6 @@ endif;
                     </div>
                     <!-- End Facing -->
 
-                    <!-- Facing -->
-                    <div class="col-md-4 d-none">
-                        <div class="form-group">
-                            <label for="">Facing</label>
-                            <select name="property_details[facingg]" id="" class="form-control" >
-                                <option value="" disabled selected>Choose...</option>
-                                <?php 
-                                    foreach(facings() ?? [] as $facing_item): 
-                                    $selected         = $facing_item->facing_id == (( $facing ?? 0 ) ? str_before('|', $facing ) : '') ? 'selected' : '';
-                                ?>
-                                    <option <?=  ( $facing ?? 0 ) ? str_before('|', $facing ) : '' ?> value="<?= "$facing_item->facing_id | $facing_item->title" ?>"  <?= $selected ?>><?= $facing_item->title ?></option>   
-                                    <?php endforeach; ?>
-                                </select>
-                        </div>
-                    </div>
-                    <!-- End Facing -->
-
                     <!-- dimension F x B x S1 x S2 -->
                     <div class="col-md-4">
                         <div class="form-group">

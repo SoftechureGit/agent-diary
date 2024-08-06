@@ -256,6 +256,10 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id, $use
             cursor: pointer;
         }
 
+        .inventory-table caption {
+            font-size: 13px;
+            font-style: italic;
+        }
     </style>
 
 </head>

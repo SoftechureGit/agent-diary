@@ -2545,7 +2545,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 if (count($user_ids)) {
                     $where_ids .= " AND (tbl_users.user_id='" . implode("' OR tbl_users.user_id='", $user_ids) . "')";
                 }
-                
+
                 $where .= $where_ids;
 
                 $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,user_title,first_name,last_name,parent_id,is_individual,firm_name');
@@ -4456,28 +4456,37 @@ WHERE lead_id='" . $lead_id . "'
      */
     public function get_project_inventory()
     {
-        $product_id             = $this->input->post('product_id');
-        $property_unit_code_id  = $this->input->post('property_unit_code_id');
+        # Init
+        $records                        = array();
+        $columns                        = array();
+        $product_id                     = $this->input->post('product_id');
+        $property_unit_code_id          = $this->input->post('property_unit_code_id');
+        $data['product_id']             = $product_id;
+        # End Init
 
-        $data['product_id'] = $product_id;
+        # Property Data
+        $property                       =   property($product_id);
+        # End Property Data
 
-        $records = array();
-        $where = "product_id='" . $product_id . "'";
-        
-        if($property_unit_code_id):
-            $where .= " and unit_code='" . $property_unit_code_id . "'";
+        # Inventory Data
+        $where                          = "product_id='" . $product_id . "'";
+
+        if ($property_unit_code_id) :
+            $where                      .= " and unit_code='" . $property_unit_code_id . "'";
         endif;
 
-        $record_data = $this->Action_model->detail_result('tbl_inventory', $where);
-        if ($record_data) {
-            $records = $record_data;
-        }
-        $data['records'] = $records;
+        $record_data                    = $this->Action_model->detail_result('tbl_inventory', $where);
 
-        $columns = array();
+        if ($record_data) {
+            $records                    = $record_data;
+        }
+
+        $data['records']                = $records;                     # Set in data array
+        # End Inventory Data
+
 
         $where = "product_id='" . $product_id . "'";
-        
+
         $this->db->select('*');
         $this->db->from('tbl_product_plc_details');
         $this->db->join('tbl_price_components', 'tbl_price_components.price_component_id = tbl_product_plc_details.price_comp_id');
@@ -4505,12 +4514,6 @@ WHERE lead_id='" . $lead_id . "'
         $record_pd = $this->Action_model->select_single('tbl_products', "product_id='" . $product_id . "'");
         $unit_code_list = array();
 
-        /*if ($record_pd->project_type==3) {
-            $where = "product_id='".$product_id."'";
-        }
-        else {
-            $where = "product_id='".$product_id."' AND property_type='".$record_pd->property_type."'";
-        }*/
         $where = "product_id='" . $product_id . "' AND project_type='" . $record_pd->project_type . "' AND property_type='" . $record_pd->property_type . "'";
 
         $this->db->select('*');
@@ -4542,28 +4545,24 @@ WHERE lead_id='" . $lead_id . "'
 
 
         # Table View
-        $table_view                 =   "<div class='table-responsive'>
+
+        $table_headings             =   $this->inventory_table_headings($property->property_type_id);
+        $table_view                 =   "<div class='table-responsive inventory-table'>
                                         <table class='table table-bordered'>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Unit Code</th>
-                                            <th>Referance Number</th>
-                                            <th>Unit no</th>
-                                            <th class='text-center'>Action</th>
-                                        </tr>
+                                        <caption>* $property->property_type_name *</caption>
+                                        $table_headings
                                         ";
 
-        if(!count($records ?? [])):
-             $table_view                     .= "<tr><td colspan='5' class='text-center'>No inventory found</td></tr>";
+        if (!count($records ?? [])) :
+            $table_view                     .= "<tr><td colspan='10' class='text-center'>No inventory found</td></tr>";
         endif;
 
         foreach ($records ?? [] as $inventory_key => $inventory) :
 
-
             $inventory_id                   =   $inventory->inventory_id;
             $inventory_key                  =   ++$inventory_key;
-            $property_details               =   $inventory->property_details ? json_decode($inventory->property_details) : null;
-
+            $property_details = $inventory_details =   $inventory->property_details ? json_decode($inventory->property_details) : null;
+            
             #
             if ($inventory->product_id) :
                 $property               = property($inventory->product_id);
@@ -4576,21 +4575,48 @@ WHERE lead_id='" . $lead_id . "'
             #
 
             $unit_code                      =   $property_details->unit_code ?? '';
-            $unit_no                        =    $property_details->unit_no ?? '';
+            $unit_no                        =   $property_details->unit_no ?? '';
             $referance_number               =   $property_details->referance_number ?? $inventory->reference ?? '';
 
-            $table_view                     .=  "<tr>
-                                                        <td>$inventory_key</td>
-                                                        <td>$unit_code_name</td>
-                                                        <td>$referance_number</td>
-                                                        <td>$unit_no</td>
-                                                        <td class='text-center'>
-                                                            <span class='text-primary px-2 view-inventory-record' data-id='$inventory_id'><i class='fa fa-eye'></i></span>
-                                                            <span class='text-success px-2 add-edit-inventory' data-id='$inventory_id'><i class='fa fa-edit'></i></span>
-                                                            <span class='text-danger px-2 delete-inventory-record' data-id='$inventory_id'><i class='fa fa-trash'></i></span>
-                                                        </td>
-                                                    </tr>
-                                                ";
+            // $table_view                     .=  "<tr>
+            //                                             <td>$inventory_key</td>
+            //                                             <td>$unit_code_name</td>
+            //                                             <td>$referance_number</td>
+            //                                             <td>$unit_no</td>
+            //                                             <td class='text-center'>
+            //                                                 <span class='text-primary px-2 view-inventory-record' data-id='$inventory_id'><i class='fa fa-eye'></i></span>
+            //                                                 <span class='text-success px-2 add-edit-inventory' data-id='$inventory_id'><i class='fa fa-edit'></i></span>
+            //                                                 <span class='text-danger px-2 delete-inventory-record' data-id='$inventory_id'><i class='fa fa-trash'></i></span>
+            //                                             </td>
+            //                                         </tr>
+            //                                     ";
+
+
+            # Inventory Details Init
+            $inv_accomodation                       =   $property->accomodation_name ?? '-';
+            $inv_floor                              =   ( $inventory_details->floor_id ?? 0 ) ? ( getFloors($inventory_details->floor_id)->name ?? '-' ) : '';
+            $inv_tower                              =   ( $inventory_details->block_or_tower_id ?? 0 ) ? ( getBlocksOrTowers($inventory_details->block_or_tower_id)->name ?? '-' ) : '';
+            $inv_facing                             =   ( $inventory_details->facing_id ?? 0 ) ? ( facings($inventory_details->facing_id)->title ?? '-' ): '-';
+            $inv_plot_size                          =   ( $inventory_details->plot_size ?? '-' ).' '. ( sizeUnits($inventory_details->size_unit ?? 0)->unit_name  ?? '-' ) ?? '-';
+            # End Inventory Details Init
+
+            $inventory_table_data                 =   (object) [
+                                                                    'serial_number'         =>   $inventory_key,
+                                                                    'inventory_id'          =>   $inventory_id,
+                                                                    'referance_number'      =>   $referance_number ?? '-',
+                                                                    'accomodation'          =>   $inv_accomodation,
+                                                                    'floor'                 =>   $inv_floor,
+                                                                    'size'                  =>   $property->unit_size_name ?? '-',
+                                                                    'tower'                 =>   $inv_tower,
+                                                                    'quote'                 =>   '-',
+                                                                    'facing'                =>   $inv_facing,
+                                                                    'plot_size'             =>   $inv_plot_size,
+                                                                    'unit_size'             =>   $inventory_details->size_unit ?? '-',
+                                                                    'unit_type'             =>   $inventory_details->unit_type ?? '-',
+                                                                    'status'                =>   '-',
+                                                                ];
+
+            $table_view                     .=  $this->inventory_table_heading_data($property->property_type_id, $inventory_table_data);
         endforeach;
 
         $table_view                         .=   "</table><div>";
@@ -4812,10 +4838,19 @@ WHERE lead_id='" . $lead_id . "'
         }
 
         if ($this->input->post()) {
+            // echo $account_id;
+            // die;
             $builder_id = $this->input->post('builder_id');
             $where = "tbl_products.agent_id='" . $account_id . "' AND tbl_products.builder_id='" . $builder_id . "'";
-            
-            $product_data = $this->Action_model->detail_result('tbl_products', $where, 'product_id,project_name, property_type as property_type_id');
+            $this->db->distinct();
+            $this->db->select("product_id,project_name, property_type as property_type_id");
+            $this->db->from('tbl_products');
+            $this->db->where($where);
+            $product_data = $this->db->get()->result();
+
+
+            // $product_data = $this->Action_model->detail_result('tbl_products', $where, 'product_id,project_name, property_type as property_type_id');
+
             if ($product_data) {
                 $product_list = $product_data;
             }
@@ -6952,7 +6987,7 @@ WHERE lead_id='" . $lead_id . "'
                                             if ($b_cost_unit == '1') { // for Sq.Yd
                                                 $current_rate = $item->plot_size * $itemInv->current_rate;
                                             } else if ($b_cost_unit == '2') { // for Sq.Ft
-                                                $current_rate += $item->construction_area * $itemInv->current_rate;
+                                                $current_rate += ($item->construction_area ?? 0) * $itemInv->current_rate;
                                             } else if ($b_cost_unit == '5') { // for Fix
                                                 $current_rate = $itemInv->current_rate;
                                             }
@@ -7362,7 +7397,7 @@ WHERE lead_id='" . $lead_id . "'
                                     if ($b_cost_unit == '1') { // for Sq.Yd
                                         $current_rate = $item->plot_size * $itemInv->current_rate;
                                     } else if ($b_cost_unit == '2') { // for Sq.Ft
-                                        $current_rate += $item->construction_area * $itemInv->current_rate;
+                                        $current_rate += ($item->construction_area ?? 0) * $itemInv->current_rate;
                                     } else if ($b_cost_unit == '5') { // for Fix
                                         $current_rate = $itemInv->current_rate;
                                     }
@@ -7474,6 +7509,10 @@ WHERE lead_id='" . $lead_id . "'
                 $data['plc_details'] = $plc_details;
 
                 $data['record'] = $record;
+
+                // echo "<pre>";
+                // print_r($data);
+                // die;
                 $this->load->view(AGENT_URL . 'get_product_unit_single', $data);
             } else {
                 echo 'error';
@@ -7568,7 +7607,7 @@ WHERE lead_id='" . $lead_id . "'
 
     public function get_product_inventory_list()
     {
-        
+
         $array = array();
         $items = array();
         $account_id = getAccountId();
@@ -11047,15 +11086,15 @@ WHERE lead_id='" . $lead_id . "'
                 $res_arr                            =   $result ? ['status' => true, 'message' => 'Successfully record updated'] : ['status' => false, 'message' => 'Some error occured'];
             else :
                 $result                             =   $this->Action_model->insert_data($data, 'tbl_inventory');
-                    
-                if($result):
+
+                if ($result) :
                     $property_details['id']         =   $result;
-                   
+
                     $property_details               =   $property_details ? json_encode($property_details) : NULL;
 
                     $data                                   =   [
-                                                                    'property_details'      =>  $property_details,
-                                                                ];
+                        'property_details'      =>  $property_details,
+                    ];
                     $result                             =   $this->Action_model->update_data($data, 'tbl_inventory', "inventory_id = $result");
                 endif;
 
@@ -11075,8 +11114,8 @@ WHERE lead_id='" . $lead_id . "'
     {
 
         // print_r($this->input->post()); die;
-        
-        if ($this->input->post()):
+
+        if ($this->input->post()) :
 
             if (!$this->input->post()) :
                 echo json_encode(['status' => false, 'message' => 'Reqeust method is not POST']);
@@ -11085,104 +11124,105 @@ WHERE lead_id='" . $lead_id . "'
             $res_arr                                    =   [];
 
             # Init
-                $product_id                                 =   $this->input->post('product_id');
-                $builder_id                                 =   $this->input->post('builder_id');
+            $product_id                                 =   $this->input->post('product_id');
+            $builder_id                                 =   $this->input->post('builder_id');
             # End Init
 
-    
+
             $total_data_count    = 0;
-            $total_uploaded_data_count = 0;  
-    
-           
+            $total_uploaded_data_count = 0;
+
+
             $data_excel = array();
-    
-            
-    
-                    $upload_path = FCPATH . './uploads/raw-data/';
-                    # Create Folder if Folder Not Exits
-                    if (!file_exists($upload_path)) {
-                        mkdir($upload_path, 0777, true);
-                    }
-                    # End Create Folder if Folder Not Exits
-            
-                    $config['upload_path']             = $upload_path;
-            
-                    $config['allowed_types']          =    'xlsx';  
-
-                    $this->load->library('upload', $config);
-
-                    if ($this->upload->do_upload('file')) {
-                        
-                        $data = $this->upload->data();
-    
-                    if ($data['file_ext'] == '.xlsx') {
-    
-                        require('application/libraries/php-excel-reader/excel_reader2.php');
-                        require('application/libraries/SpreadsheetReader.php');
-    
-    
-                        $Reader = new SpreadsheetReader($data['full_path']);
-                        $Sheets = $Reader->Sheets();
 
 
-                        // print_r($Sheets); die;
 
-                       
-    
-                        
-                        foreach ($Sheets as $Index => $Name) {
-                            if ($Index == 0) {
-                                $Reader->ChangeSheet($Index);
-                                foreach ($Reader as $Key => $Row) {
-                                  
-                                    if ($Key  > 0) {
+            $upload_path = FCPATH . './uploads/raw-data/';
+            # Create Folder if Folder Not Exits
+            if (!file_exists($upload_path)) {
+                mkdir($upload_path, 0777, true);
+            }
+            # End Create Folder if Folder Not Exits
 
-                                        print_r($Row); die;
+            $config['upload_path']             = $upload_path;
 
-                                        $total_data_count++;
-                                        $data_array = array(
-                                            'data_title'            =>  $Row[1] ?? '',
-                                            'data_first_name'       =>  $Row[2] ?? '',
-                                            'data_last_name'        =>  $Row[3] ?? '',
-                                            'data_mobile'           =>  $Row[4] ?? '',
-                                            'data_email'            =>  $Row[5] ?? ''
-                                        );
-    
-                                        $where          =   "data_mobile='" . $Row[4] . "' AND account_id='" . $account_id . "'";
-                                        $lead_detail    =   $this->Action_model->select_single('tbl_data', $where);
-    
-                                        if ($lead_detail) {
-    
-                                            $this->Action_model->update_data($data_array, 'tbl_data', $where);
-                                        } else {
-                                            if( $Row[4] && $Row[2]){
-                                                $total_uploaded_data_count++;
-                                                $data_array2 = array(
-                                                    'added_by'          =>  $user_id,
-                                                    'account_id'        =>  $account_id,
-                                                    'data_status'       =>  1,
-                                                    'file_name'         =>  $this->input->post('lead_data_type'),
-                                                );
-        
-                                                $data_array     =   array_merge($data_array, $data_array2);
-                                                $lead_id        =   $this->Action_model->insert_data($data_array, 'tbl_data');
-                                            }
+            $config['allowed_types']          =    'xlsx';
+
+            $this->load->library('upload', $config);
+
+            if ($this->upload->do_upload('file')) {
+
+                $data = $this->upload->data();
+
+                if ($data['file_ext'] == '.xlsx') {
+
+                    require('application/libraries/php-excel-reader/excel_reader2.php');
+                    require('application/libraries/SpreadsheetReader.php');
+
+
+                    $Reader = new SpreadsheetReader($data['full_path']);
+                    $Sheets = $Reader->Sheets();
+
+
+                    // print_r($Sheets); die;
+
+
+
+
+                    foreach ($Sheets as $Index => $Name) {
+                        if ($Index == 0) {
+                            $Reader->ChangeSheet($Index);
+                            foreach ($Reader as $Key => $Row) {
+
+                                if ($Key  > 0) {
+
+                                    print_r($Row);
+                                    die;
+
+                                    $total_data_count++;
+                                    $data_array = array(
+                                        'data_title'            =>  $Row[1] ?? '',
+                                        'data_first_name'       =>  $Row[2] ?? '',
+                                        'data_last_name'        =>  $Row[3] ?? '',
+                                        'data_mobile'           =>  $Row[4] ?? '',
+                                        'data_email'            =>  $Row[5] ?? ''
+                                    );
+
+                                    $where          =   "data_mobile='" . $Row[4] . "' AND account_id='" . $account_id . "'";
+                                    $lead_detail    =   $this->Action_model->select_single('tbl_data', $where);
+
+                                    if ($lead_detail) {
+
+                                        $this->Action_model->update_data($data_array, 'tbl_data', $where);
+                                    } else {
+                                        if ($Row[4] && $Row[2]) {
+                                            $total_uploaded_data_count++;
+                                            $data_array2 = array(
+                                                'added_by'          =>  $user_id,
+                                                'account_id'        =>  $account_id,
+                                                'data_status'       =>  1,
+                                                'file_name'         =>  $this->input->post('lead_data_type'),
+                                            );
+
+                                            $data_array     =   array_merge($data_array, $data_array2);
+                                            $lead_id        =   $this->Action_model->insert_data($data_array, 'tbl_data');
                                         }
                                     }
                                 }
                             }
                         }
-    
-                        unlink($data['full_path']);
                     }
+
+                    unlink($data['full_path']);
                 }
-    
-                $this->session->set_flashdata('success_msg', "Data Uploaded  $total_uploaded_data_count out of $total_data_count (some data is already exist)");
-             
-           
-                $result                             =   $this->Action_model->insert_data($data, 'tbl_inventory');
-                $res_arr                            =   $result ? ['status' => true, 'message' => 'Successfully record inserted'] : ['status' => false, 'message' => 'Some error occured'];
-  
+            }
+
+            $this->session->set_flashdata('success_msg', "Data Uploaded  $total_uploaded_data_count out of $total_data_count (some data is already exist)");
+
+
+            $result                             =   $this->Action_model->insert_data($data, 'tbl_inventory');
+            $res_arr                            =   $result ? ['status' => true, 'message' => 'Successfully record inserted'] : ['status' => false, 'message' => 'Some error occured'];
+
             echo json_encode($res_arr);
         endif;
     }
@@ -11245,4 +11285,216 @@ WHERE lead_id='" . $lead_id . "'
         echo json_encode($res_arr);
     }
     # End Delete Inventory Details
+
+    # Property Inventory Table Headings
+    public function inventory_table_headings($property_type_id)
+    {
+        $table_headings                             =   "";
+        switch ($property_type_id):
+            case '1':
+                $table_headings                             =   "<tr>
+                                                                    <th>#</th>
+                                                                    <th>Unit ref No</th>
+                                                                    <th>Accomodation</th>
+                                                                    <th>Floor</th>
+                                                                    <th>Size</th>
+                                                                    <th>Tower</th>
+                                                                    <th>QUT</th>
+                                                                    <th class='text-center'>Action</th>
+                                                                </tr>";
+                break;
+            case '2':
+                $table_headings                             =   "<tr>
+                                                                    <th>#</th>
+                                                                    <th>Unit ref No</th>
+                                                                    <th>Plot Size</th>
+                                                                    <th>Unit Size</th>
+                                                                    <th>Facing</th>
+                                                                    <th>Get Qut</th>
+                                                                    <th>Status</th>
+                                                                    <th class='text-center'>Action</th>
+                                                                </tr>";
+                break;
+            case '3':
+                $table_headings                             =   "<tr>
+                                                                        <th>#</th>
+                                                                        <th>Unit ref No</th>
+                                                                        <th>Size</th>
+                                                                        <th>Facing</th>
+                                                                        <th>Get Qut</th>
+                                                                        <th>Status</th>
+                                                                        <th class='text-center'>Action</th>
+                                                                    </tr>";
+                break;
+            case '4':
+                $table_headings                             =   "<tr>
+                                                                        <th>#</th>
+                                                                        <th>Unit ref No</th>
+                                                                        <th>Size</th>
+                                                                        <th>Unit type</th>
+                                                                        <th>Get Qut</th>
+                                                                        <th>Status</th>
+                                                                        <th class='text-center'>Action</th>
+                                                                    </tr>";
+                break;
+            case '5':
+                $table_headings                             =   "<tr>
+                                                                        <th>#</th>
+                                                                        <th>Unit ref No</th>
+                                                                        <th>Size</th>
+                                                                        <th>Unit type</th>
+                                                                        <th>Get Qut</th>
+                                                                        <th>Status</th>
+                                                                        <th class='text-center'>Action</th>
+                                                                    </tr>";
+                break;
+            case '7':
+                $table_headings                             =   "<tr>
+                                                                        <th>#</th>
+                                                                        <th>Unit ref No</th>
+                                                                        <th>Plot Size</th>
+                                                                        <th>Unit Size</th>
+                                                                        <th>Facing</th>
+                                                                        <th>Get Qut</th>
+                                                                        <th>Status</th>
+                                                                        <th class='text-center'>Action</th>
+                                                                    </tr>";
+                break;
+            case '9':
+                $table_headings                             =   "<tr>
+                                                                    <th>#</th>
+                                                                    <th>Unit ref No</th>
+                                                                    <th>Accomodation</th>
+                                                                    <th>Floor</th>
+                                                                    <th>Size</th>
+                                                                    <th>Tower</th>
+                                                                    <th>QUT</th>
+                                                                    <th class='text-center'>Action</th>
+                                                                </tr>";
+                break;
+        endswitch;
+
+        return $table_headings;
+    }
+    # End Property Inventory Table Headings
+
+    # Property Inventory Table Heading Data
+    public function inventory_table_heading_data($property_type_id, $inventory_table_data)
+    {
+        $table_headings_data                             =   "";
+        switch ($property_type_id):
+            case '1':                                           # Apartment 
+                $table_headings_data                             =   "<tr>
+                                                                    <td>$inventory_table_data->serial_number</td>
+                                                                    <td>$inventory_table_data->referance_number</td>
+                                                                    <td>$inventory_table_data->accomodation</td>
+                                                                    <td>$inventory_table_data->floor</td>
+                                                                    <td>$inventory_table_data->size</td>
+                                                                    <td>$inventory_table_data->tower</td>
+                                                                    <td>$inventory_table_data->status</td>
+                                                                    <td class='text-center'>
+                                                                        <span class='text-primary px-2 view-inventory-record' data-id='$inventory_table_data->inventory_id'><i class='fa fa-eye'></i></span>
+                                                                        <span class='text-success px-2 add-edit-inventory' data-id='$inventory_table_data->inventory_id'><i class='fa fa-edit'></i></span>
+                                                                        <span class='text-danger px-2 delete-inventory-record' data-id='$inventory_table_data->inventory_id'><i class='fa fa-trash'></i></span>
+                                                                    </td>
+                                                                </tr>";
+                break;
+            case '2':                                           # Villa
+                $table_headings_data                             =   "<tr>
+                                                                    <td>$inventory_table_data->serial_number</td>
+                                                                    <td>$inventory_table_data->referance_number</td>
+                                                                    <td>$inventory_table_data->plot_size</td>
+                                                                    <td>$inventory_table_data->unit_size</td>
+                                                                    <td>$inventory_table_data->facing</td>
+                                                                    <td>$inventory_table_data->quote</td>
+                                                                    <td>$inventory_table_data->status</td>
+                                                                    <td class='text-center'>
+                                                                        <span class='text-primary px-2 view-inventory-record' data-id='$inventory_table_data->inventory_id'><i class='fa fa-eye'></i></span>
+                                                                        <span class='text-success px-2 add-edit-inventory' data-id='$inventory_table_data->inventory_id'><i class='fa fa-edit'></i></span>
+                                                                        <span class='text-danger px-2 delete-inventory-record' data-id='$inventory_table_data->inventory_id'><i class='fa fa-trash'></i></span>
+                                                                    </td>
+                                                                </tr>";
+                break;
+            case '3':                                           # Plot
+                $table_headings_data                             =   "<tr>
+                                                                        <td>$inventory_table_data->serial_number</td>
+                                                                        <td>$inventory_table_data->referance_number</td>
+                                                                        <td>$inventory_table_data->plot_size</td>
+                                                                        <td>$inventory_table_data->facing</td>
+                                                                        <td>$inventory_table_data->quote</td>
+                                                                        <td>$inventory_table_data->status</td>
+                                                                        <td class='text-center'>
+                                                                            <span class='text-primary px-2 view-inventory-record' data-id='$inventory_table_data->inventory_id'><i class='fa fa-eye'></i></span>
+                                                                            <span class='text-success px-2 add-edit-inventory' data-id='$inventory_table_data->inventory_id'><i class='fa fa-edit'></i></span>
+                                                                            <span class='text-danger px-2 delete-inventory-record' data-id='$inventory_table_data->inventory_id'><i class='fa fa-trash'></i></span>
+                                                                        </td>
+                                                                    </tr>";
+                break;
+            case '4':                                           # Shop
+                $table_headings_data                             =   "<tr>
+                                                                        <td>$inventory_table_data->serial_number</td>
+                                                                        <td>$inventory_table_data->referance_number</td>
+                                                                        <td>$inventory_table_data->size</td>
+                                                                        <td>$inventory_table_data->unit_type</td>
+                                                                        <td>$inventory_table_data->quote</td>
+                                                                        <td>$inventory_table_data->status</td>
+                                                                        <td class='text-center'>
+                                                                            <span class='text-primary px-2 view-inventory-record' data-id='$inventory_table_data->inventory_id'><i class='fa fa-eye'></i></span>
+                                                                            <span class='text-success px-2 add-edit-inventory' data-id='$inventory_table_data->inventory_id'><i class='fa fa-edit'></i></span>
+                                                                            <span class='text-danger px-2 delete-inventory-record' data-id='$inventory_table_data->inventory_id'><i class='fa fa-trash'></i></span>
+                                                                        </td>
+                                                                    </tr>";
+                break;
+            case '5':                                           # Office
+                $table_headings_data                             =   "<tr>
+                                                                        <td>$inventory_table_data->serial_number</td>
+                                                                        <td>$inventory_table_data->referance_number</td>
+                                                                        <td>$inventory_table_data->size</td>
+                                                                        <td>$inventory_table_data->unit_type</td>
+                                                                        <td>$inventory_table_data->quote</td>
+                                                                        <td>$inventory_table_data->status</td>
+                                                                        <td class='text-center'>
+                                                                            <span class='text-primary px-2 view-inventory-record' data-id='$inventory_table_data->inventory_id'><i class='fa fa-eye'></i></span>
+                                                                            <span class='text-success px-2 add-edit-inventory' data-id='$inventory_table_data->inventory_id'><i class='fa fa-edit'></i></span>
+                                                                            <span class='text-danger px-2 delete-inventory-record' data-id='$inventory_table_data->inventory_id'><i class='fa fa-trash'></i></span>
+                                                                        </td>
+                                                                    </tr>";
+                break;
+            case '7':                                           # Builder Floor
+                $table_headings_data                             =   "<tr>
+                                                                        <td>$inventory_table_data->serial_number</td>
+                                                                        <td>$inventory_table_data->referance_number</td>
+                                                                        <td>$inventory_table_data->plot_size</td>
+                                                                        <td>$inventory_table_data->unit_size</td>
+                                                                        <td>$inventory_table_data->facing</td>
+                                                                        <td>$inventory_table_data->quote</td>
+                                                                        <td>$inventory_table_data->status</td>
+                                                                        <td class='text-center'>
+                                                                            <span class='text-primary px-2 view-inventory-record' data-id='$inventory_table_data->inventory_id'><i class='fa fa-eye'></i></span>
+                                                                            <span class='text-success px-2 add-edit-inventory' data-id='$inventory_table_data->inventory_id'><i class='fa fa-edit'></i></span>
+                                                                            <span class='text-danger px-2 delete-inventory-record' data-id='$inventory_table_data->inventory_id'><i class='fa fa-trash'></i></span>
+                                                                        </td>
+                                                                    </tr>";
+                break;
+            case '9':                                           # Apartment
+                $table_headings_data                             =   "<tr>
+                                                                    <td>$inventory_table_data->serial_number</td>
+                                                                    <td>$inventory_table_data->referance_number</td>
+                                                                    <td>$inventory_table_data->accomodation</td>
+                                                                    <td>$inventory_table_data->floor</td>
+                                                                    <td>$inventory_table_data->size</td>
+                                                                    <td>$inventory_table_data->tower</td>
+                                                                    <td>$inventory_table_data->quote</td>
+                                                                    <td class='text-center'>
+                                                                        <span class='text-primary px-2 view-inventory-record' data-id='$inventory_table_data->inventory_id'><i class='fa fa-eye'></i></span>
+                                                                        <span class='text-success px-2 add-edit-inventory' data-id='$inventory_table_data->inventory_id'><i class='fa fa-edit'></i></span>
+                                                                        <span class='text-danger px-2 delete-inventory-record' data-id='$inventory_table_data->inventory_id'><i class='fa fa-trash'></i></span>
+                                                                    </td>
+                                                                </tr>";
+                break;
+        endswitch;
+
+        return $table_headings_data;
+    }
+    # End Property Inventory Table Heading Data
 }
