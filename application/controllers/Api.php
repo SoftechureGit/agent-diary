@@ -2857,6 +2857,9 @@ class Api extends CI_Controller {
         $account_id = 0;
         $user_id = 0;
 
+             $data['json_data']  = json_encode($this->input->post());   
+
+            $this->db->insert('tbl_get_all_data_json' , $data);
       
          if(isset($_POST['user_hash'])):
 
