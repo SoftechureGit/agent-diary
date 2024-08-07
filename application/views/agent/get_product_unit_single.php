@@ -125,7 +125,7 @@
           <div class="row">
             <div class="col-md-12">
               <div class="text-right">
-                <button class="btn btn-info btn-sm inventory-filter-modal-btn" data-property-type="<?= $record->unit_type_name ?>">Filter</button>
+                <button class="btn btn-info btn-sm inventory-filter-modal-btn" data-property-type="<?= $record->property_type_id ?>">Filter</button>
               </div>
             </div>
           </div>
@@ -299,7 +299,8 @@
       <div class="modal-body">
         <div class="row">
           <!-- Status -->
-          <div class="col-md-4">
+          <div class="col-md-4 filter-col">
+            <div class="form-group">
               <label for="status">Status</label>
 
               <select id="inventory_filter_status" class="form-control select2 filter-invetory">
@@ -309,10 +310,11 @@
                 <?php endforeach; ?>
               </select>
             </div>
-            <!-- Status -->
+            </div>
+          <!-- Status -->
 
-            <!-- Facing -->
-            <div class="col-md-4">
+          <!-- Facing -->
+          <div class="col-md-4 filter-col">
               <div class="form-group">
                 <label for="">Facing</label>
                 <select id="inventory_filter_facing" class="form-control select2 filter-invetory">
@@ -326,10 +328,11 @@
                 </select>
               </div>
             </div>
-            <!-- End Facing -->
+          <!-- End Facing -->
 
-            <!-- Floor -->
-            <div class="col-md-4">
+          <!-- Floor -->
+          <div class="col-md-4 filter-col">
+            <div class="form-group">
               <label for="status">Floor</label>
 
               <select id="inventory_filter_floor" class="form-control select2 filter-invetory">
@@ -342,10 +345,12 @@
                 <?php endforeach; ?>
               </select>
             </div>
-            <!-- End Floor -->
+            </div>
+          <!-- End Floor -->
 
-            <!-- Tower -->
-            <div class="col-md-4">
+          <!-- Tower -->
+          <div class="col-md-4 filter-col">
+            <div class="form-group">
               <label for="status">Tower</label>
 
               <select id="inventory_filter_tower" class="form-control select2 filter-invetory">
@@ -356,11 +361,13 @@
                   <option value="<?= $block_or_tower->id ?>"><?= $block_or_tower->name ?? '' ?></option>
                 <?php endforeach; ?>
               </select>
-            </div>
-            <!-- End Tower -->
+          </div>
+          </div>
+          <!-- End Tower -->
 
-            <!-- Accomodations -->
-            <div class="col-md-4">
+          <!-- Accomodations -->
+          <div class="col-md-4 filter-col">
+            <div class="form-group">
               <label for="status">Accomodations</label>
 
               <select id="inventory_filter_accomodation" class="form-control select2 filter-invetory">
@@ -371,8 +378,9 @@
                   <option value="<?= $accomodation->id ?>"><?= $accomodation->name ?? '' ?></option>
                 <?php endforeach; ?>
               </select>
-            </div>
-            <!-- End Accomodations -->
+            </div>  
+            </div>  
+          <!-- End Accomodations -->
         </div>
       </div>
       <div class="modal-footer">
@@ -387,11 +395,54 @@
 <script>
   //getRequirementList(<?= $record->lead_id ?? 0 ?>);
 
-  $(document).on('click', '.inventory-filter-modal-btn', function(){
-    var property_type  = $(this).data('property-type');
+  $(document).on('click', '.inventory-filter-modal-btn', function() {
+    var property_type = $(this).data('property-type');
 
-    // console.log(property_type);
-    
+    console.log(property_type)
+    /** Property Form */
+
+    $('#inventoryFilterModal .filter-col').addClass('d-none')
+
+    switch (property_type) {
+      case 1:   // Multistory Apartment
+        $('#inventoryFilterModal #inventory_filter_status').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_accomodation').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_floor').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_tower').parents('.filter-col').removeClass('d-none')
+        break;
+
+      case 3:   // Plot
+        $('#inventoryFilterModal #inventory_filter_status').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_facing').parents('.filter-col').removeClass('d-none')
+        break;
+
+      case 7:   // Builder Floor
+        $('#inventoryFilterModal #inventory_filter_status').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_facing').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_floor').parents('.filter-col').removeClass('d-none')
+        break;
+
+      case 2:     // Villa
+        $('#inventoryFilterModal #inventory_filter_status').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_facing').parents('.filter-col').removeClass('d-none')
+        break;
+
+      case 4:     // Shop
+        $('#inventoryFilterModal #inventory_filter_status').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_floor').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_tower').parents('.filter-col').removeClass('d-none')
+        break;
+
+      case 5:    // Office
+        $('#inventoryFilterModal #inventory_filter_status').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_floor').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_tower').parents('.filter-col').removeClass('d-none')
+        break;
+    }
+    /** End Property Form */
+
     $('#inventoryFilterModal').modal('show')
+
+    convertToSelect2()
   })
 </script>

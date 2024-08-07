@@ -79,7 +79,7 @@ class Api extends CI_Controller {
     
     # Check API KEY
     public function checkApiKey(){
-        $api_key            =  $this->input->request_headers()['Api-Key'] ?? '';
+        $api_key            =  $this->input->request_headers()['API-KEY'] ?? $this->input->request_headers()['Api-Key'] ?? '';
         
         if($api_key == API_KEY):
             return true;
@@ -2236,10 +2236,9 @@ class Api extends CI_Controller {
 
     public function add_lead()
     {
-        $array = array();
-        
-        $account_id = 0;
-        $user_id = 0;
+        $array                          =   array();
+        $account_id                     =   0;
+        $user_id                        =   0;
 
         $where = "user_hash='".$this->input->post('user_hash')."'";
         $user_detail = $this->Action_model->select_single('tbl_users',$where);

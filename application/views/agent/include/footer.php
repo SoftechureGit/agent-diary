@@ -773,7 +773,6 @@
             setTimeout(function() {
                                     // $(".project_inventory").html(response.data_view);
                                     $(".inventory-list-container").html(response.table_view);
-                                    convertToSelect2()
                                   }, 100);
                       },
              error: function() {
