@@ -137,29 +137,29 @@
             </div>
             <!-- Status -->
 
-             <!-- Facing -->
-             <div class="col-md-3">
-                        <div class="form-group">
-                            <label for="">Facing</label>
-                            <select id="inventory_filter_facing" class="form-control select2 filter-invetory" >
-                                <option value="">All</option>
-                                <?php 
-                                    foreach(facings() ?? [] as $facing_item): 
-                                    $selected         = $facing_item->facing_id == ( $facing_id ?? 0 ) ? 'selected' : '';
-                                ?>
-                                    <option value="<?= $facing_item->facing_id ?>"  <?= $selected ?>><?= $facing_item->title ?></option>   
-                                    <?php endforeach; ?>
-                                </select>
-                        </div>
-                    </div>
-                    <!-- End Facing -->
+            <!-- Facing -->
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="">Facing</label>
+                <select id="inventory_filter_facing" class="form-control select2 filter-invetory">
+                  <option value="">All</option>
+                  <?php
+                  foreach (facings() ?? [] as $facing_item) :
+                    $selected         = $facing_item->facing_id == ($facing_id ?? 0) ? 'selected' : '';
+                  ?>
+                    <option value="<?= $facing_item->facing_id ?>" <?= $selected ?>><?= $facing_item->title ?></option>
+                  <?php endforeach; ?>
+                </select>
+              </div>
+            </div>
+            <!-- End Facing -->
 
             <!-- Floor -->
             <div class="col-md-3">
               <label for="status">Floor</label>
 
               <select id="inventory_filter_floor" class="form-control select2 filter-invetory">
-                <option value="" selected disabled>Choose</option>
+                <option value="">All</option>
                 <?php
                 foreach (getFloors() ?? [] as $floor) :
                   $selected         = (($floor_id ?? 0) == $floor->id) ? 'selected' : '';
@@ -168,7 +168,37 @@
                 <?php endforeach; ?>
               </select>
             </div>
-            <!-- Floor -->
+            <!-- End Floor -->
+
+            <!-- Tower -->
+            <div class="col-md-3">
+              <label for="status">Tower</label>
+
+              <select id="inventory_filter_tower" class="form-control select2 filter-invetory">
+                <option value="">All</option>
+                <?php
+                foreach (getBlocksOrTowers() ?? [] as $block_or_tower) :
+                ?>
+                  <option value="<?= $block_or_tower->id ?>"><?= $block_or_tower->name ?? '' ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+            <!-- End Tower -->
+
+            <!-- Accomodations -->
+            <div class="col-md-3">
+              <label for="status">Accomodations</label>
+
+              <select id="inventory_filter_accomodation" class="form-control select2 filter-invetory">
+                <option value="">All</option>
+                <?php
+                foreach (accomodations() ?? [] as $accomodation) :
+                ?>
+                  <option value="<?= $accomodation->id ?>"><?= $accomodation->name ?? '' ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+            <!-- End Accomodations -->
 
 
           </div>

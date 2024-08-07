@@ -738,9 +738,11 @@
          var property_unit_code_id    = $("#property_unit_code_id").val();
 
         /** Filter */
-        var inventory_filter_status   = $('#inventory_filter_status').val()
-        var inventory_filter_facing   = $('#inventory_filter_facing').val()
-        var inventory_filter_floor    = $('#inventory_filter_floor').val()
+        var inventory_filter_status           = $('#inventory_filter_status').val()
+        var inventory_filter_facing           = $('#inventory_filter_facing').val()
+        var inventory_filter_floor            = $('#inventory_filter_floor').val()
+        var inventory_filter_tower            = $('#inventory_filter_tower').val()
+        var inventory_filter_accomodation     = $('#inventory_filter_accomodation').val()
         /** End Filter */
 
          if (product_id == "") {
@@ -754,10 +756,13 @@
             type      : "POST",
             url       : "<?= base_url(AGENT_URL . 'api/get_project_inventory') ?>",
             data     : {
-                          product_id              : product_id,
-                          property_unit_code_id   : property_unit_code_id,
-                          inventory_filter_status : inventory_filter_status,
-                          inventory_filter_facing : inventory_filter_facing
+                          product_id                      : product_id,
+                          property_unit_code_id           : property_unit_code_id,
+                          inventory_filter_status         : inventory_filter_status,
+                          inventory_filter_facing         : inventory_filter_facing,
+                          inventory_filter_floor          : inventory_filter_floor,
+                          inventory_filter_tower          : inventory_filter_tower,
+                          inventory_filter_accomodation   : inventory_filter_accomodation,
                         },
             dataType : 'json',
             beforeSend: function(data) {
@@ -786,18 +791,13 @@
            return false;
          }
 
-        //  if ($('#modal-inventory-form [name="property_details[unit_code]"]').data('selected_id') == this.value) {
-        //    var inventory_id = $('#modal-inventory-form [name="property_details[id]"]').val()
+          var accomodation_id     = $(this).find('option:checked').data('accomodation-id')
 
-        //    getInventory({
-        //      'id': inventory_id
-        //    })
-        //  } 
-        //  else {
+            $('#modal-inventory-form [name="property_details[accomodation_id]"]').val(accomodation_id)
+
            getPropertyUnitDetails({
              'id': this.value
            })
-        //  }
        })
 
        function getPropertyUnitDetails({

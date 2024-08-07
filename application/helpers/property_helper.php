@@ -6,8 +6,8 @@ if (!function_exists('facings')) {
     function facings($id = '')
     {
         $where              =   "facing_status = 1";
-        
-        if($id):
+
+        if ($id) :
             $where          .=   " and facing_id = '$id'";
         endif;
 
@@ -72,7 +72,7 @@ function property($id)
 {
     return db_instance()
         ->select(
-                    'property.product_id as id,
+            'property.product_id as id,
                     property.project_name as name, 
                     property.property_type as property_type_id, 
                     property.project_type as project_type_id,
@@ -101,48 +101,50 @@ function parkings($id)
     $parkings                   =   [];
     $parkings                   =   [];
     $record                     =   db_instance()
-                                    ->select(
-                                                'property.product_id as id, 
+        ->select(
+            'property.product_id as id, 
                                                 property.project_name as name, 
                                                 property.parking_open,
                                                 property.parking_stilt,
                                                 property.parking_basment as parking_basement
                                                 '
-                                    )
-                                    ->where("property.product_id='$id'")
-                                    ->get('tbl_products as property')
-                                    ->row();
-    
-    if($record):
+        )
+        ->where("property.product_id='$id'")
+        ->get('tbl_products as property')
+        ->row();
 
-            # Open Parking
-            if(( $record->parking_open ?? 0 )):
-                $parkings[]           = (object) [
-                                                    'label' => 'Open', 
-                                                    'value' => 'open'];
-            endif;
-            # End Open Parking
+    if ($record) :
 
-            # Stilt Parking
-            if(( $record->parking_stilt ?? 0 )):
-                $parkings[]           = (object) [
-                                                    'label' => 'Stilt', 
-                                                    'value' => 'stilt'];
-            endif;
-            # End Stilt Parking
+        # Open Parking
+        if (($record->parking_open ?? 0)) :
+            $parkings[]           = (object) [
+                'label' => 'Open',
+                'value' => 'open'
+            ];
+        endif;
+        # End Open Parking
 
-            # Basement Parking
-            if(( $record->parking_basement ?? 0 )):
-                $parkings[]           = (object) [
-                                                    'label' => 'Basement', 
-                                                    'value' => 'basement'];
-            endif;
-            # End Basement Parking
-            
+        # Stilt Parking
+        if (($record->parking_stilt ?? 0)) :
+            $parkings[]           = (object) [
+                'label' => 'Stilt',
+                'value' => 'stilt'
+            ];
+        endif;
+        # End Stilt Parking
+
+        # Basement Parking
+        if (($record->parking_basement ?? 0)) :
+            $parkings[]           = (object) [
+                'label' => 'Basement',
+                'value' => 'basement'
+            ];
+        endif;
+    # End Basement Parking
+
     endif;
 
     return (object) $parkings;
-    
 }
 # End Get Property Parkings Details
 
@@ -184,99 +186,133 @@ function getPropertyPlcs($property_id, $selected_applicable_plcs = null)
 # End Get Inventory Details
 
 # Get Property Accomodations
-function getPropertyAccomodations($project_type_id, $property_type_id, $property_id, $id = null)
-{
-    $unit_code_list   = null;
+if (!function_exists('getPropertyAccomodations')) {
+    function getPropertyAccomodations($project_type_id, $property_type_id, $property_id, $id = null)
+    {
+        $unit_code_list   = null;
 
-    $where = "product_id='" . $property_id . "' AND project_type='" . $project_type_id . "' AND property_type='" . $property_type_id . "'";
+        $where = "product_id='" . $property_id . "' AND project_type='" . $project_type_id . "' AND property_type='" . $property_type_id . "'";
 
-    if ($id) :
-        $where  .= " and inventory.product_unit_detail_id = '$id'";
-    endif;
+        if ($id) :
+            $where  .= " and inventory.product_unit_detail_id = '$id'";
+        endif;
 
-    db_instance()->select("inventory.product_unit_detail_id as id, inventory.code as inventory_unit_code, accomodation.accomodation_name, concat(accomodation.accomodation_name,' ', inventory.code) as unit_code_with_accomodation_name");
-    db_instance()->from('tbl_product_unit_details as inventory');
-    db_instance()->join('tbl_accomodations as accomodation', 'accomodation.accomodation_id = inventory.accomodation', 'left');
-    db_instance()->where($where);
-    $query = db_instance()->get();
+        db_instance()->select("inventory.product_unit_detail_id as id, inventory.code as inventory_unit_code, accomodation.accomodation_id, accomodation.accomodation_name, concat(accomodation.accomodation_name,' ', inventory.code) as unit_code_with_accomodation_name");
+        db_instance()->from('tbl_product_unit_details as inventory');
+        db_instance()->join('tbl_accomodations as accomodation', 'accomodation.accomodation_id = inventory.accomodation', 'left');
+        db_instance()->where($where);
+        $query = db_instance()->get();
 
-    if ($id) :
-        $result = $query->row();
-    else :
-        $result = $query->result();
-    endif;
+        if ($id) :
+            $result = $query->row();
+        else :
+            $result = $query->result();
+        endif;
 
-    return $result ?? null;
+        return $result ?? null;
+    }
 }
 # End Get Property Accomodations
 
 # Get Floors
-function getFloors($id = null)
-{
-    $where  = "floor_status = '1'";
-
-    if ($id) :
-        $where  .= " and floor_id = $id";
-    endif;
-
-    $result  = db_instance()
-        ->select('floor_id as id, floor_name as name')
-        ->where($where)
-        ->get('tbl_floors');
-
-    if ($id) :
-        $result  = $result->row();
-    else :
-        $result  = $result->result();
-    endif;
-
-    return $result;
-}
-# End Get Floors
-
-# Get Blocks or Towers
-function getBlocksOrTowers($id = null)
-{
-    $where  = "1 = 1";
-
-    if ($id) :
-        $where  .= " and block_id = $id";
-    endif;
-
-    $result  = db_instance()
-        ->select('block_id as id, block_name as name')
-        ->where($where)
-        ->get('tbl_product_block_details');
-
-    if ($id) :
-        $result  = $result->row();
-    else :
-        $result  = $result->result();
-    endif;
-
-    return $result;
-}
-        # End Get Blocks or Towers
-
-    # Inventory Status
-    function inventory_status($id = ''){
-        $where  = "1 = '1'";
+if (!function_exists('getFloors')) {
+    function getFloors($id = null)
+    {
+        $where  = "floor_status = '1'";
 
         if ($id) :
-            $where  .= " and tbl_inventory_status = $id";
+            $where  .= " and floor_id = $id";
         endif;
-    
+
         $result  = db_instance()
-            ->select('inventory_status_id as id, inventory_status_name as name')
+            ->select('floor_id as id, floor_name as name')
             ->where($where)
-            ->get('tbl_inventory_status');
-    
+            ->get('tbl_floors');
+
         if ($id) :
             $result  = $result->row();
         else :
             $result  = $result->result();
         endif;
-    
+
         return $result;
     }
-    # End Inventory Status
+}
+# End Get Floors
+
+# Get Blocks or Towers
+if (!function_exists('getBlocksOrTowers')) {
+    function getBlocksOrTowers($id = null)
+    {
+        $where  = "1 = 1";
+
+        if ($id) :
+            $where  .= " and block_id = $id";
+        endif;
+
+        $result  = db_instance()
+            ->select('block_id as id, block_name as name')
+            ->where($where)
+            ->get('tbl_product_block_details');
+
+        if ($id) :
+            $result  = $result->row();
+        else :
+            $result  = $result->result();
+        endif;
+
+        return $result;
+    }
+}
+# End Get Blocks or Towers
+
+# Inventory Status
+if (!function_exists('inventory_status')) {
+    function inventory_status($id = '')
+    {
+        $where  = "1 = '1'";
+
+        if ($id) :
+            $where  .= " and tbl_inventory_status = $id";
+        endif;
+
+        $result  = db_instance()
+            ->select('inventory_status_id as id, inventory_status_name as name')
+            ->where($where)
+            ->get('tbl_inventory_status');
+
+        if ($id) :
+            $result  = $result->row();
+        else :
+            $result  = $result->result();
+        endif;
+
+        return $result;
+    }
+}
+# End Inventory Status
+
+# Accomodations
+if (!function_exists('accomodations')) {
+    function accomodations($id = ''){
+        $where  = "accomodation_status = '1'";
+
+        if ($id) :
+            $where  .= " and accomodation_id = $id";
+        endif;
+
+        $result  = db_instance()
+            ->select('accomodation_id as id, accomodation_name as name')
+            ->where($where)
+            ->get('tbl_accomodations');
+
+        if ($id) :
+            $result  = $result->row();
+        else :
+            $result  = $result->result();
+        endif;
+
+        return $result;
+    }
+}
+# End Accomodations

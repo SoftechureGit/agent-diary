@@ -4465,8 +4465,11 @@ WHERE lead_id='" . $lead_id . "'
         # End Init
 
         # Filter Init
-        $inventory_filter_status_id            =   $this->input->post('inventory_filter_status');
-        $inventory_filter_facing_id            =   $this->input->post('inventory_filter_facing');
+        $inventory_filter_status_id             =   $this->input->post('inventory_filter_status');
+        $inventory_filter_facing_id             =   $this->input->post('inventory_filter_facing');
+        $inventory_filter_floor_id              =   $this->input->post('inventory_filter_floor');
+        $inventory_filter_tower_id              =   $this->input->post('inventory_filter_tower');
+        $inventory_filter_accomodation_id       =   $this->input->post('inventory_filter_accomodation');
         # End Filter Init
 
         # Property Data
@@ -4483,7 +4486,18 @@ WHERE lead_id='" . $lead_id . "'
 
         if($inventory_filter_facing_id):
             $where                      .= " and JSON_EXTRACT(`property_details`, '$.facing_id') ='$inventory_filter_facing_id'";
-            // $where                      .= " and `property_details`->>'$.facing_id') ='$inventory_filter_facing_id'";
+        endif;
+
+        if($inventory_filter_floor_id):
+            $where                      .= " and JSON_EXTRACT(`property_details`, '$.floor_id') ='$inventory_filter_floor_id'";
+        endif;
+
+        if($inventory_filter_tower_id):
+            $where                      .= " and JSON_EXTRACT(`property_details`, '$.block_or_tower_id') ='$inventory_filter_tower_id'";
+        endif;
+
+        if($inventory_filter_accomodation_id):
+            $where                      .= " and JSON_EXTRACT(`property_details`, '$.accomodation_id') ='$inventory_filter_accomodation_id'";
         endif;
         ##### End Inventory Filter Functionality #####
 
