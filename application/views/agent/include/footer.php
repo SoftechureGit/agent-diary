@@ -727,7 +727,8 @@
        /** End Get Inventory Details */
 
       /** Inventory Filter */
-      $(document).on('change', '.filter-invetory', function(){
+      $(document).on('click', '.inventory-filter-apply-btn', function(){
+        $('#inventoryFilterModal').modal('hide');
         get_project_inventory();
       })
       /** End Inventory Filter */

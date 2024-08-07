@@ -117,90 +117,17 @@
       <div id="navtabs-inventory" class="tab-pane">
 
         <!-- Filter -->
-        <div class="filter-wrapper mb-4">
+        <div class="filter-wrapper mb-2">
           <!-- <details open>
           <summary> -->
           <!-- Filter -->
           <!-- </summary> -->
           <div class="row">
-
-            <!-- Status -->
-            <div class="col-md-3">
-              <label for="status">Status</label>
-
-              <select id="inventory_filter_status" class="form-control select2 filter-invetory">
-                <option value="">All</option>
-                <?php foreach (inventory_status() as $inventory_status) : ?>
-                  <option value="<?= $inventory_status->id; ?>"><?= $inventory_status->name; ?></option>
-                <?php endforeach; ?>
-              </select>
-            </div>
-            <!-- Status -->
-
-            <!-- Facing -->
-            <div class="col-md-3">
-              <div class="form-group">
-                <label for="">Facing</label>
-                <select id="inventory_filter_facing" class="form-control select2 filter-invetory">
-                  <option value="">All</option>
-                  <?php
-                  foreach (facings() ?? [] as $facing_item) :
-                    $selected         = $facing_item->facing_id == ($facing_id ?? 0) ? 'selected' : '';
-                  ?>
-                    <option value="<?= $facing_item->facing_id ?>" <?= $selected ?>><?= $facing_item->title ?></option>
-                  <?php endforeach; ?>
-                </select>
+            <div class="col-md-12">
+              <div class="text-right">
+                <button class="btn btn-info btn-sm inventory-filter-modal-btn" data-property-type="<?= $record->unit_type_name ?>">Filter</button>
               </div>
             </div>
-            <!-- End Facing -->
-
-            <!-- Floor -->
-            <div class="col-md-3">
-              <label for="status">Floor</label>
-
-              <select id="inventory_filter_floor" class="form-control select2 filter-invetory">
-                <option value="">All</option>
-                <?php
-                foreach (getFloors() ?? [] as $floor) :
-                  $selected         = (($floor_id ?? 0) == $floor->id) ? 'selected' : '';
-                ?>
-                  <option value="<?= $floor->id ?>"><?= $floor->name ?? '' ?></option>
-                <?php endforeach; ?>
-              </select>
-            </div>
-            <!-- End Floor -->
-
-            <!-- Tower -->
-            <div class="col-md-3">
-              <label for="status">Tower</label>
-
-              <select id="inventory_filter_tower" class="form-control select2 filter-invetory">
-                <option value="">All</option>
-                <?php
-                foreach (getBlocksOrTowers() ?? [] as $block_or_tower) :
-                ?>
-                  <option value="<?= $block_or_tower->id ?>"><?= $block_or_tower->name ?? '' ?></option>
-                <?php endforeach; ?>
-              </select>
-            </div>
-            <!-- End Tower -->
-
-            <!-- Accomodations -->
-            <div class="col-md-3">
-              <label for="status">Accomodations</label>
-
-              <select id="inventory_filter_accomodation" class="form-control select2 filter-invetory">
-                <option value="">All</option>
-                <?php
-                foreach (accomodations() ?? [] as $accomodation) :
-                ?>
-                  <option value="<?= $accomodation->id ?>"><?= $accomodation->name ?? '' ?></option>
-                <?php endforeach; ?>
-              </select>
-            </div>
-            <!-- End Accomodations -->
-
-
           </div>
           <!-- </details> -->
         </div>
@@ -358,6 +285,113 @@
     </div>
   </div>
 </div>
+
+<!-- Filter Modal -->
+<div class="modal fade" id="inventoryFilterModal" role="dialog" aria-labelledby="inventoryFilterModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="inventoryFilterModalLabel">Inventory Filters</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <!-- Status -->
+          <div class="col-md-4">
+              <label for="status">Status</label>
+
+              <select id="inventory_filter_status" class="form-control select2 filter-invetory">
+                <option value="">All</option>
+                <?php foreach (inventory_status() as $inventory_status) : ?>
+                  <option value="<?= $inventory_status->id; ?>"><?= $inventory_status->name; ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+            <!-- Status -->
+
+            <!-- Facing -->
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="">Facing</label>
+                <select id="inventory_filter_facing" class="form-control select2 filter-invetory">
+                  <option value="">All</option>
+                  <?php
+                  foreach (facings() ?? [] as $facing_item) :
+                    $selected         = $facing_item->facing_id == ($facing_id ?? 0) ? 'selected' : '';
+                  ?>
+                    <option value="<?= $facing_item->facing_id ?>" <?= $selected ?>><?= $facing_item->title ?></option>
+                  <?php endforeach; ?>
+                </select>
+              </div>
+            </div>
+            <!-- End Facing -->
+
+            <!-- Floor -->
+            <div class="col-md-4">
+              <label for="status">Floor</label>
+
+              <select id="inventory_filter_floor" class="form-control select2 filter-invetory">
+                <option value="">All</option>
+                <?php
+                foreach (getFloors() ?? [] as $floor) :
+                  $selected         = (($floor_id ?? 0) == $floor->id) ? 'selected' : '';
+                ?>
+                  <option value="<?= $floor->id ?>"><?= $floor->name ?? '' ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+            <!-- End Floor -->
+
+            <!-- Tower -->
+            <div class="col-md-4">
+              <label for="status">Tower</label>
+
+              <select id="inventory_filter_tower" class="form-control select2 filter-invetory">
+                <option value="">All</option>
+                <?php
+                foreach (getBlocksOrTowers() ?? [] as $block_or_tower) :
+                ?>
+                  <option value="<?= $block_or_tower->id ?>"><?= $block_or_tower->name ?? '' ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+            <!-- End Tower -->
+
+            <!-- Accomodations -->
+            <div class="col-md-4">
+              <label for="status">Accomodations</label>
+
+              <select id="inventory_filter_accomodation" class="form-control select2 filter-invetory">
+                <option value="">All</option>
+                <?php
+                foreach (accomodations() ?? [] as $accomodation) :
+                ?>
+                  <option value="<?= $accomodation->id ?>"><?= $accomodation->name ?? '' ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+            <!-- End Accomodations -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary text-white" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary inventory-filter-apply-btn">Apply</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Filter Modal -->
+
 <script>
   //getRequirementList(<?= $record->lead_id ?? 0 ?>);
+
+  $(document).on('click', '.inventory-filter-modal-btn', function(){
+    var property_type  = $(this).data('property-type');
+
+    // console.log(property_type);
+    
+    $('#inventoryFilterModal').modal('show')
+  })
 </script>

@@ -2305,11 +2305,11 @@ class Api extends CI_Controller {
             }
             else {
 
-                if($this->Action_model->select_single('tbl_leads',"lead_email='".$this->input->post('lead_email')."' AND account_id='".$account_id."'")){
-                    $array = array('status'=>'false','msg'=>'Email Already Exist.');
-                    echo json_encode($array);
-                    exit;
-                }
+                // if($this->Action_model->select_single('tbl_leads',"lead_email='".$this->input->post('lead_email')."' AND account_id='".$account_id."'")){
+                //     $array = array('status'=>'false','msg'=>'Email Already Exist.');
+                //     echo json_encode($array);
+                //     exit;
+                // }
 
                 if($this->Action_model->select_single('tbl_leads',"lead_mobile_no='".$this->input->post('lead_mobile_no')."' AND account_id='".$account_id."'")){
                     $array = array('status'=>'false','msg'=>'Mobile No Already Exist.');
@@ -2335,7 +2335,7 @@ class Api extends CI_Controller {
                 );
                 $this->Action_model->insert_data($lead_history_array,'tbl_lead_history');
 
-                $array = array('status'=>'true','msg'=>'Lead Added Successfully!!','lead_id'=>$this->db->insert_id());
+                $array = array('status'=>'true','msg'=>'Lead Added Successfully!!','lead_id'=>$lead_id);
                 
             }
         }
