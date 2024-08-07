@@ -5,9 +5,15 @@
 if (!function_exists('facings')) {
     function facings($id = '')
     {
+        $where              =   "facing_status = 1";
+        
+        if($id):
+            $where          .=   " and facing_id = '$id'";
+        endif;
+
         $records    =   db_instance()
             ->select('*')
-            ->where("facing_status = 1")
+            ->where($where)
             ->order_by("title", "asc")
             ->get('tbl_facings');
 
@@ -251,3 +257,26 @@ function getBlocksOrTowers($id = null)
     return $result;
 }
         # End Get Blocks or Towers
+
+    # Inventory Status
+    function inventory_status($id = ''){
+        $where  = "1 = '1'";
+
+        if ($id) :
+            $where  .= " and tbl_inventory_status = $id";
+        endif;
+    
+        $result  = db_instance()
+            ->select('inventory_status_id as id, inventory_status_name as name')
+            ->where($where)
+            ->get('tbl_inventory_status');
+    
+        if ($id) :
+            $result  = $result->row();
+        else :
+            $result  = $result->result();
+        endif;
+    
+        return $result;
+    }
+    # End Inventory Status
