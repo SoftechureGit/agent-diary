@@ -979,7 +979,7 @@ if (!function_exists('getAccountId')) {
                         facing,
                         concat('$image_base_url', image) as image_url   
                     ")
-            ->where("product_unit_detail_id = $id")
+            ->where("product_unit_detail_id = $id") 
             ->order_by("code", "asc")
             ->get('tbl_product_unit_details')
             ->row();
