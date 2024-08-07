@@ -4464,12 +4464,28 @@ WHERE lead_id='" . $lead_id . "'
         $data['product_id']             = $product_id;
         # End Init
 
+        # Filter Init
+        $inventory_filter_status_id            =   $this->input->post('inventory_filter_status');
+        $inventory_filter_facing_id            =   $this->input->post('inventory_filter_facing');
+        # End Filter Init
+
         # Property Data
         $property                       =   property($product_id);
         # End Property Data
 
         # Inventory Data
         $where                          = "product_id='" . $product_id . "'";
+
+        ##### Inventory Filter Functionality #####
+        if($inventory_filter_status_id):
+            $where                      .= " and inventory_status ='$inventory_filter_status_id'";
+        endif;
+
+        if($inventory_filter_facing_id):
+            $where                      .= " and JSON_EXTRACT(`property_details`, '$.facing_id') ='$inventory_filter_facing_id'";
+            // $where                      .= " and `property_details`->>'$.facing_id') ='$inventory_filter_facing_id'";
+        endif;
+        ##### End Inventory Filter Functionality #####
 
         if ($property_unit_code_id) :
             $where                      .= " and unit_code='" . $property_unit_code_id . "'";
@@ -4480,6 +4496,9 @@ WHERE lead_id='" . $lead_id . "'
         $this->db->join('tbl_inventory_status as inventory_status', 'inventory_status.inventory_status_id = inventory.inventory_status');
         $record_data = $this->db->from('tbl_inventory as inventory')->get()->result();
         // $record_data                    = $this->Action_model->detail_result('tbl_inventory', $where);
+
+        // echo $this->db->last_query();
+        // die;
 
         if ($record_data) {
             $records                    = $record_data;
@@ -4601,6 +4620,7 @@ WHERE lead_id='" . $lead_id . "'
             $inv_floor                              =   ( $inventory_details->floor_id ?? 0 ) ? ( getFloors($inventory_details->floor_id)->name ?? '-' ) : '';
             $inv_tower                              =   ( $inventory_details->block_or_tower_id ?? 0 ) ? ( getBlocksOrTowers($inventory_details->block_or_tower_id)->name ?? '-' ) : '';
             $inv_facing                             =   ( $inventory_details->facing_id ?? 0 ) ? ( facings($inventory_details->facing_id)->title ?? '-' ): '-';
+
             $inv_plot_size                          =   ( $inventory_details->plot_size ?? '-' ).' '. ( sizeUnits($inventory_details->size_unit ?? 0)->unit_name  ?? '-' ) ?? '-';
             $inv_quote                              =   "<div class='text-center' onclick='getQuatation(".$inventory_details->id.")'><button class='btn btn-warning btn-sm' style='color:#fff;'><i class='fa fa-eye'></i></button></div>";
             # End Inventory Details Init

@@ -726,10 +726,22 @@
        }
        /** End Get Inventory Details */
 
+      /** Inventory Filter */
+      $(document).on('change', '.filter-invetory', function(){
+        get_project_inventory();
+      })
+      /** End Inventory Filter */
+
        function get_project_inventory() {
 
-         var product_id = $("#product_id").val();
-         var property_unit_code_id = $("#property_unit_code_id").val();
+         var product_id               = $("#product_id").val();
+         var property_unit_code_id    = $("#property_unit_code_id").val();
+
+        /** Filter */
+        var inventory_filter_status   = $('#inventory_filter_status').val()
+        var inventory_filter_facing   = $('#inventory_filter_facing').val()
+        var inventory_filter_floor    = $('#inventory_filter_floor').val()
+        /** End Filter */
 
          if (product_id == "") {
            $(".project_inventory").html("");
@@ -738,26 +750,28 @@
          } else {
            $('.add-inventory-container').removeClass('d-none')
 
-           $.ajax({
-             type: "POST",
-             url: "<?= base_url(AGENT_URL . 'api/get_project_inventory') ?>",
-             data: {
-               product_id: product_id,
-               property_unit_code_id: property_unit_code_id
-             },
-             dataType: 'json',
-             beforeSend: function(data) {
+          $.ajax({
+            type      : "POST",
+            url       : "<?= base_url(AGENT_URL . 'api/get_project_inventory') ?>",
+            data     : {
+                          product_id              : product_id,
+                          property_unit_code_id   : property_unit_code_id,
+                          inventory_filter_status : inventory_filter_status,
+                          inventory_filter_facing : inventory_filter_facing
+                        },
+            dataType : 'json',
+            beforeSend: function(data) {
                // $(".project_inventory").html("<div style='padding:50px;' align='center'><img src='<?= base_url('public/front/ajax-loader.gif') ?>' style='height:60px;'></div>");
-             },
-             success: function(response) {
-               setTimeout(function() {
-                 // $(".project_inventory").html(response.data_view);
-                 $(".inventory-list-container").html(response.table_view);
-               }, 100);
-             },
+            },
+            success: function(response) {
+            setTimeout(function() {
+                                    // $(".project_inventory").html(response.data_view);
+                                    $(".inventory-list-container").html(response.table_view);
+                                    convertToSelect2()
+                                  }, 100);
+                      },
              error: function() {
-               $(".project_inventory").html("<div class=' alert alert-danger'>Some error occurred, please try again.</div>");
-
+                 $(".project_inventory").html("<div class=' alert alert-danger'>Some error occurred, please try again.</div>");
              }
            });
          }
