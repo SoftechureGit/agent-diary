@@ -4630,7 +4630,7 @@ WHERE lead_id='" . $lead_id . "'
 
 
             # Inventory Details Init
-            $inv_accomodation                       =   $property->accomodation_name ?? '-';
+            $inv_accomodation                       =   ( $inventory_details->accomodation_id ?? 0 ) ? ( accomodations($inventory_details->accomodation_id)->name ?? '-' ) : '';
             $inv_floor                              =   ( $inventory_details->floor_id ?? 0 ) ? ( getFloors($inventory_details->floor_id)->name ?? '-' ) : '';
             $inv_tower                              =   ( $inventory_details->block_or_tower_id ?? 0 ) ? ( getBlocksOrTowers($inventory_details->block_or_tower_id)->name ?? '-' ) : '';
             $inv_facing                             =   ( $inventory_details->facing_id ?? 0 ) ? ( facings($inventory_details->facing_id)->title ?? '-' ): '-';
