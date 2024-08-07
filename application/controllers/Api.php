@@ -2093,6 +2093,7 @@ class Api extends CI_Controller {
                 if (count($user_ids)) {
                     $where_ids .= " AND (tbl_users.user_id='" . implode("' OR tbl_users.user_id='", $user_ids) . "')";
                 }
+
                 $where .= $where_ids;
     
                 $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,user_title,first_name,last_name,parent_id,is_individual,firm_name');
@@ -2180,8 +2181,6 @@ class Api extends CI_Controller {
                 $where = "country_id='1' AND state_status=1";
                 $state_list = $this->Action_model->detail_result('tbl_states', $where);
 
-              
-    
                 $where = "occupation_status='1'";
                 $occupation_list = $this->Action_model->detail_result('tbl_occupations', $where);
     
@@ -2220,6 +2219,7 @@ class Api extends CI_Controller {
                     'designations_list' => $designations_list,
                     'lead_source_list'  => $lead_source_list,
                     'lead_stage_list'   => $lead_stage_list,
+                    'lead_type_list'    =>  $lead_type_list,
                     'city_list'         =>  '',
                     'next_lead_id'      =>'',
                     'previous_lead_id'  =>  '' 
@@ -3263,9 +3263,11 @@ class Api extends CI_Controller {
             $city_id=$this->input->post('city_id');
             $where = "city_id='".$city_id."' AND location_status='1'";
             $location_data = $this->Action_model->detail_result('tbl_locations',$where,'location_id,location_name');
+            
             if ($location_data) {
                 $location_list = $location_data;
             }
+
             $array = array('status'=>'true','msg'=>'Data Found','location_list'=>$location_list);
         }
         else { 
