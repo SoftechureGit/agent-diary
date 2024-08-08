@@ -486,7 +486,40 @@ if (!function_exists('accomodations')) {
             return $records;
         }
     endif;
-    # End Tower Floors
+    # End Status Floors
+
+    # Facing List
+    if(!function_exists('inventory_facings')):
+        function inventory_facings($data = null){
+
+            # Data 
+            $property_id    = $data->property_id ?? 0;
+            $unit_code      = $data->unit_code ?? 0;
+            # End Data 
+
+            # Conditions
+            $where          =   ' 1 = 1';
+
+            if($property_id):
+                $where          .=   " and inventory.product_id = $property_id";
+            endif;
+            
+            if($unit_code):
+                $where          .=   " and inventory.unit_code = $unit_code";
+            endif;
+            # End Conditions
+
+            db_instance()->distinct("JSON_EXTRACT(property_details, '$.facing_id')");
+            db_instance()->select("JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.facing_id')) as id, facing.title as name");
+            db_instance()->where($where);
+            db_instance()->join('tbl_facings as facing', "facing.facing_id = JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.facing_id'))", "left");
+            db_instance()->from('tbl_inventory as inventory');
+            $records = db_instance()->get()->result();
+     
+            return $records;
+        }
+    endif;
+    # End Facing Floors
 
 /*******************************************
  *  Inventory Filters

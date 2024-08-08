@@ -325,10 +325,14 @@
               <select id="inventory_filter_facing" class="form-control select2 filter-invetory">
                 <option value="">All</option>
                 <?php
-                foreach (facings() ?? [] as $facing_item) :
-                  $selected         = $facing_item->facing_id == ($facing_id ?? 0) ? 'selected' : '';
+                 $inventory_facing_data   = (object) [
+                  'property_id' => ($record->product_id ?? 0),
+                  'unit_code'   => ($record->product_unit_detail_id ?? 0),
+                ];
+                foreach (inventory_facings($inventory_facing_data) ?? [] as $facing_item) :
+                  $selected         = $facing_item->id == ($facing_id ?? 0) ? 'selected' : '';
                 ?>
-                  <option value="<?= $facing_item->facing_id ?>" <?= $selected ?>><?= $facing_item->title ?></option>
+                  <option value="<?= $facing_item->id ?>" <?= $selected ?>><?= $facing_item->name ?></option>
                 <?php endforeach; ?>
               </select>
             </div>
