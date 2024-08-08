@@ -792,8 +792,12 @@
          }
 
           var accomodation_id     = $(this).find('option:checked').data('accomodation-id')
+          var accomodation_name     = $(this).find('option:checked').data('accomodation-name')
+
+          console.log(accomodation_name)
 
             $('#modal-inventory-form [name="property_details[accomodation_id]"]').val(accomodation_id)
+            $('#modal-inventory-form input[name="property_details[unit_type]"]').val(accomodation_name)
 
            getPropertyUnitDetails({
              'id': this.value

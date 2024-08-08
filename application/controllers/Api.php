@@ -11438,9 +11438,20 @@ $property_list = $query->result();
                  $department_list = (($department_list) ? $department_list : array());
                  $lead_source_list = (($lead_source_list) ? $lead_source_list : array());
                  $lead_stage_list = (($lead_stage_list) ? $lead_stage_list : array());
-     
+                 
+                 # Primary Mobile Number Country Code
+                 $primary_country_code                          =   ( $record->primary_mobile_number_country_data ?? null ) ? json_decode($record->primary_mobile_number_country_data): '';
+                 $record->primary_mobile_number_country_data    =   $primary_country_code->dialCode ?? 0;
+                 # End Primary Mobile Number Country Code
+                 
+                 # Secondary Mobile Number Country Code
+                 $primary_country_code                          =   ( $record->secondary_mobile_number_country_data ?? null ) ? json_decode($record->secondary_mobile_number_country_data): '';
+                 $record->secondary_mobile_number_country_data    =   $primary_country_code->dialCode ?? 0;
+                 # End Secondary Mobile Number Country Code
+
                  foreach ($record as $k => $v) {
                      $record->$k = ($v || $v == 0) ? $v : '';
+
                  } 
                  
                  $record_p = '';

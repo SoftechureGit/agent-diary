@@ -32,9 +32,15 @@ endif;
                                 <option value="" disabled selected>Choose...</option>
                                 <?php
                                 foreach ($unit_code_with_accomodations ?? [] as $unit_code_with_accomodation) :
-                                    $selected         = (($unit_code ?? 0) == $unit_code_with_accomodation->id) ? 'selected' : '';
+                                     $selected         = (($unit_code ?? 0) == $unit_code_with_accomodation->id) ? 'selected' : '';
                                 ?>
-                                    <option value="<?= $unit_code_with_accomodation->id ?>" <?= $selected ?> data-accomodation-id="<?= $unit_code_with_accomodation->accomodation_id ?? 0 ;?>"><?= $unit_code_with_accomodation->unit_code_with_accomodation_name ?? $unit_code_with_accomodation->inventory_unit_code ?? '' ?></option>
+                                    <option 
+                                        value                       =   "<?= $unit_code_with_accomodation->id ?>" 
+                                        data-accomodation-id        =   "<?= $unit_code_with_accomodation->accomodation_id ?? 0 ;?>"
+                                        data-accomodation-name      =   "<?= $unit_code_with_accomodation->accomodation_name ?? '' ;?>"
+                                        <?= $selected ?> 
+                                        >
+                                    <?= $unit_code_with_accomodation->unit_code_with_accomodation_name ?? $unit_code_with_accomodation->inventory_unit_code ?? '' ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <input type="hidden" name="property_details[accomodation_id]" value="<?= $accomodation_id ?? 0 ;?>">
@@ -118,15 +124,15 @@ endif;
                     <!-- SA -->
                     <div class="col-md-2">
                         <div class="form-group">
-                            <label for="">SA</label>
-                            <input type="text" placeholder="Enter SA" name="property_details[sa]" value="<?= $sa ?? '' ?>" class="form-control">
+                            <label for="">SA Size</label>
+                            <input type="text" placeholder="Enter SA Size" name="property_details[sa]" value="<?= $sa ?? '' ?>" class="form-control">
                         </div>
                     </div>
                     <!-- End SA -->
 
                     <!-- SA Size  -->
                     <div class="col-md-2">
-                        <label for="">SA Size </label>
+                        <label for="">SA Unit </label>
                         <select class="form-control" id="" name="property_details[sa_size_unit]">
                             <option value="">Select Unit</option>
                             <?php foreach (sizeUnits() ?? []  as $item) :
@@ -142,15 +148,15 @@ endif;
                     <!-- BA -->
                     <div class="col-md-2">
                         <div class="form-group">
-                            <label for="">BA</label>
-                            <input type="text" placeholder="Enter BA" name="property_details[ba]" value="<?= $ba ?? '' ?>" class="form-control">
+                            <label for="">BA Size</label>
+                            <input type="text" placeholder="Enter BA Size" name="property_details[ba]" value="<?= $ba ?? '' ?>" class="form-control">
                         </div>
                     </div>
                     <!-- End BA -->
 
                     <!-- BA Size  -->
                     <div class="col-md-2">
-                        <label for="">BA Size </label>
+                        <label for="">BA Unit </label>
                         <select class="form-control" id="" name="property_details[ba_size_unit]">
                             <option value="">Select Unit</option>
                             <?php foreach (sizeUnits() ?? []  as $item) :
@@ -167,15 +173,15 @@ endif;
                     <!-- CA -->
                     <div class="col-md-2">
                         <div class="form-group">
-                            <label for="">CA</label>
-                            <input type="text" placeholder="Enter CA" name="property_details[ca]" value="<?= $ca ?? '' ?>" class="form-control">
+                            <label for="">CA Size</label>
+                            <input type="text" placeholder="Enter CA Size" name="property_details[ca]" value="<?= $ca ?? '' ?>" class="form-control">
                         </div>
                     </div>
                     <!-- End CA -->
 
                     <!-- CA Size  -->
                     <div class="col-md-2">
-                        <label for="">CA Size </label>
+                        <label for="">CA Unit </label>
                         <select class="form-control" id="" name="property_details[ca_size_unit]">
                             <option value="">Select Unit</option>
                             <?php foreach (sizeUnits() ?? []  as $item) :
