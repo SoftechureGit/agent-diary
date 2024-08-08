@@ -381,6 +381,27 @@
             </div>  
             </div>  
           <!-- End Accomodations -->
+
+          <!-- Sa Size -->
+          <div class="col-md-4 filter-col">
+            <div class="form-group">
+              <label for="sa_size">Size</label>
+              <select id="inventory_filter_sa_size" class="form-control select2 filter-invetory">
+                <option value="">All</option>
+                <?php
+                  $inventory_sa_size_data   = (object) [
+                                                          'property_id' => ( $record->product_id ?? 0 ),
+                                                          'unit_code'   => ( $record->product_unit_detail_id ?? 0 ),
+                                                        ];
+                  
+                foreach (inventory_sa_sizes($inventory_sa_size_data) ?? [] as $sa_size) :
+                ?>
+                  <option value="<?= $sa_size->sa_size ?> | <?= $sa_size->unit_id ?>"><?= $sa_size->sa_size ?? '' ?> <?= $sa_size->unit_name ?? '' ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>  
+            </div>  
+          <!-- End Accomodations -->
         </div>
       </div>
       <div class="modal-footer">
@@ -398,7 +419,6 @@
   $(document).on('click', '.inventory-filter-modal-btn', function() {
     var property_type = $(this).data('property-type');
 
-    console.log(property_type)
     /** Property Form */
 
     $('#inventoryFilterModal .filter-col').addClass('d-none')
@@ -409,6 +429,7 @@
         $('#inventoryFilterModal #inventory_filter_accomodation').parents('.filter-col').removeClass('d-none')
         $('#inventoryFilterModal #inventory_filter_floor').parents('.filter-col').removeClass('d-none')
         $('#inventoryFilterModal #inventory_filter_tower').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_sa_size').parents('.filter-col').removeClass('d-none')
         break;
 
       case 3:   // Plot

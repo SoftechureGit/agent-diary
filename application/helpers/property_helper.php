@@ -316,3 +316,60 @@ if (!function_exists('accomodations')) {
     }
 }
 # End Accomodations
+
+/*******************************************
+ *  Inventory Filters
+*******************************************/
+    # Sa Size List
+    if(!function_exists('inventory_sa_sizes')):
+        function inventory_sa_sizes($data = null){
+            # Data 
+            $property_id    = $data->property_id ?? 0;
+            $unit_code      = $data->unit_code ?? 0;
+            # End Data 
+
+            # Conditions
+            $where          =   '1 = 1';
+
+            if($property_id):
+                $where          .=   " and inventory.product_id = $property_id";
+            endif;
+            
+            if($unit_code):
+                $where          .=   " and inventory.unit_code = $unit_code";
+            endif;
+            # End Conditions
+
+            db_instance()->distinct("JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.sa')) as sa_size");
+            db_instance()->select("
+                                    JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.sa')) as sa_size, 
+                                    size_unit.unit_name,
+                                    size_unit.unit_id");
+            db_instance()->where($where);
+            db_instance()->join('tbl_units as size_unit', "size_unit.unit_id = JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.sa_size_unit'))", "left");
+            db_instance()->from('tbl_inventory as inventory');
+        
+            $records = db_instance()->get()->result();
+     
+            return $records;
+        }
+    endif;
+    # Sa Size List
+
+    # Size List
+    if(!function_exists('inventory_sizes')):
+        function inventory_sizes(){
+            db_instance()->distinct("JSON_EXTRACT(property_details, '$.sa') as sa_size");
+            db_instance()->select("JSON_EXTRACT(property_details, '$.sa') as sa_size, size_unit.unit_name");
+            db_instance()->join('tbl_units as size_unit', "size_unit.unit_id = JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.sa_size_unit'))", "left");
+            db_instance()->from('tbl_inventory');
+            $records = db_instance()->get()->result();
+     
+            return $records;
+        }
+    endif;
+    # Size List
+
+/*******************************************
+ *  Inventory Filters
+*******************************************/

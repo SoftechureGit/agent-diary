@@ -4472,6 +4472,7 @@ WHERE lead_id='" . $lead_id . "'
         $inventory_filter_floor_id              =   $this->input->post('inventory_filter_floor');
         $inventory_filter_tower_id              =   $this->input->post('inventory_filter_tower');
         $inventory_filter_accomodation_id       =   $this->input->post('inventory_filter_accomodation');
+        $inventory_filter_sa_size               =   $this->input->post('inventory_filter_sa_size');
         # End Filter Init
 
         # Property Data
@@ -4500,6 +4501,20 @@ WHERE lead_id='" . $lead_id . "'
 
         if($inventory_filter_accomodation_id):
             $where                      .= " and JSON_EXTRACT(`property_details`, '$.accomodation_id') ='$inventory_filter_accomodation_id'";
+        endif;
+
+        if($inventory_filter_sa_size):
+            $inventory_filter_sa_size    =  explode('|', $inventory_filter_sa_size);
+            $inv_filter_sa_size          =  $inventory_filter_sa_size[0] ?? 0;
+            $inv_filter_sa_size_unit     =  $inventory_filter_sa_size[1] ?? 0;
+
+            if($inv_filter_sa_size):
+                $where                      .= " and JSON_EXTRACT(`property_details`, '$.sa') ='$inventory_filter_sa_size[0]'";
+            endif;
+            
+            if($inv_filter_sa_size):
+                $where                      .= " and JSON_EXTRACT(`property_details`, '$.sa_size_unit') ='$inv_filter_sa_size_unit[1]'";
+            endif;
         endif;
         ##### End Inventory Filter Functionality #####
 
@@ -4632,8 +4647,8 @@ WHERE lead_id='" . $lead_id . "'
 
 
             # Inventory Details Init
-            $inv_size                               =   ( $inventory_details->sa ?? '-' );
-            $inv_size                               .=   ' '.( $inventory_details->sa_size_unit ?? 0 ) ? ( sizeUnits($inventory_details->sa_size_unit ?? 0)->unit_name  ?? '-' ) : '';
+            $inv_size                               =   ( $inventory_details->sa ?? '-' ).' ';
+            $inv_size                               .=   ( $inventory_details->sa_size_unit ?? 0 ) ? ( sizeUnits($inventory_details->sa_size_unit ?? 0)->unit_name  ?? '-' ) : '';
 
             $inv_accomodation                       =   ( $inventory_details->accomodation_id ?? 0 ) ? ( accomodations($inventory_details->accomodation_id)->name ?? '-' ) : '';
             $inv_floor                              =   ( $inventory_details->floor_id ?? 0 ) ? ( getFloors($inventory_details->floor_id)->name ?? '-' ) : '';
@@ -7346,11 +7361,7 @@ WHERE lead_id='" . $lead_id . "'
 
     public function get_product_unit_single()
     {
-        // $this->db->select('property_details->>sa');
-        // $this->db->from('tbl_inventory');
-        // $data = $this->db->get()->result();
-        // echo '<pre>';
-        // print_r($data);
+        // print_r($inventory_sizes);
         // die;
 
         $account_id = getAccountId();

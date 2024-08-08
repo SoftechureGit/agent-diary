@@ -744,6 +744,7 @@
         var inventory_filter_floor            = $('#inventory_filter_floor').val()
         var inventory_filter_tower            = $('#inventory_filter_tower').val()
         var inventory_filter_accomodation     = $('#inventory_filter_accomodation').val()
+        var inventory_filter_sa_size     = $('#inventory_filter_sa_size').val()
         /** End Filter */
 
          if (product_id == "") {
@@ -764,6 +765,7 @@
                           inventory_filter_floor          : inventory_filter_floor,
                           inventory_filter_tower          : inventory_filter_tower,
                           inventory_filter_accomodation   : inventory_filter_accomodation,
+                          inventory_filter_sa_size        : inventory_filter_sa_size,
                         },
             dataType : 'json',
             beforeSend: function(data) {
