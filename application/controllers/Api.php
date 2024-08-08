@@ -2252,6 +2252,17 @@ class Api extends CI_Controller {
         
         if ($user_detail && $this->input->post()) {
             
+
+            # Primary Mobile Country Code
+            $primary_country_code           =   $this->input->post('primary_mobile_number_country_data');
+            // $primary_country_code           =   $primary_country_code ? json_encode(['dialCode' => $primary_country_code ]) : null;
+            # End Primary Mobile Country Code
+
+            # Secondary Mobile Country Code
+            $secondary_country_code           =   $this->input->post('secondary_mobile_number_country_data');
+            // $secondary_country_code           =   $secondary_country_code ? json_encode(['dialCode' => $secondary_country_code ]) : null;
+            # End Secondary Mobile Country Code
+
             $id=$this->input->post('lead_id');
             $record = $this->Action_model->select_single('tbl_leads',"lead_id='".$id."'");
 
@@ -2283,7 +2294,10 @@ class Api extends CI_Controller {
                 'lead_marital_status'=>$this->input->post('lead_marital_status'),
                 'lead_designation'=>$this->input->post('lead_designation'),
                 'lead_company'=>$this->input->post('lead_company'),
-                'lead_annual_income'=>$this->input->post('lead_annual_income')
+                'lead_annual_income'=>$this->input->post('lead_annual_income'),
+                'primary_mobile_number_country_data' => $primary_country_code ,
+                'secondary_mobile_number_country_data' => $secondary_country_code ,
+                'platform'      =>  'app',
             );
 
             if ($record) {

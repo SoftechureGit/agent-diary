@@ -1607,6 +1607,8 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 'secondary_mobile_number_country_data'       => $secondary_mobile_number_country_data,
                 'location_id'                                => $this->input->post('location_id'),
                 'profile'                                    => $profile->file_name ?? '',
+
+                'platform'                                    =>  'web',
             );
 
             if ($record) {
@@ -4630,6 +4632,9 @@ WHERE lead_id='" . $lead_id . "'
 
 
             # Inventory Details Init
+            $inv_size                               =   ( $inventory_details->sa ?? '-' );
+            $inv_size                               .=   ' '.( $inventory_details->sa_size_unit ?? 0 ) ? ( sizeUnits($inventory_details->sa_size_unit ?? 0)->unit_name  ?? '-' ) : '';
+
             $inv_accomodation                       =   ( $inventory_details->accomodation_id ?? 0 ) ? ( accomodations($inventory_details->accomodation_id)->name ?? '-' ) : '';
             $inv_floor                              =   ( $inventory_details->floor_id ?? 0 ) ? ( getFloors($inventory_details->floor_id)->name ?? '-' ) : '';
             $inv_tower                              =   ( $inventory_details->block_or_tower_id ?? 0 ) ? ( getBlocksOrTowers($inventory_details->block_or_tower_id)->name ?? '-' ) : '';
@@ -4645,7 +4650,7 @@ WHERE lead_id='" . $lead_id . "'
                                                                     'referance_number'      =>   $referance_number ?? '-',
                                                                     'accomodation'          =>   $inv_accomodation,
                                                                     'floor'                 =>   $inv_floor,
-                                                                    'size'                  =>   $property->unit_size_name ?? '-',
+                                                                    'size'                  =>   $inv_size,
                                                                     'tower'                 =>   $inv_tower,
                                                                     'quote'                 =>   $inv_quote,
                                                                     'facing'                =>   $inv_facing,
@@ -7341,6 +7346,12 @@ WHERE lead_id='" . $lead_id . "'
 
     public function get_product_unit_single()
     {
+        // $this->db->select('property_details->>sa');
+        // $this->db->from('tbl_inventory');
+        // $data = $this->db->get()->result();
+        // echo '<pre>';
+        // print_r($data);
+        // die;
 
         $account_id = getAccountId();
 
