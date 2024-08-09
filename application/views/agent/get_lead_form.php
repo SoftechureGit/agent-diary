@@ -28,10 +28,42 @@
             </div>
 
             <div class="form-group col-md-4">
-                <label>Title:</label>
+                <label>Source <span class="text-danger">*</span></label>
+                
+                <select class="form-control" id="lead_source_id" name="lead_source_id" required>
+                     <option value="" selected disabled>Choose...</option>
+                      <?php foreach ($lead_source_list as $lead_source) { ?>
+                    <option value="<?= $lead_source->lead_source_id ?>" <?php if($id && $lead_detail->lead_source_id==$lead_source->lead_source_id) { echo 'selected'; } ?>><?= $lead_source->lead_source_name ?></option>
+                      <?php } ?>
+                 </select>
+            </div>
 
-                <select id="inputState" class="form-control" name="lead_title">
-                    <option selected="selected" value="">Select Title</option>
+            <div class="form-group col-md-4">
+                <label>Stage  <span class="text-danger">*</span></label>
+
+                <select class="form-control" name="lead_stage_id" required>
+                     <option value disabled selected>Choose...</option>
+                      <?php foreach ($lead_stage_list as $lead_stage) { ?>
+                    <option value="<?= $lead_stage->lead_stage_id ?>" <?php if($id && $lead_detail->lead_stage_id==$lead_stage->lead_stage_id) { echo 'selected'; } ?>><?= $lead_stage->lead_stage_name ?></option>
+                      <?php } ?>
+                 </select>
+            </div>
+
+            <div class="form-group col-md-4">
+                <label>Department:</label>
+                <select class="form-control" id="department_id" name="lead_department_id">
+                     <option value="">Select Department</option>
+                      <?php foreach ($department_list as $department) { ?>
+                    <option value="<?= $department->department_id ?>" <?php if($id && $lead_detail->lead_department_id==$department->department_id) { echo 'selected'; } ?>><?= $department->department_name ?></option>
+                      <?php } ?>
+                 </select>
+            </div>
+
+            <div class="form-group col-md-4">
+                <label>Title <span class="text-danger">*</span></label>
+
+                <select id="inputState" class="form-control" name="lead_title" required>
+                    <option selected value="" disabled>Select Title</option>
                     <option value="Mr." <?php if($id && $lead_detail->lead_title=='Mr.') { echo 'selected'; } ?>>Mr.</option>
                     <option value="Ms." <?php if($id && $lead_detail->lead_title=='Ms.') { echo 'selected'; } ?>>Ms.</option>
                     <option value="Mrs." <?php if($id && $lead_detail->lead_title=='Mrs.') { echo 'selected'; } ?>>Mrs.</option>
@@ -42,8 +74,8 @@
             </div>
 
             <div class="form-group col-md-4">
-                <label>First Name:</label>
-                <input type="text" class="form-control" placeholder="" id="lead_first_name" name="lead_first_name" value="<?php if($id) { echo $lead_detail->lead_first_name; } ?>" required="">
+                <label>First Name  <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" placeholder="" id="lead_first_name" name="lead_first_name" value="<?php if($id) { echo $lead_detail->lead_first_name; } ?>" required>
             </div>
 
             <div class="form-group col-md-4">
@@ -52,9 +84,9 @@
             </div>
 
             <div class="form-group col-md-4">
-                <label>Mobile:</label>
+                <label>Mobile <span class="text-danger">*</span></label>
                 <br>
-                <input type="text" class="form-control primary_mobile_number" placeholder="" id="lead_mobile_no" name="lead_mobile_no" value="<?php if($id) { echo $lead_detail->lead_mobile_no; } ?>" required="">
+                <input type="text" class="form-control primary_mobile_number" placeholder="" id="lead_mobile_no" name="lead_mobile_no" value="<?php if($id) { echo $lead_detail->lead_mobile_no; } ?>" required>
                  <!-- Primary Mobile Number Country Code -->
                  <input type="hidden" value='<?= $lead_detail->primary_mobile_number_country_data ?? '{ "name" : "India", "iso2" : "in", "dialCode" : "91" }' ?>' name="primary_mobile_number_country_data" data-iso2="<?= json_decode($lead_detail->primary_mobile_number_country_data)->iso2 ?? 'in' ?>">
                       <!-- End Primary Mobile Number Country Code -->
@@ -135,16 +167,6 @@
             </div>
 
             <div class="form-group col-md-4">
-                <label>Department:</label>
-                <select class="form-control" id="department_id" name="lead_department_id">
-                     <option value="">Select Department</option>
-                      <?php foreach ($department_list as $department) { ?>
-                    <option value="<?= $department->department_id ?>" <?php if($id && $lead_detail->lead_department_id==$department->department_id) { echo 'selected'; } ?>><?= $department->department_name ?></option>
-                      <?php } ?>
-                 </select>
-            </div>
-
-            <div class="form-group col-md-4">
                 <label>DOB:</label>
                 <input type="text" class="form-control mydatepicker" data-date-format='dd-mm-yyyy' placeholder="Enter date of birth" id="lead_dob" name="lead_dob" value="<?php if($id) { echo $lead_detail->lead_dob; } ?>">
             </div>
@@ -154,27 +176,7 @@
                 <input type="text" class="form-control mydatepicker" data-date-format='dd-mm-yyyy' placeholder="Enter DOA" id="lead_doa" name="lead_doa" value="<?php if($id) { echo $lead_detail->lead_doa; } ?>">
             </div>
 
-            <div class="form-group col-md-4">
-                <label>Source:</label>
-                
-                <select class="form-control" id="lead_source_id" name="lead_source_id">
-                     <option value="">Select Lead Source</option>
-                      <?php foreach ($lead_source_list as $lead_source) { ?>
-                    <option value="<?= $lead_source->lead_source_id ?>" <?php if($id && $lead_detail->lead_source_id==$lead_source->lead_source_id) { echo 'selected'; } ?>><?= $lead_source->lead_source_name ?></option>
-                      <?php } ?>
-                 </select>
-            </div>
-
-            <div class="form-group col-md-4">
-                <label>Stage:</label>
-
-                <select class="form-control" name="lead_stage_id">
-                     <option value="" disabled="">Select Lead Stage</option>
-                      <?php foreach ($lead_stage_list as $lead_stage) { ?>
-                    <option value="<?= $lead_stage->lead_stage_id ?>" <?php if($id && $lead_detail->lead_stage_id==$lead_stage->lead_stage_id) { echo 'selected'; } ?>><?= $lead_stage->lead_stage_name ?></option>
-                      <?php } ?>
-                 </select>
-            </div>
+          
 
 
             <div class="form-group col-md-4">
@@ -213,11 +215,11 @@
                       <?php } ?>
                 </select>
             </div>
-            <div class="form-group col-md-4">
+            <div class="form-group col-md-6">
               <label>Annual Income:</label>
               <input type="text" class="form-control" id="lead_annual_income" name="lead_annual_income" value="<?php if($id) { echo $lead_detail->lead_annual_income; } ?>" placeholder="Enter annual income">
             </div>
-            <div class="form-group col-md-12">
+            <div class="form-group col-md-6">
             	<label>Name of Company:</label>
             	<input type="text" class="form-control" id="lead_company" name="lead_company" value="<?php if($id) { echo $lead_detail->lead_company; } ?>" placeholder="Enter company name">
             </div>
