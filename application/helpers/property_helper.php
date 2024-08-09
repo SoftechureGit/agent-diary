@@ -519,7 +519,44 @@ if (!function_exists('accomodations')) {
             return $records;
         }
     endif;
-    # End Facing Floors
+    # End Facing List
+
+    # Plot Size List
+    if(!function_exists('inventory_plot_size')):
+        function inventory_plot_size($data = null){
+
+           # Data 
+           $property_id    = $data->property_id ?? 0;
+           $unit_code      = $data->unit_code ?? 0;
+           # End Data 
+
+           # Conditions
+           $where          =   '1 = 1';
+
+           if($property_id):
+               $where          .=   " and inventory.product_id = $property_id";
+           endif;
+           
+           if($unit_code):
+               $where          .=   " and inventory.unit_code = $unit_code";
+           endif;
+           # End Conditions
+
+           db_instance()->distinct("JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.plot_size')) as plot_size");
+           db_instance()->select("
+                                   JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.plot_size')) as plot_size, 
+                                   size_unit.unit_name,
+                                   size_unit.unit_id");
+           db_instance()->where($where);
+           db_instance()->join('tbl_units as size_unit', "size_unit.unit_id = JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.size_unit'))", "left");
+           db_instance()->from('tbl_inventory as inventory');
+       
+           $records = db_instance()->get()->result();
+    
+           return $records;
+        }
+    endif;
+    # End Facing List
 
 /*******************************************
  *  Inventory Filters

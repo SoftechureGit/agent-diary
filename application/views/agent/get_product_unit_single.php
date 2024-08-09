@@ -419,12 +419,34 @@
 
                 foreach (inventory_sa_sizes($inventory_sa_size_data) ?? [] as $sa_size) :
                 ?>
-                  <option value="<?= $sa_size->sa_size ?> | <?= $sa_size->unit_id ?>"><?= $sa_size->sa_size ?? '' ?> <?= $sa_size->unit_name ?? '' ?></option>
+                  <option value="<?= $sa_size->sa_size ?>|<?= $sa_size->unit_id ?>"><?= $sa_size->sa_size ?? '' ?> <?= $sa_size->unit_name ?? '' ?></option>
                 <?php endforeach; ?>
               </select>
             </div>
           </div>
-          <!-- End Accomodations -->
+          <!-- End Sa Size -->
+
+          <!-- Plot Size -->
+          <div class="col-md-4 filter-col">
+            <div class="form-group">
+              <label for="sa_size">Size</label>
+              <select id="inventory_filter_plot_size" class="form-control select2 filter-invetory">
+                <option value="">All</option>
+                <?php
+                $inventory_plot_data   = (object) [
+                  'property_id' => ($record->product_id ?? 0),
+                  'unit_code'   => ($record->product_unit_detail_id ?? 0),
+                ];
+
+
+                foreach (inventory_plot_size($inventory_plot_data) ?? [] as $plot_size) :
+                ?>
+                  <option value="<?= $plot_size->plot_size ?>|<?= $plot_size->unit_id ?>"><?= $plot_size->plot_size ?? '' ?> <?= $plot_size->unit_name ?? '' ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+          </div>
+          <!-- End Plot Size -->
         </div>
       </div>
       <div class="modal-footer">
@@ -458,6 +480,7 @@
       case 3: // Plot
         $('#inventoryFilterModal #inventory_filter_status').parents('.filter-col').removeClass('d-none')
         $('#inventoryFilterModal #inventory_filter_facing').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_plot_size').parents('.filter-col').removeClass('d-none')
         break;
 
       case 7: // Builder Floor
