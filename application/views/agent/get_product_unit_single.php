@@ -429,7 +429,7 @@
           <!-- Plot Size -->
           <div class="col-md-4 filter-col">
             <div class="form-group">
-              <label for="sa_size">Size</label>
+              <label for="sa_size">Plot Size</label>
               <select id="inventory_filter_plot_size" class="form-control select2 filter-invetory">
                 <option value="">All</option>
                 <?php
@@ -482,18 +482,19 @@
         $('#inventoryFilterModal #inventory_filter_facing').parents('.filter-col').removeClass('d-none')
         $('#inventoryFilterModal #inventory_filter_plot_size').parents('.filter-col').removeClass('d-none')
         break;
-
+        
       case 7: // Builder Floor
         $('#inventoryFilterModal #inventory_filter_status').parents('.filter-col').removeClass('d-none')
         $('#inventoryFilterModal #inventory_filter_facing').parents('.filter-col').removeClass('d-none')
         $('#inventoryFilterModal #inventory_filter_floor').parents('.filter-col').removeClass('d-none')
         break;
-
-      case 2: // Villa
-        $('#inventoryFilterModal #inventory_filter_status').parents('.filter-col').removeClass('d-none')
-        $('#inventoryFilterModal #inventory_filter_facing').parents('.filter-col').removeClass('d-none')
+        
+        case 2: // Villa
+          $('#inventoryFilterModal #inventory_filter_status').parents('.filter-col').removeClass('d-none')
+          $('#inventoryFilterModal #inventory_filter_facing').parents('.filter-col').removeClass('d-none')
+          $('#inventoryFilterModal #inventory_filter_plot_size').parents('.filter-col').removeClass('d-none')
         break;
-
+        
       case 4: // Shop
         $('#inventoryFilterModal #inventory_filter_status').parents('.filter-col').removeClass('d-none')
         $('#inventoryFilterModal #inventory_filter_floor').parents('.filter-col').removeClass('d-none')

@@ -59,37 +59,48 @@ endif;
                     </div>
                     <!-- End Plot Number -->
 
-                    <!-- Plot Size (Sqyd) -->
+                    <!-- Plot Size  -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Plot Size</label>
-                            <input type="text" placeholder="Enter Plot Size (Sqyd)" name="unit_detials[plot_size]" value="<?= $plot_size ?? '' ?>" class="form-control" >
+                            <label for="">Plot Size </label>
+                            <input type="text" placeholder="Enter Plot Size " name="property_details[plot_size]" value="<?= $plot_size ?? '' ?>" class="form-control" >
                         </div>
                     </div>
 
-                    
                     <div class="col-md-4">
-                        <label for="">Size Unit </label>
+                        <label for="">Size Unit ( Plot ) </label>
                         <select class="form-control" id="" name="property_details[size_unit]">
                                 <option value="">Select Unit</option>
                             <?php foreach (sizeUnits() ?? []  as $item) :
                                 
-                                $selected         = ( isset($size_unit) &&  $item->unit_id == size_unit ) ? 'selected' : '';
+                                $selected         = ( isset($size_unit) &&  $item->unit_id == ( $size_unit ?? '' ) ) ? 'selected' : '';
                                 ?>
                              <option value="<?= $item->unit_id ?>"  <?=$selected?> ><?= $item->unit_name ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <!-- End Plot Size (Sqyd) -->
+                    <!-- End Plot Size -->
 
-                    <!-- Unit Size (Sq.ft) -->
+                    <!-- Unit Size -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Unit Size (Sq.ft)</label>
-                            <input type="text" placeholder="Enter Unit Size (Sq.ft)" name="property_details[unit_size]" value="<?= $unit_size ?? '' ?>" class="form-control" >
+                            <label for="">Unit Size</label>
+                            <input type="text" placeholder="Enter Unit Size" name="property_details[unit_size]" value="<?= $unit_size ?? '' ?>" class="form-control" >
                         </div>
                     </div>
-                    <!-- End Unit Size (Sq.ft) -->
+                    <div class="col-md-4">
+                        <label for="">Size Unit </label>
+                        <select class="form-control" id="" name="property_details[unit_size_unit]">
+                                <option value="">Select Unit</option>
+                            <?php foreach (sizeUnits() ?? []  as $item) :
+                                
+                                $selected         = ( isset($size_unit) &&  $item->unit_id == ( $size_unit ?? '' ) ) ? 'selected' : '';
+                                ?>
+                             <option value="<?= $item->unit_id ?>"  <?=$selected?> ><?= $item->unit_name ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <!-- End Unit Size -->
 
                     <!-- Number of Floor -->
                     <div class="col-md-4">

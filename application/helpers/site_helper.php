@@ -977,6 +977,7 @@ if (!function_exists('getAccountId')) {
                         unit as size_unit,
                         plot_unit,
                         facing,
+                        no_of_floor as number_of_floor,
                         concat('$image_base_url', image) as image_url   
                     ")
             ->where("product_unit_detail_id = $id") 
