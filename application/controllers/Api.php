@@ -2257,25 +2257,25 @@ class Api extends CI_Controller {
     # Store Lead
     public function store_lead()
     {   
-        $this->form_validation->set_rules('lead_date', 'Date', 'required');
-        $this->form_validation->set_rules('lead_time', 'Time', 'required');
-        $this->form_validation->set_rules('lead_source_id', 'Source', 'required');
-        $this->form_validation->set_rules('lead_stage_id', 'Stage', 'required');
-        $this->form_validation->set_rules('lead_title', 'Title', 'required');
-        $this->form_validation->set_rules('lead_first_name', 'First Name', 'required');
-        $this->form_validation->set_rules('lead_mobile_no', 'Mobile Number', 'required');
+        // $this->form_validation->set_rules('lead_date', 'Date', 'required');
+        // $this->form_validation->set_rules('lead_time', 'Time', 'required');
+        // $this->form_validation->set_rules('lead_source_id', 'Source', 'required');
+        // $this->form_validation->set_rules('lead_stage_id', 'Stage', 'required');
+        // $this->form_validation->set_rules('lead_title', 'Title', 'required');
+        // $this->form_validation->set_rules('lead_first_name', 'First Name', 'required');
+        // $this->form_validation->set_rules('lead_mobile_no', 'Mobile Number', 'required');
 
-        $this->form_validation->set_rules('lead_email', 'Email', 'valid_email|trim');
+        // $this->form_validation->set_rules('lead_email', 'Email', 'valid_email|trim');
 
-        if ($this->form_validation->run() == FALSE):
-             // Validation failed
-            $response = array(
-                'status' => 'error',
-                'msg'   => validation_errors('<div style="color:red;">','</div>')
-            );
-            echo json_encode($response);
-            exit;
-        endif;
+        // if ($this->form_validation->run() == FALSE):
+        //      // Validation failed
+        //     $response = array(
+        //         'status' => 'error',
+        //         'msg'   => validation_errors('<div style="color:red;">','</div>')
+        //     );
+        //     echo json_encode($response);
+        //     exit;
+        // endif;
 
         # User Details
         $user_detail                    =   $this->user;
