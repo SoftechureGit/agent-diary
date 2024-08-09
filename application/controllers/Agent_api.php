@@ -4675,6 +4675,8 @@ WHERE lead_id='" . $lead_id . "'
             $inv_facing                             =   ( $inventory_details->facing_id ?? 0 ) ? ( facings($inventory_details->facing_id)->title ?? '-' ): '-';
 
             $inv_plot_size                          =   ( $inventory_details->plot_size ?? '-' ).' '. ( sizeUnits($inventory_details->size_unit ?? 0)->unit_name  ?? '-' ) ?? '-';
+
+            $inv_unit_size                          =   ( $inventory_details->unit_size ?? '-' ).' '. ( sizeUnits($inventory_details->unit_size_unit ?? 0)->unit_name  ?? '-' ) ?? '-';
             $inv_quote                              =   "<div class='text-center' onclick='getQuatation(".$inventory_details->id.")'><button class='btn btn-warning btn-sm' style='color:#fff;'><i class='fa fa-eye'></i></button></div>";
             # End Inventory Details Init
 
@@ -4689,7 +4691,7 @@ WHERE lead_id='" . $lead_id . "'
                                                                     'quote'                 =>   $inv_quote,
                                                                     'facing'                =>   $inv_facing,
                                                                     'plot_size'             =>   $inv_plot_size,
-                                                                    'unit_size'             =>   $inventory_details->size_unit ?? '-',
+                                                                    'unit_size'             =>   $inv_unit_size,
                                                                     'unit_type'             =>   $inventory_details->unit_type ?? '-',
                                                                     'status'                =>   $inventory->inventory_status_name ?? '-',
                                                                 ];

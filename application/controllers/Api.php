@@ -2278,7 +2278,10 @@ class Api extends CI_Controller {
         endif;
 
         # User Details
-        $user_detail                    =   $this->user;
+        // $user_detail                    =   $this->user;
+
+        $where = "user_hash='".$this->input->post('user_hash')."'";
+        $user_detail = $this->Action_model->select_single('tbl_users',$where);
         # End User Details
 
         $array                          =   array();
