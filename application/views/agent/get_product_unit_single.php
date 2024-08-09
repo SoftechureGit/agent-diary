@@ -447,6 +447,28 @@
             </div>
           </div>
           <!-- End Plot Size -->
+
+          <!-- Unit Size -->
+          <div class="col-md-4 filter-col">
+            <div class="form-group">
+              <label for="unit_size">Unit Size</label>
+              <select id="inventory_filter_unit_size" class="form-control select2 filter-invetory">
+                <option value="">All</option>
+                <?php
+                $inventory_unit_data   = (object) [
+                  'property_id' => ($record->product_id ?? 0),
+                  'unit_code'   => ($record->product_unit_detail_id ?? 0),
+                ];
+
+
+                foreach (inventory_unit_size($inventory_unit_data) ?? [] as $unit_size) :
+                ?>
+                  <option value="<?= $unit_size->unit_size ?>|<?= $unit_size->unit_id ?>"><?= $unit_size->unit_size ?? '' ?> <?= $unit_size->unit_name ?? '' ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+          </div>
+          <!-- End Unit Size -->
         </div>
       </div>
       <div class="modal-footer">
@@ -483,16 +505,19 @@
         $('#inventoryFilterModal #inventory_filter_plot_size').parents('.filter-col').removeClass('d-none')
         break;
         
-      case 7: // Builder Floor
-        $('#inventoryFilterModal #inventory_filter_status').parents('.filter-col').removeClass('d-none')
-        $('#inventoryFilterModal #inventory_filter_facing').parents('.filter-col').removeClass('d-none')
-        $('#inventoryFilterModal #inventory_filter_floor').parents('.filter-col').removeClass('d-none')
+        case 7: // Builder Floor
+          $('#inventoryFilterModal #inventory_filter_status').parents('.filter-col').removeClass('d-none')
+          $('#inventoryFilterModal #inventory_filter_facing').parents('.filter-col').removeClass('d-none')
+          $('#inventoryFilterModal #inventory_filter_plot_size').parents('.filter-col').removeClass('d-none')
+          $('#inventoryFilterModal #inventory_filter_unit_size').parents('.filter-col').removeClass('d-none')
+         $('#inventoryFilterModal #inventory_filter_floor').parents('.filter-col').removeClass('d-none')
         break;
         
         case 2: // Villa
           $('#inventoryFilterModal #inventory_filter_status').parents('.filter-col').removeClass('d-none')
           $('#inventoryFilterModal #inventory_filter_facing').parents('.filter-col').removeClass('d-none')
           $('#inventoryFilterModal #inventory_filter_plot_size').parents('.filter-col').removeClass('d-none')
+          $('#inventoryFilterModal #inventory_filter_unit_size').parents('.filter-col').removeClass('d-none')
         break;
         
       case 4: // Shop

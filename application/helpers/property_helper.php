@@ -585,7 +585,7 @@ if (!function_exists('accomodations')) {
                                    size_unit.unit_name,
                                    size_unit.unit_id");
            db_instance()->where($where);
-           db_instance()->join('tbl_units as size_unit', "size_unit.unit_id = JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.unit_size'))", "left");
+           db_instance()->join('tbl_units as size_unit', "size_unit.unit_id = JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.unit_size_unit'))", "left");
            db_instance()->from('tbl_inventory as inventory');
        
            $records = db_instance()->get()->result();

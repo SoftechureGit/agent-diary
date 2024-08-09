@@ -38,16 +38,22 @@ $property_layout_url        =   $property_layout ? base_url("uploads/images/prop
                 <?php if ($plot_size ?? 0) : ?>
                 <tr>
                     <th>Plot Size</th>
-                    <td><?= $plot_size ?? '' ?></td>
+                    <td>
+                        <?= $plot_size ?? '' ?>
+                        <?php if ($size_unit ?? 0) : echo (sizeUnits($size_unit)->unit_name ?? ''); endif; ?>
+                    </td>
                 </tr>
                 <?php endif; ?>
                 <!-- End Plot Size -->
 
                 <!-- Unit Size -->
-                <?php if ($size_unit ?? 0) : ?>
+                <?php if ($unit_size ?? 0) : ?>
                 <tr>
                     <th>Unit Size</th>
-                    <td><?= sizeUnits($size_unit)->unit_name ?? '' ?></td>
+                    <td>
+                        <?= $unit_size ?? '' ?>
+                        <?php if ($unit_size_unit ?? 0) : echo (sizeUnits($unit_size_unit)->unit_name ?? ''); endif; ?>
+                    </td>
                 </tr>
                 <?php endif; ?>
                 <!-- End Unit Size -->
@@ -160,6 +166,24 @@ $property_layout_url        =   $property_layout ? base_url("uploads/images/prop
                 </tr>
                 <?php endif; ?>
                 <!-- End Dimension -->
+
+                <!-- Tarrace -->
+                <?php if ($tarrace ?? 0) : ?>
+                <tr>
+                    <th>Tarrace</th>
+                    <td><?= $tarrace ?></td>
+                </tr>
+                <?php endif; ?>
+                <!-- End Tarrace -->
+
+                <!-- Basment -->
+                <?php if ($basment ?? 0) : ?>
+                <tr>
+                    <th>Basment</th>
+                    <td><?= $basment ?></td>
+                </tr>
+                <?php endif; ?>
+                <!-- End Basment -->
 
                 <!-- Parking -->
                 <?php if (is_array($parking ?? [])) : ?>

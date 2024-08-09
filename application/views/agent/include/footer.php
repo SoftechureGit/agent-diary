@@ -746,6 +746,7 @@
         var inventory_filter_accomodation     = $('#inventory_filter_accomodation').val()
         var inventory_filter_sa_size          = $('#inventory_filter_sa_size').val()
         var inventory_filter_plot_size        = $('#inventory_filter_plot_size').val()
+        var inventory_filter_unit_size        = $('#inventory_filter_unit_size').val()
         /** End Filter */
 
          if (product_id == "") {
@@ -768,6 +769,7 @@
                           inventory_filter_accomodation   : inventory_filter_accomodation,
                           inventory_filter_sa_size        : inventory_filter_sa_size,
                           inventory_filter_plot_size      : inventory_filter_plot_size,
+                          inventory_filter_unit_size      : inventory_filter_unit_size,
                         },
             dataType : 'json',
             beforeSend: function(data) {

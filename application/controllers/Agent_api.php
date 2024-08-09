@@ -4474,6 +4474,7 @@ WHERE lead_id='" . $lead_id . "'
         $inventory_filter_accomodation_id       =   $this->input->post('inventory_filter_accomodation');
         $inventory_filter_sa_size               =   $this->input->post('inventory_filter_sa_size');
         $inventory_filter_plot_size             =   $this->input->post('inventory_filter_plot_size');
+        $inventory_filter_unit_size             =   $this->input->post('inventory_filter_unit_size');
         # End Filter Init
 
         # Property Data
@@ -4514,7 +4515,7 @@ WHERE lead_id='" . $lead_id . "'
                 $where                      .= " and JSON_EXTRACT(`property_details`, '$.sa') ='$inv_filter_sa_size'";
             endif;
             
-            if($inv_filter_sa_size):
+            if($inv_filter_sa_size_unit):
                 $where                      .= " and JSON_EXTRACT(`property_details`, '$.sa_size_unit') ='$inv_filter_sa_size_unit'";
             endif;
         endif;
@@ -4530,11 +4531,27 @@ WHERE lead_id='" . $lead_id . "'
                 $where                      .= " and JSON_EXTRACT(`property_details`, '$.plot_size') ='$inv_filter_plot_size'";
             endif;
             
-            if($inv_filter_plot_size):
+            if($inv_filter_plot_size_unit):
                 $where                      .= " and JSON_EXTRACT(`property_details`, '$.size_unit') ='$inv_filter_plot_size_unit'";
             endif;
         endif;
         # End Plot Size Filter
+
+        # Unit Size Filter
+        if($inventory_filter_unit_size):
+            $inventory_filter_unit_size    =  explode('|', $inventory_filter_unit_size);
+            $inv_filter_unit_size          =  $inventory_filter_unit_size[0] ?? 0;
+            $inv_filter_unit_size_unit     =  $inventory_filter_unit_size[1] ?? 0;
+
+            if($inv_filter_unit_size):
+                $where                      .= " and JSON_EXTRACT(`property_details`, '$.unit_size') ='$inv_filter_unit_size'";
+            endif;
+            
+            if($inv_filter_unit_size_unit):
+                $where                      .= " and JSON_EXTRACT(`property_details`, '$.unit_size_unit') ='$inv_filter_unit_size_unit'";
+            endif;
+        endif;
+        # End Unit Size Filter
         ##### End Inventory Filter Functionality #####
 
         if ($property_unit_code_id) :
