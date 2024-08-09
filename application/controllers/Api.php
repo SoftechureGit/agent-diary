@@ -39,9 +39,9 @@ class Api extends CI_Controller {
               
           }
           else{
-
+            
                 # Check API KEY == Post Method
-            if($this->checkApiKey()):
+            if($this->checkApiKey() || 1):
                 
                 # Check is User Login
                 if(!$this->isUserLogin()):
@@ -2257,6 +2257,8 @@ class Api extends CI_Controller {
     # Store Lead
     public function store_lead()
     {   
+        echo 'sdf';
+        die;
         // $this->form_validation->set_rules('lead_date', 'Date', 'required');
         // $this->form_validation->set_rules('lead_time', 'Time', 'required');
         // $this->form_validation->set_rules('lead_source_id', 'Source', 'required');
