@@ -2271,7 +2271,7 @@ class Api extends CI_Controller {
              // Validation failed
             $response = array(
                 'status' => 'error',
-                'message' => validation_errors('<div style="color:red;">','</div>')
+                'msg'   => validation_errors('<div style="color:red;">','</div>')
             );
             echo json_encode($response);
             exit;
