@@ -34,6 +34,24 @@ $property_layout_url        =   $property_layout ? base_url("uploads/images/prop
                 <?php endif; ?>
                 <!-- End Plot Number -->
 
+                <!-- Unit Number -->
+                <?php if ($unit_number ?? 0) : ?>
+                <tr>
+                    <th>Unit Number</th>
+                    <td><?= $unit_number ?? '' ?></td>
+                </tr>
+                <?php endif; ?>
+                <!-- End Unit Number -->
+
+                <!-- Tower -->
+                <?php if ($tower ?? 0) : ?>
+                <tr>
+                    <th>Tower</th>
+                    <td><?= $tower ?? '' ?></td>
+                </tr>
+                <?php endif; ?>
+                <!-- End Tower -->
+
                 <!-- Plot Size -->
                 <?php if ($plot_size ?? 0) : ?>
                 <tr>
@@ -45,6 +63,18 @@ $property_layout_url        =   $property_layout ? base_url("uploads/images/prop
                 </tr>
                 <?php endif; ?>
                 <!-- End Plot Size -->
+
+                <!-- Area Size -->
+                <?php if ($area ?? 0) : ?>
+                <tr>
+                    <th>Area</th>
+                    <td>
+                        <?= $area ?? '' ?>
+                        <?php if ($size_unit ?? 0) : echo (sizeUnits($size_unit)->unit_name ?? ''); endif; ?>
+                    </td>
+                </tr>
+                <?php endif; ?>
+                <!-- End Area Size -->
 
                 <!-- Unit Size -->
                 <?php if ($unit_size ?? 0) : ?>
@@ -184,6 +214,24 @@ $property_layout_url        =   $property_layout ? base_url("uploads/images/prop
                 </tr>
                 <?php endif; ?>
                 <!-- End Basment -->
+
+                <!-- Pentry -->
+                <?php if ($pentry ?? 0) : ?>
+                <tr>
+                    <th>Pentry</th>
+                    <td><?= $pentry ?></td>
+                </tr>
+                <?php endif; ?>
+                <!-- End Pentry -->
+
+                <!-- Washroom -->
+                <?php if ($washroom ?? 0) : ?>
+                <tr>
+                    <th>Washroom</th>
+                    <td><?= $washroom ?></td>
+                </tr>
+                <?php endif; ?>
+                <!-- End Washroom -->
 
                 <!-- Parking -->
                 <?php if (is_array($parking ?? [])) : ?>

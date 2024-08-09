@@ -747,6 +747,7 @@
         var inventory_filter_sa_size          = $('#inventory_filter_sa_size').val()
         var inventory_filter_plot_size        = $('#inventory_filter_plot_size').val()
         var inventory_filter_unit_size        = $('#inventory_filter_unit_size').val()
+        var inventory_filter_unit_type        = $('#inventory_filter_unit_type').val()
         /** End Filter */
 
          if (product_id == "") {
@@ -770,6 +771,7 @@
                           inventory_filter_sa_size        : inventory_filter_sa_size,
                           inventory_filter_plot_size      : inventory_filter_plot_size,
                           inventory_filter_unit_size      : inventory_filter_unit_size,
+                          inventory_filter_unit_type      : inventory_filter_unit_type,
                         },
             dataType : 'json',
             beforeSend: function(data) {
@@ -864,10 +866,10 @@
                  /** End Size Unit */
 
                  /** Property Layout */
-                if (key == 'image_url' && value != '') {
+                if (key == 'image_url' && ( value == '' || value != null)) {
                    $('.property-layout-anchor').removeClass('d-none').attr('href', value)
                    $('.old_property_layout').val(value.split('/').pop())
-                 } else if (key == 'image_url' && value == '') {
+                 } else if (key == 'image_url' && ( value == '' || value == null)) {
                    $('.property-layout-anchor').addClass('d-none').attr('href', '#')
                    $('.old_property_layout').val('')
                  }

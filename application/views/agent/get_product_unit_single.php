@@ -469,6 +469,20 @@
             </div>
           </div>
           <!-- End Unit Size -->
+
+          <!-- Unit Type -->
+          <div class="col-md-4 filter-col">
+            <div class="form-group">
+              <label for="unit_size">Unit Type</label>
+              <select id="inventory_filter_unit_type" class="form-control select2 filter-invetory">
+                <option value="">All</option>
+               
+                <option value="locable">Locable</option>
+                <option value="virtual">Virtual</option>
+                </select>
+            </div>
+          </div>
+          <!-- End Unit Size -->
         </div>
       </div>
       <div class="modal-footer">
@@ -522,14 +536,16 @@
         
       case 4: // Shop
         $('#inventoryFilterModal #inventory_filter_status').parents('.filter-col').removeClass('d-none')
-        $('#inventoryFilterModal #inventory_filter_floor').parents('.filter-col').removeClass('d-none')
         $('#inventoryFilterModal #inventory_filter_tower').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_floor').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_unit_type').parents('.filter-col').removeClass('d-none')
         break;
 
       case 5: // Office
         $('#inventoryFilterModal #inventory_filter_status').parents('.filter-col').removeClass('d-none')
-        $('#inventoryFilterModal #inventory_filter_floor').parents('.filter-col').removeClass('d-none')
         $('#inventoryFilterModal #inventory_filter_tower').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_floor').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_unit_type').parents('.filter-col').removeClass('d-none')
         break;
     }
     /** End Property Form */

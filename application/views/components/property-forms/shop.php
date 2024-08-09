@@ -58,11 +58,20 @@ endif;
                     </div>
                     <!-- End Unit Number -->
 
-                    <!-- Floor -->
-                    <div class="col-md-4">
+                     <!-- Floor -->
+                  <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Floor</label>
-                            <input type="text" placeholder="Enter Floor" name="property_details[floor]" value="<?= $floor ?? '' ?>" class="form-control" >
+                            <!-- <input type="text" placeholder="Enter Floor" name="property_details[floor]" value="<?= $floor ?? '' ?>" class="form-control" > -->
+                            <select name="property_details[floor_id]" id="" class="form-control">
+                                <option value="" disabled selected>Choose...</option>
+                                <?php
+                                foreach (getFloors() ?? [] as $floor) :
+                                    $selected         = (($floor_id ?? 0) == $floor->id) ? 'selected' : '';
+                                ?>
+                                    <option value="<?= $floor->id ?>" <?= $selected ?>><?= $floor->name ?? '' ?></option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                     </div>
                     <!-- End Floor -->
@@ -82,21 +91,21 @@ endif;
                             <label for="">Unit Type</label>
                             <select  class="form-control" name="property_details[unit_type]" >
                                 <option value="" selected disabled>Choose...</option>
-                                <option value="locable" <?= ($tower ?? '' == 'locable') ? 'selected' : '' ?>>Locable</option>
-                                <option value="virtual" <?= ($tower ?? '' == 'virtual') ? 'selected' : '' ?>>Virtual</option>
+                                <option value="locable" <?= ( ( $unit_type ?? '' ) == 'locable') ? 'selected' : '' ?>>Locable</option>
+                                <option value="virtual" <?= ( ( $unit_type ?? '' ) == 'virtual') ? 'selected' : '' ?>>Virtual</option>
                             </select>
                         </div>
                     </div>
                     <!-- End Unit Type -->
 
-                    <!-- Area (Sqft) -->
+                    <!-- Area  -->
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Area</label>
-                            <input type="text" placeholder="Enter Area (Sqft)" name="property_details[area]" value="<?= $area ?? '' ?>" class="form-control" >
+                            <input type="text" placeholder="Enter Area " name="property_details[area]" value="<?= $area ?? '' ?>" class="form-control" >
                         </div>
                     </div>
-                    <!-- End Area (Sqft) -->
+                    <!-- End Area -->
 
                     
                     <div class="col-md-4">
@@ -105,7 +114,7 @@ endif;
                                 <option value="">Select Unit</option>
                             <?php foreach (sizeUnits() ?? []  as $item) :
                                 
-                                $selected         = ( isset($size_unit) &&  $item->unit_id == size_unit ) ? 'selected' : '';
+                                $selected         = ( isset($size_unit) &&  $item->unit_id == $size_unit ) ? 'selected' : '';
                                 ?>
                              <option value="<?= $item->unit_id ?>"  <?=$selected?> ><?= $item->unit_name ?></option>
                             <?php endforeach; ?>

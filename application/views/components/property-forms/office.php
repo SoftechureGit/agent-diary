@@ -64,7 +64,16 @@ endif;
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Floor</label>
-                            <input type="text" placeholder="Enter Floor" name="property_details[floor]" value="<?= $floor ?? '' ?>" class="form-control" >
+                            <!-- <input type="text" placeholder="Enter Floor" name="property_details[floor]" value="<?= $floor ?? '' ?>" class="form-control" > -->
+                            <select name="property_details[floor_id]" id="" class="form-control">
+                                <option value="" disabled selected>Choose...</option>
+                                <?php
+                                foreach (getFloors() ?? [] as $floor) :
+                                    $selected         = (($floor_id ?? 0) == $floor->id) ? 'selected' : '';
+                                ?>
+                                    <option value="<?= $floor->id ?>" <?= $selected ?>><?= $floor->name ?? '' ?></option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                     </div>
                     <!-- End Floor -->
@@ -78,14 +87,14 @@ endif;
                     </div>
                     <!-- End Tower -->
 
-                    <!-- Unit Type -->
-                    <div class="col-md-4">
+                     <!-- Unit Type -->
+                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Unit Type</label>
-                            <select name="unit_type" class="form-control" name="property_details[unit_type]" >
+                            <select  class="form-control" name="property_details[unit_type]" >
                                 <option value="" selected disabled>Choose...</option>
-                                <option value="locable" <?= ($tower ?? '' == 'locable') ? 'selected' : '' ?>>Locable</option>
-                                <option value="virtual" <?= ($tower ?? '' == 'virtual') ? 'selected' : '' ?>>Virtual</option>
+                                <option value="locable" <?= ( ( $unit_type ?? '' ) == 'locable') ? 'selected' : '' ?>>Locable</option>
+                                <option value="virtual" <?= ( ( $unit_type ?? '' ) == 'virtual') ? 'selected' : '' ?>>Virtual</option>
                             </select>
                         </div>
                     </div>

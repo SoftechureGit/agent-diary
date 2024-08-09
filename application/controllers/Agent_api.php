@@ -4475,6 +4475,7 @@ WHERE lead_id='" . $lead_id . "'
         $inventory_filter_sa_size               =   $this->input->post('inventory_filter_sa_size');
         $inventory_filter_plot_size             =   $this->input->post('inventory_filter_plot_size');
         $inventory_filter_unit_size             =   $this->input->post('inventory_filter_unit_size');
+        $inventory_filter_unit_type             =   $this->input->post('inventory_filter_unit_type');
         # End Filter Init
 
         # Property Data
@@ -4503,6 +4504,10 @@ WHERE lead_id='" . $lead_id . "'
 
         if($inventory_filter_accomodation_id):
             $where                      .= " and JSON_EXTRACT(`property_details`, '$.accomodation_id') ='$inventory_filter_accomodation_id'";
+        endif;
+
+        if($inventory_filter_unit_type):
+            $where                      .= " and JSON_EXTRACT(`property_details`, '$.unit_type') ='$inventory_filter_unit_type'";
         endif;
 
         # Sa Size Filter
@@ -4683,8 +4688,15 @@ WHERE lead_id='" . $lead_id . "'
 
 
             # Inventory Details Init
-            $inv_size                               =   ( $inventory_details->sa ?? '-' ).' ';
-            $inv_size                               .=   ( $inventory_details->sa_size_unit ?? 0 ) ? ( sizeUnits($inventory_details->sa_size_unit ?? 0)->unit_name  ?? '-' ) : '';
+            if(($inventory_details->sa ?? 0) || ($inventory_details->sa_size_unit ?? 0)):
+                $inv_size                               =   ( $inventory_details->sa ?? '-' ).' ';
+                $inv_size                               .=   ( $inventory_details->sa_size_unit ?? 0 ) ? ( sizeUnits($inventory_details->sa_size_unit ?? 0)->unit_name  ?? '-' ) : '';
+            endif;
+
+            if(($inventory_details->area ?? 0) || ($inventory_details->size_unit ?? 0)):
+                $inv_size                               =   ( $inventory_details->area ?? '-' ).' ';
+                $inv_size                               .=   ( $inventory_details->size_unit ?? 0 ) ? ( sizeUnits($inventory_details->size_unit ?? 0)->unit_name  ?? '-' ) : '';
+            endif;
 
             $inv_accomodation                       =   ( $inventory_details->accomodation_id ?? 0 ) ? ( accomodations($inventory_details->accomodation_id)->name ?? '-' ) : '';
             $inv_floor                              =   ( $inventory_details->floor_id ?? 0 ) ? ( getFloors($inventory_details->floor_id)->name ?? '-' ) : '';
@@ -4703,13 +4715,13 @@ WHERE lead_id='" . $lead_id . "'
                                                                     'referance_number'      =>   $referance_number ?? '-',
                                                                     'accomodation'          =>   $inv_accomodation,
                                                                     'floor'                 =>   $inv_floor,
-                                                                    'size'                  =>   $inv_size,
+                                                                    'size'                  =>   $inv_size ?? '-',
                                                                     'tower'                 =>   $inv_tower,
                                                                     'quote'                 =>   $inv_quote,
                                                                     'facing'                =>   $inv_facing,
                                                                     'plot_size'             =>   $inv_plot_size,
                                                                     'unit_size'             =>   $inv_unit_size,
-                                                                    'unit_type'             =>   $inventory_details->unit_type ?? '-',
+                                                                    'unit_type'             =>   ucwords($inventory_details->unit_type ?? '-'),
                                                                     'status'                =>   $inventory->inventory_status_name ?? '-',
                                                                 ];
 
