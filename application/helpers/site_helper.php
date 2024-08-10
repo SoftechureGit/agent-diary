@@ -432,6 +432,8 @@ if (!function_exists('getAccountId')) {
        # Get property information
             $property_details = property($property_id);
 
+            // print_r($property_details); die;
+
             
             // print_r($property_details); die;
        # End  Get property information  
@@ -439,6 +441,16 @@ if (!function_exists('getAccountId')) {
        # Get Unit code 
             $unit_codes       =  getPropertyAccomodations($property_details->project_type_id, $property_details->property_type_id, $property_id);     
        # End Unit  code
+
+
+       # Get Parking
+            
+            $parkings         =         parkings($property_details->id ?? 0); 
+
+
+            // print_r($parkings); die;
+       
+       # End Get Parking 
 
         $form               =   '';
         $excel_sheet        =   [];
@@ -508,7 +520,7 @@ if (!function_exists('getAccountId')) {
                 $form                           =  'plot';
                 $excel_sheet[0]['title']                    =  'Plot';
                 $excel_sheet[0]['headers']                  =  ['S.N.', 'Unit Code', 'Referance Number', 'Plot Number', 'Plot Size', 'Size Unit' ,'Block' ,'Applicable PLC' , 'Facing' , 'Dimantion F x B x S1 x S2' ,'Layout Upload'];
-                $excel_sheet[0]['data'][]                     =  ['', '', '', '', '', ''];
+                $excel_sheet[0]['data'][]                   =  ['', '', '', '', '', ''];
 
                 # unit code
                    $excel_sheet[1]['title']      = 'Unit Code';  
@@ -603,22 +615,66 @@ if (!function_exists('getAccountId')) {
                     $count++;
 
                  } 
-                # end facing   
+                # end facing  
+                        
+                   # parkings
+                
+                   $excel_sheet[4]['title']         = 'Parkings';
+                   $excel_sheet[4]['headers']       =  ['S.N', 'Label', 'Value'];
+  
+                   $count = 1; 
+          
+                   foreach($parkings as $parking ){
+  
+                       $excel_sheet[4]['data'][] = [$count,$parking->label , $parking->value] ;
+                       $count++;
+  
+                   } 
+                   if($parkings){
+                       $excel_sheet[4]['data'][] = ['','',''];
+                   }
+  
+               
+               # end parkings 
 
                       # Applicable PLC
                   
-                      $excel_sheet[4]['title']         = 'Applicable PLC';  
-                      $excel_sheet[4]['headers']       =  ['S.N.', 'Title', 'PLC ID' ];
+                      $excel_sheet[5]['title']         = 'Applicable PLC';  
+                      $excel_sheet[5]['headers']       =  ['S.N.', 'Title', 'PLC ID' ];
                       $count = 1;
   
                       foreach(getPropertyPlcs($property_id ?? 0) as $ApplicablePlc){
-                      $excel_sheet[4]['data'][] = [$count,$ApplicablePlc->price_component_name , $ApplicablePlc->price_component_id] ;
+                      $excel_sheet[5]['data'][] = [$count,$ApplicablePlc->price_component_name , $ApplicablePlc->price_component_id] ;
                       $count++;
                       } 
                       if(count(getPropertyPlcs($property_id ?? 0)) == 0){
-                          $excel_sheet[4]['data'][] = ['','',''];
+                          $excel_sheet[5]['data'][] = ['','',''];
                       }
                     # end Applicable PLC
+
+                         # size Floor 
+                         $excel_sheet[6]['title']         = 'Floor';  
+                         $excel_sheet[6]['headers']       =  ['S.N.', 'Name', 'Floor Id' ];
+                         $count = 1;
+
+                         foreach(getFloors() as $get_floor){
+                         $excel_sheet[6]['data'][] = [$count,$get_floor->name , $get_floor->id] ;
+                         $count++;
+                         } 
+                         # end size  Tower 
+
+                         # size Floor 
+                         $excel_sheet[7]['title']         = 'Tower';  
+                         $excel_sheet[7]['headers']       =  ['S.N.', 'Name', 'Floor Id' ];
+                         $count = 1;
+
+                         foreach(getBlocksOrTowers() as $block_or_tower){
+                         $excel_sheet[7]['data'][] = [$count,$block_or_tower->name , $block_or_tower->id] ;
+                         $count++;
+                         } 
+
+            
+                        # end size  Floor 
 
                 break;
             case '5': # Office
@@ -677,6 +733,26 @@ if (!function_exists('getAccountId')) {
                           $excel_sheet[4]['data'][] = ['','',''];
                       }
                   # end Applicable PLC
+
+                       # parkings
+                
+                       $excel_sheet[5]['title']         = 'Parkings';
+                       $excel_sheet[5]['headers']       =  ['S.N', 'Label', 'Value'];
+      
+                       $count = 1; 
+              
+                       foreach($parkings as $parking ){
+      
+                           $excel_sheet[5]['data'][] = [$count,$parking->label , $parking->value] ;
+                           $count++;
+      
+                       } 
+                       if($parkings){
+                           $excel_sheet[5]['data'][] = ['','',''];
+                       }
+      
+                   
+                   # end parkings 
 
                 break;
             case '7':
@@ -737,8 +813,40 @@ if (!function_exists('getAccountId')) {
                       }
                   # end Applicable PLC
 
+                       # parkings
+                
+                       $excel_sheet[5]['title']         = 'Parkings';
+                       $excel_sheet[5]['headers']       =  ['S.N', 'Label', 'Value'];
+      
+                       $count = 1; 
+              
+                       foreach($parkings as $parking ){
+      
+                           $excel_sheet[5]['data'][] = [$count,$parking->label , $parking->value] ;
+                           $count++;
+      
+                       } 
+                       if($parkings){
+                           $excel_sheet[5]['data'][] = ['','',''];
+                       }
+      
+                   
+                   # end parkings 
+
+                        # size Floor 
+                            $excel_sheet[6]['title']         = 'Floor';  
+                            $excel_sheet[6]['headers']       =  ['S.N.', 'Name', 'Floor Id' ];
+                            $count = 1;
+
+                            foreach(getFloors() as $get_floor){
+                            $excel_sheet[6]['data'][] = [$count,$get_floor->name , $get_floor->id] ;
+                            $count++;
+                            } 
+                    # end size  Floor 
+
                 break;
             case '1':
+               
                 $form          =   'apartment';
                 $excel_sheet[0]['title']                        =  'Apartment';
                 $excel_sheet[0]['headers']                      =  ['S.N.', 'Unit Code ', 'Referance Number', 'Unit No', 'Floor', 'Tower' ,'Unit Type' ,'SA' , 'SA Size' , 'BA' ,'BA Size' , 'CA' ,'CA Size' ,'Applicable PLC' , 'Facing' , 'Parking' , 'Layout Upload Url'];
@@ -806,6 +914,8 @@ if (!function_exists('getAccountId')) {
                     }
                 # end Applicable PLC
 
+              
+
                   # facing
                   $excel_sheet[6]['title']         = 'Facing';
                   $excel_sheet[6]['headers']       =  ['S.N', 'Title', 'Facing Id'];
@@ -819,6 +929,26 @@ if (!function_exists('getAccountId')) {
 
                 } 
                # end facing 
+
+                  # parkings
+                
+                  $excel_sheet[7]['title']         = 'Parkings';
+                  $excel_sheet[7]['headers']       =  ['S.N', 'Label', 'Value'];
+ 
+                  $count = 1; 
+         
+                  foreach($parkings as $parking ){
+ 
+                      $excel_sheet[7]['data'][] = [$count,$parking->label , $parking->value] ;
+                      $count++;
+ 
+                  } 
+                  if($parkings){
+                      $excel_sheet[7]['data'][] = ['','',''];
+                  }
+ 
+              
+              # end parkings 
 
                 break;
             case '9':
@@ -904,6 +1034,26 @@ if (!function_exists('getAccountId')) {
 
                 } 
                # end facing 
+
+                    # parkings
+                
+                    $excel_sheet[7]['title']         = 'Parkings';
+                    $excel_sheet[7]['headers']       =  ['S.N', 'Label', 'Value'];
+   
+                    $count = 1; 
+           
+                    foreach($parkings as $parking ){
+   
+                        $excel_sheet[7]['data'][] = [$count,$parking->label , $parking->value] ;
+                        $count++;
+   
+                    } 
+                    if($parkings){
+                        $excel_sheet[7]['data'][] = ['','',''];
+                    }
+   
+                
+                # end parkings 
                 break;
         endswitch;
         
@@ -912,7 +1062,7 @@ if (!function_exists('getAccountId')) {
         // print_r($excel_sheet); die;
 
         if ($form) :  
-            return inventory_create_sample_file($excel_sheet);
+            return inventory_create_sample_file($excel_sheet , $property_details->name);
         else :
             return "<div class='text-center my-3'><h4>Form not available.</h4></div>";
         endif;
@@ -1050,7 +1200,7 @@ if (!function_exists('getAccountId')) {
 
     
     #  create excel with multiple sheet
-     function inventory_create_sample_file($excel_sheet){
+     function inventory_create_sample_file($excel_sheet , $sheet_name){
         
         require_once(APPPATH . 'third_party/PHPExcel/Classes/PHPExcel.php');
         require_once(APPPATH . 'third_party/PHPExcel/Classes/PHPExcel/IOFactory.php');
@@ -1100,7 +1250,7 @@ if (!function_exists('getAccountId')) {
         
         // Save the spreadsheet
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="download-sample.xlsx"');
+        header('Content-Disposition: attachment;filename=".'.$sheet_name.'.xlsx"');
         header('Cache-Control: max-age=0');
         $writer->save('php://output');
 

@@ -11242,7 +11242,7 @@ WHERE lead_id='" . $lead_id . "'
             # propery details
                 $property_details = property($product_id);
 
-                print_r($property_details); die;
+                // print_r($property_details); die;
             # End  propery details
 
 
@@ -11298,10 +11298,13 @@ WHERE lead_id='" . $lead_id . "'
                                                         'size_unit' => $Row[5],
                                                         'number_of_floor'   => $Row[6],
                                                         'block' => $Row[7],
-                                                        'applicable_plc' => $Row[8],
+                                                        'applicable_plc' =>  explode(',',$Row[8]),
                                                         'facing_id' => $Row[9],
                                                         'dimension' => $Row[9]
                                                     );
+
+                                                  
+
                                                 break;
                                             case '3': #Plot
                                                     $property_details = array(
@@ -11313,10 +11316,13 @@ WHERE lead_id='" . $lead_id . "'
                                                         'plot_size' => $Row[4],
                                                         'size_unit' => $Row[5],
                                                         'block'   => $Row[6],
-                                                        'applicable_plc' => $Row[7],
-                                                        'facing' => $Row[8],
+                                                        'applicable_plc' =>  explode(',',$Row[7]),
+                                                        'facing_id' => $Row[8],
                                                         'dimension' => $Row[9]
-                                                    );            
+                                                    );      
+                                                    
+                                                    // print_r($property_details) ; die;
+                                                    
                                                 break;
                                             case '4': # shop
                                                
@@ -11326,13 +11332,13 @@ WHERE lead_id='" . $lead_id . "'
                                                     'unit_code' => $Row[1],
                                                     'referance_number' => $Row[2],
                                                     'floor' => $Row[3],
-                                                    'tower' => $Row[4],
+                                                    'block_or_tower_id' => $Row[4],
                                                     'unit_type' => $Row[5],
                                                     'area'   => $Row[6],
                                                     'size_unit' => $Row[7],
-                                                    'applicable_plc' => $Row[8],
+                                                    'applicable_plc' =>  explode(',',$Row[8]),
                                                     'facing_id' => $Row[9],
-                                                    'parking' => $Row[9]
+                                                    'parking' =>  explode(',',$Row[10])
                                                 );
                                                 break;
                                             case '5': # Office
@@ -11348,9 +11354,9 @@ WHERE lead_id='" . $lead_id . "'
                                                 'unit_type'   => $Row[6],
                                                 'area' => $Row[7],
                                                 'size_unit' => $Row[8],
-                                                'applicable_plc' => $Row[9],
+                                                'applicable_plc' =>  explode(',',$Row[9]),
                                                 'facing_id' => $Row[10],
-                                                'parking' => $Row[11],
+                                                'parking' =>  explode(',',$Row[11]),
                                                 'pentry' => $Row[12],
                                                 'washroom' => $Row[13],
                                             );
@@ -11366,12 +11372,12 @@ WHERE lead_id='" . $lead_id . "'
                                                     'size_unit' => $Row[5],
                                                     'floor'   => $Row[6],
                                                     'block' => $Row[7],
-                                                    'applicable_plc' => $Row[8],
+                                                    'applicable_plc' => explode(',',$Row[8]),
                                                     'facing_id' => $Row[9],
                                                     'dimension' => $Row[10],
                                                     'tarrace' => $Row[11],
                                                     'basment' => $Row[12],
-                                                    'parking' => $Row[13],
+                                                    'parking' =>  explode(',',$Row[13]),
                                                 );
                                 
                                                 break;
@@ -11379,19 +11385,21 @@ WHERE lead_id='" . $lead_id . "'
                                                 $property_details = array(
                                                     'id' => '',
                                                     'product_id' => $product_id,
-                                                    'unit_no' => $Row[1],
-                                                    'floor_id' => $Row[2],
-                                                    'block_or_tower_id' => $Row[3],
-                                                    'unit_type' => $Row[4],
-                                                    'sa' => $Row[5],
-                                                    'sa_size_unit'   => $Row[6],
-                                                    'ba' => $Row[7],
-                                                    'ba_size_unit' => $Row[8],
-                                                    'ca' => $Row[9],
-                                                    'ca_size_unit' => $Row[10],
-                                                    'applicable_plc' => $Row[11],
-                                                    'facing_id' => $Row[12],
-                                                    'parking' => $Row[13],
+                                                    'unit_code' => $Row[1],
+                                                    'referance_number' => $Row[2],
+                                                    'unit_no' => $Row[3],
+                                                    'floor_id' => $Row[4],
+                                                    'block_or_tower_id' => $Row[5],
+                                                    'unit_type' => $Row[6],
+                                                    'sa' => $Row[7],
+                                                    'sa_size_unit'   => $Row[8],
+                                                    'ba' => $Row[9],
+                                                    'ba_size_unit' => $Row[10],
+                                                    'ca' => $Row[11],
+                                                    'ca_size_unit' => $Row[12],
+                                                    'applicable_plc' =>  explode(',',$Row[13]),
+                                                    'facing_id' => $Row[14],
+                                                    'parking' => explode(',',$Row[15]),
                                                 );
                                 
                                                 break;
@@ -11399,19 +11407,21 @@ WHERE lead_id='" . $lead_id . "'
                                                 $property_details = array(
                                                     'id' => '',
                                                     'product_id' => $product_id,
-                                                    'unit_no' => $Row[1],
-                                                    'floor_id' => $Row[2],
-                                                    'block_or_tower_id' => $Row[3],
-                                                    'unit_type' => $Row[4],
-                                                    'sa' => $Row[5],
-                                                    'sa_size_unit'   => $Row[6],
-                                                    'ba' => $Row[7],
-                                                    'ba_size_unit' => $Row[8],
-                                                    'ca' => $Row[9],
-                                                    'ca_size_unit' => $Row[10],
-                                                    'applicable_plc' => $Row[11],
-                                                    'facing_id' => $Row[12],
-                                                    'parking' => $Row[13],
+                                                    'unit_code' => $Row[1],
+                                                    'referance_number' => $Row[2],
+                                                    'unit_no' => $Row[3],
+                                                    'floor_id' => $Row[4],
+                                                    'block_or_tower_id' => $Row[5],
+                                                    'unit_type' => $Row[6],
+                                                    'sa' => $Row[7],
+                                                    'sa_size_unit'   => $Row[8],
+                                                    'ba' => $Row[9],
+                                                    'ba_size_unit' => $Row[10],
+                                                    'ca' => $Row[11],
+                                                    'ca_size_unit' => $Row[12],
+                                                    'applicable_plc' =>  explode(',',$Row[13]),
+                                                    'facing_id' => $Row[14],
+                                                    'parking' => explode(',',$Row[15]),
                                                 );
                                                 break;
                                         endswitch;
