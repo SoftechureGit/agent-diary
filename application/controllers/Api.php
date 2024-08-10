@@ -2146,7 +2146,7 @@ class Api extends CI_Controller {
                 $where = "lead_type_status='1'";
                 $lead_type_list = $this->Action_model->detail_result('tbl_lead_types', $where, 'lead_type_id,lead_type_name');
                 $data['lead_type_list'] = (($lead_type_list) ? $lead_type_list : array());
-    
+
                 $state_list = (($state_list) ? $state_list : array());
                 $city_list = (($city_list) ? $city_list : array());
                 $occupation_list = (($occupation_list) ? $occupation_list : array());
@@ -2161,6 +2161,13 @@ class Api extends CI_Controller {
 
                 $where = "designation_status='1'";
                 $designations_list = $this->Action_model->detail_result('tbl_designations', $where);
+
+
+                # Data From DB
+                $genders                        = $this->db->from('tbl_gender')->get()->result();
+                $designations                   = $this->db->select('designation_id as id, designation_name as name, ')->where('designation_status', '1')->from('tbl_designations')->get()->result();
+                $martial_status                 = $this->db->from('tbl_martial_status')->get()->result();
+                # End Data From DB
     
                 $array['data'] = array(
                     'status' => 'true',
@@ -2174,6 +2181,9 @@ class Api extends CI_Controller {
                     'lead_source_list' => $lead_source_list,
                     'lead_stage_list' => $lead_stage_list,
                     'city_list' => $city_list,
+                    'genders'                   => $genders,
+                    'designations'              => $designations,
+                    'martial_status'            => $martial_status,
                     'next_lead_id' =>$previous_lead_id,
                     'previous_lead_id' =>  $next_lead_id  
                 );
