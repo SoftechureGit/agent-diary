@@ -123,14 +123,23 @@ endif;
                     </div>
                     <!-- End Facing -->
 
-                    <!-- dimension F x B x S1 x S2 -->
+                    <!-- Dimension F x B x S1 x S2 -->
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Dimension F x B x S1 x S2</label>
                             <input type="text" placeholder="Enter dimension F x B x S1 x S2" name="property_details[dimension]" value="<?= $dimension ?? $dimension ?? '' ?>" class="form-control" >
                         </div>
                     </div>
-                    <!-- End dimension F x B x S1 x S2 -->
+                    <!-- End Dimension F x B x S1 x S2 -->
+
+                     <!-- Remark -->
+                     <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="">Remark</label>
+                            <textarea type="text" placeholder="Enter remark" name="property_details[remark]" class="form-control"><?= $remark ?? '' ?></textarea>
+                        </div>
+                    </div>
+                    <!-- End Remark -->
                 </div>
             </div>
         </div>

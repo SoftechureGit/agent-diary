@@ -167,17 +167,19 @@ endif;
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Parking</label>
-                            <select name="property_details[parking][]" id="" class="form-select" multiple>
-
-                                <?php 
-                                foreach(parkings($product_id ?? 0) as $parking_item): ?>
-                                    <option value="<?= $parking_item->value ?>" <?= in_array($parking_item->value, $parking ?? []) ? 'selected' : '' ?>><?= $parking_item->label ?></option>
-                                <?php endforeach; ?>
-
-                            </select>
+                            <input type="text" placeholder="Enter parking" name="property_details[parking_count]" class="form-control" value="<?= $parking_count ?? '' ?>">
                         </div>
                     </div>
                     <!-- End Parking -->
+
+                     <!-- Remark -->
+                     <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="">Remark</label>
+                            <textarea type="text" placeholder="Enter remark" name="property_details[remark]" class="form-control"><?= $remark ?? '' ?></textarea>
+                        </div>
+                    </div>
+                    <!-- End Remark -->
                 </div>
             </div>
         </div>

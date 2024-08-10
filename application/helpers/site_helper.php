@@ -385,11 +385,17 @@ if (!function_exists('getAccountId')) {
     # End Lead Unit Details
 
     # Get Property Form
-    function property_form($property_id, $property_details = null)
+    function property_form($property_type_id, $property_details = null)
     {
         $form          =   '';
         
-        switch ($property_id):
+        # Commercial
+        if(!$property_type_id):
+            $form          =   'commercial';
+        endif;
+        # End Commercial
+
+        switch ($property_type_id):
             case '2':
                 $form          =   'villa';
                 break;
@@ -414,7 +420,6 @@ if (!function_exists('getAccountId')) {
         endswitch;
 
         if ($form) :
-        
             return CI()->load->view("components/property-forms/$form", $property_details ?? [], true);
         else :
             return "<div class='text-center my-3'><h4>Form not available.</h4></div>";

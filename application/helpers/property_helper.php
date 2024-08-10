@@ -191,15 +191,26 @@ if (!function_exists('getPropertyAccomodations')) {
     {
         $unit_code_list   = null;
 
-        $where = "product_id='" . $property_id . "' AND project_type='" . $project_type_id . "' AND property_type='" . $property_type_id . "'";
+        $where = "product_id='$property_id' AND project_type='$project_type_id'";
+        
+        if($property_type_id):
+            $where .= " AND property_type='" . $property_type_id . "'";
+        endif;
+
 
         if ($id) :
             $where  .= " and inventory.product_unit_detail_id = '$id'";
         endif;
 
-        db_instance()->select("inventory.product_unit_detail_id as id, inventory.code as inventory_unit_code, accomodation.accomodation_id, accomodation.accomodation_name, concat(accomodation.accomodation_name,' ', inventory.code) as unit_code_with_accomodation_name");
+        db_instance()->select("inventory.product_unit_detail_id as id, 
+                                inventory.code as inventory_unit_code, 
+                                accomodation.accomodation_id, 
+                                accomodation.accomodation_name, 
+                                concat(accomodation.accomodation_name,' ', inventory.code) as unit_code_with_accomodation_name,
+                                unit_type.unit_type_name as property_type_name");
         db_instance()->from('tbl_product_unit_details as inventory');
         db_instance()->join('tbl_accomodations as accomodation', 'accomodation.accomodation_id = inventory.accomodation', 'left');
+        db_instance()->join('tbl_unit_types as unit_type', 'unit_type.unit_type_id = inventory.sub_category', 'left');
         db_instance()->where($where);
         $query = db_instance()->get();
 
@@ -711,4 +722,62 @@ if (!function_exists('accomodations')) {
     }
 /*******************************************
  *  End Site Visit Filters
+*******************************************/
+
+/*******************************************
+ *  Builder Form
+*******************************************/
+
+    #   Tarrace
+    if(!function_exists('tarraces')):
+        function tarraces($id = ''){
+            $where  = "1 = '1'";
+    
+            if ($id) :
+                $where  .= " and id = $id";
+            endif;
+    
+            $result  = db_instance()
+                ->select('id, name')
+                ->where($where)
+                ->get('tbl_tarraces');
+    
+            if ($id) :
+                $result  = $result->row();
+            else :
+                $result  = $result->result();
+            endif;
+    
+            return $result;
+        }
+    endif;
+    #   End Tarrace
+
+    #   Basment
+    if(!function_exists('basments')):
+        function basments($id = ''){
+            $where  = "1 = '1'";
+    
+            if ($id) :
+                $where  .= " and id = $id";
+            endif;
+    
+            $result  = db_instance()
+                ->select('id, name')
+                ->where($where)
+                ->get('tbl_basments');
+    
+            if ($id) :
+                $result  = $result->row();
+            else :
+                $result  = $result->result();
+            endif;
+    
+            return $result;
+        }
+    endif;
+    #   End Basment
+
+/*******************************************
+ *  End Builder Form
 *******************************************/

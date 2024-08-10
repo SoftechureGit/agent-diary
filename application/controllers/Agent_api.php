@@ -4639,18 +4639,23 @@ WHERE lead_id='" . $lead_id . "'
         $data['floor_list'] = $this->Action_model->detail_result('tbl_floors', "floor_id!=''");
 
 
+        $property_type_name = $property->property_type_name ? $property->property_type_name : 'Commercial';
+
         # Table View
 
         $table_headings             =   $this->inventory_table_headings($property->property_type_id);
         $table_view                 =   "<div class='table-responsive inventory-table'>
                                         <table class='table table-bordered'>
-                                        <caption>* $property->property_type_name *</caption>
+                                        <caption>* $property_type_name *</caption>
                                         $table_headings
                                         ";
 
         if (!count($records ?? [])) :
             $table_view                     .= "<tr><td colspan='10' class='text-center'>No inventory found</td></tr>";
         endif;
+
+        // print_r($records );
+        // die;
 
         foreach ($records ?? [] as $inventory_key => $inventory) :
 
@@ -4660,6 +4665,7 @@ WHERE lead_id='" . $lead_id . "'
             
             #
             if ($inventory->product_id) :
+                
                 $property               = property($inventory->product_id);
                 if ($property_details->unit_code ?? 0) :
                     $property_accomodation  = getPropertyAccomodations($property->project_type_id, $property->property_type_id, $inventory->product_id, $property_details->unit_code);
@@ -4708,6 +4714,8 @@ WHERE lead_id='" . $lead_id . "'
             $inv_unit_size                          =   ( $inventory_details->unit_size ?? '-' ).' '. ( sizeUnits($inventory_details->unit_size_unit ?? 0)->unit_name  ?? '-' ) ?? '-';
             $inv_quote                              =   "<div class='text-center' onclick='getQuatation(".$inventory_details->id.")'><button class='btn btn-warning btn-sm' style='color:#fff;'><i class='fa fa-eye'></i></button></div>";
             # End Inventory Details Init
+            
+           
 
             $inventory_table_data                 =   (object) [
                                                                     'serial_number'         =>   $inventory_key,
@@ -4729,6 +4737,9 @@ WHERE lead_id='" . $lead_id . "'
         endforeach;
 
         $table_view                         .=   "</table><div>";
+
+        // print_r($table_view);
+        // die;
 
         # End Table View
 
@@ -11628,6 +11639,22 @@ WHERE lead_id='" . $lead_id . "'
     public function inventory_table_headings($property_type_id)
     {
         $table_headings                             =   "";
+
+        # Commercial
+        if(!$property_type_id):
+            $table_headings                             =   "<tr>
+                                                                        <th>#</th>
+                                                                        <th>Unit ref No</th>
+                                                                        <th>Size</th>
+                                                                        <th>Unit type</th>
+                                                                        <th class='inv_quote'>Get Qut</th>
+                                                                        <th>Status</th>
+                                                                        <th class='text-center'>Action</th>
+                                                                    </tr>";
+            return $table_headings;
+        endif;
+        # End Commercial
+
         switch ($property_type_id):
             case '1':
                 $table_headings                             =   "<tr>
@@ -11720,6 +11747,26 @@ WHERE lead_id='" . $lead_id . "'
     public function inventory_table_heading_data($property_type_id, $inventory_table_data)
     {
         $table_headings_data                             =   "";
+
+        # Commercial
+        if(!$property_type_id):
+            $table_headings_data                             =   "<tr>
+                                                                        <td>$inventory_table_data->serial_number</td>
+                                                                        <td>$inventory_table_data->referance_number</td>
+                                                                        <td>$inventory_table_data->size</td>
+                                                                        <td>$inventory_table_data->unit_type</td>
+                                                                        <td class='inv_quote'>$inventory_table_data->quote</td>
+                                                                        <td>$inventory_table_data->status</td>
+                                                                        <td class='text-center'>
+                                                                            <span class='text-primary px-2 view-inventory-record' data-id='$inventory_table_data->inventory_id'><i class='fa fa-eye'></i></span>
+                                                                            <span class='text-success px-2 add-edit-inventory' data-id='$inventory_table_data->inventory_id'><i class='fa fa-edit'></i></span>
+                                                                            <span class='text-danger px-2 delete-inventory-record' data-id='$inventory_table_data->inventory_id'><i class='fa fa-trash'></i></span>
+                                                                        </td>
+                                                                    </tr>";
+            return $table_headings_data;
+        endif;
+        # End Commercial
+
         switch ($property_type_id):
             case '1':                                           # Apartment 
                 $table_headings_data                             =   "<tr>

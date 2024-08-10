@@ -16,6 +16,15 @@ $property_layout_url        =   $property_layout ? base_url("uploads/images/prop
                 <?php endif; ?>
                 <!-- End Unit Code -->
 
+                <!-- Property Type Name -->
+                <?php if ($property_type_name ?? 0) : ?>
+                <tr>
+                    <th>Property Type Name</th>
+                    <td><?= $property_type_name ?? '' ?></td>
+                </tr>
+                <?php endif; ?>
+                <!-- End Property Type Name -->
+
                 <!-- Referance Number -->
                 <?php if ($referance_number ?? 0) : ?>
                 <tr>
@@ -198,19 +207,19 @@ $property_layout_url        =   $property_layout ? base_url("uploads/images/prop
                 <!-- End Dimension -->
 
                 <!-- Tarrace -->
-                <?php if ($tarrace ?? 0) : ?>
+                <?php if ($tarrace_id ?? 0) : ?>
                 <tr>
                     <th>Tarrace</th>
-                    <td><?= $tarrace ?></td>
+                    <td><?= tarraces($tarrace_id)->name ?? '' ?></td>
                 </tr>
                 <?php endif; ?>
                 <!-- End Tarrace -->
 
                 <!-- Basment -->
-                <?php if ($basment ?? 0) : ?>
+                <?php if ($basment_id ?? 0) : ?>
                 <tr>
                     <th>Basment</th>
-                    <td><?= $basment ?></td>
+                    <td><?= basments($basment_id)->name ?? '' ?></td>
                 </tr>
                 <?php endif; ?>
                 <!-- End Basment -->
@@ -219,7 +228,7 @@ $property_layout_url        =   $property_layout ? base_url("uploads/images/prop
                 <?php if ($pentry ?? 0) : ?>
                 <tr>
                     <th>Pentry</th>
-                    <td><?= $pentry ?></td>
+                    <td><?= ucwords(str_replace('_',' ', $pentry))  ?></td>
                 </tr>
                 <?php endif; ?>
                 <!-- End Pentry -->
@@ -228,7 +237,7 @@ $property_layout_url        =   $property_layout ? base_url("uploads/images/prop
                 <?php if ($washroom ?? 0) : ?>
                 <tr>
                     <th>Washroom</th>
-                    <td><?= $washroom ?></td>
+                    <td><?= ucwords(str_replace('_',' ', $washroom)) ?></td>
                 </tr>
                 <?php endif; ?>
                 <!-- End Washroom -->
@@ -242,6 +251,24 @@ $property_layout_url        =   $property_layout ? base_url("uploads/images/prop
                 <?php endif; ?>
                 <!-- End Parking -->
            
+                 <!-- Remark -->
+                 <?php if ($parking_count ?? 0) : ?>
+                <tr>
+                    <th>Parking</th>
+                    <td><?= $parking_count ?></td>
+                </tr>
+                <?php endif; ?>
+                <!-- End Remark -->
+
+                 <!-- Remark -->
+                 <?php if ($remark ?? 0) : ?>
+                <tr>
+                    <th>Remark</th>
+                    <td><?= $remark ?></td>
+                </tr>
+                <?php endif; ?>
+                <!-- End Remark -->
+
             <?php if ($property_layout_url ?? 0) : ?>
                 <tr>
                     <th>Layout</th>

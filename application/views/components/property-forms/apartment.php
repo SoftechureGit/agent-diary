@@ -243,6 +243,15 @@ endif;
                     </div>
                     <!-- End Parking -->
 
+                    <!-- Remark -->
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="">Remark</label>
+                            <textarea type="text" placeholder="Enter remark" name="property_details[remark]" class="form-control"><?= $remark ?? '' ?></textarea>
+                        </div>
+                    </div>
+                    <!-- End Remark -->
+
                 </div>
             </div>
         </div>

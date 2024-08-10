@@ -5,9 +5,8 @@ elseif(is_array($property_details ?? null)):
     extract($property_details ?? []);
 endif;
 ?>
-<!-- Office Details -->
-<section id="office-property-form" class="theme-form">
-
+<!-- Shop Details -->
+<section id="shop-property-form" class="theme-form">
 <input type="hidden" name="property_details[id]" value="<?= $lead_or_inventory_id ?? '' ?>" class="id">
 <input type="hidden" name="property_details[product_id]" value="<?= $product_id ?? 0 ?>" class="product_id">
 
@@ -18,14 +17,14 @@ endif;
                     <!-- Form Name -->
                     <div class="col-md-12">
                         <div class="text-left">
-                            <h3 class="form-heading">Office Details</h3>
+                            <h3 class="form-heading"><span class="commercial-property-type"></span> Details</h3>
                             <hr>
                         </div>
                     </div>
                     <!-- End Form Name -->
 
-                    <!-- Unit Code -->
-                    <div class="col-md-4">
+                  <!-- Unit Code -->
+                  <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Unit Code  <span class="text-danger">*</span></label>
                             <select name="property_details[unit_code]" id="" class="form-control" data-selected_id="<?= $unit_code ?? 0 ?>" required>
@@ -34,14 +33,15 @@ endif;
                                     foreach($unit_code_with_accomodations ?? [] as $unit_code_with_accomodation): 
                                     $selected         = (($unit_code ?? 0 ) == $unit_code_with_accomodation->id ) ? 'selected' : '';
                                 ?>
-                                    <option value="<?= $unit_code_with_accomodation->id ?>"   <?= $selected ?>><?= $unit_code_with_accomodation->unit_code_with_accomodation_name ?? $unit_code_with_accomodation->inventory_unit_code ?? '' ?></option>   
+                                    <option value="<?= $unit_code_with_accomodation->id ?>"   <?= $selected ?> data-property-type-name="<?= $unit_code_with_accomodation->property_type_name ?? ''; ?>"><?= $unit_code_with_accomodation->unit_code_with_accomodation_name ?? $unit_code_with_accomodation->inventory_unit_code ?? '' ?></option>   
                                     <?php endforeach; ?>
                                 </select>
+
+                                <input type="hidden" value="" name="property_details[property_type_name]" id="property_type_name">
                                 <!-- <label id="property_details[unit_code]-error" class="error" for="property_details[unit_code]"></label> -->
                             </div>
                     </div>
                     <!-- End Unit Code -->
-
                     <!-- Referance No -->
                     <div class="col-md-4">
                         <div class="form-group">
@@ -60,8 +60,8 @@ endif;
                     </div>
                     <!-- End Unit Number -->
 
-                    <!-- Floor -->
-                    <div class="col-md-4">
+                     <!-- Floor -->
+                  <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Floor</label>
                             <!-- <input type="text" placeholder="Enter Floor" name="property_details[floor]" value="<?= $floor ?? '' ?>" class="form-control" > -->
@@ -78,8 +78,8 @@ endif;
                     </div>
                     <!-- End Floor -->
 
-                     <!-- Block Or Floor -->
-                     <div class="col-md-4">
+                    <!-- Block Or Floor -->
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Tower</label>
                             <!-- <input type="text" placeholder="Enter Tower" name="property_details[tower]" value="<?= $tower ?? '' ?>" class="form-control" > -->
@@ -96,8 +96,8 @@ endif;
                     </div>
                     <!-- End Block Or Floor -->
 
-                     <!-- Unit Type -->
-                     <div class="col-md-4">
+                    <!-- Unit Type -->
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Unit Type</label>
                             <select  class="form-control" name="property_details[unit_type]" >
@@ -109,29 +109,78 @@ endif;
                     </div>
                     <!-- End Unit Type -->
 
-                    <!-- Area (Sqft) -->
-                    <div class="col-md-4">
+                    <!-- SA -->
+                    <div class="col-md-2">
                         <div class="form-group">
-                            <label for="">Area</label>
-                            <input type="text" placeholder="Enter Area " name="property_details[area]" value="<?= $area ?? '' ?>" class="form-control" >
+                            <label for="">SA Size</label>
+                            <input type="text" placeholder="Enter SA Size" name="property_details[sa]" value="<?= $sa ?? '' ?>" class="form-control">
                         </div>
                     </div>
+                    <!-- End SA -->
 
-                   
-                    <div class="col-md-4">
-                        <label for="">Size Unit </label>
-                        <select class="form-control" id="" name="property_details[size_unit]">
-                                <option value="">Select Unit</option>
+                    <!-- SA Size  -->
+                    <div class="col-md-2">
+                        <label for="">SA Unit </label>
+                        <select class="form-control" id="" name="property_details[sa_size_unit]">
+                            <option value="">Select Unit</option>
                             <?php foreach (sizeUnits() ?? []  as $item) :
-                                
-                                $selected         = ( isset($size_unit) &&  $item->unit_id == $size_unit ) ? 'selected' : '';
-                                ?>
-                             <option value="<?= $item->unit_id ?>"  <?=$selected?> ><?= $item->unit_name ?></option>
+
+                                $selected         = ($item->unit_id == ($sa_size_unit ?? '')) ? 'selected' : '';
+                            ?>
+                                <option value="<?= $item->unit_id ?>" <?= $selected ?>><?= $item->unit_name ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
+                    <!-- End SA Size -->
 
-                    <!-- End Area (Sqft) -->
+                    <!-- BA -->
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="">BA Size</label>
+                            <input type="text" placeholder="Enter BA Size" name="property_details[ba]" value="<?= $ba ?? '' ?>" class="form-control">
+                        </div>
+                    </div>
+                    <!-- End BA -->
+
+                    <!-- BA Size  -->
+                    <div class="col-md-2">
+                        <label for="">BA Unit </label>
+                        <select class="form-control" id="" name="property_details[ba_size_unit]">
+                            <option value="">Select Unit</option>
+                            <?php foreach (sizeUnits() ?? []  as $item) :
+
+                                $selected         = ($item->unit_id == ($ba_size_unit ?? '')) ? 'selected' : '';
+                            ?>
+                                <option value="<?= $item->unit_id ?>" <?= $selected ?>><?= $item->unit_name ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <!-- End BA Size -->
+
+
+                    <!-- CA -->
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="">CA Size</label>
+                            <input type="text" placeholder="Enter CA Size" name="property_details[ca]" value="<?= $ca ?? '' ?>" class="form-control">
+                        </div>
+                    </div>
+                    <!-- End CA -->
+
+                    <!-- CA Size  -->
+                    <div class="col-md-2">
+                        <label for="">CA Unit </label>
+                        <select class="form-control" id="" name="property_details[ca_size_unit]">
+                            <option value="">Select Unit</option>
+                            <?php foreach (sizeUnits() ?? []  as $item) :
+
+                                $selected         = ($item->unit_id == ($ca_size_unit ?? '')) ? 'selected' : '';
+                            ?>
+                                <option value="<?= $item->unit_id ?>" <?= $selected ?>><?= $item->unit_name ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <!-- End CA Size -->
 
                     <!-- Applicable PLC -->
                     <div class="col-md-4">
@@ -170,32 +219,33 @@ endif;
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Parking</label>
-                            <select name="property_details[parking][]" id="" class="form-select" multiple>
-
-                                <?php 
-                                foreach(parkings($product_id ?? 0) as $parking_item): ?>
-                                    <option value="<?= $parking_item->value ?>" <?= in_array($parking_item->value, $parking ?? []) ? 'selected' : '' ?>><?= $parking_item->label ?></option>
-                                <?php endforeach; ?>
-
-                            </select>
+                            <input type="text" placeholder="Enter parking" name="property_details[parking_count]" class="form-control" value="<?= $parking_count ?? '' ?>">
                         </div>
                     </div>
                     <!-- End Parking -->
 
                     <!-- Pentry -->
-                    <div class="col-md-4">
+                    <div class="col-md-4 commercial-col pentry-col d-none">
                         <div class="form-group">
                             <label for="">Pentry</label>
-                            <input type="text" placeholder="Enter Pentry" name="property_details[pentry]" value="<?= $pentry ?? '' ?>" class="form-control" >
+                            <select name="property_details[pentry]" class="form-control">
+                                <option value="" selected disabled>Choose...</option>
+                                <option value="with_pentry" <?= ( $pentry ?? '' ) == 'with_pentry' ? 'selected' : '' ?>>With Pentry</option>
+                                <option value="without_pentry" <?= ( $pentry ?? '' ) == 'without_pentry' ? 'selected' : '' ?>>Without Pentry</option>
+                            </select>
                         </div>
                     </div>
                     <!-- End Pentry -->
 
                     <!-- Washroom -->
-                    <div class="col-md-4">
+                    <div class="col-md-4 commercial-col washroom-col d-none">
                         <div class="form-group">
                             <label for="">Washroom</label>
-                            <input type="text" placeholder="Enter Washroom" name="property_details[washroom]" value="<?= $washroom ?? '' ?>" class="form-control" >
+                            <select name="property_details[washroom]" class="form-control">
+                                <option value="" selected disabled>Choose...</option>
+                                <option value="with_washroom" <?= ( $washroom ?? '' ) == 'with_washroom' ? 'selected' : '' ?>>With Washroom</option>
+                                <option value="without_washroom" <?= ( $washroom ?? '' ) == 'without_washroom' ? 'selected' : '' ?>>Without Washroom</option>
+                            </select>
                         </div>
                     </div>
                     <!-- End Washroom -->
@@ -213,4 +263,4 @@ endif;
         </div>
     </div>
 </section>
-<!-- End Office Details -->
+<!-- End Shop Details -->

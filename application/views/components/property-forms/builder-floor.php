@@ -175,7 +175,15 @@ endif;
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Tarrace</label>
-                            <input type="text" placeholder="Enter Tarrace" name="property_details[tarrace]" value="<?= $tarrace ?? '' ?>" class="form-control" >
+                            <select name="property_details[tarrace_id]" id="" class="form-control" >
+                                <option value="" disabled selected>Choose...</option>
+                                <?php 
+                                    foreach(tarraces() ?? [] as $tarrace): 
+                                    $selected         = $tarrace->id == ( $tarrace_id ?? 0 ) ? 'selected' : '';
+                                ?>
+                                    <option value="<?= $tarrace->id ?>"  <?= $selected ?>><?= $tarrace->name ?></option>   
+                                    <?php endforeach; ?>
+                                </select>
                         </div>
                     </div>
                     <!-- End Tarrace -->
@@ -184,26 +192,36 @@ endif;
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Basment</label>
-                            <input type="text" placeholder="Enter Basment" name="property_details[basment]" value="<?= $basment ?? '' ?>" class="form-control" >
+                            <select name="property_details[basment_id]" id="" class="form-control" >
+                                <option value="" disabled selected>Choose...</option>
+                                <?php 
+                                    foreach(basments() ?? [] as $basment): 
+                                    $selected         = $basment->id == ( $basment_id ?? 0 ) ? 'selected' : '';
+                                ?>
+                                    <option value="<?= $basment->id ?>"  <?= $selected ?>><?= $basment->name ?></option>   
+                                    <?php endforeach; ?>
+                                </select>
                         </div>
                     </div>
                     <!-- End Basment -->
 
-                    <!-- Parking -->
-                    <div class="col-md-4">
+                      <!-- Parking -->
+                      <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Parking</label>
-                            <select name="property_details[parking][]" id="" class="form-select" multiple>
-
-                                <?php 
-                                foreach(parkings($product_id ?? 0) as $parking_item): ?>
-                                    <option value="<?= $parking_item->value ?>" <?= in_array($parking_item->value, $parking ?? []) ? 'selected' : '' ?>><?= $parking_item->label ?></option>
-                                <?php endforeach; ?>
-
-                            </select>
+                            <input type="text" placeholder="Enter parking" name="property_details[parking_count]" class="form-control" value="<?= $parking_count ?? '' ?>">
                         </div>
                     </div>
                     <!-- End Parking -->
+
+                     <!-- Remark -->
+                     <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="">Remark</label>
+                            <textarea type="text" placeholder="Enter remark" name="property_details[remark]" class="form-control"><?= $remark ?? '' ?></textarea>
+                        </div>
+                    </div>
+                    <!-- End Remark -->
                 </div>
             </div>
         </div>

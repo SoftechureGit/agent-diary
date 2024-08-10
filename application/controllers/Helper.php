@@ -109,9 +109,9 @@ class Helper extends CI_Controller
         $property_layout                =   null;
         $property_layout_url            =   null;
 
-        if (!$property_type_id) :
-            return null;
-        endif;
+        // if (!$property_type_id) :
+        //     return null;
+        // endif;
 
         switch ($form_request_for):
             case 'inventory':

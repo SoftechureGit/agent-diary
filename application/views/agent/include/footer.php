@@ -795,18 +795,42 @@
 
        $(document).on('change', '[name="property_details[unit_code]"]', function() {
 
+        /** Commercial */
+        var property_type_name     = $(this).find('option:checked').data('property-type-name')
+
+        if(property_type_name){
+            $('#property_type_name').val(property_type_name)
+            console.log(property_type_name)
+            $('.commercial-property-type').text(property_type_name)
+
+            /** Property Type Name */
+
+            $('.commercial-col').addClass('d-none')
+            
+            switch(property_type_name){
+              case 'Shop':
+
+                break;
+
+                case 'Office':
+                  $('.pentry-col').removeClass('d-none')
+                  $('.washroom-col').removeClass('d-none')
+                break;
+            }
+            /** End Property Type Name */
+        }
+        /** End Commercial */
+
         if ($('#modal-inventory-form [name="property_details[id]"]').val() != '') {
            return false;
          }
 
           var accomodation_id     = $(this).find('option:checked').data('accomodation-id')
           var accomodation_name     = $(this).find('option:checked').data('accomodation-name')
-
-          console.log(accomodation_name)
-
-            $('#modal-inventory-form [name="property_details[accomodation_id]"]').val(accomodation_id)
-            $('#modal-inventory-form input[name="property_details[unit_type]"]').val(accomodation_name)
-
+          
+          $('#modal-inventory-form [name="property_details[accomodation_id]"]').val(accomodation_id)
+          $('#modal-inventory-form input[name="property_details[unit_type]"]').val(accomodation_name)
+          
            getPropertyUnitDetails({
              'id': this.value
            })
