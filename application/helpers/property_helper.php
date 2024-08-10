@@ -598,3 +598,117 @@ if (!function_exists('accomodations')) {
 /*******************************************
  *  Inventory Filters
 *******************************************/
+
+/*******************************************
+ *  Site Visit Filters
+*******************************************/
+    
+    # Site Visit Filter Followup Users
+    if(!function_exists('site_visit_filter_followup_users')){
+        function site_visit_filter_followup_users($data = null){
+
+            # Data 
+            $property_id    = $data->property_id ?? 0;
+            # End Data 
+ 
+            # Conditions
+            $where          =   '1 = 1';
+ 
+            if($property_id):
+                $where          .=   " and site_visit.project_id = $property_id";
+            endif;
+            
+            # End Conditions
+ 
+            db_instance()->distinct("site_visit.assign_to");
+            db_instance()->select("
+                                    user.user_id as id,
+                                     CONCAT(
+                                            COALESCE(user.user_title, ''),
+                                            ' ',
+                                            COALESCE(user.first_name, ''),
+                                            ' ',
+                                            COALESCE(user.last_name, '')
+                                        ) as full_name
+                                ");
+            db_instance()->where($where);
+            db_instance()->join('tbl_users as user', "user.user_id = site_visit.assign_to", "left");
+            db_instance()->from('tbl_site_visit as site_visit');
+        
+            $records = db_instance()->get()->result();
+     
+            return $records;
+        }
+        }
+        # End Site Visit Filter Followup Users
+
+    # Site Visit Filter Lead Status
+    if(!function_exists('site_visit_filter_lead_status')){
+        function site_visit_filter_lead_status($data = null){
+
+            # Data 
+            $property_id    = $data->property_id ?? 0;
+            # End Data 
+ 
+            # Conditions
+            $where          =   '1 = 1';
+ 
+            if($property_id):
+                $where          .=   " and site_visit.project_id = $property_id";
+            endif;
+            
+            # End Conditions
+ 
+            db_instance()->distinct("site_visit.assign_to");
+            db_instance()->select("
+                                    lead_status.lead_type_id as id,
+                                    lead_status.lead_type_name as name
+                                ");
+            db_instance()->where($where);
+            db_instance()->join('tbl_leads as lead', "lead.lead_id = site_visit.lead_id", "left");
+            db_instance()->join('tbl_lead_types as lead_status', "lead_status.lead_type_id = lead.lead_status", "left");
+            db_instance()->from('tbl_site_visit as site_visit');
+        
+            $records = db_instance()->get()->result();
+     
+            return $records;
+        }
+        # End Site Visit Filter Lead Status
+    }
+
+    # Site Visit Filter Lead Stage
+    if(!function_exists('site_visit_filter_lead_stage')){
+        function site_visit_filter_lead_stage($data = null){
+
+            # Data 
+            $property_id    = $data->property_id ?? 0;
+            # End Data 
+ 
+            # Conditions
+            $where          =   '1 = 1';
+ 
+            if($property_id):
+                $where          .=   " and site_visit.project_id = $property_id";
+            endif;
+            
+            # End Conditions
+ 
+            db_instance()->distinct("site_visit.assign_to");
+            db_instance()->select("
+                                    lead_stage.lead_stage_id as id,
+                                    lead_stage.lead_stage_name as name
+                                ");
+            db_instance()->where($where);
+            db_instance()->join('tbl_leads as lead', "lead.lead_id = site_visit.lead_id", "left");
+            db_instance()->join('tbl_lead_stages as lead_stage', "lead_stage.lead_stage_id = lead.lead_stage_id", "left");
+            db_instance()->from('tbl_site_visit as site_visit');
+        
+            $records = db_instance()->get()->result();
+     
+            return $records;
+        }
+        # End Site Visit Filter Lead Stage
+    }
+/*******************************************
+ *  End Site Visit Filters
+*******************************************/

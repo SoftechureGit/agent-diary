@@ -280,13 +280,30 @@
       <div id="navtabs-payment-plan" class="tab-pane">
       </div>
       <div id="navtabs-site-visit" class="tab-pane">
-        <div class="site_visit_list"></div>
+        <!-- Filter -->
+        <div class="filter-wrapper mb-2">
+          <!-- <details open>
+          <summary> -->
+          <!-- Filter -->
+          <!-- </summary> -->
+          <div class="row">
+            <div class="col-md-12">
+              <div class="text-right">
+                <button class="btn btn-info btn-sm site-visit-filter-modal-btn">Filter</button>
+              </div>
+            </div>
+          </div>
+          <!-- </details> -->
+        </div>
+        <!-- End Filter -->
+        <div class="site_visit_table_view"></div>
+        <!-- <div class="site_visit_list"></div> -->
       </div>
     </div>
   </div>
 </div>
 
-<!-- Filter Modal -->
+<!-- Inventory Filter Modal -->
 <div class="modal fade" id="inventoryFilterModal" role="dialog" aria-labelledby="inventoryFilterModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -305,7 +322,7 @@
 
               <select id="inventory_filter_status" class="form-control select2 filter-invetory">
                 <option value="">All</option>
-                <?php 
+                <?php
                 $inventory_status_data   = (object) [
                   'property_id' => ($record->product_id ?? 0),
                   'unit_code'   => ($record->product_unit_detail_id ?? 0),
@@ -325,7 +342,7 @@
               <select id="inventory_filter_facing" class="form-control select2 filter-invetory">
                 <option value="">All</option>
                 <?php
-                 $inventory_facing_data   = (object) [
+                $inventory_facing_data   = (object) [
                   'property_id' => ($record->product_id ?? 0),
                   'unit_code'   => ($record->product_unit_detail_id ?? 0),
                 ];
@@ -370,10 +387,10 @@
               <select id="inventory_filter_tower" class="form-control select2 filter-invetory">
                 <option value="">All</option>
                 <?php
-                  $inventory_tower_data   = (object) [
-                    'property_id' => ($record->product_id ?? 0),
-                    'unit_code'   => ($record->product_unit_detail_id ?? 0),
-                  ];
+                $inventory_tower_data   = (object) [
+                  'property_id' => ($record->product_id ?? 0),
+                  'unit_code'   => ($record->product_unit_detail_id ?? 0),
+                ];
                 foreach (inventory_tower($inventory_tower_data) ?? [] as $block_or_tower) :
                 ?>
                   <option value="<?= $block_or_tower->id ?>"><?= $block_or_tower->name ?? '' ?></option>
@@ -476,10 +493,10 @@
               <label for="unit_size">Unit Type</label>
               <select id="inventory_filter_unit_type" class="form-control select2 filter-invetory">
                 <option value="">All</option>
-               
+
                 <option value="locable">Locable</option>
                 <option value="virtual">Virtual</option>
-                </select>
+              </select>
             </div>
           </div>
           <!-- End Unit Size -->
@@ -492,10 +509,104 @@
     </div>
   </div>
 </div>
-<!-- End Filter Modal -->
+<!-- End Inventory Filter Modal -->
+
+<!-- Site Visit Filter Modal -->
+<div class="modal fade" id="siteVisitFilterModal" role="dialog" aria-labelledby="siteVisitFilterModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="siteVisitFilterModalLabel">Site Visit Filters</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <!-- Followup By -->
+          <div class="col-md-4 filter-col">
+            <div class="form-group">
+              <label for="followup_by">Followup By</label>
+
+              <select id="site_visit_filter_followup_by" class="form-control select2">
+                <option value="">All</option>
+                <?php
+                  $site_visit_followup_users_data   = (object) [
+                    'property_id' => ($record->product_id ?? 0)
+                  ];
+                foreach (site_visit_filter_followup_users($site_visit_followup_users_data) as $followup_user) : ?>
+                  <option value="<?= $followup_user->id; ?>"><?= $followup_user->full_name; ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+          </div>
+          <!-- End Followup By -->
+
+          <!-- Lead Status -->
+          <div class="col-md-4 filter-col">
+            <div class="form-group">
+              <label for="lead_status">Lead Status</label>
+
+              <select id="site_visit_filter_lead_status" class="form-control select2">
+                <option value="">All</option>
+                <?php
+                  $site_visit_lead_status_data   = (object) [
+                    'property_id' => ($record->product_id ?? 0)
+                  ];
+                foreach (site_visit_filter_lead_status($site_visit_lead_status_data) as $lead_status) : ?>
+                  <option value="<?= $lead_status->id; ?>"><?= $lead_status->name; ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+          </div>
+          <!-- End Lead Status -->
+
+          <!-- Lead Stage -->
+          <div class="col-md-4 filter-col">
+            <div class="form-group">
+              <label for="lead_stage">Lead Stage</label>
+
+              <select id="site_visit_filter_lead_stage" class="form-control select2">
+                <option value="">All</option>
+                <?php
+                  $site_visit_lead_stage_data   = (object) [
+                    'property_id' => ($record->product_id ?? 0)
+                  ];
+                foreach (site_visit_filter_lead_stage($site_visit_lead_stage_data) as $lead_stage) : ?>
+                  <option value="<?= $lead_stage->id; ?>"><?= $lead_stage->name; ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+          </div>
+          <!-- End Lead Stage -->
+
+          <!-- Date -->
+          <div class="col-md-4">
+            <div class="form-group">
+              <label for="status">Date</label>
+
+              <input type="date" id="site_visit_filter_date" class="form-control">
+            </div>
+          </div>
+          <!-- End Date -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary text-white" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary site-visit-filter-apply-btn">Apply</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Site Visit Filter Modal -->
 
 <script>
   //getRequirementList(<?= $record->lead_id ?? 0 ?>);
+
+  $(document).on('click', '.site-visit-filter-modal-btn', function() {
+    $('#siteVisitFilterModal').modal('show')
+    convertToSelect2()
+  });
 
   $(document).on('click', '.inventory-filter-modal-btn', function() {
     var property_type = $(this).data('property-type');
@@ -518,22 +629,22 @@
         $('#inventoryFilterModal #inventory_filter_facing').parents('.filter-col').removeClass('d-none')
         $('#inventoryFilterModal #inventory_filter_plot_size').parents('.filter-col').removeClass('d-none')
         break;
-        
-        case 7: // Builder Floor
-          $('#inventoryFilterModal #inventory_filter_status').parents('.filter-col').removeClass('d-none')
-          $('#inventoryFilterModal #inventory_filter_facing').parents('.filter-col').removeClass('d-none')
-          $('#inventoryFilterModal #inventory_filter_plot_size').parents('.filter-col').removeClass('d-none')
-          $('#inventoryFilterModal #inventory_filter_unit_size').parents('.filter-col').removeClass('d-none')
-         $('#inventoryFilterModal #inventory_filter_floor').parents('.filter-col').removeClass('d-none')
+
+      case 7: // Builder Floor
+        $('#inventoryFilterModal #inventory_filter_status').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_facing').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_plot_size').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_unit_size').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_floor').parents('.filter-col').removeClass('d-none')
         break;
-        
-        case 2: // Villa
-          $('#inventoryFilterModal #inventory_filter_status').parents('.filter-col').removeClass('d-none')
-          $('#inventoryFilterModal #inventory_filter_facing').parents('.filter-col').removeClass('d-none')
-          $('#inventoryFilterModal #inventory_filter_plot_size').parents('.filter-col').removeClass('d-none')
-          $('#inventoryFilterModal #inventory_filter_unit_size').parents('.filter-col').removeClass('d-none')
+
+      case 2: // Villa
+        $('#inventoryFilterModal #inventory_filter_status').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_facing').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_plot_size').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_unit_size').parents('.filter-col').removeClass('d-none')
         break;
-        
+
       case 4: // Shop
         $('#inventoryFilterModal #inventory_filter_status').parents('.filter-col').removeClass('d-none')
         $('#inventoryFilterModal #inventory_filter_tower').parents('.filter-col').removeClass('d-none')

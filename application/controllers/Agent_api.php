@@ -10168,7 +10168,7 @@ WHERE lead_id='" . $lead_id . "'
         }
     }
 
-    public function get_product_site_visit_list()
+    public function get_product_site_visit_list_old()
     {
         $array = array();
 
@@ -10235,6 +10235,130 @@ WHERE lead_id='" . $lead_id . "'
 
         echo json_encode($array);
     }
+
+    # Site Visit List
+    public function get_product_site_visit_list()
+    {
+        $array                                  =   array();
+        $view                                  =   null;
+
+        if (!$this->input->post()) {
+            $array = array('status' => 'error', 'message' => 'Some error occurred, please try again.');
+            echo json_encode($array);
+            exit;
+        }
+
+        $account_id                             =   getAccountId();
+
+        if ($account_id) {
+
+            # Init
+            $product_id                         =   $this->input->post('product_id');
+            $site_visit_filter_followup_by      =   $this->input->post('site_visit_filter_followup_by');
+            $site_visit_filter_lead_status      =   $this->input->post('site_visit_filter_lead_status');
+            $site_visit_filter_lead_stage       =   $this->input->post('site_visit_filter_lead_stage');
+            $site_visit_filter_date             =   $this->input->post('site_visit_filter_date');
+            # End Init
+
+
+            
+            $where = "(tbl_products.agent_id='" . $account_id . "' OR (tbl_site_visit.account_id='" . $account_id . "' AND share_account_id='" . $account_id . "')) AND tbl_site_visit.project_id='" . $product_id . "' AND site_visit_status='2'";
+            
+                # Filter
+                # Followup By
+                if($site_visit_filter_followup_by):
+                    $where .= " and tbl_site_visit.assign_to = '$site_visit_filter_followup_by'";
+                endif;
+                # End Followup By
+
+                # Lead Status
+                if($site_visit_filter_lead_status):
+                    $where .= " and tbl_leads.lead_status = '$site_visit_filter_lead_status'";
+                endif;
+                # End Lead Status
+
+                # Lead Stage
+                if($site_visit_filter_lead_stage):
+                    $where .= " and tbl_leads.lead_stage_id = '$site_visit_filter_lead_stage'";
+                endif;
+                # End Lead Stage
+
+                # Date
+                if($site_visit_filter_date):
+                    $site_visit_filter_date    = date('d-m-Y', strtotime($site_visit_filter_date));
+                    $where .= " and tbl_site_visit.visit_date = '$site_visit_filter_date'";
+                endif;
+                # End Date
+                # End Filter
+
+                $where .= " ORDER BY STR_TO_DATE(visit_date,'%d-%m-%Y') DESC,visit_time DESC";
+
+                $this->db->select(" *,
+                                    tbl_leads.lead_id as lead_id,
+                                    CONCAT(lead_title, ' ',lead_first_name, ' ', lead_last_name) AS 'lead_name',
+                                    tbl_builders.firm_name as b_firm_name,
+                                    lead_status.lead_type_name as lead_status_name");
+                $this->db->from('tbl_site_visit');
+                $this->db->join('tbl_leads', 'tbl_leads.lead_id = tbl_site_visit.lead_id');
+                $this->db->join('tbl_products', 'tbl_products.product_id = tbl_site_visit.project_id', 'left');
+                $this->db->join('tbl_users', 'tbl_users.user_id = tbl_site_visit.assign_to', 'left');
+                $this->db->join('tbl_builders', 'tbl_builders.builder_id = tbl_products.builder_id', 'left');
+                $this->db->join('tbl_lead_stages', 'tbl_lead_stages.lead_stage_id = tbl_leads.lead_stage_id', 'left');
+                $this->db->join('tbl_lead_sources', 'tbl_lead_sources.lead_source_id = tbl_leads.lead_source_id', 'left');
+                $this->db->join('tbl_project_share', "tbl_project_share.project_id = tbl_products.product_id AND share_account_id='" . $account_id . "'", 'left');
+                $this->db->join('tbl_lead_types as lead_status', "lead_status.lead_type_id = tbl_leads.lead_status", 'left');
+                $this->db->where($where);
+                $query = $this->db->get();
+                $record_data = $query->result();
+
+                // print_r($record_data);
+                // print_r($this->db->last_query());
+                // die;
+
+                //print_r(count($record_data));
+                $records = array();
+                if ($record_data) {
+                    foreach ($record_data as $item) {
+                        //echo $item->lead_id.", ";
+                        $next_followup = "";
+                        $next_followup_date = "";
+                        $records[] = array(
+                            'site_visit_id' => $item->site_visit_id,
+                            'lead_name' => $item->lead_name,
+                            'lead_title' => $item->lead_title,
+                            'lead_first_name' => $item->lead_first_name,
+                            'lead_last_name' => $item->lead_last_name,
+                            'lead_date' => $item->lead_date,
+                            'builder' => $item->b_firm_name,
+                            'assign_to' => ucwords($item->user_title . ' ' . $item->first_name . ' ' . $item->last_name),
+                            'project_name' => $item->project_name,
+                            'visit_date' => $item->visit_date,
+                            'visit_time' => $item->visit_time,
+                            'interested' => $item->interested,
+                            'comment' => $item->comment,
+                            'site_visit_status' => $item->site_visit_status,
+                            'next_followup_date' => $next_followup_date,
+                            'lead_mobile_no' => $item->lead_mobile_no,
+                            'lead_stage_name' => (!$item->lead_stage_name) ? '' : $item->lead_stage_name,
+                            'lead_source_name' => (!$item->lead_source_name) ? '' : $item->lead_source_name,
+                            'lead_email' => $item->lead_email,
+                            'next_followup' => $next_followup,
+                            'lead_status_name' =>  $item->lead_status_name
+                        );
+                    }
+                }
+
+                $view                       =   $this->load->view('components/site-visits/list', ['records' => $records], true);
+
+                $array = array('status' => 'success', 'message' => count($records) . ' Records Found', 'records' => $records, 'view' => $view);
+            } else {
+                $array = array('status' => 'error', 'message' => 'No Leads');
+            
+        } 
+
+        echo json_encode($array);
+    }
+    # End Site Visit List
 
     public function product_list()
     {

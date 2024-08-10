@@ -260,6 +260,10 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id, $use
             font-size: 13px;
             font-style: italic;
         }
+
+        .site_visit_table_view table tr td{
+            font-size: 13px;
+        }
     </style>
 
 </head>
