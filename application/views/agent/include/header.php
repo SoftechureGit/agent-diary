@@ -267,7 +267,7 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id, $use
             font-size: 13px;
         }
 
-        .site_visit_table_view table col {
+        .inventory-list-container table colgroup col {
             width: auto !important;
         }
     </style>
