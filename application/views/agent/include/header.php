@@ -23,6 +23,8 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id, $use
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@23.1.0/build/css/intlTelInput.css">
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.10/css/select2.min.css">
 
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/2.1.3/css/dataTables.dataTables.min.css">
+
 
     <style>
         body {
@@ -263,6 +265,10 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id, $use
 
         .site_visit_table_view table tr td{
             font-size: 13px;
+        }
+
+        .site_visit_table_view table col {
+            width: auto !important;
         }
     </style>
 

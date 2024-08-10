@@ -56,6 +56,7 @@
      <script src="<?php echo base_url('public/admin/') ?>plugins/toast/js/jquery.toast.js"></script>
      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
      <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.10/js/select2.min.js"></script>
+     <script src="https://cdn.datatables.net/2.1.3/js/dataTables.min.js"></script>
 
      <!-- ChartistJS demo -->
 
@@ -781,6 +782,7 @@
             setTimeout(function() {
                                     // $(".project_inventory").html(response.data_view);
                                     $(".inventory-list-container").html(response.table_view);
+                                    $(".inventory-list-container table").dataTable()
                                   }, 100);
                       },
              error: function() {

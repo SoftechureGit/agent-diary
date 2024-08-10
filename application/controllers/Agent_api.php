@@ -4649,9 +4649,13 @@ WHERE lead_id='" . $lead_id . "'
         $table_view                 =   "<div class='table-responsive inventory-table'>
                                         <table class='table table-bordered'>
                                         <caption>* $property_type_name *</caption>
+                                        <thead>
                                         $table_headings
+                                        </thead>
+                                        </tbody>
                                         ";
 
+                                       
         if (!count($records ?? [])) :
             $table_view                     .= "<tr><td colspan='10' class='text-center'>No inventory found</td></tr>";
         endif;
@@ -4738,7 +4742,7 @@ WHERE lead_id='" . $lead_id . "'
             $table_view                     .=  $this->inventory_table_heading_data($property->property_type_id, $inventory_table_data);
         endforeach;
 
-        $table_view                         .=   "</table><div>";
+        $table_view                         .=   "</tbody></table><div>";
 
         // print_r($table_view);
         // die;
