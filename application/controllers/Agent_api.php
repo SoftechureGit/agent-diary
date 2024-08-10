@@ -1607,6 +1607,8 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 'secondary_mobile_number_country_data'       => $secondary_mobile_number_country_data,
                 'location_id'                                => $this->input->post('location_id'),
                 'profile'                                    => $profile->file_name ?? '',
+
+                'platform'                                    =>  'web',
             );
 
             if ($record) {
@@ -2434,7 +2436,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 $record_data = $query->result();
 
                 // print_r($this->db->last_query());
-                // // print_r($record_data);
+                // print_r($record_data);
                 // die;
 
                 $records = array();
@@ -4465,8 +4467,15 @@ WHERE lead_id='" . $lead_id . "'
         # End Init
 
         # Filter Init
-        $inventory_filter_status_id            =   $this->input->post('inventory_filter_status');
-        $inventory_filter_facing_id            =   $this->input->post('inventory_filter_facing');
+        $inventory_filter_status_id             =   $this->input->post('inventory_filter_status');
+        $inventory_filter_facing_id             =   $this->input->post('inventory_filter_facing');
+        $inventory_filter_floor_id              =   $this->input->post('inventory_filter_floor');
+        $inventory_filter_tower_id              =   $this->input->post('inventory_filter_tower');
+        $inventory_filter_accomodation_id       =   $this->input->post('inventory_filter_accomodation');
+        $inventory_filter_sa_size               =   $this->input->post('inventory_filter_sa_size');
+        $inventory_filter_plot_size             =   $this->input->post('inventory_filter_plot_size');
+        $inventory_filter_unit_size             =   $this->input->post('inventory_filter_unit_size');
+        $inventory_filter_unit_type             =   $this->input->post('inventory_filter_unit_type');
         # End Filter Init
 
         # Property Data
@@ -4483,8 +4492,71 @@ WHERE lead_id='" . $lead_id . "'
 
         if($inventory_filter_facing_id):
             $where                      .= " and JSON_EXTRACT(`property_details`, '$.facing_id') ='$inventory_filter_facing_id'";
-            // $where                      .= " and `property_details`->>'$.facing_id') ='$inventory_filter_facing_id'";
         endif;
+
+        if($inventory_filter_floor_id):
+            $where                      .= " and JSON_EXTRACT(`property_details`, '$.floor_id') ='$inventory_filter_floor_id'";
+        endif;
+
+        if($inventory_filter_tower_id):
+            $where                      .= " and JSON_EXTRACT(`property_details`, '$.block_or_tower_id') ='$inventory_filter_tower_id'";
+        endif;
+
+        if($inventory_filter_accomodation_id):
+            $where                      .= " and JSON_EXTRACT(`property_details`, '$.accomodation_id') ='$inventory_filter_accomodation_id'";
+        endif;
+
+        if($inventory_filter_unit_type):
+            $where                      .= " and JSON_EXTRACT(`property_details`, '$.unit_type') ='$inventory_filter_unit_type'";
+        endif;
+
+        # Sa Size Filter
+        if($inventory_filter_sa_size):
+            $inventory_filter_sa_size    =  explode('|', $inventory_filter_sa_size);
+            $inv_filter_sa_size          =  $inventory_filter_sa_size[0] ?? 0;
+            $inv_filter_sa_size_unit     =  $inventory_filter_sa_size[1] ?? 0;
+
+            if($inv_filter_sa_size):
+                $where                      .= " and JSON_EXTRACT(`property_details`, '$.sa') ='$inv_filter_sa_size'";
+            endif;
+            
+            if($inv_filter_sa_size_unit):
+                $where                      .= " and JSON_EXTRACT(`property_details`, '$.sa_size_unit') ='$inv_filter_sa_size_unit'";
+            endif;
+        endif;
+        # End Sa Size Filter
+
+        # Plot Size Filter
+        if($inventory_filter_plot_size):
+            $inventory_filter_plot_size    =  explode('|', $inventory_filter_plot_size);
+            $inv_filter_plot_size          =  $inventory_filter_plot_size[0] ?? 0;
+            $inv_filter_plot_size_unit     =  $inventory_filter_plot_size[1] ?? 0;
+
+            if($inv_filter_plot_size):
+                $where                      .= " and JSON_EXTRACT(`property_details`, '$.plot_size') ='$inv_filter_plot_size'";
+            endif;
+            
+            if($inv_filter_plot_size_unit):
+                $where                      .= " and JSON_EXTRACT(`property_details`, '$.size_unit') ='$inv_filter_plot_size_unit'";
+            endif;
+        endif;
+        # End Plot Size Filter
+
+        # Unit Size Filter
+        if($inventory_filter_unit_size):
+            $inventory_filter_unit_size    =  explode('|', $inventory_filter_unit_size);
+            $inv_filter_unit_size          =  $inventory_filter_unit_size[0] ?? 0;
+            $inv_filter_unit_size_unit     =  $inventory_filter_unit_size[1] ?? 0;
+
+            if($inv_filter_unit_size):
+                $where                      .= " and JSON_EXTRACT(`property_details`, '$.unit_size') ='$inv_filter_unit_size'";
+            endif;
+            
+            if($inv_filter_unit_size_unit):
+                $where                      .= " and JSON_EXTRACT(`property_details`, '$.unit_size_unit') ='$inv_filter_unit_size_unit'";
+            endif;
+        endif;
+        # End Unit Size Filter
         ##### End Inventory Filter Functionality #####
 
         if ($property_unit_code_id) :
@@ -4616,12 +4688,24 @@ WHERE lead_id='" . $lead_id . "'
 
 
             # Inventory Details Init
-            $inv_accomodation                       =   $property->accomodation_name ?? '-';
+            if(($inventory_details->sa ?? 0) || ($inventory_details->sa_size_unit ?? 0)):
+                $inv_size                               =   ( $inventory_details->sa ?? '-' ).' ';
+                $inv_size                               .=   ( $inventory_details->sa_size_unit ?? 0 ) ? ( sizeUnits($inventory_details->sa_size_unit ?? 0)->unit_name  ?? '-' ) : '';
+            endif;
+
+            if(($inventory_details->area ?? 0) || ($inventory_details->size_unit ?? 0)):
+                $inv_size                               =   ( $inventory_details->area ?? '-' ).' ';
+                $inv_size                               .=   ( $inventory_details->size_unit ?? 0 ) ? ( sizeUnits($inventory_details->size_unit ?? 0)->unit_name  ?? '-' ) : '';
+            endif;
+
+            $inv_accomodation                       =   ( $inventory_details->accomodation_id ?? 0 ) ? ( accomodations($inventory_details->accomodation_id)->name ?? '-' ) : '';
             $inv_floor                              =   ( $inventory_details->floor_id ?? 0 ) ? ( getFloors($inventory_details->floor_id)->name ?? '-' ) : '';
             $inv_tower                              =   ( $inventory_details->block_or_tower_id ?? 0 ) ? ( getBlocksOrTowers($inventory_details->block_or_tower_id)->name ?? '-' ) : '';
             $inv_facing                             =   ( $inventory_details->facing_id ?? 0 ) ? ( facings($inventory_details->facing_id)->title ?? '-' ): '-';
 
             $inv_plot_size                          =   ( $inventory_details->plot_size ?? '-' ).' '. ( sizeUnits($inventory_details->size_unit ?? 0)->unit_name  ?? '-' ) ?? '-';
+
+            $inv_unit_size                          =   ( $inventory_details->unit_size ?? '-' ).' '. ( sizeUnits($inventory_details->unit_size_unit ?? 0)->unit_name  ?? '-' ) ?? '-';
             $inv_quote                              =   "<div class='text-center' onclick='getQuatation(".$inventory_details->id.")'><button class='btn btn-warning btn-sm' style='color:#fff;'><i class='fa fa-eye'></i></button></div>";
             # End Inventory Details Init
 
@@ -4631,13 +4715,13 @@ WHERE lead_id='" . $lead_id . "'
                                                                     'referance_number'      =>   $referance_number ?? '-',
                                                                     'accomodation'          =>   $inv_accomodation,
                                                                     'floor'                 =>   $inv_floor,
-                                                                    'size'                  =>   $property->unit_size_name ?? '-',
+                                                                    'size'                  =>   $inv_size ?? '-',
                                                                     'tower'                 =>   $inv_tower,
                                                                     'quote'                 =>   $inv_quote,
                                                                     'facing'                =>   $inv_facing,
                                                                     'plot_size'             =>   $inv_plot_size,
-                                                                    'unit_size'             =>   $inventory_details->size_unit ?? '-',
-                                                                    'unit_type'             =>   $inventory_details->unit_type ?? '-',
+                                                                    'unit_size'             =>   $inv_unit_size,
+                                                                    'unit_type'             =>   ucwords($inventory_details->unit_type ?? '-'),
                                                                     'status'                =>   $inventory->inventory_status_name ?? '-',
                                                                 ];
 
@@ -7327,6 +7411,8 @@ WHERE lead_id='" . $lead_id . "'
 
     public function get_product_unit_single()
     {
+        // print_r($inventory_sizes);
+        // die;
 
         $account_id = getAccountId();
 
@@ -7335,7 +7421,7 @@ WHERE lead_id='" . $lead_id . "'
 
             $where = "pud.product_unit_detail_id='" . $id . "' AND (p.agent_id='" . $account_id . "' OR share_account_id='" . $account_id . "')";
 
-            $this->db->select("pud.product_unit_detail_id,pud.no_of_bathroom,pud.no_of_unit,pud.ca,pud.ba,pud.sa,p.description,tbl_product_types.product_type_name,tbl_unit_types.unit_type_name,tbl_city.city_name,tbl_states.state_name,tbl_locations.location_name,tbl_accomodations.accomodation_name,p.product_id,p.project_name,p.no_of_tower,p.cc_certificate,p.oc_certificate,p.parking_open,p.o_price,p.parking_stilt,p.s_price,p.parking_basment,p.b_price,p.parking_gst,tbl_builders.firm_name as b_firm_name,p.project_type,p.property_type,pud.sa,pud.plot_size,pud.plot_unit,punit.unit_name as plot_unit_name,sa_unit.unit_name as sa_unit_name,pud.basic_cost,p.b_cost_unit");
+            $this->db->select("pud.product_unit_detail_id,pud.no_of_bathroom,pud.no_of_unit,pud.ca,pud.ba,pud.sa,p.description,tbl_product_types.product_type_name,tbl_unit_types.unit_type_name,tbl_city.city_name,tbl_states.state_name,tbl_locations.location_name,tbl_accomodations.accomodation_name,p.product_id,p.project_name,p.no_of_tower,p.cc_certificate,p.oc_certificate,p.parking_open,p.o_price,p.parking_stilt,p.s_price,p.parking_basment,p.b_price,p.parking_gst,tbl_builders.firm_name as b_firm_name,p.project_type,p.property_type,pud.sa,pud.plot_size,pud.plot_unit,punit.unit_name as plot_unit_name,sa_unit.unit_name as sa_unit_name,pud.basic_cost,p.b_cost_unit,p.property_type as property_type_id");
             $this->db->from('tbl_product_unit_details as pud');
             $this->db->join('tbl_products as p', 'p.product_id = pud.product_id', 'left');
             $this->db->join('tbl_product_types', 'tbl_product_types.product_type_id=p.project_type', 'left');

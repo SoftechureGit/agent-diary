@@ -7,6 +7,7 @@ class Api extends CI_Controller {
     
  public function __construct() {
         parent::__construct();
+        $this->load->library('form_validation');
          $this->load->model('Action_model');
          $this->load->helpers('site_helper');
         header('Content-Type: application/json'); 
@@ -38,17 +39,8 @@ class Api extends CI_Controller {
               
           }
           else{
-                # Check API KEY
-                if(!$this->checkApiKey()):
-                    $result['data'] = array('status'=>'false','msg'=> 'Invalid API Key.');
-                    $someJSON = json_encode($result);
-                    echo $someJSON;
-                    exit;
-                endif;
-            }
-        }
-        else{
-            # Check API KEY
+
+                # Check API KEY == Post Method
             if($this->checkApiKey()):
                 
                 # Check is User Login
@@ -61,7 +53,7 @@ class Api extends CI_Controller {
                 echo $someJSON;
                 exit;
                 endif;
-                # Check is User Login
+                # Check is User Login 
             else:
                 $result['data']             =   [
                                                     'status'    =>  'false',
@@ -71,7 +63,34 @@ class Api extends CI_Controller {
                 echo $someJSON;
                 exit;
             endif;
-            # Check API KEY
+            # End Check API KEY == Post Method
+            }
+        }
+        else{
+            # Check API KEY == Get Method
+            if($this->checkApiKey()):
+                
+                # Check is User Login
+                if(!$this->isUserLogin()):
+                    $result['data']         =   [
+                                                    'status'    =>  'false',
+                                                    'msg'       =>  'Unauthorized'
+                                                ];
+                    $someJSON                       =   json_encode($result);
+                echo $someJSON;
+                exit;
+                endif;
+                # Check is User Login 
+            else:
+                $result['data']             =   [
+                                                    'status'    =>  'false',
+                                                    'msg'       =>  'Invalid API Key.'
+                                                ];
+                $someJSON                       =   json_encode($result);
+                echo $someJSON;
+                exit;
+            endif;
+            # End Check API KEY == Get Method
             
         }
 
@@ -79,7 +98,7 @@ class Api extends CI_Controller {
     
     # Check API KEY
     public function checkApiKey(){
-        $api_key            =  $this->input->request_headers()['Api-Key'] ?? '';
+        $api_key            =  $this->input->request_headers()['API-KEY'] ?? $this->input->request_headers()['Api-Key'] ?? '';
         
         if($api_key == API_KEY):
             return true;
@@ -94,7 +113,8 @@ class Api extends CI_Controller {
         $access_token            =   $this->input->request_headers()['Access-Token'] ?? '';
         
         if($access_token):
-            $where          =   "user_hash = '$access_token' and role_id = '2'";
+            // $where          =   "user_hash = '$access_token' and role_id = '2'";
+            $where          =   "user_hash = '$access_token'";
             $this->user     =   $this->Action_model->select_single('tbl_users', $where, "tbl_users.*, CONCAT(first_name,' ',last_name) as name");
             return true;
         endif;
@@ -2234,18 +2254,44 @@ class Api extends CI_Controller {
         echo json_encode($array);
     }
 
-    public function add_lead()
-    {
-        $array = array();
-        
-        $account_id = 0;
-        $user_id = 0;
+    # Store Lead
+    public function store_lead()
+    {   
+        $this->form_validation->set_rules('lead_date', 'Date', 'required');
+        $this->form_validation->set_rules('lead_time', 'Time', 'required');
+        $this->form_validation->set_rules('lead_source_id', 'Source', 'required');
+        $this->form_validation->set_rules('lead_stage_id', 'Stage', 'required');
+        $this->form_validation->set_rules('lead_title', 'Title', 'required');
+        $this->form_validation->set_rules('lead_first_name', 'First Name', 'required');
+        $this->form_validation->set_rules('lead_mobile_no', 'Mobile Number', 'required');
+
+        $this->form_validation->set_rules('lead_email', 'Email', 'valid_email|trim');
+
+        if ($this->form_validation->run() == FALSE):
+             // Validation failed
+            $response = array(
+                'status' => 'error',
+                'msg'   => validation_errors('<div style="color:red;">','</div>')
+            );
+            echo json_encode($response);
+            exit;
+        endif;
+
+        # User Details
+        // $user_detail                    =   $this->user;
 
         $where = "user_hash='".$this->input->post('user_hash')."'";
         $user_detail = $this->Action_model->select_single('tbl_users',$where);
+        # End User Details
+
+        $array                          =   array();
+        $account_id                     =   0;
+        $user_id                        =   0;
+
+
         if ($user_detail) {
-            $user_id=$user_detail->user_id;
-            $account_id = $user_detail->user_id;
+            $user_id            =   $user_detail->user_id;
+            $account_id         =   $user_detail->user_id;
             if ($user_detail->role_id!=2) {
                 $account_id = $user_detail->parent_id;
             }
@@ -2253,89 +2299,143 @@ class Api extends CI_Controller {
         
         if ($user_detail && $this->input->post()) {
             
-            $id=$this->input->post('lead_id');
-            $record = $this->Action_model->select_single('tbl_leads',"lead_id='".$id."'");
+            # Lead Id
+            $id                                     =   $this->input->post('lead_id');
+            # End Lead Id
+            
+            # Record Exists
+            $record                                 =   $this->Action_model->select_single('tbl_leads',"lead_id='".$id."'");
+            # End Record Exists
 
-            $record_array = array(
-                'lead_title'=>$this->input->post('lead_title'),
-                'lead_first_name'=>$this->input->post('lead_first_name'),
-                'lead_last_name'=>$this->input->post('lead_last_name'),
-                'lead_date'=>$this->input->post('lead_date'),
-                'lead_time'=>$this->input->post('lead_time'),
-                'lead_mobile_no_2'=>$this->input->post('lead_mobile_no_2'),
-                'lead_address'=>$this->input->post('lead_address'),
-                'lead_state_id'=>$this->input->post('lead_state_id'),
-                'lead_city_id'=>$this->input->post('lead_city_id'),
-                'lead_occupation_id'=>$this->input->post('lead_occupation_id'),
-                'lead_department_id'=>$this->input->post('lead_department_id'),
-                'lead_dob'=>$this->input->post('lead_dob'),
-                'lead_doa'=>$this->input->post('lead_doa'),
-                'lead_source_id'=>$this->input->post('lead_source_id'),
-                'lead_stage_id'=>$this->input->post('lead_stage_id'),
-                'lead_status'=>$this->input->post('lead_status'),
-                'user_id'=>$user_id,
-                'added_by'=>$user_id,
-                'account_id'=>$account_id,
-                'lead_pan_no'=>$this->input->post('lead_pan_no'),
-                'lead_adhar_no'=>$this->input->post('lead_adhar_no'),
-                'lead_voter_id'=>$this->input->post('lead_voter_id'),
-                'lead_passport_no'=>$this->input->post('lead_passport_no'),
-                'lead_gender'=>$this->input->post('lead_gender'),
-                'lead_marital_status'=>$this->input->post('lead_marital_status'),
-                'lead_designation'=>$this->input->post('lead_designation'),
-                'lead_company'=>$this->input->post('lead_company'),
-                'lead_annual_income'=>$this->input->post('lead_annual_income')
-            );
+            # Init
+            $primary_mobile_number                  =   $this->input->post('lead_mobile_no');
+            $email                                  =   $this->input->post('lead_email');
+            # End Init
 
-            if ($record) {
+            # Profile
+            if(!empty($_FILES['profile']['name'])):
+                $profile                                =   upload_file('profile', 'profile', time());
+            endif;
 
-                if($this->Action_model->select_single('tbl_leads',"lead_mobile_no='".$this->input->post('lead_mobile_no')."' AND account_id='".$account_id."' AND lead_id!='".$id."'")){
-                    $array = array('status'=>'false','msg'=>'Mobile No Already Exist.');
+            # End Profile
+
+            $record_array                           = array(
+                                                            'lead_date'                                 =>  $this->input->post('lead_date'),
+                                                            'lead_time'                                 =>  $this->input->post('lead_time'),
+
+                                                            'lead_title'                                =>  $this->input->post('lead_title'),
+                                                            'lead_first_name'                           =>  $this->input->post('lead_first_name'),
+                                                            'lead_last_name'                            =>  $this->input->post('lead_last_name'),
+                                                            'lead_email'                                =>  $email,
+                                                            'primary_mobile_number_country_data'        =>  $this->input->post('primary_mobile_number_country_data'),
+                                                            'lead_mobile_no'                            =>  $primary_mobile_number,
+                                                            
+                                                            'secondary_mobile_number_country_data'      =>  $this->input->post('secondary_mobile_number_country_data'),
+                                                            'lead_mobile_no_2'                          =>  $this->input->post('lead_mobile_no_2'),
+
+                                                            'profile'                                   => $profile->file_name ?? null,
+
+                                                            'lead_source_id'                            =>  $this->input->post('lead_source_id'),
+                                                            'lead_stage_id'                             =>  $this->input->post('lead_stage_id'),
+                                                            'lead_occupation_id'                        =>  $this->input->post('lead_occupation_id'),
+                                                            'lead_department_id'                        =>  $this->input->post('lead_department_id'),
+
+                                                            'lead_address'                              =>  $this->input->post('lead_address'),
+                                                            'lead_state_id'                             =>  $this->input->post('lead_state_id'),
+                                                            'lead_city_id'                              =>  $this->input->post('lead_city_id'),
+                                                            'location_id'                               =>  $this->input->post('location_id'),
+
+                                                            'lead_dob'                                  =>  $this->input->post('lead_dob'),
+                                                            'lead_doa'                                  =>  $this->input->post('lead_doa'),
+                                                            'user_id'                                   =>  $user_id,
+                                                            'added_by'                                  =>  $user_id,
+                                                            'account_id'                                =>  $account_id,
+                                                            'lead_pan_no'                               =>  $this->input->post('lead_pan_no'),
+                                                            'lead_adhar_no'                             =>  $this->input->post('lead_adhar_no'),
+                                                            'lead_voter_id'                             =>  $this->input->post('lead_voter_id'),
+                                                            'lead_passport_no'                          =>  $this->input->post('lead_passport_no'),
+                                                            'lead_gender'                               =>  $this->input->post('lead_gender'),
+                                                            'lead_marital_status'                       =>  $this->input->post('lead_marital_status'),
+                                                            'lead_designation'                          =>  $this->input->post('lead_designation'),
+                                                            'lead_company'                              =>  $this->input->post('lead_company'),
+                                                            'lead_annual_income'                        =>  $this->input->post('lead_annual_income'),
+                                                            
+                                                            
+                                                            'platform'                                  =>  'app',
+                                                            'updated_at'                                =>  time(),
+                                                            'lead_status'                               =>  $this->input->post('lead_status'),
+                                                        );
+
+            # Is Mobile Exists
+            $where                                  =   "lead_mobile_no = '$primary_mobile_number' AND account_id = '$account_id' ";
+            
+            if($id):
+                $where                              .=   "  AND lead_id != '$id'";
+            endif;
+
+            $is_mobile_exists                       =   $this->Action_model->select_single('tbl_leads', $where);
+
+            if($is_mobile_exists):
+                $array                              =   [
+                                                            'status'    =>  'false',
+                                                            'msg'       =>  'Mobile already exist.'
+                                                        ];
+                echo json_encode($array);
+                exit;
+           endif;
+            # End Is Mobile Exists
+
+            # Is Email Exists
+            if($email):
+                $where                                  =   "lead_email = '$email' AND account_id = '$account_id' ";
+                
+                if($id):
+                    $where                              .=   "  AND lead_id != '$id'";
+                endif;
+
+                $is_mobile_exists                       =   $this->Action_model->select_single('tbl_leads', $where);
+
+                if($is_mobile_exists):
+                    $array                              =   [
+                                                                'status'    =>  'false',
+                                                                'msg'       =>  'Email already exist.'
+                                                            ];
                     echo json_encode($array);
                     exit;
-                }
+                endif;
+            endif;
+            # End Is Email Exists
+
+            if ($record) {
                 
-                $record_array['lead_mobile_no'] = $this->input->post('lead_mobile_no');
-
-                $record_array['updated_at'] = time();
-
-                $this->Action_model->update_data($record_array,'tbl_leads',"lead_id='".$id."'");
-                $array = array('status'=>'true','msg'=>'Lead Updated Successfully!!');
+                # Update Lead
+                $this->Action_model->update_data($record_array, 'tbl_leads', "lead_id='$id'");
+                # End Update Lead
+                
+                $array                  =  array('status'=>'true','msg'=>'Lead Updated Successfully!!');
 
             }
             else {
-
-                if($this->Action_model->select_single('tbl_leads',"lead_email='".$this->input->post('lead_email')."' AND account_id='".$account_id."'")){
-                    $array = array('status'=>'false','msg'=>'Email Already Exist.');
-                    echo json_encode($array);
-                    exit;
-                }
-
-                if($this->Action_model->select_single('tbl_leads',"lead_mobile_no='".$this->input->post('lead_mobile_no')."' AND account_id='".$account_id."'")){
-                    $array = array('status'=>'false','msg'=>'Mobile No Already Exist.');
-                    echo json_encode($array);
-                    exit;
-                }
-
-                $record_array['created_at'] = time();
-                $record_array['updated_at'] = time();
-                $record_array['lead_email'] = $this->input->post('lead_email');
-                $record_array['lead_mobile_no'] = $this->input->post('lead_mobile_no');
-
+                # Create Lead
+                $record_array['created_at']             =   time();
                 
-                $lead_id = $this->Action_model->insert_data($record_array,'tbl_leads');
+                $lead_id                =  $this->Action_model->insert_data($record_array, 'tbl_leads');
+                # End Create Lead
 
-                $lead_history_array = array(
-                    'title' => 'Lead Created',
-                    'description' => 'Lead created by '.$this->Action_model->get_name($user_id),
-                    'lead_id' => $lead_id,
-                    'created_at' => time(),
-                    "account_id"=>$account_id,
-                    "user_id"=>$user_id
-                );
-                $this->Action_model->insert_data($lead_history_array,'tbl_lead_history');
+                # Lead History
+                $lead_history_array     =   array(
+                                                    'title'         =>  'Lead Created',
+                                                    'description'   =>  'Lead created by '.$this->Action_model->get_name($user_id),
+                                                    'lead_id'       =>  $lead_id,
+                                                    'created_at'    =>  time(),
+                                                    "account_id"    =>  $account_id,
+                                                    "user_id"       =>  $user_id
+                                                );
 
-                $array = array('status'=>'true','msg'=>'Lead Added Successfully!!','lead_id'=>$this->db->insert_id());
+                $this->Action_model->insert_data($lead_history_array, 'tbl_lead_history');
+                # End Lead History
+
+                $array                  =   array('status'=>'true', 'msg'=>'Lead Added Successfully!!', 'lead_id' => $lead_id);
                 
             }
         }
@@ -2346,6 +2446,7 @@ class Api extends CI_Controller {
         echo json_encode($array);
         
     }
+    # End Store Lead
 
     public function delete_lead()
     {
@@ -11439,9 +11540,20 @@ $property_list = $query->result();
                  $department_list = (($department_list) ? $department_list : array());
                  $lead_source_list = (($lead_source_list) ? $lead_source_list : array());
                  $lead_stage_list = (($lead_stage_list) ? $lead_stage_list : array());
-     
+                 
+                 # Primary Mobile Number Country Code
+                 $primary_country_code                          =   ( $record->primary_mobile_number_country_data ?? null ) ? json_decode($record->primary_mobile_number_country_data): '';
+                 $record->primary_mobile_number_country_data    =   $primary_country_code->dialCode ?? 0;
+                 # End Primary Mobile Number Country Code
+                 
+                 # Secondary Mobile Number Country Code
+                 $primary_country_code                          =   ( $record->secondary_mobile_number_country_data ?? null ) ? json_decode($record->secondary_mobile_number_country_data): '';
+                 $record->secondary_mobile_number_country_data    =   $primary_country_code->dialCode ?? 0;
+                 # End Secondary Mobile Number Country Code
+
                  foreach ($record as $k => $v) {
                      $record->$k = ($v || $v == 0) ? $v : '';
+
                  } 
                  
                  $record_p = '';

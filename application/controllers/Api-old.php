@@ -2,68 +2,137 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Api extends CI_Controller {
+    
+    public $user                    =   null;
+    
  public function __construct() {
         parent::__construct();
          $this->load->model('Action_model');
+         $this->load->helpers('site_helper');
         header('Content-Type: application/json'); 
+        
         if($this->input->post()){
+            
           $api_key = $this->input->post('api_key');
           if ($api_key==API_KEY) {
               
               $user_hash = $this->session->userdata('user_hash');
-			    
-			    $user_detail = (object)array();
-			    if($user_hash) { 
+                
+                $user_detail = (object)array();
+                if($user_hash) { 
                     $user_data=$this->Action_model->select_single('tbl_users',array('user_hash'=>$user_hash,'role_id'=>'2'));
-        			if($customer_data){
-        			    $user_detail = $customer_data;
-			            $user_detail->user_logged = "1";
-        			}
-        			else {
-        			    $result['data'] = array('status'=>'false','msg'=> 'User Not Found.');
+                    if($customer_data){
+                        $user_detail = $customer_data;
+                        $user_detail->user_logged = "1";
+                    }
+                    else {
+                        $result['data'] = array('status'=>'false','msg'=> 'User Not Found.');
                         $someJSON = json_encode($result);
                         echo $someJSON;
                         exit;
-        			}
-			    }
-			    else {
-			        $user_detail->user_logged = "0";
-			    }
+                    }
+                }
+                else {
+                    $user_detail->user_logged = "0";
+                }
               
           }
           else{
-                $result['data'] = array('status'=>'false','msg'=> 'Authorization failed: Invalid API Key.');
-                $someJSON = json_encode($result);
-                echo $someJSON;
-                exit;
+                # Check API KEY
+                if(!$this->checkApiKey()):
+                    $result['data'] = array('status'=>'false','msg'=> 'Invalid API Key.');
+                    $someJSON = json_encode($result);
+                    echo $someJSON;
+                    exit;
+                endif;
             }
         }
         else{
-            $result['data'] = array('status'=>'false','msg'=> 'Authorization failed: Invalid API Key.');
-            $someJSON = json_encode($result);
-            echo $someJSON;
-            exit;
+            # Check API KEY
+            if($this->checkApiKey()):
+                
+                # Check is User Login
+                if(!$this->isUserLogin()):
+                    $result['data']         =   [
+                                                    'status'    =>  'false',
+                                                    'msg'       =>  'Unauthorized'
+                                                ];
+                    $someJSON                       =   json_encode($result);
+                echo $someJSON;
+                exit;
+                endif;
+                # Check is User Login
+            else:
+                $result['data']             =   [
+                                                    'status'    =>  'false',
+                                                    'msg'       =>  'Invalid API Key.'
+                                                ];
+                $someJSON                       =   json_encode($result);
+                echo $someJSON;
+                exit;
+            endif;
+            # Check API KEY
+            
         }
 
     }
-
-	public function index()
-	{
+    
+    # Check API KEY
+    public function checkApiKey(){
+        $api_key            =  $this->input->request_headers()['API-KEY'] ?? $this->input->request_headers()['Api-Key'] ?? '';
         
-	  $array = array('status'=>'false','msg'=>'Some error occurred, please try again.');
-      echo json_encode($array);
-	}
-	
-	public function dashboard()
+        if($api_key == API_KEY):
+            return true;
+        endif;
+
+        return false;
+    }
+    # Check API KEY
+    
+    # Check Is User Login
+    public function isUserLogin(){
+        $access_token            =   $this->input->request_headers()['Access-Token'] ?? '';
+        
+        if($access_token):
+            $where          =   "user_hash = '$access_token' and role_id = '2'";
+            $this->user     =   $this->Action_model->select_single('tbl_users', $where, "tbl_users.*, CONCAT(first_name,' ',last_name) as name");
+            return true;
+        endif;
+
+        return false;
+    }
+    # Check Is User Login
+    
+    # Log
+    public function dd($param){
+        echo "<pre>";
+        print_r($param);
+        die;
+    }
+    # End Log
+    
+
+    public function index()
     {
-        $array=array();
-        if($this->input->post()){
+        
+      $array = array('status'=>'false','msg'=>'Some error occurred, please try again.');
+      echo json_encode($array);
+    }
+    
+    public function dashboard()
+    {
+        $array                  =   array();
+     
+        if($this->input->get()){
 
-        $member = ($this->input->post('member') && is_numeric($this->input->post('member')))?$this->input->post('member'):"";
-         $project = ($this->input->post('project') && is_numeric($this->input->post('project')))?$this->input->post('project'):"";
+        
+         $member = ($this->input->get('member') && is_numeric($this->input->get('member')))?$this->input->get('member'):"";
+         $project = ($this->input->get('project') && is_numeric($this->input->get('project')))?$this->input->get('project'):"";
 
-        $where = "user_hash='".$this->input->post('user_hash')."'";
-        $user_detail = $this->Action_model->select_single('tbl_users',$where,"CONCAT(first_name,' ',last_name) as name, tbl_users.*");
+        // $where = "user_hash='".$this->input->get('user_hash')."'";
+        // $user_detail = $this->Action_model->select_single('tbl_users',$where,"CONCAT(first_name,' ',last_name) as name, tbl_users.*");
+        
+        $user_detail = $this->user;
 
         $is_trial = false;
         $trial_expired = false;
@@ -137,7 +206,8 @@ class Api extends CI_Controller {
       $total_lead_conversion_sale = 0;
       $total_lead_dead_sale = 0;
 
-        $account_id = getAccountIdHash($this->input->post('user_hash'));
+        // $account_id = getAccountIdHash($this->input->get('user_hash'));
+        $account_id = $this->user->user_id;
 
         $where = "account_id='".$account_id."'".(($member)?" AND tbl_leads.user_id='".$member."'":"");
         $tb_data = $this->Action_model->select_single('tbl_leads',$where,"COUNT(CASE WHEN added_to_followup = 1 THEN lead_id END) as upcoming_followup,COUNT(CASE WHEN followup_date = '".date('d-m-Y')."' THEN lead_id END) as today_followup,COUNT(CASE WHEN added_to_followup = 0 THEN lead_id END) as missed_followup"); 
@@ -318,7 +388,12 @@ class Api extends CI_Controller {
                 if ($dd) {
                     $total_conversion = $dd->total;
                 }
+                
                 $percentage_conversion = ($total_conversion==0 && $total_lead==0)?0:($total_conversion*100)/$total_lead;
+                
+                
+                    // echo   ($percentage_conversion); die;
+                
                 $percentage_conversion = number_format((float)$percentage_conversion, 2, '.', '');
                 $row->percentage_conversion = str_replace("0.00", "0", $percentage_conversion);
 
@@ -331,14 +406,31 @@ class Api extends CI_Controller {
                 $dd = $query->row();
                 $percentage_site_visit = 0;
                 $total_site_visit = 0;
+                
                 if ($dd) {
                     $total_site_visit = $dd->total;
                 }
-                $percentage_site_visit = ($total_conversion==0 && $total_site_visit==0)?0:($total_conversion*100)/$total_site_visit;
-                $percentage_site_visit = number_format((float)$percentage_site_visit, 2, '.', '');
-                $row->percentage_site_visit = str_replace("0.00", "0", $percentage_site_visit);
+                
+             
+                
+                
+                if ( $total_conversion == 0 &&  $total_site_visit == 0):
+                    
+                   $percentage_site_visit  =   0 ;
+                   
+                else:
+                    
+                     $percentage_site_visit =    $total_site_visit ? ($total_conversion*100)/($total_site_visit) : 0;  
+                     
+                endif;        
+                
+                
+                $row->percentage_site_visit = str_replace("0.00", "0", $percentage_site_visit); 
 
                 $user_list[] = $row;
+                
+                
+                //   echo   ($percentage_site_visit); die;
             }
         }
         //$data['user_list'] = $user_list; 
@@ -351,26 +443,36 @@ class Api extends CI_Controller {
       $team_list=array();
           $team_list[]=array(
             "user_id"=>(string)1,
-	        "name"=>"Rakesh Kumar",
-	        "total_lead"=>(string)15,
-	        "total_conversion"=>(string)12,
-	        "total_site_visit"=>(string)122
+            "name"=>"Rakesh Kumar",
+            "total_lead"=>(string)15,
+            "total_conversion"=>(string)12,
+            "total_site_visit"=>(string)122
           );
           $team_list[]=array(
             "user_id"=>(string)1,
-	        "name"=>"Pawan Kumar",
-	        "total_lead"=>(string)13,
-	        "total_conversion"=>(string)11,
-	        "total_site_visit"=>(string)172
+            "name"=>"Pawan Kumar",
+            "total_lead"=>(string)13,
+            "total_conversion"=>(string)11,
+            "total_site_visit"=>(string)172
           );
-       $where1 = "country_id='1'";
+       $where1 = "country_id='1' AND state_status=1";
         $state_list = $this->Action_model->detail_result('tbl_states',$where1);
         
         $data['state_list'] = $state_list;
       $where = "site_setting_id='1'";
                 $site_setting=$this->Action_model->select_single('tbl_site_setting',$where,"*"); 
 
-            $array['data'] = array('status'=>'true','msg'=>'Found','data'=>$data,'user_detail'=>$user_detail,'project_list'=>$project_list,'site_setting'=>$site_setting,'team_list'=>$team_list,'state_list'=>$state_list);
+            $associate_complete = "0";
+            $role_id = (string)$this->user->role_id;
+            $is_agent = "0";
+            if ($this->user->role_id=='2' && $this->user->associate_complete==1) {
+                $associate_complete = "1";
+            }
+            if ($this->user->role_id=='2') {
+                $is_agent = "1";
+            }
+
+            $array['data'] = array('status'=>'true','msg'=>'Found','data'=>$data,'user_detail'=>$user_detail,'project_list'=>$project_list,'site_setting'=>$site_setting,'team_list'=>$team_list,'state_list'=>$state_list,'associate_complete'=>$associate_complete,'role_id'=>$role_id,"is_agent"=>$is_agent);
         
         }else{
             $array['data'] = array('status'=>'false','msg'=>'Some error occurred, please try again.');
@@ -378,10 +480,10 @@ class Api extends CI_Controller {
         echo json_encode($array);
     }
 
-	public function agent_signin()
-	{
-		$array = array();
-		
+    public function agent_signin()
+    {
+        $array = array();
+        
         if ($this->input->post()) {
             
             $username=$this->input->post('username');
@@ -389,7 +491,7 @@ class Api extends CI_Controller {
             $account_id=$this->input->post('account_id');
 
             $recordAccount = $this->Action_model->select_single('tbl_users',"email='".$account_id."' AND role_id='2'");
-
+            
             if ($recordAccount) {
 
                 if ($recordAccount->username==$username) {
@@ -446,11 +548,11 @@ class Api extends CI_Controller {
         }
 
         echo json_encode($array);
-	}
+    }
 
 
 
-	public function getAgent($value='')
+    public function getAgent($value='')
     {
         $where = "user_hash='".$value."'";
         $user_detail = $this->Action_model->select_single('tbl_users',$where);
@@ -504,196 +606,253 @@ class Api extends CI_Controller {
         return $user_ids;
     }
 
-	public function associate_save()
-	{
+    public function associate_save()
+    {
         
-	  $array = array();
+      $array = array();
 
         if ($this->input->post()) {
 
-        	$agent = $this->getAgent();
-            if ($agent) {
+            $where = "user_hash='".$this->input->post('user_hash')."'";
+            $user = $this->Action_model->select_single('tbl_users',$where);
+            if ($user) {
 
-            	$agent_logo = "";
-	            $cin_image = "";
-	            $tan_image = "";
-	            $pan_image = "";
-	            $gst_image = "";
-	            $adhar_image = "";
+                $logo = "";
+                $cin_image = "";
+                $tan_image = "";
+                $pan_image = "";
+                $gst_image = "";
+                $adhar_image = "";
+                $rera_image = "";
+                $image = "";
 
-                $agent_logo = $agent->agent_logo;
-                $cin_image = $agent->cin_image;
-                $tan_image = $agent->tan_image;
-                $pan_image = $agent->pan_image;
-                $gst_image = $agent->gst_image;
-                $adhar_image = $agent->adhar_image;
-
-
-	            $config['upload_path'] = './uploads/images/agent/logo/';
-	            $config['allowed_types']= 'jpg|png';
-	            $config['max_size']             = 5*1024;
-	            $config['remove_spaces'] = TRUE;
-	            $config['encrypt_name'] = TRUE;
-
-	            $this->load->library('upload', $config);
-
-	            $this->upload->initialize($config);
-
-	            if (!empty($_FILES['agent_logo']['name'])) {
-	                if (!$this->upload->do_upload('agent_logo'))
-	                { 
-	                    $error = array('error' => $this->upload->display_errors());
-	                    $array = array('status'=>'false','message'=> $error['error']);
-	                    echo json_encode($array);
-	                    exit;
-	                }
-	                else
-	                { 
-	                    if($agent && $agent->agent_logo && file_exists('./uploads/images/agent/logo/'.$agent->agent_logo)){ unlink('./uploads/images/agent/logo/'.$agent->agent_logo); }
-	                    $agent_logo=$this->upload->data('file_name');
-	                }
-	            }
-
-	            $config['upload_path'] = './uploads/images/agent/document/';
-	            $config['allowed_types']= 'jpg|png|pdf';
-	            $config['max_size']             = 5*1024;
-	            $config['remove_spaces'] = TRUE;
-	            $config['encrypt_name'] = TRUE;
-
-	            $this->load->library('upload', $config);
-
-	            $this->upload->initialize($config);
-
-	            if (!empty($_FILES['cin_image']['name'])) {
-	                if (!$this->upload->do_upload('cin_image'))
-	                { 
-	                    $error = array('error' => $this->upload->display_errors());
-	                    $array = array('status'=>'false','message'=> $error['error']);
-	                    echo json_encode($array);
-	                    exit;
-	                }
-	                else
-	                { 
-	                    if($agent && $agent->cin_image && file_exists('./uploads/images/agent/logo/'.$agent->cin_image)){ unlink('./uploads/images/agent/logo/'.$agent->cin_image); }
-	                    $cin_image=$this->upload->data('file_name');
-	                }
-	            }
+                $logo = $user->logo;
+                $cin_image = $user->cin_image;
+                $tan_image = $user->tan_image;
+                $pan_image = $user->pan_image;
+                $gst_image = $user->gst_image;
+                $adhar_image = $user->adhar_image;
+                $rera_image = $user->rera_image;
+                $image = $user->image;
 
 
-	            if (!empty($_FILES['tan_image']['name'])) {
-	                if (!$this->upload->do_upload('tan_image'))
-	                { 
-	                    $error = array('error' => $this->upload->display_errors());
-	                    $array = array('status'=>'false','message'=> $error['error']);
-	                    echo json_encode($array);
-	                    exit;
-	                }
-	                else
-	                { 
-	                    if($agent && $agent->tan_image && file_exists('./uploads/images/agent/logo/'.$agent->tan_image)){ unlink('./uploads/images/agent/logo/'.$agent->tan_image); }
-	                    $tan_image=$this->upload->data('file_name');
-	                }
-	            }
+                $config['upload_path'] = './uploads/images/user/logo/';
+                $config['allowed_types']= 'jpg|png';
+                $config['max_size']             = 5*1024;
+                $config['remove_spaces'] = TRUE;
+                $config['encrypt_name'] = TRUE;
+
+                $this->load->library('upload', $config);
+
+                $this->upload->initialize($config);
+
+                if (!empty($_FILES['logo']['name'])) {
+                    if (!$this->upload->do_upload('logo'))
+                    { 
+                        $error = array('error' => $this->upload->display_errors());
+                        $array['data'] = array('status'=>'error','msg'=> $error['error']);
+                        echo json_encode($array);
+                        exit;
+                    }
+                    else
+                    { 
+                        if($user && $user->logo && file_exists('./uploads/images/user/logo/'.$user->logo)){ unlink('./uploads/images/user/logo/'.$user->logo); }
+                        $logo=$this->upload->data('file_name');
+                    }
+                }
+
+                $config['upload_path'] = './uploads/images/user/photo/';
+                $config['allowed_types']= 'jpg|png';
+                $config['max_size']             = 5*1024;
+                $config['remove_spaces'] = TRUE;
+                $config['encrypt_name'] = TRUE;
+
+                $this->load->library('upload', $config);
+
+                $this->upload->initialize($config);
+
+                if (!empty($_FILES['image']['name'])) {
+                    if (!$this->upload->do_upload('image'))
+                    { 
+                        $error = array('error' => $this->upload->display_errors());
+                        $array['data'] = array('status'=>'error','msg'=> $error['error']);
+                        echo json_encode($array);
+                        exit;
+                    }
+                    else
+                    { 
+                        if($user && $user->image && file_exists('./uploads/images/user/photo/'.$user->image)){ unlink('./uploads/images/user/photo/'.$user->image); }
+                        $image=$this->upload->data('file_name');
+                    }
+                }
+
+                $config['upload_path'] = './uploads/images/user/document/';
+                $config['allowed_types']= 'jpg|png|pdf';
+                $config['max_size']             = 5*1024;
+                $config['remove_spaces'] = TRUE;
+                $config['encrypt_name'] = TRUE;
+
+                $this->load->library('upload', $config);
+
+                $this->upload->initialize($config);
+
+                if (!empty($_FILES['cin_image']['name'])) {
+                    if (!$this->upload->do_upload('cin_image'))
+                    { 
+                        $error = array('error' => $this->upload->display_errors());
+                        $array['data'] = array('status'=>'error','msg'=> $error['error']);
+                        echo json_encode($array);
+                        exit;
+                    }
+                    else
+                    { 
+                        if($user && $user->cin_image && file_exists('./uploads/images/user/document/'.$user->cin_image)){ unlink('./uploads/images/user/document/'.$user->cin_image); }
+                        $cin_image=$this->upload->data('file_name');
+                    }
+                }
 
 
-	            if (!empty($_FILES['pan_image']['name'])) {
-	                if (!$this->upload->do_upload('pan_image'))
-	                { 
-	                    $error = array('error' => $this->upload->display_errors());
-	                    $array = array('status'=>'false','message'=> $error['error']);
-	                    echo json_encode($array);
-	                    exit;
-	                }
-	                else
-	                { 
-	                    if($agent && $agent->pan_image && file_exists('./uploads/images/agent/logo/'.$agent->pan_image)){ unlink('./uploads/images/agent/logo/'.$agent->pan_image); }
-	                    $pan_image=$this->upload->data('file_name');
-	                }
-	            }
+                if (!empty($_FILES['tan_image']['name'])) {
+                    if (!$this->upload->do_upload('tan_image'))
+                    { 
+                        $error = array('error' => $this->upload->display_errors());
+                        $array['data'] = array('status'=>'error','msg'=> $error['error']);
+                        echo json_encode($array);
+                        exit;
+                    }
+                    else
+                    { 
+                        if($user && $user->tan_image && file_exists('./uploads/images/user/document/'.$user->tan_image)){ unlink('./uploads/images/user/document/'.$user->tan_image); }
+                        $tan_image=$this->upload->data('file_name');
+                    }
+                }
 
 
-	            if (!empty($_FILES['gst_image']['name'])) {
-	                if (!$this->upload->do_upload('gst_image'))
-	                { 
-	                    $error = array('error' => $this->upload->display_errors());
-	                    $array = array('status'=>'false','message'=> $error['error']);
-	                    echo json_encode($array);
-	                    exit;
-	                }
-	                else
-	                { 
-	                    if($agent && $agent->gst_image && file_exists('./uploads/images/agent/logo/'.$agent->gst_image)){ unlink('./uploads/images/agent/logo/'.$agent->gst_image); }
-	                    $gst_image=$this->upload->data('file_name');
-	                }
-	            }
+                if (!empty($_FILES['pan_image']['name'])) {
+                    if (!$this->upload->do_upload('pan_image'))
+                    { 
+                        $error = array('error' => $this->upload->display_errors());
+                        $array['data'] = array('status'=>'error','msg'=> $error['error']);
+                        echo json_encode($array);
+                        exit;
+                    }
+                    else
+                    { 
+                        if($user && $user->pan_image && file_exists('./uploads/images/user/document/'.$user->pan_image)){ unlink('./uploads/images/user/document/'.$user->pan_image); }
+                        $pan_image=$this->upload->data('file_name');
+                    }
+                }
 
-	            if (!empty($_FILES['adhar_image']['name'])) {
-	                if (!$this->upload->do_upload('adhar_image'))
-	                { 
-	                    $error = array('error' => $this->upload->display_errors());
-	                    $array = array('status'=>'false','message'=> $error['error']);
-	                    echo json_encode($array);
-	                    exit;
-	                }
-	                else
-	                { 
-	                    if($agent && $agent->adhar_image && file_exists('./uploads/images/agent/logo/'.$agent->adhar_image)){ unlink('./uploads/images/agent/logo/'.$agent->adhar_image); }
-	                    $adhar_image=$this->upload->data('file_name');
-	                }
-	            }
 
-            	$record_array = array(
-	                'is_verify'=>$this->input->post('is_verify'),
-	                'firm_type_id'=>$this->input->post('firm_type_id'),
-	                'firm_name'=>$this->input->post('firm_name'),
-	                'address_1'=>$this->input->post('address_1'),
-	                'address_2'=>$this->input->post('address_2'),
-	                'address_3'=>$this->input->post('address_3'),
-	                'agent_country_id'=>$this->input->post('country_id'),
-	                'agent_state_id'=>$this->input->post('state_id'),
-	                'agent_city_id'=>$this->input->post('city_id'),
-	                'agent_mobile'=>$this->input->post('agent_mobile'),
-	                'agent_contact_no'=>$this->input->post('agent_contact_no'),
-	                'agent_contact_person'=>$this->input->post('agent_contact_person'),
-	                'agent_whatsapp_no'=>$this->input->post('agent_whatsapp_no'),
-	                'agent_email'=>$this->input->post('agent_email'),
-	                'rera_registered'=>$this->input->post('rera_registered'),
-	                'rera_no'=>$this->input->post('rera_no'),
-	                'owner_title'=>$this->input->post('owner_title'),
-	                'owner_first_name'=>$this->input->post('owner_first_name'),
-	                'owner_last_name	'=>$this->input->post('owner_last_name	'),
-	                'rera_dor'=>$this->input->post('rera_dor'),
-	                'rera_valid_till'=>$this->input->post('rera_valid_till'),
-	                'pan_no'=>$this->input->post('pan_no'),
-	                'adhar_no'=>$this->input->post('adhar_no'),
-	                'gst_no'=>$this->input->post('gst_no'),
-	                'cin_no'=>$this->input->post('cin_no'),
-	                'tan_no'=>$this->input->post('tan_no'),
-	                'agent_logo'=>$agent_logo,
-                	'cin_image'=>$cin_image,
-                	'tan_image'=>$tan_image,
-                	'pan_image'=>$pan_image,
-                	'gst_image'=>$gst_image,
-                	'adhar_image'=>$adhar_image
-	            );
+                if (!empty($_FILES['gst_image']['name'])) {
+                    if (!$this->upload->do_upload('gst_image'))
+                    { 
+                        $error = array('error' => $this->upload->display_errors());
+                        $array['data'] = array('status'=>'error','msg'=> $error['error']);
+                        echo json_encode($array);
+                        exit;
+                    }
+                    else
+                    { 
+                        if($user && $user->gst_image && file_exists('./uploads/images/user/document/'.$user->gst_image)){ unlink('./uploads/images/user/document/'.$user->gst_image); }
+                        $gst_image=$this->upload->data('file_name');
+                    }
+                }
+
+                if (!empty($_FILES['adhar_image']['name'])) {
+                    if (!$this->upload->do_upload('adhar_image'))
+                    { 
+                        $error = array('error' => $this->upload->display_errors());
+                        $array['data'] = array('status'=>'error','msg'=> $error['error']);
+                        echo json_encode($array);
+                        exit;
+                    }
+                    else
+                    { 
+                        if($user && $user->adhar_image && file_exists('./uploads/images/user/document/'.$user->adhar_image)){ unlink('./uploads/images/user/document/'.$user->adhar_image); }
+                        $adhar_image=$this->upload->data('file_name');
+                    }
+                }
+
+                if (!empty($_FILES['rera_image']['name'])) {
+                    if (!$this->upload->do_upload('rera_image'))
+                    { 
+                        $error = array('error' => $this->upload->display_errors());
+                        $array['data'] = array('status'=>'error','msg'=> $error['error']);
+                        echo json_encode($array);
+                        exit;
+                    }
+                    else
+                    { 
+                        if($user && $user->rera_image && file_exists('./uploads/images/user/logo/'.$user->rera_image)){ unlink('./uploads/images/user/logo/'.$user->rera_image); }
+                        $rera_image=$this->upload->data('file_name');
+                    }
+                }
+
+                
+                $record_array = array(
+                    'user_title'=>$this->input->post('user_title'),
+                    'first_name'=>$this->input->post('first_name'),
+                    'last_name    '=>$this->input->post('last_name'),
+                    'sdw_title'=>$this->input->post('sdw_title'),
+                    'sdw_first_name'=>$this->input->post('sdw_first_name'),
+                    'sdw_last_name    '=>$this->input->post('sdw_last_name'),
+                    'is_individual'=>$this->input->post('is_individual'),
+                    'firm_type_id'=>$this->input->post('firm_type_id'),
+                    'firm_name'=>$this->input->post('firm_name'),
+                    'address_1'=>$this->input->post('address_1'),
+                    'address_2'=>$this->input->post('address_2'),
+                    'address_3'=>$this->input->post('address_3'),
+                    'country_id'=>$this->input->post('country_id'),
+                    'state_id'=>$this->input->post('state_id'),
+                    'city_id'=>$this->input->post('city_id'),
+                    'mobile'=>$this->input->post('mobile'),
+                    'contact_no'=>$this->input->post('contact_no'),
+                    'whatsapp_no'=>$this->input->post('whatsapp_no'),
+                    'email'=>$this->input->post('email'),
+                    'rera_registered'=>$this->input->post('rera_registered'),
+                    'rera_no'=>$this->input->post('rera_no'),
+                    'owner_title'=>$this->input->post('owner_title'),
+                    'owner_first_name'=>$this->input->post('owner_first_name'),
+                    'owner_last_name'=>$this->input->post('owner_last_name'),
+                    'owner_mobile'=>$this->input->post('owner_mobile'),
+                    'owner_contact_no'=>$this->input->post('owner_contact_no'),
+                    'owner_whatsapp_no'=>$this->input->post('owner_whatsapp_no'),
+                    'rera_dor'=>$this->input->post('rera_dor'),
+                    'rera_valid_till'=>$this->input->post('rera_valid_till'),
+                    'pan_no'=>$this->input->post('pan_no'),
+                    'adhar_no'=>$this->input->post('adhar_no'),
+                    'gst_no'=>$this->input->post('gst_no'),
+                    'cin_no'=>$this->input->post('cin_no'),
+                    'tan_no'=>$this->input->post('tan_no'),
+                    'logo'=>$logo,
+                    'cin_image'=>$cin_image,
+                    'tan_image'=>$tan_image,
+                    'pan_image'=>$pan_image,
+                    'gst_image'=>$gst_image,
+                    'adhar_image'=>$adhar_image,
+                    'rera_image'=>$rera_image,
+                    'image'=>$image,
+                    'associate_complete'=>1
+                );
 
                 $record_array['updated_at'] = time();
-                $this->Action_model->update_data($record_array,'tbl_agents',"agent_id='".$agent->agent_id."'");
+                $this->Action_model->update_data($record_array,'tbl_users',"user_id='".$user->user_id."'");
 
-                $array = array('status'=>'true','msg'=>'Updated Successfully!!');
+                $array['data'] = array('status'=>'true','msg'=>'Associate registration form completed successfully.');
             }
             else {
-            	$array = array('status'=>'false','msg'=>'Not Found.');
+                $array['data'] = array('status'=>'error','msg'=>'Not Found.');
             }
         }
         else { 
-           $array = array('status'=>'false','msg'=>'Some error occurred, please try again.');
+           $array['data'] = array('status'=>'error','msg'=>'Some error occurred, please try again.');
         }
 
         echo json_encode($array);
-	}
+    }
 
-	public function update_password()
+    public function update_password()
     {
         $array = array();
 
@@ -730,7 +889,7 @@ class Api extends CI_Controller {
 
         if ($this->input->post()) {
 
-            $where = "user_hash='".$this->session->userdata('agent_hash')."'";
+            $where = "user_hash='".$this->input->post("user_hash")."'";
             $user_detail = $this->Action_model->select_single('tbl_users',$where);
 
             $record_array = array(
@@ -1010,7 +1169,7 @@ class Api extends CI_Controller {
                     }
 
                     $user_image = base_url('uploads/images/user/photo/user.png');
-                   	if ($chat->sender_id==$user_id) {
+                    if ($chat->sender_id==$user_id) {
                         if ($chat->s_image) {
                             $user_image = base_url('uploads/images/user/photo/'.$chat->s_image);
                         }
@@ -1072,8 +1231,8 @@ class Api extends CI_Controller {
     public function role_list(){
         if ($this->input->post()) {
 
-        	$where = "user_hash='".$this->session->userdata('agent_hash')."'";
-        	$user_detail = $this->Action_model->select_single('tbl_users',$where);
+            $where = "user_hash='".$this->session->userdata('agent_hash')."'";
+            $user_detail = $this->Action_model->select_single('tbl_users',$where);
 
             $postData = $this->input->post();
             $select = 'role_id,role_name,role_status';
@@ -1085,7 +1244,7 @@ class Api extends CI_Controller {
                 $searchQuery = " (role_name like '%".$searchValue."%' ) AND (is_agent_member='1') AND user_id='".$user_detail->user_id."'";
              }
              else {
-             	$searchQuery.="(is_agent_member='1') AND user_id='".$user_detail->user_id."'";
+                $searchQuery.="(is_agent_member='1') AND user_id='".$user_detail->user_id."'";
              }
             $data = $this->Action_model->ajaxDatatable($postData,$searchQuery,'tbl_roles',$where,$select);
 
@@ -1125,7 +1284,7 @@ class Api extends CI_Controller {
 
         if ($this->input->post()) {
 
-        	$where = "user_hash='".$this->session->userdata('agent_hash')."'";
+            $where = "user_hash='".$this->session->userdata('agent_hash')."'";
             $user_detail = $this->Action_model->select_single('tbl_users',$where);
 
             $uid = $user_detail->user_id;
@@ -1148,8 +1307,8 @@ class Api extends CI_Controller {
                     $array = array('status'=>'false','msg'=>'This Role Name is already exist.');
                 }
                 else {
-                	$this->Action_model->update_data($record_array,'tbl_roles',"role_id='".$id."'");
-                	$array = array('status'=>'added','msg'=>'Role Updated Successfully!!');
+                    $this->Action_model->update_data($record_array,'tbl_roles',"role_id='".$id."'");
+                    $array = array('status'=>'added','msg'=>'Role Updated Successfully!!');
                 }
             }
             else {
@@ -1162,9 +1321,9 @@ class Api extends CI_Controller {
                     $array = array('status'=>'false','msg'=>'This Role Name is already exist.');
                 }
                 else {
-	                $this->Action_model->insert_data($record_array,'tbl_roles');
-	                $array = array('status'=>'added','msg'=>'Role Added Successfully!!');
-	            }
+                    $this->Action_model->insert_data($record_array,'tbl_roles');
+                    $array = array('status'=>'added','msg'=>'Role Added Successfully!!');
+                }
             }
         }
         else { 
@@ -1203,30 +1362,53 @@ class Api extends CI_Controller {
 
     /* team start */
     public function team_list(){
-     	
-     	$where = "user_hash='".$this->session->userdata('agent_hash')."'";
-    	$user_detail = $this->Action_model->select_single('tbl_users',$where);
+        
+
+        $where = "user_hash='".$this->input->post('user_hash')."'";
+    
+        $user_detail = $this->Action_model->select_single('tbl_users',$where);
 
         $uid = $user_detail->user_id;
-        if ($user_detail->parent_id!=0) {
+        if ($user_detail->parent_id!=0)
+        {
             $uid = $user_detail->parent_id;
         }
 
-        $postData = $this->input->post();
         $select = 'tbl_users.user_id,date_register,mobile,user_title,first_name,last_name,user_status,role_name,username';
-        $where = '';
-
-        $searchValue = $postData['search']['value'];
+      
+      
+        $searchValue = $this->input->post("search");
         $searchQuery = "";
-         if($searchValue != ''){
+         if($searchValue != '')
+         {
             $searchQuery = " (first_name like '%".$searchValue."%' ) AND tbl_roles.is_agent_member='1' AND tbl_users.parent_id='".$uid."'";
          }
-         else {
+         else 
+         {
             $searchQuery ="tbl_roles.is_agent_member='1' AND tbl_users.parent_id='".$uid."'";
          }
-        $data = $this->Action_model->ajaxDatatable($postData,$searchQuery,'tbl_users',$where,$select,array('tbl_roles',"tbl_roles.role_id=tbl_users.role_id" ));
-
-        echo json_encode($data);
+         
+    
+          $this->db->select($select);
+                $this->db->from('tbl_users');
+                $this->db->join('tbl_roles', 'tbl_roles.role_id = tbl_users.role_id');
+                $this->db->where($searchQuery);
+                $query = $this->db->get();
+                $data = $query->result();
+       
+       $response = array();
+       
+       if(count($data)):
+           
+           $response =  array("status"=>true,"msg"=>"Data successfully found","team_list"=>$data);
+       
+       else:
+           
+           $response =  array("status"=>false,"msg"=>"Data not found","team_list"=>$data);
+       
+       endif;
+       
+        echo json_encode($response);
     }
 
     public function get_team()
@@ -1235,12 +1417,23 @@ class Api extends CI_Controller {
 
         if ($this->input->post()) {
             $id=$this->input->post('id');
-            $record = $this->Action_model->select_single('tbl_users',"user_id='".$id."'");
+             $record=  $this->db->select("tbl_users.user_id,user_status,tbl_users.role_id,username,user_title,first_name,last_name,full_name,email,email_verify,mobile,mobile_verify,whatsapp_no,date_register,report_to,parent_id,tbl_roles.role_name");
+                $this->db->from('tbl_users');
+                $this->db->join('tbl_roles', 'tbl_roles.role_id = tbl_users.role_id');
+                $this->db->where("tbl_users.user_id='".$id."'");
+                $query = $this->db->get();
+                $record = $query->row();
+    
             if ($record) {
 
-                $user_role_id=$record->role_id;
-                $account_id = getAccountId();
-
+                $user_role_id = $record->role_id;
+                $account_id = $record->user_id;
+                  if ($record->role_id!=2) 
+                  {
+                   $account_id = $record->parent_id;
+                  }
+            
+             
                 $where = "";
                 if ($user_role_id==5) {
                     $where = "user_id='".$account_id."'";
@@ -1252,14 +1445,19 @@ class Api extends CI_Controller {
                     $where = "((role_id='4' OR role_id='5') AND parent_id='".$account_id."') OR user_id='".$account_id."'";
                 }
                 
+                $user_list=array();
+                
                 if ($where) {
                     $user_data = $this->Action_model->detail_result('tbl_users',$where);
+                   
                     if ($user_data) {
                         foreach ($user_data as $item) {
-                            if ($item->parent_id==0) {
+                            if ($item->parent_id==0) 
+                            {
                                 $name = ($item->is_individual)?(ucwords($item->user_title.' '.$item->first_name.' '.$item->last_name)):$item->firm_name;
                             }
-                            else {
+                            else 
+                            {
                                 $name = ucwords($item->user_title.' '.$item->first_name.' '.$item->last_name);
                             }
                             $user_list[] = array('name'=>$name,'id'=>$item->user_id);
@@ -1267,14 +1465,14 @@ class Api extends CI_Controller {
                     }
                 }
 
-                $array = array('status'=>'true','msg'=>'','record'=>$record,'user_list'=>$user_list);
+                $array = array('status'=>true,'message'=>'Record Found','record'=>$record,'user_list'=>$user_list);
             }
             else {
-                $array = array('status'=>'false','msg'=>'Record Not Found.');
+                $array = array('status'=>false,'message'=>'Record Not Found.');
             }
         }
         else { 
-           $array = array('status'=>'false','msg'=>'Some error occurred, please try again.');
+           $array = array('status'=>false,'message'=>'Some error occurred, please try again.');
         }
 
         echo json_encode($array);
@@ -1286,12 +1484,15 @@ class Api extends CI_Controller {
         $array = array();
         $user_list = array();
 
-        if ($this->input->post()) {
+        if ($this->input->post()) 
+        {
             $user_role_id=$this->input->post('user_role_id');
-            $account_id = getAccountId();
-
+            $account_id = getAccountIdHash($this->input->post("user_hash"));
+            
+            
             $where = "";
-            if ($user_role_id==5) {
+            if ($user_role_id==5) 
+            {
                 $where = "user_id='".$account_id."'";
             }
             else if ($user_role_id==4) {
@@ -1332,7 +1533,7 @@ class Api extends CI_Controller {
 
         if ($this->input->post()) {
 
-        	$where = "user_hash='".$this->session->userdata('agent_hash')."'";
+            $where = "user_hash='".$this->input->post('user_hash')."'";
             $user_detail = $this->Action_model->select_single('tbl_users',$where);
 
             $uid = $user_detail->user_id;
@@ -1368,7 +1569,7 @@ class Api extends CI_Controller {
                 }
 
                 $this->Action_model->update_data($record_array,'tbl_users',"user_id='".$id."'");
-                $array = array('status'=>'added','msg'=>'Team Updated Successfully!!');
+                $array = array('status'=>true,'msg'=>'Team Updated Successfully!!');
             }
             else {
 
@@ -1379,20 +1580,20 @@ class Api extends CI_Controller {
                 $record_array['email_verify'] = 1;
                 $record_array['password'] = md5($this->input->post('user_password'));
                     
-            	if ($this->Action_model->select_single('tbl_users',"username='".$this->input->post('user_user_id')."'")) {
-            		$array = array('status'=>'false','msg'=>'This Username is already exist.');
-            	}
-            	else if ($this->Action_model->select_single('tbl_users',"email='".$this->input->post('user_email')."'")) {
-            		$array = array('status'=>'false','msg'=>'This email address is already exist.');
-            	}
+                if ($this->Action_model->select_single('tbl_users',"username='".$this->input->post('user_user_id')."'")) {
+                    $array = array('status'=>false,'msg'=>'This Username is already exist.');
+                }
+                else if ($this->Action_model->select_single('tbl_users',"email='".$this->input->post('user_email')."'")) {
+                    $array = array('status'=>false,'msg'=>'This email address is already exist.');
+                }
                 else {
-	                $this->Action_model->insert_data($record_array,'tbl_users');
-	                $array = array('status'=>'added','msg'=>'Team Added Successfully!!');
+                    $this->Action_model->insert_data($record_array,'tbl_users');
+                    $array = array('status'=>true,'msg'=>'Team Added Successfully!!');
                 }
             }
         }
         else { 
-           $array = array('status'=>'false','msg'=>'Some error occurred, please try again.');
+           $array = array('status'=>false,'msg'=>'Some error occurred, please try again.');
         }
 
         echo json_encode($array);
@@ -1410,14 +1611,14 @@ class Api extends CI_Controller {
 
             if ($record) {
                 $this->Action_model->delete_query('tbl_users',"user_id='".$id."'");
-                $array = array('status'=>'added','msg'=>'Team Deleted Successfully!!');
+                $array = array('status'=>true,'msg'=>'Team Deleted Successfully!!');
             }
             else {
-                $array = array('status'=>'added','msg'=>'Record Not Found!!');
+                $array = array('status'=>false,'msg'=>'Record Not Found!!');
             }
         }
         else { 
-           $array = array('status'=>'false','msg'=>'Some error occurred, please try again.');
+           $array = array('status'=>false,'msg'=>'Some error occurred, please try again.');
         }
 
         echo json_encode($array);
@@ -1724,7 +1925,7 @@ class Api extends CI_Controller {
         echo json_encode($data);
     }
 
-    public function get_lead()
+    public function get_leadddd()
     {
 
         if ($this->input->post()) {
@@ -1738,7 +1939,7 @@ class Api extends CI_Controller {
 
             $where = "lead_id='".$id."' AND account_id='".$account_id."'";
 
-            $this->db->select("*");
+            $this->db->select("tbl_users.username as added_by_name,tbl_leads.*,tbl_states.*,tbl_states.*,tbl_city.*,tbl_occupations.*,tbl_lead_types.*,tbl_lead_stages.*,tbl_lead_sources.*,tbl_designations.*");
             $this->db->from('tbl_leads');
             $this->db->join('tbl_states', 'tbl_states.state_id = tbl_leads.lead_state_id','left');
             $this->db->join('tbl_city', 'tbl_city.city_id = tbl_leads.lead_city_id','left');
@@ -1747,6 +1948,7 @@ class Api extends CI_Controller {
             $this->db->join('tbl_lead_stages', 'tbl_lead_stages.lead_stage_id = tbl_leads.lead_stage_id','left');
             $this->db->join('tbl_lead_sources', 'tbl_lead_sources.lead_source_id = tbl_leads.lead_source_id','left');
             $this->db->join('tbl_designations', 'tbl_designations.designation_id = tbl_leads.lead_designation','left');
+            $this->db->join('tbl_users','tbl_leads.added_by = tbl_users.user_id','left');
             $this->db->where($where);
             $query = $this->db->get();
             $record = $query->row();
@@ -1769,14 +1971,15 @@ class Api extends CI_Controller {
                 $user_list = $this->Action_model->detail_result('tbl_users',$where,'user_id,user_title,first_name,last_name,parent_id,is_individual,firm_name');
                
                 $lead_data=array();
-                foreach($user_list as $row){
+                foreach($user_list as $row)
+                {
                     $row->is_individual=(($row->is_individual!='')?$row->is_individual:"");
                     $row->firm_name=(($row->firm_name!='')?$row->firm_name:"");
                     $row->parent_id=(($row->parent_id!='')?$row->parent_id:"");
                     $lead_data[]=$row;
                 }
                 
-            $where = "country_id='1'";
+            $where = "country_id='1' AND state_status=1";
             $state_list = $this->Action_model->detail_result('tbl_states',$where);
             $where = "state_id='".$record->lead_state_id."'";
             $city_list = $this->Action_model->detail_result('tbl_city',$where);
@@ -1805,8 +2008,9 @@ class Api extends CI_Controller {
             $lead_source_list = (($lead_source_list)?$lead_source_list:array());
             $lead_stage_list = (($lead_stage_list)?$lead_stage_list:array());
                 
-                foreach($record as $k=>$v){
-	                $record->$k =  ($v || $v==0)?$v:'';
+                foreach($record as $k=>$v)
+                {
+                    $record->$k =  ($v || $v==0)?$v:'';
                 }
                 
             $array['data'] = array('status'=>'true','msg'=>'Lead Found','lead_data'=>$record,'records'=>$lead_data,'state_list'=>$state_list,'occupation_list'=>$occupation_list,'department_list'=>$department_list,'lead_source_list'=>$lead_source_list,'lead_stage_list'=>$lead_stage_list,'city_list'=>$city_list);
@@ -1824,12 +2028,217 @@ class Api extends CI_Controller {
         
     }
 
+    public function get_lead()
+    {
+        if ($this->input->post()) {
+            $account_id = getAccountIdHash($this->input->post('user_hash'));
+    
+            if (!$account_id) {
+                $array['data'] = array('status' => 'false', 'msg' => 'Some Error Occurred.');
+                echo json_encode($array);
+                exit;
+            }
+
+            $profile_base_url           =   base_url('public/other/profile/');
+    
+            $id = $this->input->post('lead_id');
+    
+            $where = "lead_id='" . $id . "' AND account_id='" . $account_id . "'";
+    
+            $this->db->select("tbl_users.username as added_by_name, tbl_leads.*, tbl_states.*, tbl_city.*, tbl_occupations.*, tbl_lead_types.*, tbl_lead_stages.*, tbl_lead_sources.*, tbl_designations.*");
+            $this->db->from('tbl_leads');
+            $this->db->join('tbl_states', 'tbl_states.state_id = tbl_leads.lead_state_id', 'left');
+            $this->db->join('tbl_city', 'tbl_city.city_id = tbl_leads.lead_city_id', 'left');
+            $this->db->join('tbl_occupations', 'tbl_occupations.occupation_id = tbl_leads.lead_occupation_id', 'left');
+            $this->db->join('tbl_lead_types', 'tbl_lead_types.lead_type_id = tbl_leads.lead_status', 'left');
+            $this->db->join('tbl_lead_stages', 'tbl_lead_stages.lead_stage_id = tbl_leads.lead_stage_id', 'left');
+            $this->db->join('tbl_lead_sources', 'tbl_lead_sources.lead_source_id = tbl_leads.lead_source_id', 'left');
+            $this->db->join('tbl_designations', 'tbl_designations.designation_id = tbl_leads.lead_designation', 'left');
+            $this->db->join('tbl_users', 'tbl_leads.added_by = tbl_users.user_id', 'left');
+            $this->db->where($where);
+            $query = $this->db->get();
+            $record = $query->row();
+    
+            if ($record) {
+                $record->full_profile_url = $record->profile ? $profile_base_url.$record->profile : base_url('public/front/user.png');
+                // Fetch previous lead ID
+                $this->db->select('lead_id');
+                $this->db->from('tbl_leads');
+                $this->db->where('account_id', $account_id);
+                $this->db->where('lead_id <', $id);
+                $this->db->order_by('lead_id', 'DESC');
+                $this->db->limit(1);
+                $previous_lead_query = $this->db->get();
+                $previous_lead = $previous_lead_query->row();
+    
+                // Fetch next lead ID
+                $this->db->select('lead_id');
+                $this->db->from('tbl_leads');
+                $this->db->where('account_id', $account_id);
+                $this->db->where('lead_id >', $id);
+                $this->db->order_by('lead_id', 'ASC');
+                $this->db->limit(1);
+                $next_lead_query = $this->db->get();
+                $next_lead = $next_lead_query->row();
+    
+                $next_lead_id = $next_lead ? $next_lead->lead_id : null;
+                $previous_lead_id = $previous_lead ? $previous_lead->lead_id : null;
+
+
+    
+                $where = "user_status='1' AND ((parent_id='" . $account_id . "') OR (user_id='" . $account_id . "' AND role_id='2'))";
+                $where_ids = "";
+                $user_ids = $this->get_level_user_ids($this->input->post('user_hash'));
+    
+                if (count($user_ids)) {
+                    $where_ids .= " AND (tbl_users.user_id='" . implode("' OR tbl_users.user_id='", $user_ids) . "')";
+                }
+
+                $where .= $where_ids;
+    
+                $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,user_title,first_name,last_name,parent_id,is_individual,firm_name');
+    
+                $lead_data = array();
+                foreach ($user_list as $row) {
+                    $row->is_individual = (($row->is_individual != '') ? $row->is_individual : "");
+                    $row->firm_name = (($row->firm_name != '') ? $row->firm_name : "");
+                    $row->parent_id = (($row->parent_id != '') ? $row->parent_id : "");
+                    $lead_data[] = $row;
+                }
+    
+                $where = "country_id='1' AND state_status=1";
+                $state_list = $this->Action_model->detail_result('tbl_states', $where);
+                $where = "state_id='" . $record->lead_state_id . "'";
+                $city_list = $this->Action_model->detail_result('tbl_city', $where);
+    
+                $where = "occupation_status='1'";
+                $occupation_list = $this->Action_model->detail_result('tbl_occupations', $where);
+    
+                $where = "department_status='1'";
+                $department_list = $this->Action_model->detail_result('tbl_departments', $where);
+    
+                $where = "lead_source_status='1'";
+                $lead_source_list = $this->Action_model->detail_result('tbl_lead_sources', $where);
+    
+                $where = "lead_stage_status='1'";
+                $lead_stage_list = $this->Action_model->detail_result('tbl_lead_stages', $where);
+    
+                $where = "lead_type_status='1'";
+                $lead_type_list = $this->Action_model->detail_result('tbl_lead_types', $where, 'lead_type_id,lead_type_name');
+                $data['lead_type_list'] = (($lead_type_list) ? $lead_type_list : array());
+    
+                $state_list = (($state_list) ? $state_list : array());
+                $city_list = (($city_list) ? $city_list : array());
+                $occupation_list = (($occupation_list) ? $occupation_list : array());
+                $department_list = (($department_list) ? $department_list : array());
+                $lead_source_list = (($lead_source_list) ? $lead_source_list : array());
+                $lead_stage_list = (($lead_stage_list) ? $lead_stage_list : array());
+    
+                foreach ($record as $k => $v) {
+                    $record->$k = ($v || $v == 0) ? $v : '';
+                }
+
+
+                $where = "designation_status='1'";
+                $designations_list = $this->Action_model->detail_result('tbl_designations', $where);
+    
+                $array['data'] = array(
+                    'status' => 'true',
+                    'msg' => 'Lead Found',
+                    'lead_data' => $record,
+                    'records' => $lead_data,
+                    'state_list' => $state_list,
+                    'occupation_list' => $occupation_list,
+                    'department_list' => $department_list,
+                    'designations_list' => $designations_list,
+                    'lead_source_list' => $lead_source_list,
+                    'lead_stage_list' => $lead_stage_list,
+                    'city_list' => $city_list,
+                    'next_lead_id' =>$previous_lead_id,
+                    'previous_lead_id' =>  $next_lead_id  
+                );
+            } else {
+
+                $where = "user_status='1' AND ((parent_id='" . $account_id . "') OR (user_id='" . $account_id . "' AND role_id='2'))";
+                $where_ids = "";
+                $user_ids = $this->get_level_user_ids($this->input->post('user_hash'));
+    
+                if (count($user_ids)) {
+                    $where_ids .= " AND (tbl_users.user_id='" . implode("' OR tbl_users.user_id='", $user_ids) . "')";
+                }
+                $where .= $where_ids;
+    
+                $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,user_title,first_name,last_name,parent_id,is_individual,firm_name');
+    
+                $lead_data = array();
+                foreach ($user_list as $row) {
+                    $row->is_individual = (($row->is_individual != '') ? $row->is_individual : "");
+                    $row->firm_name = (($row->firm_name != '') ? $row->firm_name : "");
+                    $row->parent_id = (($row->parent_id != '') ? $row->parent_id : "");
+                    $lead_data[] = $row;
+                }
+    
+                $where = "country_id='1' AND state_status=1";
+                $state_list = $this->Action_model->detail_result('tbl_states', $where);
+
+                $where = "occupation_status='1'";
+                $occupation_list = $this->Action_model->detail_result('tbl_occupations', $where);
+    
+                $where = "department_status='1'";
+                $department_list = $this->Action_model->detail_result('tbl_departments', $where);
+    
+                $where = "lead_source_status='1'";
+                $lead_source_list = $this->Action_model->detail_result('tbl_lead_sources', $where);
+    
+                $where = "lead_stage_status='1'";
+                $lead_stage_list = $this->Action_model->detail_result('tbl_lead_stages', $where);
+    
+                $where = "lead_type_status='1'";
+                $lead_type_list = $this->Action_model->detail_result('tbl_lead_types', $where, 'lead_type_id,lead_type_name');
+                $data['lead_type_list'] = (($lead_type_list) ? $lead_type_list : array());
+    
+                $state_list = (($state_list) ? $state_list : array());
+                $occupation_list = (($occupation_list) ? $occupation_list : array());
+                $department_list = (($department_list) ? $department_list : array());
+                $lead_source_list = (($lead_source_list) ? $lead_source_list : array());
+                $lead_stage_list = (($lead_stage_list) ? $lead_stage_list : array());
+    
+          
+
+                $where = "designation_status='1'";
+                $designations_list = $this->Action_model->detail_result('tbl_designations', $where);
+    
+                $array['data'] = array(
+                    'status'            => 'true',
+                    'msg'               => 'Lead Not Found',
+                    'lead_data'         => [],
+                    'records'           => $lead_data,
+                    'state_list'        => $state_list,
+                    'occupation_list'   => $occupation_list,
+                    'department_list'   => $department_list,
+                    'designations_list' => $designations_list,
+                    'lead_source_list'  => $lead_source_list,
+                    'lead_stage_list'   => $lead_stage_list,
+                    'lead_type_list'    =>  $lead_type_list,
+                    'city_list'         =>  '',
+                    'next_lead_id'      =>'',
+                    'previous_lead_id'  =>  '' 
+                );
+
+                // $array['data'] = array('status' => 'false', 'msg' => 'Record Not Found.');
+            }
+        } else {
+            $array['data'] = array('status' => 'false', 'msg' => 'Some error occurred, please try again.');
+        }
+    
+        echo json_encode($array);
+    }
+
     public function add_lead()
     {
-        $array = array();
-        
-        $account_id = 0;
-        $user_id = 0;
+        $array                          =   array();
+        $account_id                     =   0;
+        $user_id                        =   0;
 
         $where = "user_hash='".$this->input->post('user_hash')."'";
         $user_detail = $this->Action_model->select_single('tbl_users',$where);
@@ -1843,7 +2252,18 @@ class Api extends CI_Controller {
         
         if ($user_detail && $this->input->post()) {
             
-            $id=$this->input->post('id');
+
+            # Primary Mobile Country Code
+            $primary_country_code           =   $this->input->post('primary_mobile_number_country_data');
+            // $primary_country_code           =   $primary_country_code ? json_encode(['dialCode' => $primary_country_code ]) : null;
+            # End Primary Mobile Country Code
+
+            # Secondary Mobile Country Code
+            $secondary_country_code           =   $this->input->post('secondary_mobile_number_country_data');
+            // $secondary_country_code           =   $secondary_country_code ? json_encode(['dialCode' => $secondary_country_code ]) : null;
+            # End Secondary Mobile Country Code
+
+            $id=$this->input->post('lead_id');
             $record = $this->Action_model->select_single('tbl_leads',"lead_id='".$id."'");
 
             $record_array = array(
@@ -1874,13 +2294,16 @@ class Api extends CI_Controller {
                 'lead_marital_status'=>$this->input->post('lead_marital_status'),
                 'lead_designation'=>$this->input->post('lead_designation'),
                 'lead_company'=>$this->input->post('lead_company'),
-                'lead_annual_income'=>$this->input->post('lead_annual_income')
+                'lead_annual_income'=>$this->input->post('lead_annual_income'),
+                'primary_mobile_number_country_data' => $primary_country_code ,
+                'secondary_mobile_number_country_data' => $secondary_country_code ,
+                'platform'      =>  'app',
             );
 
             if ($record) {
 
                 if($this->Action_model->select_single('tbl_leads',"lead_mobile_no='".$this->input->post('lead_mobile_no')."' AND account_id='".$account_id."' AND lead_id!='".$id."'")){
-                    $array['data']= array('status'=>'false','msg'=>'Mobile No Already Exist.');
+                    $array = array('status'=>'false','msg'=>'Mobile No Already Exist.');
                     echo json_encode($array);
                     exit;
                 }
@@ -1890,19 +2313,19 @@ class Api extends CI_Controller {
                 $record_array['updated_at'] = time();
 
                 $this->Action_model->update_data($record_array,'tbl_leads',"lead_id='".$id."'");
-                $array['data'] = array('status'=>'true','msg'=>'Lead Updated Successfully!!');
+                $array = array('status'=>'true','msg'=>'Lead Updated Successfully!!');
 
             }
             else {
 
-                if($this->Action_model->select_single('tbl_leads',"lead_email='".$this->input->post('lead_email')."' AND account_id='".$account_id."'")){
-                    $array['data'] = array('status'=>'false','msg'=>'Email Already Exist.');
-                    echo json_encode($array);
-                    exit;
-                }
+                // if($this->Action_model->select_single('tbl_leads',"lead_email='".$this->input->post('lead_email')."' AND account_id='".$account_id."'")){
+                //     $array = array('status'=>'false','msg'=>'Email Already Exist.');
+                //     echo json_encode($array);
+                //     exit;
+                // }
 
                 if($this->Action_model->select_single('tbl_leads',"lead_mobile_no='".$this->input->post('lead_mobile_no')."' AND account_id='".$account_id."'")){
-                    $array['data'] = array('status'=>'false','msg'=>'Mobile No Already Exist.');
+                    $array = array('status'=>'false','msg'=>'Mobile No Already Exist.');
                     echo json_encode($array);
                     exit;
                 }
@@ -1925,12 +2348,12 @@ class Api extends CI_Controller {
                 );
                 $this->Action_model->insert_data($lead_history_array,'tbl_lead_history');
 
-                $array['data'] = array('status'=>'true','msg'=>'Lead Added Successfully!!','lead_id'=>$this->db->insert_id());
+                $array = array('status'=>'true','msg'=>'Lead Added Successfully!!','lead_id'=>$lead_id);
                 
             }
         }
         else { 
-           $array['data'] = array('status'=>'false','msg'=>'Some error occurred, please try again.');
+           $array = array('status'=>'false','msg'=>'Some error occurred, please try again.');
         }
 
         echo json_encode($array);
@@ -1964,8 +2387,9 @@ class Api extends CI_Controller {
         
     }
 
-    public function get_lead_list()
+    public function get_lead_list_old()
     {
+          
         $array = array();
         
         $account_id = getAccountIdHash($this->input->post('user_hash'));
@@ -1976,6 +2400,7 @@ class Api extends CI_Controller {
             $account_id = getAccountIdHash($this->input->post('user_hash'));
 
             if ($account_id) {
+
                 $filter_by = $this->input->post('filter_by');
                 $page=$this->input->post('page');
 
@@ -2006,6 +2431,7 @@ class Api extends CI_Controller {
 
                 $where_ids = "";
                 $user_ids = $this->get_level_user_ids($this->input->post('user_hash'));
+
                 if (count($user_ids)) {
                     $where_ids .= " AND (tbl_leads.user_id='".implode("' OR tbl_leads.user_id='", $user_ids)."')";
                 }
@@ -2070,6 +2496,7 @@ class Api extends CI_Controller {
                 $this->db->select("count(tbl_leads.lead_id) as total_records,CONCAT(lead_first_name, ' ', lead_last_name) AS 'lead_name'");
                 $this->db->from('tbl_leads');
                 $this->db->join('tbl_requirements', 'tbl_requirements.lead_id = tbl_leads.lead_id','left');
+                $this->db->join('tbl_states', 'tbl_states.state_id = tbl_leads.lead_state_id','left');
                 $this->db->where($where);
                 $query = $this->db->get();
                 $record_all = $query->row();
@@ -2102,15 +2529,24 @@ class Api extends CI_Controller {
                 }
 
                 $where.=" limit ".$start.",".$limit;
-                $this->db->select("tbl_leads.lead_id as id, CONCAT(lead_title,' ',lead_first_name, ' ', lead_last_name) AS 'name',lead_mobile_no as mobile, lead_email as email,CONCAT(lead_first_name, ' ', lead_last_name) AS 'lead_name'");
+                $this->db->select("tbl_leads.lead_id as id, CONCAT(lead_title,' ',lead_first_name, ' ', lead_last_name) AS 'name',lead_mobile_no as mobile, lead_email as email,CONCAT(lead_first_name, ' ', lead_last_name) AS 'lead_name' , tbl_states.state_name as state , tbl_city.city_name as city , lead_gender as gender , lead_marital_status as marital_status  ,tbl_occupations.occupation_name as occupation , lead_designation as designation , lead_company as name_of_the_company , lead_annual_income as annual_income , lead_date as date , lead_time as time , lead_status as status, tbl_lead_sources.lead_source_name as source_name, tbl_lead_stages.lead_stage_name as stage_name ");
                 $this->db->from('tbl_leads');
                 $this->db->join('tbl_requirements', 'tbl_requirements.lead_id = tbl_leads.lead_id','left');
+                $this->db->join('tbl_states', 'tbl_states.state_id = tbl_leads.lead_state_id','left');
+                $this->db->join('tbl_city', 'tbl_city.city_id       = tbl_leads.lead_city_id','left');
+                $this->db->join('tbl_occupations', 'tbl_occupations.occupation_id       = tbl_leads.lead_occupation_id','left');
+                $this->db->join('tbl_lead_sources', 'tbl_lead_sources.lead_source_id       = tbl_leads.lead_source_id','left');
+                $this->db->join('tbl_lead_stages', 'tbl_lead_stages.lead_stage_id       = tbl_leads.lead_stage_id','left');
                 $this->db->where($where);
                 $query = $this->db->get();
                 $records = $query->result();
+                
+                // echo json_encode($records); die;
+                
                 $leads_ty=array();
                 $df=array();
-                foreach($records as $leads){
+                foreach($records as $leads)
+                {
                     $leads->name=trim($leads->name);
                     $leads->profile_image= 'http://agentdairy.com/newadmin/public/front/user.png';
                     $leads_ty[]=$leads;
@@ -2133,6 +2569,300 @@ class Api extends CI_Controller {
         
     }
 
+
+    # new lead data 
+    public function get_lead_list(){
+
+           $array = array();
+
+           if ($this->input->post()) {
+
+              # agnet information 
+               $account_id      = getAccountId();
+               $agent           = $this->getAgent();
+               $user_id         = $agent->user_id ?? 0;
+               $where           = "user_hash='" . $this->input->post('user_hash') . "'";
+               $user_detail     = $this->Action_model->select_single('tbl_users', $where);
+               $account_id      = $user_detail->user_id;
+              # end agent infromation   
+            
+               if ($account_id) {
+                   # filters and shorting  
+                   $filter_by           = $this->input->post('filter_by');
+                   $page                = $this->input->post('page');
+                   $search_text         = $this->input->post('search_text');
+                   $search_date_from    = $this->input->post('search_date_from');
+                   $search_date_to      = $this->input->post('search_date_to');
+   
+                   # Lead Filter
+                    $lead_from          = $this->input->post('lead_from');
+                    $lead_to            = $this->input->post('lead_to');
+                   # End Lead Filter
+   
+                   # Followup Filter
+                    $followup_from      = $this->input->post('followup_from');
+                    $followup_to        = $this->input->post('followup_to');
+                   # End Followup Filter
+   
+                   $search_state_id     = $this->input->post('search_state_id');
+                   $search_city_id      = $this->input->post('search_city_id');
+                   $search_source_id    = $this->input->post('search_source_id');
+                   $search_stage_id     = $this->input->post('search_stage_id');
+                   $search_status       = $this->input->post('search_status');
+                   $search_location_id  = $this->input->post('search_location_id');
+                   $search_budget_min   = $this->input->post('search_budget_min');
+                   $search_budget_max   = $this->input->post('search_budget_max');
+                   $search_size_min     = $this->input->post('search_size_min');
+                   $search_size_max     = $this->input->post('search_size_max');
+                   $search_size_unit    = $this->input->post('search_size_unit');
+                   $search_agent_id     = $this->input->post('search_agent_id');
+
+                   # end  filters and shorting  
+
+                   # pagination 
+                    $limit       = 10;
+                    $total_pages = 0;
+                    $start       = 0;
+                    $next_page   = 0;
+                    $start       = ($page - 1) * $limit;
+                   # end pagination  
+
+
+                  # role filter  
+                   if ($user_detail->role_id < 3 || $user_detail->role_id == 5) {
+                       if ($user_detail->parent_id == 0) {
+                           $where = "tbl_leads.lead_status='1' AND is_customer ='0' AND tbl_leads.account_id='" . $account_id . "'";
+                       } else {
+                           $where = "tbl_leads.lead_status='1' AND is_customer ='0' AND tbl_leads.user_id='" . $account_id . "'";
+                       }
+                   } else {
+                       $where = "tbl_leads.user_id='" . $account_id . "' AND tbl_leads.lead_status='1' AND is_customer='0'";
+                   }
+                   
+                 
+                   # end 
+   
+                   $where_ids   = "";
+                //    $user_ids    = $this->get_level_user_ids();
+
+                  
+   
+                   if ($search_agent_id) {
+                       $where_ids .= " AND (tbl_followup.user_id='" . $search_agent_id . "')";
+                   }
+   
+                   $where          .= $where_ids;
+                   $where_ext       = "";
+
+                
+                # filter where condition
+
+                   if ($search_text) {
+                       $where_ext .= " AND (lead_mobile_no LIKE '%" . $search_text . "%' OR lead_email LIKE '%" . $search_text . "%' OR CONCAT(lead_title, ' ', lead_first_name, ' ', lead_last_name) LIKE '%" . $search_text . "%')";
+                   }
+   
+                   if ($lead_from && !$lead_to) {
+                       $where_ext .= " AND DATE(STR_TO_DATE(tbl_leads.lead_date, '%d-%m-%Y')) >= '$lead_from'";
+                   }
+   
+                   if ($lead_from && $lead_to) {
+                       $where_ext .= " AND DATE(STR_TO_DATE(tbl_leads.lead_date, '%d-%m-%Y')) BETWEEN '$lead_from' AND '$lead_to'";
+                   }
+   
+                   if ($followup_from && !$followup_to) {
+                       $where_ext .= " AND DATE(STR_TO_DATE(tbl_leads.followup_date, '%d-%m-%Y')) >= '$followup_from'";
+                   }
+   
+                   if ($followup_from && $followup_to) {
+   
+                       $where_ext .= " AND DATE(STR_TO_DATE(tbl_leads.followup_date, '%d-%m-%Y')) BETWEEN '$followup_from' AND '$followup_to'";
+                   }
+   
+                   if ($search_state_id) {
+                       $where_ext .= " AND lead_state_id='" . $search_state_id . "'";
+                   }
+   
+                   if ($search_city_id) {
+                       $where_ext .= " AND lead_city_id='" . $search_city_id . "'";
+                   }
+   
+                   if ($search_source_id) {
+                       $where_ext .= " AND tbl_leads.lead_source_id='" . $search_source_id . "'";
+                   }
+   
+                   if ($search_stage_id) {
+                       $where_ext .= " AND tbl_leads.lead_stage_id='" . $search_stage_id . "'";
+                   }
+                   if ($search_status) {
+                       $where_ext .= " AND tbl_leads.lead_status='" . $search_status . "'";
+                   }
+   
+                   if ($search_location_id) {
+                       $where_ext .= " AND tbl_leads.location_id='" . $search_location_id . "'";
+                   }
+   
+                   if ($search_budget_min && !$search_budget_max) {
+                       $where_ext .= " AND budget_min>='" . $search_budget_min . "'";
+                   }
+
+                   if ($search_budget_min && $search_budget_max) {
+                       $where_ext .= " AND (budget_min>='" . $search_budget_min . "' AND budget_max<='" . $search_budget_max . "')";
+                   }
+   
+                   if ($search_size_min && !$search_size_max) {
+                       $where_ext .= " AND size_min<='" . $search_size_min . "'";
+                   }
+                   if ($search_size_min && $search_size_max) {
+                       $where_ext .= " AND (size_min<='" . $search_size_min . "' AND size_max>='" . $search_size_max . "')";
+                   }
+   
+                   if ($search_size_unit) {
+                       $where_ext .= " AND size_unit='" . $search_size_unit . "'";
+                   }
+   
+                   $where .= $where_ext;
+
+                # end  filter where condition
+             
+                # Sorting
+                   switch ($filter_by):
+                       case 'due_followup':
+                           $where .= " and tbl_leads.added_to_followup = 1";
+                           $where .= " GROUP BY tbl_leads.lead_id";
+                           $where .= " ORDER BY DATE(STR_TO_DATE(`followup_date`, '%d-%m-%Y')) DESC , next_followup_time DESC";
+                           break;
+   
+                       case 'new_leads':
+                           $where .= " and tbl_leads.added_to_followup = 0";
+                           $where .= " GROUP BY tbl_leads.lead_id";
+                           $where .= " ORDER BY DATE(STR_TO_DATE(`lead_date`, '%d-%m-%Y')) DESC, lead_time DESC";
+                           break;
+                       default:
+                           $where .= " GROUP BY tbl_leads.lead_id";
+                           break;
+                   endswitch;
+                # End Sorting
+   
+                   $this->db->select("count(tbl_leads.lead_id) as total_records");
+                   $this->db->join('tbl_followup', 'tbl_followup.followup_id = tbl_leads.user_id', 'left');
+                   $this->db->where($where);
+                   $query       = $this->db->get('tbl_leads');
+                   $record_all  = $query->result();
+   
+                   $total_records = 0;
+                   if ($record_all) {
+                       $total_records = count($record_all); // $record_all->total_records;
+                       $total_pages   = ceil($total_records / $limit);
+                   }
+   
+   
+                   if ($user_detail->role_id < 3 || $user_detail->role_id == 5) {
+   
+                       if ($user_detail->parent_id == 0) {
+                           $where = "tbl_leads.lead_status='1' AND is_customer ='0' AND tbl_leads.account_id='" . $account_id . "'";
+                       } else {
+                           $where = "tbl_leads.lead_status='1' AND is_customer ='0' AND tbl_leads.user_id='" . $account_id . "'";
+                       }
+                   } 
+                   else {
+                       $where = "tbl_leads.user_id='" . $account_id . "' AND tbl_leads.lead_status='1' AND is_customer='0'";
+                   }
+
+                   $where_ids = "";
+                //    $user_ids    = $this->get_level_user_ids();
+   
+                   $where .= $where_ids;
+   
+                   $where .= $where_ext;
+   
+                   # Sorting
+                   switch ($filter_by):
+                       case 'due_followup':
+                           $where .= " and tbl_leads.added_to_followup = '1'";
+                           $where .= " GROUP BY tbl_leads.lead_id";
+                           $where .= " ORDER BY DATE(STR_TO_DATE(tbl_followup.next_followup_date, '%d-%m-%Y')) desc , tbl_followup.next_followup_time DESC";
+                           break;
+   
+                       case 'new_leads':
+                           $where .= " and tbl_leads.added_to_followup = 0";
+                           $where .= " GROUP BY tbl_leads.lead_id";
+                           $where .= " ORDER BY DATE(STR_TO_DATE(`lead_date`, '%d-%m-%Y')) DESC, lead_time DESC";
+                           break;
+                       default:
+                           $where .= " GROUP BY tbl_leads.lead_id";
+                           break;
+                   endswitch;
+                   # End Sorting
+   
+   
+                   $where .= " limit " . $start . "," . $limit;
+   
+                   $profile_base_url           =   base_url('public/other/profile/');
+   
+                   $this->db->select(
+                       "tbl_leads.*, 
+                                       CONCAT(user.user_title, user.first_name, user.last_name) as assgin_user_full_name, 
+                                       stages.lead_stage_name as stage_name, 
+                                       lead_source.lead_source_name,
+                                       concat(tbl_leads.profile) as full_profile_url,
+                                       tbl_followup.next_followup_date,
+                                       tbl_followup.next_followup_time"
+                   );
+             
+   
+                   $this->db->where($where);
+                   $this->db->join('tbl_lead_sources as lead_source', 'lead_source.lead_source_id = tbl_leads.lead_source_id', 'left');
+                   $this->db->join('tbl_lead_stages as stages', 'stages.lead_stage_id = tbl_leads.lead_stage_id', 'left');
+                   $this->db->join('tbl_users as user', 'user.user_id = tbl_leads.user_id', 'left');
+                   $this->db->join('(SELECT * FROM tbl_followup WHERE followup_id IN (SELECT MAX(followup_id) FROM tbl_followup GROUP BY lead_id)) as tbl_followup', 'tbl_followup.lead_id = tbl_leads.lead_id', 'left');
+   
+                   $query       = $this->db->get('tbl_leads');
+                   $record_data = $query->result();
+   
+                   $records = array();
+                   if ($record_data) {
+                       foreach ($record_data as $item) {
+   
+                           $lead_or_next_followp_date                  =   $item->next_followup_date ? date('d-m-Y', strtotime($item->next_followup_date)) : ($item->lead_date ? date('d-m-Y', strtotime($item->lead_date)) : 'N/A');
+                           $lead_or_next_followp_time                  =   $item->next_followup_time ? $item->next_followup_time : ($item->lead_time ? date('H:i', strtotime($item->lead_time)) : 'N/A');
+                    
+                           $records[] = array(
+                               'lead_id'                               => $item->lead_id,
+                               'lead_title'                            => $item->lead_title,
+                               'lead_first_name'                       => $item->lead_first_name,
+                               'lead_last_name'                        => $item->lead_last_name,
+                               'lead_mobile_no'                        => $item->lead_mobile_no,
+                               'lead_stage_name'                       => $item->lead_stage_name ?? '',
+                               'lead_source_name'                      => $item->lead_source_name ?? 'N/A',
+                               'lead_email'                            => $item->lead_email,
+                               'is_followup'                           => $item->added_to_followup,
+                               'assgin_user_full_name'                 => $item->assgin_user_full_name,
+                               'stage_name'                            => $item->stage_name ?? 'N/A',
+                               'full_profile_url'                      => $item->full_profile_url ? ($profile_base_url . $item->full_profile_url) : base_url('public/front/user.png'),
+                               'lead_or_next_followp_date'             => $lead_or_next_followp_date,
+                               'lead_or_next_followp_time'             => $lead_or_next_followp_time,
+                               'lead_or_next_followp_date_and_time'    => $lead_or_next_followp_date . ' ( ' . $lead_or_next_followp_time . ' )'
+                           );
+                       }
+                   }
+   
+                   if ($total_pages != $page) {
+                       $next_page = $page + 1;
+                   }
+   
+                   $array = array('status' => 'true', 'message' => 'Lead Found', 'records' => $records, 'total_records' => $total_records, 'total_pages' => $total_pages, 'next_page' => $next_page, 'records' => $records);
+               } else {
+                   $array = array('status' => 'false', 'message' => 'No Leads');
+               }
+           } else {
+               $array = array('status' => 'false', 'message' => 'Some error occurred, please try again.');
+           }
+   
+           echo json_encode($array);
+    }
+
+    # end new load data
+
     public function add_to_followup()
     {
         $array = array();
@@ -2140,7 +2870,20 @@ class Api extends CI_Controller {
         $account_id = 0;
         $user_id = 0;
 
-        $where = "user_hash='".$this->session->userdata('agent_hash')."'";
+             $data['json_data']  = json_encode($this->input->post());   
+
+            $this->db->insert('tbl_get_all_data_json' , $data);
+      
+         if(isset($_POST['user_hash'])):
+
+             $where = "user_hash='".$this->input->post('user_hash')."'";
+             
+        else:
+        
+           $where = "user_hash='".$this->session->userdata('agent_hash')."'";
+          
+        endif; 
+        
         $user_detail = $this->Action_model->select_single('tbl_users',$where);
         if ($user_detail) {
             $user_id=$user_detail->user_id;
@@ -2449,8 +3192,8 @@ class Api extends CI_Controller {
     }
     /* lead end */
 
-    /* followup start */
 
+    /* followup start */
     public function get_followup()
     {
 
@@ -2533,9 +3276,11 @@ class Api extends CI_Controller {
             $city_id=$this->input->post('city_id');
             $where = "city_id='".$city_id."' AND location_status='1'";
             $location_data = $this->Action_model->detail_result('tbl_locations',$where,'location_id,location_name');
+            
             if ($location_data) {
                 $location_list = $location_data;
             }
+
             $array = array('status'=>'true','msg'=>'Data Found','location_list'=>$location_list);
         }
         else { 
@@ -2576,17 +3321,30 @@ class Api extends CI_Controller {
         $account_id = 0;
         $user_id = 0;
 
-        $where = "user_hash='".$this->session->userdata('agent_hash')."'";
+        if(isset($_POST['user_hash'])):
+
+             $where = "user_hash='".$this->input->post('user_hash')."'";
+        else:
+        
+           $where = "user_hash='".$this->session->userdata('agent_hash')."'";
+          
+        endif; 
+        
         $user_detail = $this->Action_model->select_single('tbl_users',$where);
-        if ($user_detail) {
-            $user_id=$user_detail->user_id;
+        
+        if ($user_detail) 
+        {
+        
+          $user_id=$user_detail->user_id;
             $account_id = $user_detail->user_id;
-            if ($user_detail->role_id!=2) {
+            if ($user_detail->role_id!=2) 
+            {
                 $account_id = $user_detail->parent_id;
             }
         }
 
-        if ($user_detail && $this->input->post()) {
+        if ($user_detail && $this->input->post())
+        {
             
             $id=$this->input->post('id');
             $record = $this->Action_model->select_single('tbl_requirements',"requirement_id='".$id."' AND account_id='".$account_id."'");
@@ -2613,12 +3371,13 @@ class Api extends CI_Controller {
                 'requirement_status'=>$this->input->post('requirement_status')
             );
 
-            if ($record) {
+            if ($record) 
+            {
                 $record_array['updated_at'] = time();
 
                 $this->Action_model->update_data($record_array,'tbl_requirements',"requirement_id='".$id."'");
 
-                $array = array('status'=>'added','msg'=>'Requirement Updated Successfully!!');
+                $array = array('status'=>'true','msg'=>'Requirement Updated Successfully!!');
             }
             else {
                 $record_array['dor'] = date("d-m-Y");
@@ -2640,10 +3399,11 @@ class Api extends CI_Controller {
                 );
                 $this->Action_model->insert_data($lead_history_array,'tbl_lead_history');
 
-                $array = array('status'=>'added','msg'=>'Requirement Added Successfully!!');
+                $array = array('status'=>'true','msg'=>'Requirement Added Successfully!!');
             }
         }
-        else { 
+        else 
+        { 
            $array = array('status'=>'false','msg'=>'Some error occurred, please try again.');
         }
 
@@ -2704,7 +3464,15 @@ class Api extends CI_Controller {
         $account_id = 0;
         $user_id = 0;
 
-        $where = "user_hash='".$this->session->userdata('agent_hash')."'";
+       if(isset($_POST['user_hash'])):
+
+             $where = "user_hash='".$this->input->post('user_hash')."'";
+        else:
+        
+           $where = "user_hash='".$this->session->userdata('agent_hash')."'";
+          
+        endif; 
+        
         $user_detail = $this->Action_model->select_single('tbl_users',$where);
         if ($user_detail) {
             $user_id=$user_detail->user_id;
@@ -2734,7 +3502,7 @@ class Api extends CI_Controller {
                 $this->Action_model->update_data($record_array,'tbl_feedbacks',"feedback_id='".$feedback_id."'");
                 
 
-                $array = array('status'=>'added','msg'=>'Feedback Updated Successfully!!');
+                $array = array('status'=>'true','msg'=>'Feedback Updated Successfully!!');
             }
             else {
                 $like_property = 0;
@@ -2769,7 +3537,7 @@ class Api extends CI_Controller {
                     $id=$this->Action_model->insert_data($record_array,'tbl_feedbacks');
                 }
 
-                $array = array('status'=>'added','msg'=>'Feedback Added Successfully!!');
+                $array = array('status'=>'true','msg'=>'Feedback Added Successfully!!');
             }
             
         }
@@ -2814,7 +3582,15 @@ class Api extends CI_Controller {
         $account_id = 0;
         $user_id = 0;
 
-        $where = "user_hash='".$this->session->userdata('agent_hash')."'";
+   if(isset($_POST['user_hash'])):
+
+             $where = "user_hash='".$this->input->post('user_hash')."'";
+        else:
+        
+           $where = "user_hash='".$this->session->userdata('agent_hash')."'";
+          
+        endif; 
+        // $where = "user_hash='".$this->session->userdata('agent_hash')."'";
         $user_detail = $this->Action_model->select_single('tbl_users',$where);
         if ($user_detail) {
             $user_id=$user_detail->user_id;
@@ -3165,7 +3941,7 @@ class Api extends CI_Controller {
             $lead_detail = $this->Action_model->select_single('tbl_leads',"lead_id='".$id."' AND account_id='".$account_id."'");
             if($lead_detail) {
 
-                $where = "country_id='1'";
+                $where = "country_id='1' AND state_status=1";
                 $state_list = $this->Action_model->detail_result('tbl_states',$where);
 
                 $city_list = array();
@@ -3221,20 +3997,12 @@ class Api extends CI_Controller {
     {
         $array = array();
 
-        $account_id = 0;
+        $account_id =getAccountIdHash($this->input->post('user_hash'));
         $user_id = 0;
 
-        $where = "user_hash='".$this->session->userdata('agent_hash')."'";
-        $user_detail = $this->Action_model->select_single('tbl_users',$where);
-        if ($user_detail) {
-            $user_id=$user_detail->user_id;
-            $account_id = $user_detail->user_id;
-            if ($user_detail->role_id!=2) {
-                $account_id = $user_detail->parent_id;
-            }
-        }
-
-        if ($user_detail && $this->input->post()) {
+      
+        if ($user_detail && $this->input->post()) 
+        {
             $id=$this->input->post('id');
             $step=$this->input->post('step');
             $record = $this->Action_model->select_single('tbl_property',"property_id='".$id."' AND account_id='".$account_id."'");
@@ -3245,7 +4013,8 @@ class Api extends CI_Controller {
             $record_array = array();
             $property_detail_array = array();
 
-            if($step==1) {
+            if($step==1)
+            {
                 $record_array = array(
                     'listing_type'=>$this->input->post('listing_type'),
                     'latitude'=>$this->input->post('latitude'),
@@ -3258,9 +4027,11 @@ class Api extends CI_Controller {
                     'address'=>$this->input->post('address')
                 );
             }
-            else if($step==2) {
+            else if($step==2)
+            {
                 $ideal_business_id = "";
-                if ($this->input->post('ideal_business_id')) {
+                if ($this->input->post('ideal_business_id')) 
+                {
                     $ideal_business_id = implode(",", $this->input->post('ideal_business_id'));
                 }
 
@@ -3312,7 +4083,8 @@ class Api extends CI_Controller {
                     'main_road_shop'=>$this->input->post('main_road_shop'),
                 );
 
-                $property_detail_array = array(
+                $property_detail_array = array
+                (
                     'road_wirth'=>$this->input->post('road_wirth'),
                     'road_wirth_unit'=>$this->input->post('road_wirth_unit'),
                     'park_facing'=>$this->input->post('park_facing'),
@@ -3320,7 +4092,8 @@ class Api extends CI_Controller {
                     'sociaty_name'=>$this->input->post('sociaty_name')
                 );
 
-                if ($furnishing) {
+                if ($furnishing) 
+                {
                     foreach ($furnishing as $key => $value) {
 
                         $f_where = "property_id='".$id."' AND furnishing_id='".$key."'";
@@ -3343,7 +4116,8 @@ class Api extends CI_Controller {
                     }
                 }
             }
-            else if($step==3) {
+            else if($step==3) 
+            {
                 $record_array = array(
                     'avaliability_from'=>$this->input->post('avaliability_from'),
                     'immediately'=>$this->input->post('immediately'),
@@ -3579,15 +4353,16 @@ class Api extends CI_Controller {
                         $this->Action_model->insert_data($property_detail_array,'tbl_property_detail');
                     }
 
-                    $array = array('status'=>'true','msg'=>'Property Added Successfully.','property_id'=>$property_id);
+                    $array = array('status'=>true,'msg'=>'Property Added Successfully.','property_id'=>$property_id);
                 }
             }
             else {
-                $array = array('status'=>'false','msg'=>'Some error occurred, please try again.');
+                $array = array('status'=>false,'msg'=>'Some error occurred, please try again.');
             }
         }
-        else { 
-           $array = array('status'=>'false','msg'=>'Some error occurred, please try again.');
+        else 
+        { 
+           $array = array('status'=>false,'msg'=>'Some error occurred, please try again.');
         }
 
         echo json_encode($array);
@@ -3597,30 +4372,53 @@ class Api extends CI_Controller {
     /* property start */
     public function property_list(){
 
-        $account_id = getAccountId();
+        $account_id =  getAccountIdHash($this->input->post("user_hash"));
     
-        $postData = $this->input->post();
         $select = 'property_id,owner_title,property_status,post_date,tbl_listing_types.title as listing_type_name,product_type_name,unit_type_name';
-        $where = '';
-
-        $searchValue = $postData['search']['value'];
+   
+        $searchValue = $this->input->post('search');
         $searchQuery = "";
-        if($searchValue != ''){
+        if($searchValue != '')
+        {
+            
             $searchQuery = " (owner_title like '%".$searchValue."%' ) AND account_id='".$account_id."'";
+            
         }
-        else {
+        else
+        {
+            
             $searchQuery = "account_id='".$account_id."'";
+            
         }
+        
 
-        $data = $this->Action_model->ajaxDatatable($postData,$searchQuery,'tbl_property',$where,$select,
-            array(
-            'tbl_listing_types',"tbl_listing_types.listing_type_id=tbl_property.listing_type", 
-            'tbl_product_types',"tbl_product_types.product_type_id=tbl_property.product_type_id",
-            'tbl_unit_types',"tbl_unit_types.unit_type_id=tbl_property.unit_type_id"
-            )
-        );
+         $this->db->select($select);
+                $this->db->from('tbl_property');
+                $this->db->join('tbl_listing_types', 'tbl_listing_types.listing_type_id=tbl_property.listing_type','left');
+                $this->db->join('tbl_product_types', "tbl_product_types.product_type_id=tbl_property.product_type_id",'left');
+                $this->db->join('tbl_unit_types', "tbl_unit_types.unit_type_id=tbl_property.unit_type_id",'left');
+             
+                $this->db->where($searchQuery);
+                $query = $this->db->get();
+                $record_all = $query->result();
 
-        echo json_encode($data);
+    
+    $response = array();
+   
+    if($record_all)
+       {
+         
+         $response = array("status"=>true,"msg"=>"Data Found","properties"=>$record_all);
+           
+       }else 
+       {
+             
+             $response = array("status"=>false,"msg"=>"Data not Found","properties"=> $record_all);
+             
+       }
+     
+    
+        echo json_encode($response);
     }
 
     
@@ -3628,7 +4426,7 @@ class Api extends CI_Controller {
     {
         $array = array();
 
-        $account_id = getAccountId();
+        $account_id = getAccountIdHash($this->input->post("user_hash"));
 
         if ($account_id && $this->input->post()) {
             
@@ -3637,20 +4435,23 @@ class Api extends CI_Controller {
 
             if ($record) {
                 $this->Action_model->delete_query('tbl_property',"property_id='".$id."'");
-                $array = array('status'=>'added','msg'=>'Property Deleted Successfully!!');
+                
+                $array = array('status'=>true,'msg'=>'Property Deleted Successfully!!');
             }
             else {
-                $array = array('status'=>'added','msg'=>'Record Not Found!!');
+                $array = array('status'=>false,'msg'=>'Record Not Found!!');
             }
         }
         else { 
-           $array = array('status'=>'false','msg'=>'Some error occurred, please try again.');
+           $array = array('status'=>false,'msg'=>'Some error occurred, please try again.');
         }
 
         echo json_encode($array);
         
     }
     /* property end */
+    
+    
 
     /* manage inventory */
     public function get_project_inventory() {
@@ -5451,35 +6252,202 @@ class Api extends CI_Controller {
     /* projects */
     public function project_list(){
      
-        $account_id = 0;
+        
+        $account_id = getAccountIdHash($this->input->post("user_hash"));
         $user_id = 0;
 
-        $where = "user_hash='".$this->session->userdata('agent_hash')."'";
-        $user_detail = $this->Action_model->select_single('tbl_users',$where);
-        if ($user_detail) {
-            $user_id=$user_detail->user_id;
-            $account_id = $user_detail->user_id;
-            if ($user_detail->role_id!=2) {
-                $account_id = $user_detail->parent_id;
-            }
-        }
-
-        $postData = $this->input->post();
         $select = 'product_id,project_name,tbl_products.date_register,city_name,location_name,tbl_builders.firm_name as firm_name,tbl_users.is_individual,tbl_users.user_title as a_user_title,tbl_users.firm_name as a_firm_name,tbl_users.first_name as a_first_name,tbl_users.last_name as a_last_name,share_account_id';
         $where = '';
 
-        $searchValue = $postData['search']['value'];
+        $searchValue = $this->input->post('search');
         $searchQuery = "";
-        if($searchValue != ''){
+        if($searchValue != '')
+        {
             $searchQuery = " (project_name like '%".$searchValue."%' ) AND (agent_id='".$account_id."' OR tbl_project_share.share_account_id='".$account_id."')";
         }
         else {
             $searchQuery = "(tbl_products.agent_id='".$account_id."' OR share_account_id='".$account_id."')";
         }
-        $data = $this->Action_model->ajaxDatatableLeft($postData,$searchQuery,'tbl_products',$where,$select,array('tbl_builders','tbl_builders.builder_id=tbl_products.builder_id','tbl_city','tbl_city.city_id=tbl_products.city_id','tbl_locations','tbl_locations.location_id=tbl_products.location','tbl_project_share',"tbl_project_share.project_id=tbl_products.product_id  AND tbl_project_share.share_account_id='".$account_id."'",'tbl_users','tbl_users.user_id=tbl_project_share.account_id' ));
+        
+        
+                $this->db->select($select);
+                $this->db->from('tbl_products');
+                $this->db->join('tbl_builders', 'tbl_builders.builder_id=tbl_products.builder_id','left');
+                $this->db->join('tbl_city', "tbl_city.city_id=tbl_products.city_id",'left');
+                $this->db->join('tbl_locations', "tbl_locations.location_id=tbl_products.location",'left');
+                $this->db->join('tbl_project_share', "tbl_project_share.project_id=tbl_products.product_id  AND tbl_project_share.share_account_id='".$account_id."'",'left');
+                $this->db->join('tbl_users', "tbl_project_share.project_id=tbl_products.product_id  AND tbl_project_share.share_account_id='".$account_id."'",'left');
+                $this->db->where($searchQuery);
+                $query = $this->db->get();
+                $record_all = $query->result();
 
-        echo json_encode($data);
+       $response = array();
+       
+       if($record_all)
+       {
+         
+         $response = array("status"=>true,"msg"=>"Data Found","projects"=>$record_all);
+           
+       }else 
+       {
+             
+             $response = array("status"=>false,"msg"=>"Data not Found");
+             
+       }
+     
+        echo json_encode($response);
     }
+    
+    
+    public function share_project()
+    {
+        $array = array();
+
+        if ($this->input->post()) 
+        {
+            $account_id = getAccountIdHash($this->input->post("user_hash"));
+            $project_id=$this->input->post('project_id');
+            $share_account_id=$this->input->post('account_id');
+
+            $record_user = $this->Action_model->select_single('tbl_users',"user_id='".$account_id."' AND role_id='2' AND email='".$share_account_id."'");
+            if ($record_user) 
+            {
+                $array = array('status'=>'false','msg'=>'Enter Valid Account Id.');
+            }
+            else {
+
+
+                $record_account = $this->Action_model->select_single('tbl_users',"role_id='2' AND email='".$share_account_id."'");
+                
+                if ($record_account) {
+                    $record_project = $this->Action_model->select_single('tbl_products',"agent_id='".$account_id."' AND product_id='".$project_id."'");
+                
+                    if ($record_project) {
+
+                        $record_project = $this->Action_model->select_single('tbl_project_share',"account_id='".$account_id."' AND share_account_id='".$record_account->user_id."' AND project_id='".$project_id."'");
+                
+                        if ($record_project) {
+                            $array = array('status'=>'false','msg'=>'Project Already Shared to '.$share_account_id);
+                        }
+                        else {
+                            $record_array = array(
+                                'account_id'=>$account_id,
+                                'share_account_id'=>$record_account->user_id,
+                                'project_id'=>$project_id,
+                                'created_at'=>time()
+                            );
+                            $this->Action_model->insert_data($record_array,'tbl_project_share');
+
+                            $array = array('status'=>'true','msg'=>'Project Shared Successfully.');
+                        }
+                    }
+                    else {
+                        $array = array('status'=>'false','msg'=>'Project Not Found.');
+                    }
+                }
+                else {
+                    $array = array('status'=>'false','msg'=>'Account Id Not Found.');
+                }
+            }
+        }
+        else { 
+           $array = array('status'=>'false','msg'=>'Some error occurred, please try again.');
+        }
+
+        echo json_encode($array);
+        
+    }
+    
+
+    public function share_project_user_list(){
+     
+        $account_id = getAccountIdHash($this->input->post("user_hash"));
+        $search_by = $this->input->post('search_by');
+        $project_id = $this->input->post('project_id');
+        $select = 'project_share_id,user_id,is_individual,date_register,mobile,user_title,first_name,last_name,email,user_status,rera_no,firm_name,city_name,unique_code';
+        $searchValue = $this->input->post('search');
+        $searchQuery = "";
+         if($searchValue != ''){
+            $searchQuery = " (first_name like '%".$searchValue."%' OR last_name like '%".$searchValue."%' OR mobile like '%".$searchValue."%' OR email like '%".$searchValue."%') ";
+         }
+
+         if ($search_by)
+         {
+            if ($searchQuery) 
+            {
+                $searchQuery .= " AND ";
+            }
+             $searchQuery .=" (first_name like '%".$search_by."%' OR mobile like '%".$search_by."%' OR email like '%".$search_by."%')";
+         }
+         if ($searchQuery) 
+         {
+                $searchQuery .= " AND role_id='2' AND account_id='".$account_id."' AND project_id='".$project_id."'";
+         }
+         else 
+         {
+            $searchQuery .= "role_id='2' AND account_id='".$account_id."' AND project_id='".$project_id."'";
+         }
+
+                $this->db->select($select);
+                $this->db->from('tbl_project_share');
+                $this->db->join('tbl_users', 'tbl_users.user_id=tbl_project_share.share_account_id','left');
+                $this->db->join('tbl_city', "tbl_city.city_id=tbl_users.city_id",'left');
+                $this->db->where($searchQuery);
+                $query = $this->db->get();
+                $records = $query->result();
+
+     $response = array();
+
+      if($records)
+       {
+         
+             $response = array("status"=>true,"msg"=>"Data Found","records"=> $records);
+           
+       }else 
+       {
+             
+             $response = array("status"=>false,"msg"=>"Data not Found","records"=>$records);
+             
+       }
+     
+
+        echo json_encode($response);
+    }
+    
+    
+    
+    public function delete_share_project()
+    {
+        $array = array();
+
+        if ($this->input->post()) {
+            
+            $id=$this->input->post('id');
+            $record = $this->Action_model->select_single('tbl_project_share',"project_share_id='".$id."'");
+
+            if ($record) 
+            {
+                $this->Action_model->delete_query('tbl_project_share',"project_share_id='".$id."'");
+                
+                $array = array('status'=>true,'msg'=>'Share Project Removed Successfully!!');
+                
+            }
+            else {
+                $array = array('status'=>'false','msg'=>'Record Not Found!!');
+            }
+        }
+        else
+        { 
+            
+           $array = array('status'=>'false','msg'=>'Some error occurred, please try again.');
+           
+        }
+
+        echo json_encode($array);
+        
+    }
+    
+    
     /* projects end */
 
     /* customer start */
@@ -5968,6 +6936,7 @@ class Api extends CI_Controller {
 
     /* customer end */
 
+
     public function get_customer_by_mobile()
     {
 
@@ -6433,10 +7402,11 @@ class Api extends CI_Controller {
                     }
                 }
 
-                if ($total_pages!=$page) {
+                if ($total_pages!=$page)
+                {
                     $next_page = $page+1;
                 }
-                $array['data'] = array('status'=>'true','msg'=>'Lead Found','records'=>$records,'total_records'=>$total_records,'total_pages'=>$total_pages,'next_page'=>$next_page,'records'=>$records);
+                $array['data'] = array('status'=>'true','msg'=>'Lead Found','records'=>$records,'total_records'=>$total_records,'total_pages'=>$total_pages,'next_page'=>$next_page);
             }
             else {
                 $array['data'] = array('status'=>'false','msg'=>'No Leads');
@@ -6472,7 +7442,7 @@ class Api extends CI_Controller {
             $this->db->join('tbl_builders', 'tbl_builders.builder_id = p.builder_id','left');
             $this->db->join('tbl_units as punit', 'punit.unit_id = pud.plot_unit','left');
             $this->db->join('tbl_units as sa_unit', 'sa_unit.unit_id = pud.unit','left');
-                $this->db->join('tbl_project_share', "tbl_project_share.project_id = p.product_id AND share_account_id='".$account_id."'",'left');
+            $this->db->join('tbl_project_share', "tbl_project_share.project_id = p.product_id AND share_account_id='".$account_id."'",'left');
             $this->db->where($where);
             $query = $this->db->get();
             $record = $query->row();
@@ -6634,55 +7604,58 @@ class Api extends CI_Controller {
                 }
 
                 $budget = count($amount_array);
-                if (count($amount_array)) {
+                if (count($amount_array))
+                {
                     $b_min = $this->getMin($amount_array);
                     $b_max = $this->getMax($amount_array);
 
-                    if ($b_min==$b_max) {
+                    if ($b_min==$b_max)
+                    {
                         $budget = "₹".$b_min;
                     }
-                    else {
+                    else
+                    {
                         $budget = "₹".$b_min." to ₹".$b_max."";
                     }
                 }
                 $data['size'] = $size;
                 $data['budget'] = $budget;
 
-                $where = "product_id='".$record->product_id."'";
-                $this->db->select('*');
-                $this->db->from('tbl_product_additional_details');
-                $this->db->join('tbl_price_components', 'tbl_price_components.price_component_id = tbl_product_additional_details.price_comp_id','left');
-                $this->db->join('tbl_units', 'tbl_units.unit_id = tbl_product_additional_details.unit','left');
-                $this->db->where($where);
-                $query = $this->db->get();
-                $additional_details = $query->result();
-                $data['additional_details'] = $additional_details;
+                // $where = "product_id='".$record->product_id."'";
+                // $this->db->select('*');
+                // $this->db->from('tbl_product_additional_details');
+                // $this->db->join('tbl_price_components', 'tbl_price_components.price_component_id = tbl_product_additional_details.price_comp_id','left');
+                // $this->db->join('tbl_units', 'tbl_units.unit_id = tbl_product_additional_details.unit','left');
+                // $this->db->where($where);
+                // $query = $this->db->get();
+                // $additional_details = $query->result();
+                // $data['additional_details'] = $additional_details;
 
-                $where = "product_id='".$record->product_id."'";
-                $this->db->select('*');
-                $this->db->from('tbl_product_plc_details');
-                $this->db->join('tbl_price_components', 'tbl_price_components.price_component_id = tbl_product_plc_details.price_comp_id','left');
-                $this->db->join('tbl_units', 'tbl_units.unit_id = tbl_product_plc_details.unit','left');
-                $this->db->where($where);
-                $query = $this->db->get();
-                $plc_details = $query->result();
-                $data['plc_details'] = $plc_details;
+                // $where = "product_id='".$record->product_id."'";
+                // $this->db->select('*');
+                // $this->db->from('tbl_product_plc_details');
+                // $this->db->join('tbl_price_components', 'tbl_price_components.price_component_id = tbl_product_plc_details.price_comp_id','left');
+                // $this->db->join('tbl_units', 'tbl_units.unit_id = tbl_product_plc_details.unit','left');
+                // $this->db->where($where);
+                // $query = $this->db->get();
+                // $plc_details = $query->result();
+                // $data['plc_details'] = $plc_details;
 
                 $data['record'] = $record;
-                $array['data'] = array('status'=>'true','msg'=>'City Found','city_list'=>$data);
+                $array = array('status'=>'true','msg'=>'Product Found','product'=>$data);
             }
             else {
-                $array['data'] = array('status'=>'false','msg'=>'Some error occurred, please try again.');
+                $array = array('status'=>'false','msg'=>'Some error occurred, please try again.');
             }
         }
         else { 
-           $array['data'] = array('status'=>'false','msg'=>'Some error occurred, please try again1.');
+           $array = array('status'=>'false','msg'=>'Some error occurred, please try again1.');
         }
         echo json_encode($array);
         
     }
     
-        public function get_product_amenities_list()
+    public function get_product_amenities_list()
     {
         $array = array();
         $items = array();
@@ -6694,7 +7667,8 @@ class Api extends CI_Controller {
             $where = "product_id='".$id."'";
             $product_data = $this->Action_model->select_single('tbl_products',$where);
 
-            if ($product_data && $product_data->amenitie) {
+            if ($product_data && $product_data->amenitie) 
+            {
                 $amenitie_ids = $product_data->amenitie;
 
                 $where = "amenitie_id IN (".$amenitie_ids.")";
@@ -6715,10 +7689,10 @@ class Api extends CI_Controller {
                 }
             }
 
-            $array['data'] = array('status'=>'true','msg'=>'Data Found','items'=>$items);
+            $array = array('status'=>'true','msg'=>'Data Found','items'=>$items);
         }
         else { 
-           $array['data'] = array('status'=>'false','msg'=>'Some error occurred, please try again.');
+           $array = array('status'=>'false','msg'=>'Some error occurred, please try again.');
         }
 
         echo json_encode($array);
@@ -6737,9 +7711,8 @@ class Api extends CI_Controller {
             $where = "product_id='".$id."'";
             $product_data = $this->Action_model->select_single('tbl_products',$where);
 
-            if ($product_data && $product_data->amenitie) {
-                $amenitie_ids = $product_data->amenitie;
-
+            if ($product_data ) {
+        
                 $where = "product_id='".$id."'";
 
                 $this->db->select('*');
@@ -6769,7 +7742,7 @@ class Api extends CI_Controller {
         
     }
     
-        public function get_product_inventory_list()
+    public function get_product_inventory_list()
     {
         $array = array();
         $items = array();
@@ -6778,15 +7751,13 @@ class Api extends CI_Controller {
         if ($account_id && $this->input->post()) {
 
             $id=$this->input->post('product_id');
-            $product_unit_detail_id=$this->input->post('product_unit_detail_id');
-
+          
             $where = "product_id='".$id."'";
             $product_data = $this->Action_model->select_single('tbl_products',$where);
 
-            if ($product_data && $product_data->amenitie) {
-                $amenitie_ids = $product_data->amenitie;
-
-                $where = "tbl_inventory.product_id='".$id."' AND tbl_inventory.unit_code='".$product_unit_detail_id."'";
+            if ($product_data ) {
+              
+                $where = "tbl_inventory.product_id='".$id."' AND tbl_inventory.unit_code='".$id."'";
 
                 $this->db->select('*');
                 $this->db->from('tbl_inventory');
@@ -6820,6 +7791,1074 @@ class Api extends CI_Controller {
         echo json_encode($array);
         
     }
+    
+    
+    
+    public function get_product_inventory_quatation()
+    {
+          $array = array();
+          $additional_cost = array(); 
+          $plc_cost = array(); 
+          $parking = array();
+          
+        if ($this->input->post()) {
+
+            $account_id =getAccountIdHash($this->input->post('user_hash'));
+
+            $inventory_id=$this->input->post('inventory_id');
+            $where = "inventory_id='".$inventory_id."'";
+
+            $this->db->select('*,tbl_users.is_individual as a_is_individual,tbl_users.user_title as a_user_title,tbl_users.first_name as a_first_name,tbl_users.last_name as a_last_name,tbl_users.firm_name as a_firm_name,tbl_users.mobile as a_mobile,tbl_builders.firm_name as b_firm_name');
+            $this->db->from('tbl_inventory');
+            $this->db->join('tbl_floors', 'tbl_floors.floor_id = tbl_inventory.floor_id','left');
+            $this->db->join('tbl_product_block_details', 'tbl_product_block_details.block_id = tbl_inventory.block_id','left');
+            $this->db->join('tbl_product_unit_details', 'tbl_product_unit_details.product_unit_detail_id = tbl_inventory.unit_code','left');
+            $this->db->join('tbl_accomodations', 'tbl_accomodations.accomodation_id = tbl_product_unit_details.accomodation','left');
+            $this->db->join('tbl_products', 'tbl_products.product_id = tbl_product_unit_details.product_id','left');
+            $this->db->join('tbl_builders', 'tbl_builders.builder_id = tbl_products.builder_id','left');
+            $this->db->join('tbl_locations', 'tbl_locations.location_id = tbl_products.location','left');
+            $this->db->join('tbl_users', 'tbl_users.user_id = tbl_products.agent_id','left');
+            $this->db->where($where);
+            $query = $this->db->get();
+        
+            $inventory_data = $query->row();
+            
+            
+            if ($inventory_data) 
+            {
+                
+                
+                      $asking_price = 0;
+                    $where="pud.product_unit_detail_id='".$inventory_data->unit_code."'";
+                    $this->db->select("pud.product_unit_detail_id,tbl_product_types.product_type_name,tbl_unit_types.unit_type_name,tbl_city.city_name,tbl_states.state_name,tbl_locations.location_name,tbl_accomodations.accomodation_name,pud.project_type,pud.property_type,pud.sa,pud.plot_size,pud.plot_unit,punit.unit_name as plot_unit_name,sa_unit.unit_name as sa_unit_name,pud.basic_cost,p.b_cost_unit,p.parking_open,p.parking_stilt,p.parking_basment,p.parking_gst,p.o_price,p.s_price,p.b_price,p.b_cost_gst");
+                    $this->db->from('tbl_product_unit_details as pud');
+                    $this->db->join('tbl_products as p', 'p.product_id = pud.product_id','left');
+                    $this->db->join('tbl_product_types','tbl_product_types.product_type_id=p.project_type','left');
+                    $this->db->join('tbl_unit_types','tbl_unit_types.unit_type_id=p.property_type','left');
+                    $this->db->join('tbl_states', 'tbl_states.state_id = p.state_id','left');
+                    $this->db->join('tbl_city', 'tbl_city.city_id = p.city_id','left');
+                    $this->db->join('tbl_locations', 'tbl_locations.location_id = p.location','left');
+                    $this->db->join('tbl_accomodations', 'tbl_accomodations.accomodation_id = pud.accomodation','left');
+                    $this->db->join('tbl_units as punit', 'punit.unit_id = pud.plot_unit','left');
+                    $this->db->join('tbl_units as sa_unit', 'sa_unit.unit_id = pud.unit','left');
+                    $this->db->where($where);
+                    $query = $this->db->get();
+                    $item = $query->row();
+
+                    $size = "";
+                    $is_plot = false;
+                    $is_sa = false;
+
+                    if ($item) {
+
+                    	
+		                if($item->project_type==2){
+		                            
+		                    if(($item->property_type==1 || $item->property_type==7) && $item->sa){
+		                        $size = $item->sa;
+		                        if ($item->sa_unit_name) {
+		                            $size .= ' '.$item->sa_unit_name;
+		                        }
+		                        $is_sa = true;
+		                    }
+		                    if(($item->property_type==2 || $item->property_type==3) && $item->plot_size){
+		                        $size = $item->plot_size;
+		                        if ($item->plot_unit_name) {
+		                            $size .= ' '.$item->plot_unit_name;
+		                        }
+		                        $is_plot = true;
+		                    }
+		                }
+
+		                if($item->project_type==3 && $item->sa){
+		                        $size = $item->sa;
+		                        if ($item->sa_unit_name) {
+		                            $size .= ' '.$item->sa_unit_name;
+		                        }
+		                        $is_sa = true;
+		                }
+
+                        $budget = "";
+
+                        $this->db->select('*,tbl_inventory.inventory_id as inventory_id');
+                        $this->db->from('tbl_inventory');
+                        $this->db->join('tbl_basic_cost', 'tbl_basic_cost.inventory_id = tbl_inventory.inventory_id','left');
+                        $this->db->where("unit_code='".$item->product_unit_detail_id."' AND tbl_inventory.inventory_id='".$inventory_data->inventory_id."'");
+                        $query = $this->db->get();
+                        $itemInv = $query->row();
+
+
+                        if ($itemInv) {
+
+                          ///////////////////////////////
+                          if ($itemInv->basic_cost==1) {
+                            
+                            $current_rate = 0;
+                            if ($itemInv->basic_cost_id) {
+
+                                $b_cost_unit = $itemInv->current_rate_unit;
+                                if ($itemInv->current_rate) {
+                                    //$current_rate += $itemInv->current_rate;
+
+                                    // residencial
+                                    if($item->project_type==2){
+                                        
+                                        // for flat
+                                        if(($item->property_type==1 || $item->property_type==7)){
+                                            //$size = $item->sa;
+                                            //if ($item->sa_unit_name) {
+                                            //    $size .= ' '.$item->sa_unit_name;
+                                            //}
+
+                                            if ($b_cost_unit=='2') {// for Sq.Ft
+                                                $current_rate = $item->sa*$itemInv->current_rate;
+                                            }
+                                            else if ($b_cost_unit=='5') {// for Fix
+                                                $current_rate = $itemInv->current_rate;
+                                            }
+                                        }
+                                        // for plot
+                                        else if(($item->property_type==2 || $item->property_type==3)){
+                                            //$size = $item->plot_size;
+                                            //if ($item->plot_unit_name) {
+                                            //    $size .= ' '.$item->plot_unit_name;
+                                            //}
+                                            if ($b_cost_unit=='1') {// for Sq.Yd
+                                                $current_rate = $item->plot_size*$itemInv->current_rate;
+                                            }
+                                            else if ($b_cost_unit=='2') {// for Sq.Ft
+                                                $current_rate += $item->construction_area*$itemInv->current_rate;
+                                            } 
+                                            else if ($b_cost_unit=='5') {// for Fix
+                                                $current_rate = $itemInv->current_rate;
+                                            }
+                                        }
+                                    }
+                                    // commercial
+                                    else if($item->project_type==3){
+                                            //$size = $item->sa;
+                                            //if ($item->sa_unit_name) {
+                                            //    $size .= ' '.$item->sa_unit_name;
+                                            //}
+
+                                        if ($b_cost_unit=='2') {// for Sq.Ft
+                                            $current_rate = $item->sa*$itemInv->current_rate;
+                                        }
+                                        else if ($b_cost_unit=='5') {// for Fix
+                                            $current_rate = $itemInv->current_rate;
+                                        }
+                                    }
+                                }
+                            }
+                            else {
+
+                                $b_cost_unit = $item->b_cost_unit;
+
+                                if ($item->basic_cost) {
+
+                                    // residencial
+                                    if($item->project_type==2){
+                                        // for flat
+                                        if(($item->property_type==1 || $item->property_type==7)){
+                                            //$size = $item->sa;
+                                            //if ($item->sa_unit_name) {
+                                            //    $size .= ' '.$item->sa_unit_name;
+                                            //}
+
+                                            if ($b_cost_unit=='2') {// for Sq.Ft
+                                                $current_rate = $item->sa*$item->basic_cost;
+                                            }
+                                            else if ($b_cost_unit=='5') {// for Fix
+                                                $current_rate = $item->basic_cost;
+                                            }
+                                        }
+                                        // for plot
+                                        else if(($item->property_type==2 || $item->property_type==3)){
+                                            //$size = $item->plot_size;
+                                            //if ($item->plot_unit_name) {
+                                            //    $size .= ' '.$item->plot_unit_name;
+                                            //}
+                                            if ($b_cost_unit=='1') {// for Sq.Yd
+                                                $current_rate = $item->plot_size*$item->basic_cost;
+                                            }
+                                            else if ($b_cost_unit=='2') {// for Sq.Ft
+                                                $current_rate = $item->construction_area*$item->basic_cost;
+                                            } 
+                                            else if ($b_cost_unit=='5') {// for Fix
+                                                $current_rate = $item->basic_cost;
+                                            }
+                                        }
+                                    }
+                                    // commercial
+                                    else if($item->project_type==3){
+                                            //$size = $item->sa;
+                                            //if ($item->sa_unit_name) {
+                                            //    $size .= ' '.$item->sa_unit_name;
+                                            //}
+
+                                        if ($b_cost_unit=='2') {// for Sq.Ft
+                                            $current_rate = $item->sa*$item->basic_cost;
+                                        }
+                                        else if ($b_cost_unit=='5') {// for Fix
+                                            $current_rate = $item->basic_cost;
+                                        }
+                                    }
+                                }
+                            }
+
+                            if ($current_rate) {
+                                $asking_price = $current_rate;
+                            }
+                          }
+                          //////////////////////////////////
+
+
+
+                          // Parking Open 
+                          $parking_open_show = 0;
+                          $parking_open_price = 0;
+                          $parking_open_gst = 0;
+                          if ($itemInv->parking==1 && $item->parking_open) {
+                            $parking_open_show = 1;
+                            $current_rate = 0;
+                            if ($itemInv->o_current_rate) {
+
+                                $b_cost_unit = $itemInv->o_current_rate_unit;
+                                $parking_open_gst = $itemInv->o_current_rate_gst;
+                                if ($itemInv->o_current_rate) {
+                                    //$current_rate += $itemInv->current_rate;
+
+                                    // residencial
+                                    if($item->project_type==2){
+                                        
+                                        // for flat
+                                        if(($item->property_type==1 || $item->property_type==7)){
+                                            //$size = $item->sa;
+                                            //if ($item->sa_unit_name) {
+                                            //    $size .= ' '.$item->sa_unit_name;
+                                            //}
+
+                                            if ($b_cost_unit=='2') {// for Sq.Ft
+                                                $current_rate = $item->sa*$itemInv->o_current_rate;
+                                            }
+                                            else if ($b_cost_unit=='5') {// for Fix
+                                                $current_rate = $itemInv->o_current_rate;
+                                            }
+                                        }
+                                        // for plot
+                                        else if(($item->property_type==2 || $item->property_type==3)){
+                                            //$size = $item->plot_size;
+                                            //if ($item->plot_unit_name) {
+                                            //    $size .= ' '.$item->plot_unit_name;
+                                            //}
+                                            if ($b_cost_unit=='1') {// for Sq.Yd
+                                                $current_rate = $item->plot_size*$itemInv->o_current_rate;
+                                            }
+                                            else if ($b_cost_unit=='2') {// for Sq.Ft
+                                                $current_rate += $item->construction_area*$itemInv->o_current_rate;
+                                            } 
+                                            else if ($b_cost_unit=='5') {// for Fix
+                                                $current_rate = $itemInv->o_current_rate;
+                                            }
+                                        }
+                                    }
+                                    // commercial
+                                    else if($item->project_type==3){
+                                            //$size = $item->sa;
+                                            //if ($item->sa_unit_name) {
+                                            //    $size .= ' '.$item->sa_unit_name;
+                                            //}
+
+                                        if ($b_cost_unit=='2') {// for Sq.Ft
+                                            $current_rate = $item->sa*$itemInv->o_current_rate;
+                                        }
+                                        else if ($b_cost_unit=='5') {// for Fix
+                                            $current_rate = $itemInv->o_current_rate;
+                                        }
+                                    }
+                                }
+                            }
+                            else {
+
+                                $b_cost_unit = 5;//$item->b_cost_unit;
+                                $parking_open_gst = $item->parking_gst;
+
+                                if ($item->o_price) {
+
+                                    // residencial
+                                    if($item->project_type==2){
+                                        // for flat
+                                        if(($item->property_type==1 || $item->property_type==7)){
+                                            //$size = $item->sa;
+                                            //if ($item->sa_unit_name) {
+                                            //    $size .= ' '.$item->sa_unit_name;
+                                            //}
+
+                                            if ($b_cost_unit=='2') {// for Sq.Ft
+                                                $current_rate = $item->sa*$item->o_price;
+                                            }
+                                            else if ($b_cost_unit=='5') {// for Fix
+                                                $current_rate = $item->o_price;
+                                            }
+                                        }
+                                        // for plot
+                                        else if(($item->property_type==2 || $item->property_type==3)){
+                                            //$size = $item->plot_size;
+                                            //if ($item->plot_unit_name) {
+                                            //    $size .= ' '.$item->plot_unit_name;
+                                            //}
+                                            if ($b_cost_unit=='1') {// for Sq.Yd
+                                                $current_rate = $item->plot_size*$item->o_price;
+                                            }
+                                            else if ($b_cost_unit=='2') {// for Sq.Ft
+                                                $current_rate = $item->construction_area*$item->o_price;
+                                            } 
+                                            else if ($b_cost_unit=='5') {// for Fix
+                                                $current_rate = $item->o_price;
+                                            }
+                                        }
+                                    }
+                                    // commercial
+                                    else if($item->project_type==3){
+                                            //$size = $item->sa;
+                                            //if ($item->sa_unit_name) {
+                                            //    $size .= ' '.$item->sa_unit_name;
+                                            //}
+
+                                        if ($b_cost_unit=='2') {// for Sq.Ft
+                                            $current_rate = $item->sa*$item->o_price;
+                                        }
+                                        else if ($b_cost_unit=='5') {// for Fix
+                                            $current_rate = $item->o_price;
+                                        }
+                                    }
+                                }
+                            }
+
+                            if ($current_rate) {
+                                $parking_open_price = $current_rate;
+                            }
+                          }
+                          // Parking Open End 
+
+                          // Parking Stilt 
+                          $parking_stilt_show = 0;
+                          $parking_stilt_price = 0;
+                          $parking_stilt_gst = 0;
+                          if ($itemInv->parking==1 && $item->parking_stilt) {
+                            $parking_stilt_show = 1;
+                            $current_rate = 0;
+                            if ($itemInv->s_current_rate) {
+
+                                $b_cost_unit = $itemInv->s_current_rate_unit;
+                                $parking_stilt_gst = $itemInv->s_current_rate_gst;
+                                if ($itemInv->s_current_rate) {
+                                    //$current_rate += $itemInv->current_rate;
+
+                                    // residencial
+                                    if($item->project_type==2){
+                                        
+                                        // for flat
+                                        if(($item->property_type==1 || $item->property_type==7)){
+                                            //$size = $item->sa;
+                                            //if ($item->sa_unit_name) {
+                                            //    $size .= ' '.$item->sa_unit_name;
+                                            //}
+
+                                            if ($b_cost_unit=='2') {// for Sq.Ft
+                                                $current_rate = $item->sa*$itemInv->s_current_rate;
+                                            }
+                                            else if ($b_cost_unit=='5') {// for Fix
+                                                $current_rate = $itemInv->s_current_rate;
+                                            }
+                                        }
+                                        // for plot
+                                        else if(($item->property_type==2 || $item->property_type==3)){
+                                            //$size = $item->plot_size;
+                                            //if ($item->plot_unit_name) {
+                                            //    $size .= ' '.$item->plot_unit_name;
+                                            //}
+                                            if ($b_cost_unit=='1') {// for Sq.Yd
+                                                $current_rate = $item->plot_size*$itemInv->s_current_rate;
+                                            }
+                                            else if ($b_cost_unit=='2') {// for Sq.Ft
+                                                $current_rate += $item->construction_area*$itemInv->s_current_rate;
+                                            } 
+                                            else if ($b_cost_unit=='5') {// for Fix
+                                                $current_rate = $itemInv->s_current_rate;
+                                            }
+                                        }
+                                    }
+                                    // commercial
+                                    else if($item->project_type==3){
+                                            //$size = $item->sa;
+                                            //if ($item->sa_unit_name) {
+                                            //    $size .= ' '.$item->sa_unit_name;
+                                            //}
+
+                                        if ($b_cost_unit=='2') {// for Sq.Ft
+                                            $current_rate = $item->sa*$itemInv->s_current_rate;
+                                        }
+                                        else if ($b_cost_unit=='5') {// for Fix
+                                            $current_rate = $itemInv->s_current_rate;
+                                        }
+                                    }
+                                }
+                            }
+                            else {
+
+                                $b_cost_unit = 5;//$item->b_cost_unit;
+                                $parking_stilt_gst = $item->parking_gst;
+
+                                if ($item->s_price) {
+
+                                    // residencial
+                                    if($item->project_type==2){
+                                        // for flat
+                                        if(($item->property_type==1 || $item->property_type==7)){
+                                            //$size = $item->sa;
+                                            //if ($item->sa_unit_name) {
+                                            //    $size .= ' '.$item->sa_unit_name;
+                                            //}
+
+                                            if ($b_cost_unit=='2') {// for Sq.Ft
+                                                $current_rate = $item->sa*$item->s_price;
+                                            }
+                                            else if ($b_cost_unit=='5') {// for Fix
+                                                $current_rate = $item->s_price;
+                                            }
+                                        }
+                                        // for plot
+                                        else if(($item->property_type==2 || $item->property_type==3)){
+                                            //$size = $item->plot_size;
+                                            //if ($item->plot_unit_name) {
+                                            //    $size .= ' '.$item->plot_unit_name;
+                                            //}
+                                            if ($b_cost_unit=='1') {// for Sq.Yd
+                                                $current_rate = $item->plot_size*$item->s_price;
+                                            }
+                                            else if ($b_cost_unit=='2') {// for Sq.Ft
+                                                $current_rate = $item->construction_area*$item->s_price;
+                                            } 
+                                            else if ($b_cost_unit=='5') {// for Fix
+                                                $current_rate = $item->s_price;
+                                            }
+                                        }
+                                    }
+                                    // commercial
+                                    else if($item->project_type==3){
+                                            //$size = $item->sa;
+                                            //if ($item->sa_unit_name) {
+                                            //    $size .= ' '.$item->sa_unit_name;
+                                            //}
+
+                                        if ($b_cost_unit=='2') {// for Sq.Ft
+                                            $current_rate = $item->sa*$item->s_price;
+                                        }
+                                        else if ($b_cost_unit=='5') {// for Fix
+                                            $current_rate = $item->s_price;
+                                        }
+                                    }
+                                }
+                            }
+
+                            if ($current_rate) {
+                                $parking_stilt_price = $current_rate;
+                            }
+                          }
+                          // Parking Stilt End 
+
+                          // Parking Basment 
+                          $parking_basment_show = 0;
+                          $parking_basment_price = 0;
+                          $parking_basment_gst = 0;
+                          if ($itemInv->parking==1 && $item->parking_basment) {
+                            $parking_basment_show = 1;
+                            $current_rate = 0;
+                            if ($itemInv->b_current_rate) {
+
+                                $b_cost_unit = $itemInv->b_current_rate_unit;
+                                $parking_basment_gst = $itemInv->b_current_rate_gst;
+                                if ($itemInv->b_current_rate) {
+                                    //$current_rate += $itemInv->current_rate;
+
+                                    // residencial
+                                    if($item->project_type==2){
+                                        
+                                        // for flat
+                                        if(($item->property_type==1 || $item->property_type==7)){
+                                            //$size = $item->sa;
+                                            //if ($item->sa_unit_name) {
+                                            //    $size .= ' '.$item->sa_unit_name;
+                                            //}
+
+                                            if ($b_cost_unit=='2') {// for Sq.Ft
+                                                $current_rate = $item->sa*$itemInv->b_current_rate;
+                                            }
+                                            else if ($b_cost_unit=='5') {// for Fix
+                                                $current_rate = $itemInv->b_current_rate;
+                                            }
+                                        }
+                                        // for plot
+                                        else if(($item->property_type==2 || $item->property_type==3)){
+                                            //$size = $item->plot_size;
+                                            //if ($item->plot_unit_name) {
+                                            //    $size .= ' '.$item->plot_unit_name;
+                                            //}
+                                            if ($b_cost_unit=='1') {// for Sq.Yd
+                                                $current_rate = $item->plot_size*$itemInv->b_current_rate;
+                                            }
+                                            else if ($b_cost_unit=='2') {// for Sq.Ft
+                                                $current_rate += $item->construction_area*$itemInv->b_current_rate;
+                                            } 
+                                            else if ($b_cost_unit=='5') {// for Fix
+                                                $current_rate = $itemInv->b_current_rate;
+                                            }
+                                        }
+                                    }
+                                    // commercial
+                                    else if($item->project_type==3){
+                                            //$size = $item->sa;
+                                            //if ($item->sa_unit_name) {
+                                            //    $size .= ' '.$item->sa_unit_name;
+                                            //}
+
+                                        if ($b_cost_unit=='2') {// for Sq.Ft
+                                            $current_rate = $item->sa*$itemInv->b_current_rate;
+                                        }
+                                        else if ($b_cost_unit=='5') {// for Fix
+                                            $current_rate = $itemInv->b_current_rate;
+                                        }
+                                    }
+                                }
+                            }
+                            else {
+
+                                $b_cost_unit = 5;//$item->b_cost_unit;
+                                $parking_basment_gst = $item->parking_gst;
+
+                                if ($item->b_price) {
+
+                                    // residencial
+                                    if($item->project_type==2){
+                                        // for flat
+                                        if(($item->property_type==1 || $item->property_type==7)){
+                                            //$size = $item->sa;
+                                            //if ($item->sa_unit_name) {
+                                            //    $size .= ' '.$item->sa_unit_name;
+                                            //}
+
+                                            if ($b_cost_unit=='2') {// for Sq.Ft
+                                                $current_rate = $item->sa*$item->b_price;
+                                            }
+                                            else if ($b_cost_unit=='5') {// for Fix
+                                                $current_rate = $item->b_price;
+                                            }
+                                        }
+                                        // for plot
+                                        else if(($item->property_type==2 || $item->property_type==3)){
+                                            //$size = $item->plot_size;
+                                            //if ($item->plot_unit_name) {
+                                            //    $size .= ' '.$item->plot_unit_name;
+                                            //}
+                                            if ($b_cost_unit=='1') {// for Sq.Yd
+                                                $current_rate = $item->plot_size*$item->b_price;
+                                            }
+                                            else if ($b_cost_unit=='2') {// for Sq.Ft
+                                                $current_rate = $item->construction_area*$item->b_price;
+                                            } 
+                                            else if ($b_cost_unit=='5') {// for Fix
+                                                $current_rate = $item->b_price;
+                                            }
+                                        }
+                                    }
+                                    // commercial
+                                    else if($item->project_type==3){
+                                            //$size = $item->sa;
+                                            //if ($item->sa_unit_name) {
+                                            //    $size .= ' '.$item->sa_unit_name;
+                                            //}
+
+                                        if ($b_cost_unit=='2') {// for Sq.Ft
+                                            $current_rate = $item->sa*$item->b_price;
+                                        }
+                                        else if ($b_cost_unit=='5') {// for Fix
+                                            $current_rate = $item->b_price;
+                                        }
+                                    }
+                                }
+                            }
+
+                            if ($current_rate) {
+                                $parking_basment_price = $current_rate;
+                            }
+                          }
+                          // Parking Basment End 
+
+
+
+                        }
+                    }
+                
+                 $total_cost = 0;
+	             $total_gst_amount = 0;
+	             $total_amount = 0;
+                 $cost = 0;
+	             $gst = 0;
+	             $gst_amount = 0;
+	             $total = 0;
+	  if ($asking_price) {
+	        $total_cost += $cost = $asking_price;
+
+	    if ($item->b_cost_gst) {
+	      $gst = $item->b_cost_gst;
+	      $total_gst_amount += $gst_amount = ($cost*$gst/100);
+	    }
+	    $total_amount += $total = $cost+$gst_amount;
+	  }
+	  
+	  $item->basic_cost=$cost;
+	  
+	  
+	  
+	  
+	  
+	  
+	  
+	  if($item){ 
+	  $where = "inventory_id='".$inventory_data->inventory_id."' and is_active='1'";
+	  $this->db->select("*");
+	  $this->db->from('tbl_inventory_additional');
+	  $this->db->join('tbl_product_additional_details', 'tbl_product_additional_details.product_additional_detail_id = tbl_inventory_additional.product_additional_detail_id','left');
+	  $this->db->join('tbl_price_components', 'tbl_price_components.price_component_id = tbl_product_additional_details.price_comp_id','left');
+	  $this->db->where($where);
+	  $query = $this->db->get();
+	  
+	  $add_items = $query->result();
+	  
+	  
+	  
+	  
+	    foreach ($add_items as $itemInv) {
+	    $m_price = 0;
+	    $m_gst = 0;
+
+	    $current_rate = 0;
+	    if ($itemInv->current_rate) {
+
+	        $b_cost_unit = $itemInv->current_rate_unit;
+	        $m_gst = $itemInv->current_rate_gst;
+	        if ($itemInv->current_rate) {
+	            //$current_rate += $itemInv->current_rate;
+
+	            // residencial
+	            if($item->project_type==2){
+	                
+	                // for flat
+	                if(($item->property_type==1 || $item->property_type==7)){
+	                    //$size = $item->sa;
+	                    //if ($item->sa_unit_name) {
+	                    //    $size .= ' '.$item->sa_unit_name;
+	                    //}
+
+	                    if ($b_cost_unit=='2') {// for Sq.Ft
+	                        $current_rate = $item->sa*$itemInv->current_rate;
+	                    }
+	                    else if ($b_cost_unit=='5') {// for Fix
+	                        $current_rate = $itemInv->current_rate;
+	                    }
+	                }
+	                // for plot
+	                else if(($item->property_type==2 || $item->property_type==3)){
+	                    //$size = $item->plot_size;
+	                    //if ($item->plot_unit_name) {
+	                    //    $size .= ' '.$item->plot_unit_name;
+	                    //}
+	                    if ($b_cost_unit=='1') {// for Sq.Yd
+	                        $current_rate = $item->plot_size*$itemInv->current_rate;
+	                    }
+	                    else if ($b_cost_unit=='2') {// for Sq.Ft
+	                        $current_rate += $item->construction_area*$itemInv->current_rate;
+	                    } 
+	                    else if ($b_cost_unit=='5') {// for Fix
+	                        $current_rate = $itemInv->current_rate;
+	                    }
+	                }
+	            }
+	            // commercial
+	            else if($item->project_type==3){
+	                    //$size = $item->sa;
+	                    //if ($item->sa_unit_name) {
+	                    //    $size .= ' '.$item->sa_unit_name;
+	                    //}
+
+	                if ($b_cost_unit=='2') {// for Sq.Ft
+	                    $current_rate = $item->sa*$itemInv->current_rate;
+	                }
+	                else if ($b_cost_unit=='5') {// for Fix
+	                    $current_rate = $itemInv->current_rate;
+	                }
+	            }
+	        }
+	    }
+	    else {
+
+	        $b_cost_unit = $itemInv->unit;
+	        $m_gst = $itemInv->gst;
+
+	        if ($itemInv->price) {
+
+	            // residencial
+	            if($item->project_type==2){
+	                // for flat
+	                if(($item->property_type==1 || $item->property_type==7)){
+	                    //$size = $item->sa;
+	                    //if ($item->sa_unit_name) {
+	                    //    $size .= ' '.$item->sa_unit_name;
+	                    //}
+
+	                    if ($b_cost_unit=='2') {// for Sq.Ft
+	                        $current_rate = $item->sa*$itemInv->price;
+	                    }
+	                    else if ($b_cost_unit=='5') {// for Fix
+	                        $current_rate = $itemInv->price;
+	                    }
+	                }
+	                // for plot
+	                else if(($item->property_type==2 || $item->property_type==3)){
+	                    //$size = $item->plot_size;
+	                    //if ($item->plot_unit_name) {
+	                    //    $size .= ' '.$item->plot_unit_name;
+	                    //}
+	                    if ($b_cost_unit=='1') {// for Sq.Yd
+	                        $current_rate = $item->plot_size*$itemInv->price;
+	                    }
+	                    else if ($b_cost_unit=='2') {// for Sq.Ft
+	                        $current_rate = $item->construction_area*$itemInv->price;
+	                    } 
+	                    else if ($b_cost_unit=='5') {// for Fix
+	                        $current_rate = $itemInv->price;
+	                    }
+	                }
+	            }
+	            // commercial
+	            else if($item->project_type==3){
+	                    //$size = $item->sa;
+	                    //if ($item->sa_unit_name) {
+	                    //    $size .= ' '.$item->sa_unit_name;
+	                    //}
+
+	                if ($b_cost_unit=='2') {// for Sq.Ft
+	                    $current_rate = $item->sa*$itemInv->price;
+	                }
+	                else if ($b_cost_unit=='5') {// for Fix
+	                    $current_rate = $itemInv->price;
+	                }
+	            }
+	        }
+	    }
+
+	    if ($current_rate) {
+	        $m_price = $current_rate;
+	    }
+
+
+	    $cost = 0;
+	    $gst = 0;
+	    $gst_amount = 0;
+	    $total = 0;
+
+
+	    if ($m_price) {
+	      $total_cost += $cost = $m_price;
+
+	      if ($m_gst) {
+	        $gst = $m_gst;
+	        $total_gst_amount += $gst_amount = ($cost*$gst/100);
+	      }
+	      $total_amount += $total = $cost+$gst_amount;
+	    }
+	    
+	    $itemInv->cost = $cost;
+        
+        $additional_cost[] = $itemInv;
+	     
+	    }
+	  }
+	    $item->additional_cost = $additional_cost;
+	    
+	    
+	  $where = "inventory_id='".$inventory_data->inventory_id."' and is_active='1'";
+	  $this->db->select("*");
+	  $this->db->from('tbl_inventory_plc');
+	  $this->db->join('tbl_product_plc_details', 'tbl_product_plc_details.product_plc_detail_id = tbl_inventory_plc.product_plc_detail_id','left');
+	  $this->db->join('tbl_price_components', 'tbl_price_components.price_component_id = tbl_product_plc_details.price_comp_id','left');
+	  $this->db->where($where);
+	  $query = $this->db->get();
+	  $add_items = $query->result();
+	  
+	  
+	   foreach ($add_items as $itemInv) {
+	    $m_price = 0;
+	    $m_gst = 0;
+
+	    $current_rate = 0;
+	    if ($itemInv->current_rate) {
+
+	        $b_cost_unit = $itemInv->current_rate_unit;
+	        $m_gst = $itemInv->current_rate_gst;
+	        if ($itemInv->current_rate) {
+	            //$current_rate += $itemInv->current_rate;
+
+	            // residencial
+	            if($item->project_type==2){
+	                
+	                // for flat
+	                if(($item->property_type==1 || $item->property_type==7)){
+	                    //$size = $item->sa;
+	                    //if ($item->sa_unit_name) {
+	                    //    $size .= ' '.$item->sa_unit_name;
+	                    //}
+
+	                    if ($b_cost_unit=='2') {// for Sq.Ft
+	                        $current_rate = $item->sa*$itemInv->current_rate;
+	                    }
+	                    else if ($b_cost_unit=='5') {// for Fix
+	                        $current_rate = $itemInv->current_rate;
+	                    }
+	                    else if ($b_cost_unit=='6') {// for % of BSP
+	                        $current_rate = ($itemInv->current_rate*$asking_price/100);
+	                    }
+	                }
+	                // for plot
+	                else if(($item->property_type==2 || $item->property_type==3)){
+	                    //$size = $item->plot_size;
+	                    //if ($item->plot_unit_name) {
+	                    //    $size .= ' '.$item->plot_unit_name;
+	                    //}
+	                    if ($b_cost_unit=='1') {// for Sq.Yd
+	                        $current_rate = $item->plot_size*$itemInv->current_rate;
+	                    }
+	                    else if ($b_cost_unit=='2') {// for Sq.Ft
+	                        $current_rate += $item->construction_area*$itemInv->current_rate;
+	                    } 
+	                    else if ($b_cost_unit=='5') {// for Fix
+	                        $current_rate = $itemInv->current_rate;
+	                    }
+	                    else if ($b_cost_unit=='6') {// for % of BSP
+	                        $current_rate = ($itemInv->current_rate*$asking_price/100);
+	                    }
+	                }
+	            }
+	            // commercial
+	            else if($item->project_type==3){
+	                    //$size = $item->sa;
+	                    //if ($item->sa_unit_name) {
+	                    //    $size .= ' '.$item->sa_unit_name;
+	                    //}
+
+	                if ($b_cost_unit=='2') {// for Sq.Ft
+	                    $current_rate = $item->sa*$itemInv->current_rate;
+	                }
+	                else if ($b_cost_unit=='5') {// for Fix
+	                    $current_rate = $itemInv->current_rate;
+	                }
+	                else if ($b_cost_unit=='6') {// for % of BSP
+	                    $current_rate = ($itemInv->current_rate*$asking_price/100);
+	                }
+	            }
+	        }
+	    }
+	    else {
+
+	        $b_cost_unit = $itemInv->unit;
+	        $m_gst = $itemInv->gst;
+
+	        if ($itemInv->price) {
+
+	            // residencial
+	            if($item->project_type==2){
+	                // for flat
+	                if(($item->property_type==1 || $item->property_type==7)){
+	                    //$size = $item->sa;
+	                    //if ($item->sa_unit_name) {
+	                    //    $size .= ' '.$item->sa_unit_name;
+	                    //}
+
+	                    if ($b_cost_unit=='2') {// for Sq.Ft
+	                        $current_rate = $item->sa*$itemInv->price;
+	                    }
+	                    else if ($b_cost_unit=='5') {// for Fix
+	                        $current_rate = $itemInv->price;
+	                    }
+	                    else if ($b_cost_unit=='6') {// for % of BSP
+	                        $current_rate = ($itemInv->price*$asking_price/100);
+	                    }
+	                }
+	                // for plot
+	                else if(($item->property_type==2 || $item->property_type==3)){
+	                    //$size = $item->plot_size;
+	                    //if ($item->plot_unit_name) {
+	                    //    $size .= ' '.$item->plot_unit_name;
+	                    //}
+	                    if ($b_cost_unit=='1') {// for Sq.Yd
+	                        $current_rate = $item->plot_size*$itemInv->price;
+	                    }
+	                    else if ($b_cost_unit=='2') {// for Sq.Ft
+	                        $current_rate = $item->construction_area*$itemInv->price;
+	                    } 
+	                    else if ($b_cost_unit=='5') {// for Fix
+	                        $current_rate = $itemInv->price;
+	                    }
+	                    else if ($b_cost_unit=='6') {// for % of BSP
+	                        $current_rate = ($itemInv->price*$asking_price/100);
+	                    }
+	                }
+	            }
+	            // commercial
+	            else if($item->project_type==3){
+	                    //$size = $item->sa;
+	                    //if ($item->sa_unit_name) {
+	                    //    $size .= ' '.$item->sa_unit_name;
+	                    //}
+
+	                if ($b_cost_unit=='2') {// for Sq.Ft
+	                    $current_rate = $item->sa*$itemInv->price;
+	                }
+	                else if ($b_cost_unit=='5') {// for Fix
+	                    $current_rate = $itemInv->price;
+	                }
+	                else if ($b_cost_unit=='6') {// for % of BSP
+	                    $current_rate = ($itemInv->price*$asking_price/100);
+	                }
+	            }
+	        }
+	    }
+
+	    if ($current_rate) {
+	        $m_price = $current_rate;
+	    }
+
+
+	    $cost = 0;
+	    $gst = 0;
+	    $gst_amount = 0;
+	    $total = 0;
+
+
+	    if ($m_price) {
+	      $total_cost += $cost = $m_price;
+
+	      if ($m_gst) {
+	        $gst = $m_gst;
+	        $total_gst_amount += $gst_amount = ($cost*$gst/100);
+	      }
+	      $total_amount += $total = $cost+$gst_amount;
+	    }
+	    
+	      $itemInv->cost = $cost;
+	     
+	     $plc_cost[] = $itemInv;
+	     
+	  }
+	     $item->plc_cost = $plc_cost;
+	     
+	     
+	     
+	     	if ($parking_open_show || $parking_stilt_show || $parking_basment_show) 
+	     	{
+	     	    
+	     	    	if($parking_open_show)
+	     	    	{ 
+
+	                 $cost = 0;
+	                 $gst = 0;
+	                 $gst_amount = 0;
+	                 $total = 0;
+	                
+	                
+	                   if ($parking_open_price) 
+	                    {
+	                       $total_cost += $cost = $parking_open_price;
+
+	                       if ($parking_open_gst) 
+	                         {
+	                           $gst = $parking_open_gst;
+	                          $total_gst_amount += $gst_amount = ($cost*$gst/100);
+	                         }
+	                       $total_amount += $total = $cost+$gst_amount;
+	           
+	                 $parking[] = array("name"=>"Open","cost"=>$cost);
+	                    }
+	     	        }      
+	           if($parking_stilt_show){ 
+
+                   	  $cost = 0;
+	                  $gst = 0;
+                	  $gst_amount = 0;
+	                  $total = 0;
+	              if ($parking_stilt_price) {
+	                $total_cost += $cost = $parking_stilt_price;
+
+	               if ($parking_stilt_gst) {
+	                    $gst = $parking_stilt_gst;
+	                   $total_gst_amount += $gst_amount = ($cost*$gst/100);
+	                  }
+	              $total_amount += $total = $cost+$gst_amount;
+	            $parking[] = array("name"=>"Stilt","cost"=>$cost);
+	            
+	            }
+	           } 
+	            
+	            if($parking_basment_show){ 
+
+              	  $cost = 0;
+	              $gst = 0;
+	              $gst_amount = 0;
+	              $total = 0;
+	              if ($parking_basment_price) 
+	              {
+	               $total_cost += $cost = $parking_basment_price;
+
+	               if ($parking_basment_gst) {
+	                    $gst = $parking_basment_gst;
+	                   $total_gst_amount += $gst_amount = ($cost*$gst/100);
+	                  }
+	             $total_amount += $total = $cost+$gst_amount;
+	            
+	             $parking[] = array("name"=>"Basment","cost"=>$cost);
+	             }
+	             
+	           }
+	     	}
+	     
+	        $item->parking =  $parking;
+
+	        $item->total_cost    =  $total_cost;
+	        $item->total_gst     =  $total_gst_amount;
+	        $item->total_amount  =  $total_amount;
+  
+            $fname= $inventory_data->a_is_individual ? ucwords($inventory_data->a_user_title.' '.$inventory_data->a_first_name.' '.$inventory_data->a_last_name):$inventory_data->a_firm_name;
+            $contact_detail =$inventory_data->a_mobile?'+91'.$inventory_data->mobile:'';
+            
+           $contact_info="For any further Details Please Call Us Agent: <b> $fname ($contact_detail) </b>";
+
+           $note="<ul><li>All Payment should be make in the name of  .$inventory_data->b_firm_name . Payable at Par</li>	<li>Final price will be calculate at the time of Booking</li><li>Terms and conditional applicable</li></ul>";
+    
+           $item->note           =  $note;
+           $item->contact_info   =  $contact_info;
+          
+
+               $array = array('status'=>'true','msg'=>'Inventory Found','data'=>$item,"basic_data"=> $inventory_data);
+            }
+            else 
+            {
+                 $array = array('status'=>'false','msg'=>'Inventory Not Found');
+            }
+        }
+         echo json_encode($array);
+    }
+
 
     public function get_product_site_visit_list()
     {
@@ -6829,7 +8868,8 @@ class Api extends CI_Controller {
 
             $account_id = getAccountIdHash($this->input->post('user_hash'));
 
-            if ($account_id) {
+            if ($account_id)
+            {
                 $product_id = $this->input->post('product_id');
 
                 $where="(tbl_products.agent_id='".$account_id."' OR (tbl_site_visit.account_id='".$account_id."' AND share_account_id='".$account_id."')) AND tbl_site_visit.project_id='".$product_id."' AND site_visit_status='2' ORDER BY STR_TO_DATE(visit_date,'%d-%m-%Y') DESC,visit_time DESC";
@@ -6878,14 +8918,14 @@ class Api extends CI_Controller {
                     }
                 }
 
-                $array['data'] = array('status'=>'true','message'=>count($records).' Records Found','records'=>$records);
+                $array = array('status'=>'true','msg'=>count($records).' Records Found','records'=>$records);
             }
             else {
-                $array['data'] = array('status'=>'false','msg'=>'No Leads');
+                $array  = array('status'=>'false','msg'=>'No Leads');
             }
         }
         else { 
-           $array['data'] = array('status'=>'false','msg'=>'Some error occurred, please try again.');
+           $array = array('status'=>'false','msg'=>'Some error occurred, please try again.');
         }
 
         echo json_encode($array);
@@ -6920,7 +8960,7 @@ class Api extends CI_Controller {
         $array=array();
         if($this->input->post()){
             
-        $where = "country_id='1'";
+        $where = "country_id='1' AND state_status=1";
         $state_list = $this->Action_model->detail_result('tbl_states',$where);
 
         // $city_list = array();
@@ -6957,11 +8997,12 @@ class Api extends CI_Controller {
         }
         echo json_encode($array);
     }
+    
     public function lead_default_data(){
         $array=array();
         if($this->input->post()){
             
-        $where = "country_id='1'";
+        $where = "country_id='1' AND state_status=1";
         $state_list = $this->Action_model->detail_result('tbl_states',$where,'state_id,state_name');
 
         // $city_list = array();
@@ -6989,13 +9030,24 @@ class Api extends CI_Controller {
         $where = "title_id!=''";
         $title_list = $this->Action_model->detail_result('tbl_title',$where);
         $data['title_list'] = (($title_list)?$title_list:array());
+
+        $where = "firm_type_status='1'";
+        $firm_type_list = $this->Action_model->detail_result('tbl_firm_types',$where,"firm_type_id,firm_type_name");
+        $data['firm_type_list'] = (($firm_type_list)?$firm_type_list:array());
+
+        $where = "country_id!=''";
+        $country_list = $this->Action_model->detail_result('tbl_country',$where,"country_id,country_name");
+        $data['country_list'] = (($country_list)?$country_list:array());
         
             $state_list = (($state_list)?$state_list:array());
             $occupation_list = (($occupation_list)?$occupation_list:array());
             $department_list = (($department_list)?$department_list:array());
             $lead_source_list = (($lead_source_list)?$lead_source_list:array());
             $lead_stage_list = (($lead_stage_list)?$lead_stage_list:array());
-         $array['data'] = array('status'=>'true','msg'=>'Found','lead_date'=>date('d-m-Y'),'lead_time'=>date('h:i:s a'),'state_list'=>$state_list,'occupation_list'=>$occupation_list,'department_list'=>$department_list,'lead_source_list'=>$lead_source_list,'lead_stage_list'=>$lead_stage_list,'title_list'=>$title_list,'lead_type_list'=>$lead_type_list);
+
+            $city_list = array();
+
+         $array['data'] = array('status'=>'true','msg'=>'Found','lead_date'=>date('d-m-Y'),'lead_time'=>date('h:i:s a'),'country_list'=>$country_list,'state_list'=>$state_list,'city_list'=>$city_list,'occupation_list'=>$occupation_list,'department_list'=>$department_list,'lead_source_list'=>$lead_source_list,'lead_stage_list'=>$lead_stage_list,'title_list'=>$title_list,'lead_type_list'=>$lead_type_list,'firm_type_list'=>$firm_type_list);
         }else{
              $array['data'] = array('status'=>'false','msg'=>'Some error occurred, please try again.');
         }
@@ -7006,7 +9058,7 @@ class Api extends CI_Controller {
         $array=array();
         if($this->input->post()){
             
-        $where = "country_id='1'";
+        $where = "country_id='1' AND state_status=1";
         $state_list = $this->Action_model->detail_result('tbl_states',$where,'state_id,state_name');
 
         // $city_list = array();
@@ -7023,14 +9075,60 @@ class Api extends CI_Controller {
 
         $where = "lead_source_status='1'";
         $lead_source_list = $this->Action_model->detail_result('tbl_lead_sources',$where,'lead_source_id,lead_source_name');
+        
+        $where = "designation_status='1'";
+        $lead_designation_list = $this->Action_model->detail_result('tbl_designations',$where,'designation_id,designation_name');
 
         $where = "lead_stage_status='1'";
         $lead_stage_list = $this->Action_model->detail_result('tbl_lead_stages',$where,'lead_stage_id,lead_stage_name');
-
+        
+        
+        $where = "product_type_status='1'";
+        $product_types_list = $this->Action_model->detail_result('tbl_product_types',$where,'product_type_id as id,product_type_name as name');
+        
+        $where = "lead_option_status='1'";
+        $lead_option_list = $this->Action_model->detail_result('tbl_lead_options',$where,'lead_option_id as id,lead_option_name as name');
+        
+        $where = "lead_action_status='1'";
+        $lead_action_list = $this->Action_model->detail_result('tbl_lead_actions',$where,'lead_action_id as id,lead_action_name as name');
+        
+        $where = "unit_type_status='1'";
+        $product_unit_type_list = $this->Action_model->detail_result('tbl_unit_types',$where,'unit_type_id as id,unit_type_name as name,product_type_id');
+        
+        $where = "facing_status='1'";
+        $facing_list = $this->Action_model->detail_result('tbl_facings',$where,'facing_id as id,title as name');
+        
+        
+        $where = "ideal_business_status='1'";
+        $ideal_business_list = $this->Action_model->detail_result('tbl_ideal_business',$where,'ideal_business_id as id,ideal_business_name as name');
+        
+    
+        $where = "status='1'";
+        $furnised_status_list = $this->Action_model->detail_result('tbl_furnised_status',$where,'furnised_status_id as id,title as name');
+        
+        
+        $where = "furnishing_status='1'";
+        $furnishing_list = $this->Action_model->detail_result('tbl_furnishings',$where,'furnishing_id as id,furnishing_name as name,input_type as type');
+       
+        $where = "construction_age_status='1'";
+        $construction_age_list = $this->Action_model->detail_result('tbl_construction_ages',$where,'construction_age_id as id,construction_age_name as name');
+        
+        
+        $where = "amenitie_status='1'";
+        $amenitie_list = $this->Action_model->detail_result('tbl_amenities',$where,'amenitie_id as id,amenitie_name as name');
+        
+        $where = "listing_type_status='1'";
+        $listing_type_list = $this->Action_model->detail_result('tbl_listing_types',$where,'listing_type_id as id,title as name');
+        
+        
+        $where = "project_status='1'";
+        $product_list = $this->Action_model->detail_result('tbl_products',$where,'product_id as id,project_name as name');
+    
         $where = "lead_type_status='1'";
-        $lead_type_list = $this->Action_model->detail_result('tbl_lead_types',$where,'lead_type_id,lead_type_name');
+        $lead_type_list = $this->Action_model->detail_result('tbl_lead_types',$where,'lead_type_id ,lead_type_name');
         $data['lead_type_list'] = (($lead_type_list)?$lead_type_list:array());
         
+    
         $where = "title_id!=''";
         $title_list = $this->Action_model->detail_result('tbl_title',$where);
         $data['title_list'] = (($title_list)?$title_list:array());
@@ -7075,14 +9173,125 @@ class Api extends CI_Controller {
             $department_list = (($department_list)?$department_list:array());
             $lead_source_list = (($lead_source_list)?$lead_source_list:array());
             $lead_stage_list = (($lead_stage_list)?$lead_stage_list:array());
-         $array['data'] = array('status'=>'true','msg'=>'Found','lead_date'=>date('d-m-Y'),'lead_time'=>date('h:i:s a'),'state_list'=>$state_list,'occupation_list'=>$occupation_list,'department_list'=>$department_list,'lead_source_list'=>$lead_source_list,'lead_stage_list'=>$lead_stage_list,'title_list'=>$title_list,'lead_type_list'=>$lead_type_list,'budget_list'=>$budget_list,'unit_list'=>$unit_list,'user_list'=>$user_list_arr);
+            $lead_designation_list = (($lead_designation_list)?$lead_designation_list:array());
+            $product_types_list = (($product_types_list)?$product_types_list:array());
+            $lead_option_list = (($lead_option_list)?$lead_option_list:array());
+            $product_unit_type_list = (($product_unit_type_list)?$product_unit_type_list:array());
+            $lead_action_list = (($lead_action_list)?$lead_action_list:array());
+            $product_list = (($product_list)?$product_list:array());
+            $facing_list = (($facing_list)?$facing_list:array());
+            $furnised_status_list = (($furnised_status_list)?$furnised_status_list:array());
+            $ideal_business_list = (($ideal_business_list)?$ideal_business_list:array());
+            $furnishing_list  = (($furnishing_list )?$furnishing_list:array());
+            $construction_age_list  = (($construction_age_list )?$construction_age_list:array());
+            $amenitie_list  = (($amenitie_list)?$amenitie_list:array());
+        
+         $array['data'] = array('status'=>'true','msg'=>'Found','lead_date'=>date('d-m-Y'),'lead_time'=>date('h:i:s a'),'state_list'=>$state_list,'occupation_list'=>$occupation_list,'department_list'=>$department_list,'lead_source_list'=>$lead_source_list,'lead_stage_list'=>$lead_stage_list,'title_list'=>$title_list,'lead_type_list'=>$lead_type_list,'budget_list'=>$budget_list,'unit_list'=>$unit_list,
+         'user_list'=>$user_list_arr,"designation_list"=>$lead_designation_list,"product_type_list"=>$product_types_list,"lead_option_list"=>$lead_option_list,"product_unit_type_list"=>$product_unit_type_list,"lead_action_list"=>$lead_action_list,"product_list"=>$product_list,"product_listing"=> $listing_type_list,"facing_list"=>$facing_list,"furnishing_status_list"=>$furnised_status_list,
+         "business_ideals"=>$ideal_business_list,"furnishing_list"=>$furnishing_list,"construction_age"=>$construction_age_list,"amenities"=>$amenitie_list);
+         
         }else{
              $array['data'] = array('status'=>'false','msg'=>'Some error occurred, please try again.');
         }
         echo json_encode($array);
     }
 
-        public function get_location_list(){
+    public function lead_associate_register_default_data(){
+
+        $user_detail = $this->getAgent($this->input->post('user_hash'));
+
+        $array=array();
+        if($this->input->post()){
+
+        // $city_list = array();
+        // if ($id) {
+        //     $where = "state_id='".$lead_detail->lead_state_id."'";
+        //     $city_list = $this->Action_model->detail_result('tbl_city',$where);
+        // }
+
+        $where = "occupation_status='1'";
+        $occupation_list = $this->Action_model->detail_result('tbl_occupations',$where,'occupation_id,occupation_name');
+
+        $where = "department_status='1'";
+        $department_list = $this->Action_model->detail_result('tbl_departments',$where,'department_id,department_name');
+
+        $where = "lead_source_status='1'";
+        $lead_source_list = $this->Action_model->detail_result('tbl_lead_sources',$where,'lead_source_id,lead_source_name');
+
+        $where = "lead_stage_status='1'";
+        $lead_stage_list = $this->Action_model->detail_result('tbl_lead_stages',$where,'lead_stage_id,lead_stage_name');
+
+        $where = "lead_type_status='1'";
+        $lead_type_list = $this->Action_model->detail_result('tbl_lead_types',$where,'lead_type_id,lead_type_name');
+        $data['lead_type_list'] = (($lead_type_list)?$lead_type_list:array());
+        
+        $where = "title_id!=''";
+        $title_list = $this->Action_model->detail_result('tbl_title',$where);
+        $data['title_list'] = (($title_list)?$title_list:array());
+
+        $where = "firm_type_status='1'";
+        $firm_type_list = $this->Action_model->detail_result('tbl_firm_types',$where,"firm_type_id,firm_type_name");
+        $data['firm_type_list'] = (($firm_type_list)?$firm_type_list:array());
+
+        $where = "country_id!=''";
+        $country_list = $this->Action_model->detail_result('tbl_country',$where,"country_id,country_name");
+        $data['country_list'] = (($country_list)?$country_list:array());
+
+
+            
+        $where = "state_status=1 AND country_id='".$user_detail->country_id."'";
+        $state_list = $this->Action_model->detail_result('tbl_states',$where,'state_id,state_name');
+
+        $where = "state_id='".$user_detail->state_id."'";
+        $city_list = $this->Action_model->detail_result('tbl_city',$where,'city_id,city_name');
+        
+            $state_list = (($state_list)?$state_list:array());
+            $occupation_list = (($occupation_list)?$occupation_list:array());
+            $department_list = (($department_list)?$department_list:array());
+            $lead_source_list = (($lead_source_list)?$lead_source_list:array());
+            $lead_stage_list = (($lead_stage_list)?$lead_stage_list:array());
+
+            $city_list = (($city_list)?$city_list:city_list());
+
+            
+
+            foreach ($user_detail as $key => $value) {
+                if ($value=="0") {
+                    $user_detail->$key = "0";
+                }
+                else if($value){
+                    $user_detail->$key = $value;
+                }
+                else {
+                    $user_detail->$key = "";
+                }
+            }
+
+            $user_detail->rera_image = ($user_detail->rera_image)?base_url('uploads/images/user/document/').$user_detail->rera_image:'';
+
+            $user_detail->image = ($user_detail->image)?base_url('uploads/images/user/photo/').$user_detail->image:'';
+
+            $user_detail->logo = ($user_detail->logo)?base_url('uploads/images/user/logo/').$user_detail->logo:'';
+
+            $user_detail->cin_image = ($user_detail->cin_image)?base_url('uploads/images/user/document/').$user_detail->cin_image:'';
+
+            $user_detail->tan_image = ($user_detail->tan_image)?base_url('uploads/images/user/document/').$user_detail->tan_image:'';
+
+            $user_detail->pan_image = ($user_detail->pan_image)?base_url('uploads/images/user/document/').$user_detail->pan_image:'';
+
+            $user_detail->gst_image = ($user_detail->gst_image)?base_url('uploads/images/user/document/').$user_detail->gst_image:'';
+
+            $user_detail->adhar_image = ($user_detail->adhar_image)?base_url('uploads/images/user/document/').$user_detail->adhar_image:'';
+
+         $array['data'] = array('status'=>'true','msg'=>'Found','user_detail'=>$user_detail,'lead_date'=>date('d-m-Y'),'lead_time'=>date('h:i:s a'),'country_list'=>$country_list,'state_list'=>$state_list,'city_list'=>$city_list,'occupation_list'=>$occupation_list,'department_list'=>$department_list,'lead_source_list'=>$lead_source_list,'lead_stage_list'=>$lead_stage_list,'title_list'=>$title_list,'lead_type_list'=>$lead_type_list,'firm_type_list'=>$firm_type_list);
+        }else{
+             $array['data'] = array('status'=>'false','msg'=>'Some error occurred, please try again.');
+        }
+        echo json_encode($array);
+    }
+
+
+    public function get_location_list(){
         $array=array();
         if($this->input->post()){
             
@@ -7096,12 +9305,36 @@ class Api extends CI_Controller {
         }
         echo json_encode($array);
     }
-    
-        public function get_state_list(){
+
+    public function get_state_list_by_country(){
         $array=array();
         if($this->input->post()){
-            
-        $where = "country_id='1'";
+        
+        $country_id = "";
+        if ($this->input->post("country_id")) {
+           $country_id = $this->input->post("country_id");
+        }
+        $where = "state_status=1 AND country_id='".$country_id."'";
+        $state_list = array();
+        $state_list_data = $this->Action_model->detail_result('tbl_states',$where);
+        if ($state_list_data) {
+           $state_list = $state_list_data;
+        }
+
+        
+        $data['state_list'] = $state_list;
+         $array['data'] = array('status'=>'true','msg'=>'Found','state_list'=>$state_list);
+        }else{
+             $array['data'] = array('status'=>'false','msg'=>'Some error occurred, please try again.');
+        }
+        echo json_encode($array);
+    }
+    
+    public function get_state_list(){
+        $array=array();
+        if($this->input->post()){
+        
+        $where = "country_id='1' AND state_status=1";
         $state_list = $this->Action_model->detail_result('tbl_states',$where);
 
         
@@ -7113,7 +9346,7 @@ class Api extends CI_Controller {
         echo json_encode($array);
     }
     
-        public function get_city(){
+    public function get_city(){
         $array=array();
         if($this->input->post()){
             
@@ -7318,14 +9551,14 @@ class Api extends CI_Controller {
                 if ($total_pages!=$page) {
                     $next_page = $page+1;
                 }
-                $array['data'] = array('status'=>'true','msg'=>'Lead Found','records'=>$records,'total_records'=>$total_records,'total_pages'=>$total_pages,'next_page'=>$next_page,'records'=>$records);
+                $array['data'] = array('status'=>true,'msg'=>'Lead Found','records'=>$records,'total_records'=>$total_records,'total_pages'=>$total_pages,'next_page'=>$next_page,'records'=>$records);
             }
             else {
-                $array['data'] = array('status'=>'false','msg'=>'No Leads');
+                $array['data'] = array('status'=>false,'msg'=>'No Leads');
             }
         }
         else { 
-           $array['data'] = array('status'=>'false','msg'=>'Some error occurred, please try again.');
+           $array['data'] = array('status'=>false,'msg'=>'Some error occurred, please try again.');
         }
 
         echo json_encode($array);
@@ -7352,7 +9585,7 @@ class Api extends CI_Controller {
             $where .= $where_ids;*/
             $where .= " ORDER BY followup_id DESC";
 
-            $this->db->select('followup_id,followup_status,comment,task_desc,lead_id,tbl_followup.created_at as created_at,cu.is_individual as cu_is_individual,cu.firm_name as cu_firm_name,cu.parent_id as cu_parent_id,cu.user_title as cu_user_title,cu.first_name as cu_first_name,cu.last_name as cu_last_name,au.is_individual as au_is_individual,au.firm_name as au_firm_name,au.parent_id as au_parent_id,au.user_title as au_user_title,au.first_name as au_first_name,au.last_name as au_last_name,next_followup_date,next_followup_time,lead_action_name');
+            $this->db->select('followup_id,tbl_followup.user_id,lead_stage_id,lead_status_id,next_followup_date,next_followup_time,project_id,followup_status,comment,task_desc,lead_id,tbl_followup.created_at as created_at,cu.is_individual as cu_is_individual,cu.firm_name as cu_firm_name,cu.parent_id as cu_parent_id,cu.user_title as cu_user_title,cu.first_name as cu_first_name,cu.last_name as cu_last_name,au.is_individual as au_is_individual,au.firm_name as au_firm_name,au.parent_id as au_parent_id,au.user_title as au_user_title,au.first_name as au_first_name,au.last_name as au_last_name,next_followup_date,next_followup_time,lead_action_name');
             $this->db->from('tbl_followup');
             $this->db->join('tbl_users as cu', 'cu.user_id = tbl_followup.user_id','left');
             $this->db->join('tbl_users as au', 'au.user_id = tbl_followup.user_id','left');
@@ -7389,6 +9622,12 @@ class Api extends CI_Controller {
                         "cu_name"=>(($item->cu_parent_id==0)?(($item->cu_is_individual)?ucwords($item->cu_user_title.' '.$item->cu_first_name.' '.$item->cu_last_name):$item->cu_firm_name):ucwords($item->cu_user_title.' '.$item->cu_first_name.' '.$item->cu_last_name)),
                         "au_name"=>(($item->au_parent_id==0)?(($item->au_is_individual)?ucwords($item->au_user_title.' '.$item->au_first_name.' '.$item->au_last_name):$item->au_firm_name):ucwords($item->au_user_title.' '.$item->au_first_name.' '.$item->au_last_name)),
                         "next_action"=>$next_action,
+                        "lead_stage_id"=>$item->lead_stage_id,
+                        "lead_status_id"=>$item->lead_status_id,
+                        "next_followup_date"=>$item->next_followup_date,
+                        "next_followup_time"=>$item->next_followup_time,
+                        "project_id"=>$item->project_id,
+                        "agent_id"=>$item->user_id,
                         "lead_action_name"=>$item->lead_action_name
                     );
                 }
@@ -7422,7 +9661,7 @@ class Api extends CI_Controller {
             $where .= $where_ids;
             $where .= " ORDER BY requirement_id DESC";
 
-            $this->db->select('requirement_id,lead_id,look_for,product_type_name,unit_type_name,accomodation_name,location,size_min,size_max,size_unit,remark,dor,lead_option_name as look_for,requirement_status,state_name,city_name,b_min.budget_name as budget_minimum,b_max.budget_name as budget_maximum,su.unit_name as size_unit_name,au.is_individual as au_is_individual,au.firm_name as au_firm_name,au.parent_id as au_parent_id,au.user_title as au_user_title,au.first_name as au_first_name,au.last_name as au_last_name');
+            $this->db->select('tbl_lead_options.lead_option_id,tbl_unit_types.unit_type_id,tbl_product_types.product_type_id,tbl_states.state_id,tbl_city.city_id,requirement_id,lead_id,look_for,product_type_name,unit_type_name,accomodation_name,location,size_min,size_max,size_unit,remark,dor,lead_option_name as look_for,requirement_status,state_name,city_name,b_min.budget_name as budget_minimum,b_max.budget_name as budget_maximum,su.unit_name as size_unit_name,au.is_individual as au_is_individual,au.firm_name as au_firm_name,au.parent_id as au_parent_id,au.user_title as au_user_title,au.first_name as au_first_name,au.last_name as au_last_name');
             $this->db->from('tbl_requirements');
             $this->db->join('tbl_lead_options', 'tbl_lead_options.lead_option_id = tbl_requirements.look_for','left');
             $this->db->join('tbl_states', 'tbl_states.state_id = tbl_requirements.state_id','left');
@@ -7438,6 +9677,7 @@ class Api extends CI_Controller {
             $query = $this->db->get();
             $requirement_data = $query->result();
 
+            
             if ($requirement_data) {
                 //$requirement_list = $requirement_data;
                 foreach ($requirement_data as $item) {
@@ -7493,7 +9733,11 @@ class Api extends CI_Controller {
                         "size_unit"=>$item->size_unit_name,
                         "remark"=>$item->remark,
                         "dor"=>$item->dor,
-                        "look_for"=>$look_for,
+                        "state_id"=>$item->state_id,
+                        "city_id"=>$item->city_id,
+                        "product_type_id"=>$item->product_type_id,
+                        "product_unit_id"=>$item->unit_type_id,
+                        "lead_option_id"=>$item->lead_option_id,
                         "location"=>$location,
                         "requirement_status"=>$item->requirement_status,
                          "added_by"=>(($item->au_parent_id==0)?(($item->au_is_individual)?ucwords($item->au_user_title.' '.$item->au_first_name.' '.$item->au_last_name):$item->au_firm_name):ucwords($item->au_user_title.' '.$item->au_first_name.' '.$item->au_last_name))
@@ -7510,7 +9754,7 @@ class Api extends CI_Controller {
         
     }
     
-        public function get_lead_history_list()
+    public function get_lead_history_list()
     {
         $array = array();
         $lead_history_list = array();
@@ -7549,7 +9793,7 @@ class Api extends CI_Controller {
         
     }
     
-        public function get_feedback_list()
+    public function get_feedback_list()
     {
         $array = array();
         $feedback_list = array();
@@ -7562,7 +9806,7 @@ class Api extends CI_Controller {
 
             $sql = "
 SELECT req.requirement_id,pty.property_id,COALESCE('simple_property') as  type,bgt_min.budget_amount as req_budget_min,bgt_max.budget_amount as req_budget_max,state_name,city_name,location_name,product_type_name,unit_type_name,COALESCE('') as  project_name, pty.property_id as pid FROM tbl_requirements as req 
-JOIN tbl_property as pty ON pty.product_type_id = req.product_type_id AND pty.unit_type_id = req.unit_type_id AND pty.state_id = req.state_id AND pty.city_id = req.city_id AND FIND_IN_SET(pty.location_id,req.location)
+JOIN tbl_property as pty ON pty.product_type_id = req.product_type_id AND pty.unit_type_id = req.unit_type_id AND pty.state_id = req.state_id AND pty.city_id = req.city_id 
 LEFT JOIN tbl_budgets as bgt_min ON bgt_min.budget_id = req.budget_min 
 LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max 
 LEFT JOIN tbl_states ON tbl_states.state_id = pty.state_id 
@@ -7574,7 +9818,7 @@ WHERE lead_id='".$lead_id."'
 UNION ALL
 SELECT req.requirement_id,pty.product_unit_detail_id,COALESCE('project_property') as  type,bgt_min.budget_amount as req_budget_min,bgt_max.budget_amount as req_budget_max,state_name,city_name,location_name,product_type_name,unit_type_name,COALESCE(pdt.project_name) as  project_name,pdt.product_id as pid FROM tbl_requirements as req
 JOIN tbl_product_unit_details as pty ON pty.project_type = req.product_type_id AND ((pty.project_type != '3' AND pty.property_type = req.unit_type_id) OR (pty.project_type = '3' AND pty.sub_category = req.unit_type_id))  
-JOIN tbl_products as pdt ON pdt.product_id = pty.product_id  AND pdt.state_id = req.state_id AND pdt.city_id = req.city_id AND FIND_IN_SET(pdt.location,req.location) 
+JOIN tbl_products as pdt ON pdt.product_id = pty.product_id  AND pdt.state_id = req.state_id AND pdt.city_id = req.city_id
 LEFT JOIN tbl_budgets as bgt_min ON bgt_min.budget_id = req.budget_min 
 LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max 
 LEFT JOIN tbl_states ON tbl_states.state_id = pdt.state_id 
@@ -7582,11 +9826,11 @@ LEFT JOIN tbl_city ON tbl_city.city_id = pdt.city_id
 LEFT JOIN tbl_locations ON tbl_locations.location_id = pdt.location 
 LEFT JOIN tbl_product_types ON tbl_product_types.product_type_id = req.product_type_id 
 LEFT JOIN tbl_unit_types ON tbl_unit_types.unit_type_id = req.unit_type_id  
-WHERE lead_id='".$lead_id."'
-";
+WHERE lead_id='".$lead_id."'";
+
 
 $query = $this->db->query($sql);
-        $property_list = $query->result();
+$property_list = $query->result();
 
 
         $items = array();
@@ -8022,7 +10266,9 @@ $query = $this->db->query($sql);
 
                 if ($feedback_data) {
                     $date_user = "";//$itemPrp->visit_date." & ".$itemPrp->visit_time." By ".ucwords($itemPrp->first_name." ".$itemPrp->last_name);
-
+                    $feedback_date="";
+                    $feedback_time="";
+                    
                     $this->db->select('*');
                     $this->db->from('tbl_feedbacks');
                     $this->db->join('tbl_users', 'tbl_users.user_id = tbl_feedbacks.account_id','left');
@@ -8038,6 +10284,8 @@ $query = $this->db->query($sql);
                         $comment = $feedback_dd->comment;
                         $visit_status = ($feedback_dd->like_property)?'Yes':'No';
                         $date_user = $feedback_dd->visit_date." & ".$feedback_dd->visit_time." By ".ucwords($feedback_dd->first_name." ".$feedback_dd->last_name);
+                        $feedback_date = $feedback_dd->visit_date;
+                        $feedback_time = $feedback_dd->visit_time;
                     }
 
                     
@@ -8076,6 +10324,9 @@ $query = $this->db->query($sql);
                         "size_unit"=>$feedback_data->size_unit_name,
                         'project_name'=>$itemPrp['project_name'],
                         "date_user"=>$date_user,
+                        "feedback_date"=>$feedback_date,
+                        "feedback_time"=>$feedback_time,
+                        "customer_offer"=>$feedback_dd->customer_offer??"",
                         'size'=>$itemPrp['size'],
                         'pid'=>$itemPrp['pid'],
                         'project_url'=>$project_link,
@@ -8116,7 +10367,7 @@ $query = $this->db->query($sql);
         
     }
     
-        public function get_followup_stage_status()
+    public function get_followup_stage_status()
     {
         $array = array();
 
@@ -8148,10 +10399,40 @@ $query = $this->db->query($sql);
         
     }
 
-	public function agent_register_process()
-	{
+    public function agent_check_email()
+    {
+        $array = array();
 
-		$array = array();
+        if ($this->input->post()) {
+            
+            $agent_email=$this->input->post('email');
+            $agent_user_id=$this->input->post('user_id');
+            $record = $this->Action_model->select_single_join('tbl_users',"email='".$agent_email."' AND (tbl_users.role_id='2' OR tbl_roles.is_agent_member='1')","",array("tbl_roles","tbl_roles.role_id=tbl_users.role_id"));
+
+            if ($record) {
+                $array['data'] = array('status'=>'email_exist','msg'=>'This email address is already exist.');
+            }
+            else {
+                $record = $this->Action_model->select_single_join('tbl_users',"username='".$agent_user_id."' AND (tbl_users.role_id='2' OR tbl_roles.is_agent_member='1')","",array("tbl_roles","tbl_roles.role_id=tbl_users.role_id"));
+                if ($record) {
+                    $array['data'] = array('status'=>'user_id_exist','msg'=>'This User Id is already exist.');
+                }
+                else {
+                    $array['data'] = array('status'=>'true','msg'=>'Continue Register');
+                }
+            }
+        }
+        else { 
+           $array['data'] = array('status'=>'error','msg'=>'Some error occurred, please try again.');
+        }
+
+        echo json_encode($array);
+    }
+
+    public function agent_register_process()
+    {
+
+        $array = array();
 
         if ($this->input->post()) {
             
@@ -8162,7 +10443,7 @@ $query = $this->db->query($sql);
             $record = $this->Action_model->select_single_join('tbl_users',"email='".$agent_email."' AND (tbl_users.role_id='2' OR tbl_roles.is_agent_member='1')","",array("tbl_roles","tbl_roles.role_id=tbl_users.role_id"));
 
             if ($record) {
-                $array = array('status'=>'false','msg'=>'This email address is already exist.');
+                $array['data'] = array('status'=>'false','msg'=>'This email address is already exist.');
             }
             else {
 
@@ -8170,11 +10451,11 @@ $query = $this->db->query($sql);
 
                 if ($record_otp) {
 
-                	$record = $this->Action_model->select_single_join('tbl_users',"username='".$username."' AND (tbl_users.role_id='2' OR tbl_roles.is_agent_member='1')","",array("tbl_roles","tbl_roles.role_id=tbl_users.role_id"));
+                    $record = $this->Action_model->select_single_join('tbl_users',"username='".$username."' AND (tbl_users.role_id='2' OR tbl_roles.is_agent_member='1')","",array("tbl_roles","tbl_roles.role_id=tbl_users.role_id"));
                     if ($record) {
-    	                $array = array('status'=>'false','msg'=>'This User Id is already exist.');
-    	            }
-    	            else {
+                        $array['data'] = array('status'=>'false','msg'=>'This User Id is already exist.');
+                    }
+                    else {
 
                         $plan_id = 0;
                         $no_of_user = 0;
@@ -8189,33 +10470,33 @@ $query = $this->db->query($sql);
 
                         $email_confirm_code = bin2hex(openssl_random_pseudo_bytes(16)).md5(time());
 
-    	            	$record_array = array(
-    		                'first_name'=>$this->input->post('group_name'),
-    		                'email'=>$this->input->post('email'),
-    		                'username'=>$this->input->post('user_id'),
-    		                'first_name'=>$this->input->post('first_name'),
-    		                'last_name'=>$this->input->post('last_name'),
+                        $record_array = array(
+                            'first_name'=>$this->input->post('group_name'),
+                            'email'=>$this->input->post('email'),
+                            'username'=>$this->input->post('user_id'),
+                            'first_name'=>$this->input->post('first_name'),
+                            'last_name'=>$this->input->post('last_name'),
                             'country_id'=>1,
-    		                'city_id'=>$this->input->post('city'),
-    		                'state_id'=>$this->input->post('state'),
-    		                'mobile'=>$this->input->post('mobile'),
-    		                'whatsapp_no'=>$this->input->post('whatsapp_no'),
-    		                'date_register'=>date("d-m-Y"),
-    		                'role_id'=>2,
-    		                'user_status'=>1,
-    		                'user_hash'=>md5(time()).time().rand(1000,9999),
-    		                'password'=>md5($this->input->post('password')),
+                            'city_id'=>$this->input->post('city'),
+                            'state_id'=>$this->input->post('state'),
+                            'mobile'=>$this->input->post('mobile'),
+                            'whatsapp_no'=>$this->input->post('whatsapp_no'),
+                            'date_register'=>date("d-m-Y"),
+                            'role_id'=>2,
+                            'user_status'=>1,
+                            'user_hash'=>md5(time()).time().rand(1000,9999),
+                            'password'=>md5($this->input->post('password')),
                             'email_confirm_code'=>$email_confirm_code,
-    		                'created_at'=>time(),
-    		                'updated_at'=>time(),
-    		                'plan_id'=>$plan_id,
+                            'created_at'=>time(),
+                            'updated_at'=>time(),
+                            'plan_id'=>$plan_id,
                             'no_of_user'=>$no_of_user,
-    		                'accept_terms'=>$this->input->post('accept'),
+                            'accept_terms'=>$this->input->post('accept'),
                             'unique_code'=>rand(100000,999999),
                             'is_individual'=>'',
                             'email_verify'=>0,
                             'mobile_verify'=>1
-    		            );
+                        );
 
                         if ($plan_id==1) {
                             $record_array['current_plan_date'] = date("d-m-Y");
@@ -8240,22 +10521,22 @@ $query = $this->db->query($sql);
 
                         $this->Action_model->sendMobileSMS($this->input->post('mobile'),"Dear Agent, Thanks for Register with us, you may reach us @ support@agentdiary.com  or 9694555666");
 
-    	                $array = array('status'=>'true','msg'=>'Registration Successfully, We have sent an email with a verification link to verify your email address.');
-    	            }
+                        $array['data'] = array('status'=>'true','msg'=>'Registration Successfully, We have sent an email with a verification link to verify your email address.');
+                    }
                 }
                 else {
-                    $array = array('status'=>'false','msg'=>'Incorrect OTP');
+                    $array['data'] = array('status'=>'false','msg'=>'Incorrect OTP');
                 }
             }
         }
         else { 
-           $array = array('status'=>'false','msg'=>'Some error occurred, please try again.');
+           $array['data'] = array('status'=>'false','msg'=>'Some error occurred, please try again.');
         }
 
         echo json_encode($array);
-	}
-	
- public function agent_get_mobile_otp()
+    }
+    
+   public function agent_get_mobile_otp()
     {
         $array = array();
 
@@ -8265,10 +10546,10 @@ $query = $this->db->query($sql);
             $record = $this->Action_model->select_single_join('tbl_users',"mobile='".$mobile."' AND (tbl_users.role_id='2' OR tbl_roles.is_agent_member='1')","",array("tbl_roles","tbl_roles.role_id=tbl_users.role_id"));
 
             if ($record) {
-                $array = array('status'=>'false','msg'=>'This mobile number is already exist.');
+                $array['data'] = array('status'=>'false','msg'=>'This mobile number is already exist.');
             }
             else {
-                $otp = rand(999,9999);
+                $otp = rand(99999,999999);
                 $record_otp = $this->Action_model->select_single('tbl_otp',"mobile='".$mobile."' AND otp_type='1'");
 
                 $record_array = array(
@@ -8288,11 +10569,11 @@ $query = $this->db->query($sql);
                     $record_array['create_at'] = time();
                     $this->Action_model->insert_data($record_array,'tbl_otp');
                 }
-                $array = array('status'=>'true','msg'=>'One Time Password (OTP) has been sent to your mobile <b>'.$mobile.'</b>');
+                $array['data'] = array('status'=>'true','msg'=>'One Time Password (OTP) has been sent to your mobile '.$mobile);
             }
         }
         else { 
-           $array = array('status'=>'false','msg'=>'Some error occurred, please try again.');
+           $array['data'] = array('status'=>'false','msg'=>'Some error occurred, please try again.');
         }
 
         echo json_encode($array);
@@ -8309,30 +10590,30 @@ $query = $this->db->query($sql);
             $record = $this->Action_model->select_single_join('tbl_users',"mobile='".$mobile."' AND (tbl_users.role_id='2' OR tbl_roles.is_agent_member='1')","",array("tbl_roles","tbl_roles.role_id=tbl_users.role_id"));
 
             if ($record) {
-                $array = array('status'=>'false','msg'=>'This mobile number is already exist.');
+                $array['data'] = array('status'=>'false','msg'=>'This mobile number is already exist.');
             }
             else {
                 $record_otp = $this->Action_model->select_single('tbl_otp',"mobile='".$mobile."' AND otp='".$otp."' AND otp_type='1'");
 
                 if ($record_otp) {
-                    $array = array('status'=>'true','msg'=>'Mobile Number verified successfully.');
+                    $array['data'] = array('status'=>'true','msg'=>'Mobile Number verified successfully.');
                 }
                 else {
-                    $array = array('status'=>'false','msg'=>'Incorrect OTP');
+                    $array['data'] = array('status'=>'false','msg'=>'Incorrect OTP');
                 }
                 
             }
         }
         else { 
-           $array = array('status'=>'false','msg'=>'Some error occurred, please try again.');
+           $array['data'] = array('status'=>'false','msg'=>'Some error occurred, please try again.');
         }
 
         echo json_encode($array);
     }
 
-	public function forgot_password()
-	{
-		$array = array();
+    public function forgot_password()
+    {
+        $array = array();
 
         if ($this->input->post()) {
             
@@ -8372,9 +10653,9 @@ $query = $this->db->query($sql);
         }
 
         echo json_encode($array);
-	}
+    }
 
- public function agent_reset_password()
+    public function agent_reset_password()
     {
         $array = array();
 
@@ -8382,15 +10663,16 @@ $query = $this->db->query($sql);
             
             $reset_code=$this->input->post('reset_code');
             $password=md5($this->input->post('password'));
+            $username=$this->input->post('username');
 
-            $record = $this->Action_model->select_single_join('tbl_users',"reset_code='".$reset_code."' AND (tbl_users.role_id='2' OR tbl_roles.is_agent_member='1')","",array("tbl_roles","tbl_roles.role_id=tbl_users.role_id"));
+            $record = $this->Action_model->select_single_join('tbl_users',"email='".$username."' AND reset_code='".$reset_code."' AND (tbl_users.role_id='2' OR tbl_roles.is_agent_member='1')","",array("tbl_roles","tbl_roles.role_id=tbl_users.role_id"));
 
             if ($record) {
                 $this->Action_model->update_data(array('reset_code'=>'','password'=>$password),'tbl_users',"reset_code='".$reset_code."'");
                 $array['data'] = array('status'=>'true','msg'=>'Your password updated successfully');
             }
             else {
-                $array['data'] = array('status'=>'false','msg'=>'Enter Valid Valid Email Id.');
+                $array['data'] = array('status'=>'incorrect_otp','msg'=>'Incorrect OTP.');
             }
         }
         else { 
@@ -8400,9 +10682,9 @@ $query = $this->db->query($sql);
         echo json_encode($array);
     }
 
-	public function agent_forgot_userid()
-	{
-		$array = array();
+    public function agent_forgot_userid()
+    {
+        $array = array();
 
         if ($this->input->post()) {
             
@@ -8433,9 +10715,1335 @@ $query = $this->db->query($sql);
         }
 
         echo json_encode($array);
-	}
-	
+    }
+    
+    public function invoice_list()
+    {
+     
+        $where = "user_hash='".$this->input->post('user_hash')."'";
+    
+        $user_detail = $this->Action_model->select_single('tbl_users',$where);
 
+        $uid = $user_detail->user_id;
+        if ($user_detail->parent_id!=0)
+        {
+            $uid = $user_detail->parent_id;
+        }
+
+        $select = "user_id,payment_id,tbl_payment.no_of_user,CASE
+                                                              WHEN invoice_type = 1 THEN 'Peforma Invoice'
+                                                              WHEN invoice_type = 2 THEN 'Tax Invoice'
+                                                              ELSE ''
+                                                              END AS invoice_type,
+                 CONCAT(current_plan_date,' TO ',next_due_date) AS bill_period,amount_per_user,monthly_cost,total_amount,payment_status,
+                 invoice_date,name,tbl_plan.plan_name,tbl_city.city_name,receipt_remark,receipt_date,invoice_id,tbl_states.state_name";
+      
+       $searchValue = $this->input->post("search");
+       $searchQuery = "((entry_type='1' AND payment_status='1') OR (entry_type='2')) AND user_id='".$uid."'";
+       
+      
+         if($searchValue != '')
+         {
+           
+            $searchQuery .= " AND (tbl_payment.no_of_user like '%".$searchValue."%' OR  invoice_type like '%".$searchValue."%' OR current_plan_date like '%".$searchValue."%' OR next_due_date like '%".$searchValue."%'
+            OR amount_per_user like '%".$searchValue."%' OR monthly_cost like '%".$searchValue."%' OR total_amount like '%".$searchValue."%' OR invoice_date like '%".$searchValue."%' OR payment_id like '%".$searchValue."%' OR CASE 
+            WHEN payment_status = 0 THEN 'unpaid'
+            WHEN payment_status = 1 THEN 'paid'
+            ELSE ''
+            END LIKE '".$searchValue."%' 
+            OR CASE 
+             WHEN invoice_type = 1 THEN 'Peforma Invoice'
+             WHEN invoice_type = 2 THEN 'Tax Invoice'
+             ELSE ''
+             END LIKE '%".$searchValue."%') ";
+         }
+     
+          $this->db->select($select);
+                $this->db->from('tbl_payment');
+                $this->db->join('tbl_plan', "tbl_plan.plan_id = tbl_payment.plan_id", 'left');
+                $this->db->join('tbl_city', "tbl_city.city_id = tbl_payment.city", 'left');
+                $this->db->join('tbl_states', "tbl_states.state_id = tbl_payment.state", 'left');
+                $this->db->where($searchQuery);
+                $query = $this->db->get();
+                $data = $query->result();
+                
+    
+       $response = array();
+       
+       if(count($data)):
+           
+           $response =  array("status"=>true,"msg"=>"Data successfully found","invoice_list"=>$data);
+       
+       else:
+           
+           $response =  array("status"=>false,"msg"=>"Data not found","invoice_list"=>$data);
+       
+       endif;
+       
+        echo json_encode($response);
+   }
+    
+    
+   /* template start */
+    public function template_list(){
+     
+        $account_id = getAccountIdHash($this->input->post("user_hash"));
+        $select = 'template_id,template_name,template_status,template_type,template_message,disable_delete';
+      
+        $searchValue = $this->input->post("search");
+        $searchQuery = "template_id!='' AND user_id='".$account_id."'";
+         if($searchValue != '')
+         {
+            $searchQuery .= " AND (template_name like '%".$searchValue."%' ) ";
+         }
+           
+       $this->db->select($select);
+       $this->db->from('tbl_templates');
+       $this->db->where($searchQuery);
+       $query = $this->db->get();
+       $data = $query->result();
+       
+       
+       $response = array();
+       
+       if(count($data)):
+           
+           $response =  array("status"=>true,"msg"=>"Data successfully found","template_list"=>$data);
+       
+       else:
+           
+           $response =  array("status"=>false,"msg"=>"Data not found","template_list"=>$data);
+       
+       endif;
+       
+       
+        echo json_encode($response);
+    }
+    
+    
+
+    public function template_process()
+    {
+        $array = array();
+
+        if ($this->input->post()) {
+            
+            $id=$this->input->post('id');
+            $account_id = getAccountIdHash($this->input->post("user_hash"));
+
+            $record = $this->Action_model->select_single('tbl_templates',"template_id='".$id."' AND user_id='".$account_id."'");
+
+            $record_array = array(
+                'template_name'=>$this->input->post('template_name'),
+                'template_status'=>$this->input->post('template_status'),
+                'template_message'=>$this->input->post('template_message'),
+                'template_type'=>$this->input->post('template_type'),
+                'template_subject'=>$this->input->post('template_subject')
+            );
+
+            if ($record) {
+                $record_array['updated_at'] = time();
+
+                if ($this->Action_model->select_single('tbl_templates',"template_name='".$this->input->post('template_name')."' AND template_id!='".$id."' AND user_id='".$account_id."'")) {
+                    $array = array('status'=>false,'msg'=>'This Template is already exist.');
+                }
+                else {
+                    $this->Action_model->update_data($record_array,'tbl_templates',"template_id='".$id."'");
+                    $array = array('status'=>true,'msg'=>'Template Updated Successfully!!');
+                }
+            }
+            else 
+            {
+                $record_array['user_id'] = $account_id;
+                $record_array['created_at'] = time();
+                $record_array['updated_at'] = time();
+
+                if ($this->Action_model->select_single('tbl_templates',"template_name='".$this->input->post('template_name')."' AND user_id='".$account_id."'"))
+                {
+                    $array = array('status'=>false,'msg'=>'This Template is already exist.');
+                }
+                else {
+                    $this->Action_model->insert_data($record_array,'tbl_templates');
+                    $array = array('status'=>true,'msg'=>'Template Added Successfully!!');
+                }
+            }
+        }
+        else { 
+           $array = array('status'=>false,'msg'=>'Some error occurred, please try again.');
+        }
+
+        echo json_encode($array);
+        
+    }
+
+    public function delete_template()
+    {
+        $array = array();
+
+        if ($this->input->post()) {
+            
+            $id=$this->input->post('id');
+            $account_id = getAccountIdHash($this->input->post("user_hash"));
+            $record = $this->Action_model->select_single('tbl_templates',"template_id='".$id."' AND user_id='".$account_id."'");
+
+            if ($record) {
+                $this->Action_model->delete_query('tbl_templates',"template_id='".$id."'");
+                $array = array('status'=>true,'msg'=>'Template Deleted Successfully!!');
+            }
+            else {
+                $array = array('status'=>false,'msg'=>'Record Not Found!!');
+            }
+        }
+        else { 
+           $array = array('status'=>false,'msg'=>'Some error occurred, please try again.');
+        }
+
+        echo json_encode($array);
+        
+    }
+    /* template end */
+    
+
+
+
+   /* email configuration or whatsapp configuration start*/
+   
+   
+   public function user_detail()
+   {
+        $account_id =  getAccountIdHash($this->input->post("user_hash"));
+        $where = "tbl_users.user_id='".$account_id."'";
+        $this->db->select('tbl_user_details.mail_username,tbl_user_details.mail_password,tbl_user_details.whatsapp_api_mobile,tbl_user_details.whatsapp_api_password,tbl_users.no_of_sms,
+        tbl_users.first_name,tbl_users.last_name,tbl_users.email,tbl_users.email_verify,tbl_users.mobile,tbl_users.username,tbl_users.mobile_verify,tbl_users.no_of_user,tbl_users.per_user_amount,tbl_users.monthly_cost,tbl_plan.plan_name');
+        $this->db->from('tbl_users');
+        $this->db->join('tbl_user_details', 'tbl_user_details.user_id = tbl_users.user_id');
+        $this->db->join('tbl_plan', 'tbl_plan.plan_id = tbl_users.plan_id');
+        $this->db->where($where);
+        $query = $this->db->get();
+        $user_detail = $query->row();
+        
+        $response = array();
+        if(!$user_detail)
+        {
+          $response = array('status'=>false,'msg'=>'Not a valid User');
+          
+        }else
+        {
+             $response = array('status'=>true,'msg'=>'Valid User',"user_data"=>$user_detail);
+        }
+        
+       echo json_encode($response );
+   }
+
+
+   public function update_email_configuration()
+    {
+        $array = array();
+
+        if ($this->input->post()) {
+            $account_id =  getAccountIdHash($this->input->post("user_hash"));
+            $where = "user_id='".$account_id."'";
+            $user_detail = $this->Action_model->select_single('tbl_users',$where);
+
+            $record_array = array(
+                'mail_username'=>$this->input->post('mail_username'),
+                'mail_password'=>$this->input->post('mail_password')
+            );
+
+            if ($user_detail) 
+            {
+                $this->Action_model->update_data($record_array,'tbl_user_details',$where);
+                $array = array('status'=>true,'msg'=>'Email Configration Updated Successfully!!');
+            }
+            else {
+                $array = array('status'=>false,'msg'=>'Some error occurred, please try again.');
+            }
+        }
+        else { 
+           $array = array('status'=>false,'msg'=>'Some error occurred, please try again.');
+        }
+        
+        echo json_encode($array);
+        
+    }
+    
+    
+
+    public function update_whatsapp_configuration()
+    {
+        $array = array();
+
+        if ($this->input->post()) 
+        {
+            $account_id = getAccountIdHash($this->input->post("user_hash"));
+            $where = "user_id='".$account_id."'";
+            $user_detail = $this->Action_model->select_single('tbl_users',$where);
+
+            $record_array = array
+            (
+                'whatsapp_api_mobile'=>$this->input->post('whatsapp_api_mobile'),
+                'whatsapp_api_password'=>$this->input->post('whatsapp_api_password')
+            );
+
+            if ($user_detail) 
+            {
+                $this->Action_model->update_data($record_array,'tbl_user_details',$where);
+                $array = array('status'=>true,'msg'=>'Whatsapp Configration Updated Successfully!!');
+            }
+            else {
+                $array = array('status'=>false,'msg'=>'Some error occurred, please try again.');
+            }
+        }
+        else
+        { 
+           $array = array('status'=>false,'msg'=>'Some error occurred, please try again.');
+        }
+
+        echo json_encode($array);
+        
+    }
+
+  /* email configuration or whatsapp configuration end*/
+  
+  
+  
+    public function get_verify_mobile_otp()
+    {
+        $array = array();
+        $account_id = getAccountIdHash($this->input->post("user_hash"));
+        $where = "user_id='".$account_id."'";
+        $user_detail = $this->Action_model->select_single('tbl_users',$where);
+        
+        if ($user_detail) 
+        {
+            $mobile =$user_detail->mobile;
+            $user_id=$user_detail->user_id;
+          
+        }
+
+        if ($user_detail && $this->input->post()) 
+        {
+            $mobile_otp = rand(999,9999);
+            $this->Action_model->update_data(array('mobile_otp'=>$mobile_otp),'tbl_users',$where);
+            
+            $array = array('status'=>true,'msg'=>'OTP sent to '.$mobile);
+        }
+        else 
+        { 
+           $array = array('status'=>false,'msg'=>'Some error occurred, please try again.');
+           
+        }
+
+        echo json_encode($array);
+        
+    }
+
+    public function verify_mobile()
+    {
+        $array = array();
+
+        $account_id = 0;
+        $user_id = 0;
+        $mobile = "";
+        
+        $account_id = getAccountIdHash($this->input->post("user_hash"));
+        $where = "user_id='".$account_id."'";
+        $user_detail = $this->Action_model->select_single('tbl_users',$where);
+        
+        if ($user_detail) 
+        {
+            $mobile =$user_detail->mobile;
+            $user_id=$user_detail->user_id;
+        }
+
+        if ($user_detail && $this->input->post()) 
+        {
+            $mobile_otp = $this->input->post('mobile_otp');
+            
+            if ($user_detail->mobile_otp==$mobile_otp) 
+            {
+                
+                $this->Action_model->update_data(array('mobile_otp'=>'','mobile_verify'=>1),'tbl_users', $where);
+             
+                $array = array('status'=>true,'msg'=>'Mobile Verified');
+            
+            }
+            else 
+            {
+                $array = array('status'=>false,'msg'=>'Incorrect OTP');
+            }
+            
+        }
+        else 
+        { 
+           $array = array('status'=>false,'msg'=>'Some error occurred, please try again.');
+        }
+
+        echo json_encode($array);
+    }
+    
+    
+    
+     // custom sms
+    public function get_sms_form()
+    {
+        $array = array();
+
+        if ($this->input->post()) {
+            $type = $this->input->post('type');
+
+            $account_id = getAccountIdHash($this->input->post("user_hash"));
+            $where = "template_status='1' AND user_id='".$account_id."' AND template_type='".$type."'";
+            $template_data = $this->Action_model->detail_result('tbl_templates',$where);
+            $template_list = array();
+            if ($template_data) {
+                $template_list = $template_data;
+            }
+            
+        
+            $array = array('status'=>true,'message'=>'Data found','template_list'=>$template_list);
+        }
+        else { 
+           $array = array('status'=>false,'message'=>'Some error occurred, please try again.');
+        }
+
+        echo json_encode($array);
+        
+    }
+    
+    
+    public function send_sms_whatsapp_email()
+    {
+        $array = array();
+        $type = $this->input->post('type');
+        $user_id = getAccountIdHash($this->input->post("user_hash"));
+        $send_to = $this->input->post('send_to');
+        $message = $this->input->post('message');
+        $subject = $this->input->post('subject');
+        $send_type = $this->input->post('send_type');
+
+        if($send_type=="lead") {
+
+            $where = "lead_id='".$user_id."'";
+            $user_detail = $this->Action_model->select_single('tbl_leads',$where,"*,CONCAT(lead_first_name, ' ', lead_last_name) AS lead_name");
+
+            if ($user_detail) {
+                $message = str_replace("[customer_name]", $user_detail->lead_name, $message);
+                $message = str_replace("[customer_email]", $user_detail->lead_email, $message);
+                $message = str_replace("[customer_mobile]", $user_detail->lead_mobile_no, $message);
+            }
+        }
+        else if($send_type=="agent") {
+
+            $where = "user_id='".$user_id."'";
+            $user_detail = $this->Action_model->select_single('tbl_users',$where);
+
+            if ($user_detail) 
+            {
+                $message = str_replace("[name]", $this->Action_model->get_name($user_detail->user_id), $message);
+                $message = str_replace("[email]", $user_detail->email, $message);
+                $message = str_replace("[mobile]", $user_detail->mobile, $message);
+                $message = str_replace("[expire_date]", $user_detail->next_due_date, $message);
+            }
+        }
+        else {
+
+            $where = "user_id='".$user_id."'";
+            $user_detail = $this->Action_model->select_single('tbl_users',$where);
+
+            if ($user_detail) {
+                $message = str_replace("[name]", $this->Action_model->get_name($user_detail->user_id), $message);
+                $message = str_replace("[email]", $user_detail->email, $message);
+                $message = str_replace("[mobile]", $user_detail->mobile, $message);
+                $message = str_replace("[expire_date]", $user_detail->next_due_date, $message);
+            }
+        }
+
+        //echo $message;exit;
+
+        if ($this->input->post()) 
+        {
+            $msg = "";
+            if ($type=="1") {
+                $msg = "SMS Sent Successfully";
+
+                $account_id = getAccountIdHash($this->input->post("user_hash"));
+                $where = "tbl_user_details.user_id='".$account_id."'";
+
+                $this->db->select('*');
+                $this->db->from('tbl_user_details');
+                $this->db->join('tbl_users', 'tbl_users.user_id = tbl_user_details.user_id');
+                $this->db->where($where);
+                $query = $this->db->get();
+                $agent_detail = $query->row();
+                if ($agent_detail && $agent_detail->no_of_sms>0) {
+
+
+                    $s_account_id = $account_id;
+                    $s_team_user_id = "";
+                    $s_customer_id = "";
+                    $s_mobile = $send_to;
+                    $s_message  =$message;
+
+                    $sms_response = $this->Action_model->sendMobileSMS($s_mobile,$s_message,true);
+                    
+                    if ($sms_response) {
+                        $sms_response_array = json_decode($sms_response);
+                        if ($sms_response_array && isset($sms_response_array->status) && $sms_response_array->status=="success") {
+
+                            $sms_before = $agent_detail->no_of_sms;
+                            $net_no_of_sms = $sms_before - 1;
+                            $sms_after = $net_no_of_sms;
+
+                            $user_data = array(
+                                'no_of_sms' => $net_no_of_sms
+                            );
+                            $where = "user_id='".$account_id."'";
+                            $this->Action_model->update_data($user_data,'tbl_users',$where);
+
+                            $sms_credit_array = array(
+                                'account_id' => $s_account_id,
+                                'team_user_id' => $s_team_user_id,
+                                'customer_id' => $s_customer_id,
+                                'sms_before' => $sms_before,
+                                'sms_after' => $sms_after,
+                                'mobile' => $s_mobile,
+                                'message' => $s_message,
+                                'create_at' => date("d-m-Y H:i:s A")
+                            );
+
+                            $this->Action_model->insert_data($sms_credit_array,'tbl_sms_history');
+
+
+                            $array = array('status'=>true,'msg'=>$msg);
+                        }
+                        else {
+                            $array = array('status'=>false,'msg'=>"SMS API Error, Please Try Again");
+                        }
+                    }
+                    else {
+                        $array = array('status'=>false,'msg'=>"SMS API Error, Please Try Again");
+                    }
+                }
+                else {
+                    $array = array('status'=>false,'msg'=>"Please purchase sms and try again.");
+                }
+            }
+            else if ($type=="2") 
+            {
+                $msg = "Email Sent Successfully";
+                $result_status = $this->Action_model->sendEmailFromAgent($send_to,$subject,$message,$user_id);
+                
+
+                if ($result_status==1) 
+                {
+                    $array = array('status'=>true,'msg'=>$msg);
+                }
+                else if ($result_status==2)
+                {
+                    $array = array('status'=>false,'msg'=>"Please update your email configuration and try again");
+                }
+                else {
+                    $array = array('status'=>false,'msg'=>"Error in sending email, Please Try Again");
+                }
+            }
+            else if ($type=="3") 
+            {
+                $msg = "Whatsapp Message Sent Successfully";
+                $result_status = $this->Action_model->sendWhatsappMessageFromAgent($send_to,$message, $user_id);
+                if ($result_status==1)
+                {
+                    $array = array('status'=>true,'msg'=>$msg);
+                }
+                else if ($result_status==2)
+                {
+                    $array = array('status'=>false,'msg'=>"Please update your whatsapp configuration and try again");
+                }
+                else 
+                {
+                    $array = array('status'=>false,'msg'=>"Whatsapp API Error, Please Try Again");
+                }
+            }
+
+            
+        }
+        else { 
+           $array = array('status'=>false,'msg'=>'Some error occurred, please try again.');
+        }
+
+        echo json_encode($array);
+    
+    }
+    
+    public function transfer_lead()
+    {
+        $array = array();
+
+        $account_id = getAccountIdHash($this->input->post("user_hash"));
+        $user_id = 0;
+
+        if($this->input->post()) 
+        {
+            $transfer_lead_id = $this->input->post('transfer_lead_id');
+            $transfer_to = $this->input->post('transfer_to');
+
+            $record = $this->Action_model->select_single('tbl_leads',"lead_id='".$transfer_lead_id."' AND account_id='".$account_id."'");
+
+            if ($record) {
+
+                $record_array = array(
+                    'user_id'=>$transfer_to
+                );
+
+                $this->Action_model->update_data($record_array,'tbl_leads',"lead_id='".$transfer_lead_id."' AND account_id='".$account_id."'");
+
+                $this->Action_model->update_data($record_array,'tbl_followup',"lead_id='".$transfer_lead_id."' AND user_id='".$record->user_id."'");
+                $this->Action_model->update_data($record_array,'tbl_requirements',"lead_id='".$transfer_lead_id."' AND user_id='".$record->user_id."'");
+                $this->Action_model->update_data($record_array,'tbl_site_visit',"lead_id='".$transfer_lead_id."' AND user_id='".$record->user_id."'");
+
+                $record_array = array(
+                    'lead_id'=>$transfer_lead_id,
+                    'transfer_from'=>$record->user_id,
+                    'transfer_to'=>$transfer_to,
+                    'transfer_by'=>$user_id,
+                    'created_at'=>time()
+                );
+
+                $this->Action_model->insert_data($record_array,'tbl_lead_transfer');
+
+                $lead_history_array = array(
+                    'title' => 'Transfer Lead',
+                    'description' => 'Lead transfer to '.$this->Action_model->get_name($transfer_to).' by '.$this->Action_model->get_name($user_id),
+                    'lead_id' => $transfer_lead_id,
+                    'created_at' => time(),
+                    "account_id"=>$account_id,
+                    "user_id"=>$user_id
+                );
+                $this->Action_model->insert_data($lead_history_array,'tbl_lead_history');
+
+                $array = array('status'=>"true",'msg'=>'Lead Transfered Successfully!!');
+            }
+            else {
+                $array = array('status'=>"false",'msg'=>'Lead Not Found!!');
+            }
+        }
+        else { 
+           $array = array('status'=>"false",'msg'=>'Some error occurred, please try again.');
+        }
+
+        echo json_encode($array);
+        
+    }
+    
+
+    # start lead details
+
+    public function get_lead_details_with_p_c_n(){
+       
+        $previous_lead_id         = $this->input->post('previous_id');
+        $current_lead_id          = $this->input->post('current_id');
+        $next_lead_id             = $this->input->post('next_id');
+        
+        
+            if ($this->input->post()) {
+             $account_id = getAccountIdHash($this->input->post('user_hash'));
+     
+             if (!$account_id) {
+                 $array['data'] = array('status' => 'false', 'msg' => 'Some Error Occurred.');
+                 echo json_encode($array);
+                 exit;
+             }
+     
+             // $id = $this->input->post('lead_id');
+     
+             $where = "lead_id='" . $current_lead_id . "' AND account_id='" . $account_id . "'";
+
+             $profile_base_url     =   base_url('public/other/profile/');
+     
+             $this->db->select("tbl_users.username as added_by_name, tbl_leads.* ,tbl_states.*, tbl_city.*, tbl_occupations.*, tbl_lead_types.*, tbl_lead_stages.*, tbl_lead_sources.*, tbl_designations.*");
+             $this->db->from('tbl_leads');
+             $this->db->join('tbl_states', 'tbl_states.state_id = tbl_leads.lead_state_id', 'left');
+             $this->db->join('tbl_city', 'tbl_city.city_id = tbl_leads.lead_city_id', 'left');
+             $this->db->join('tbl_occupations', 'tbl_occupations.occupation_id = tbl_leads.lead_occupation_id', 'left');
+             $this->db->join('tbl_lead_types', 'tbl_lead_types.lead_type_id = tbl_leads.lead_status', 'left');
+             $this->db->join('tbl_lead_stages', 'tbl_lead_stages.lead_stage_id = tbl_leads.lead_stage_id', 'left');
+             $this->db->join('tbl_lead_sources', 'tbl_lead_sources.lead_source_id = tbl_leads.lead_source_id', 'left');
+             $this->db->join('tbl_designations', 'tbl_designations.designation_id = tbl_leads.lead_designation', 'left');
+             $this->db->join('tbl_users', 'tbl_leads.added_by = tbl_users.user_id', 'left');
+             $this->db->where($where);
+             $query = $this->db->get();
+             $record = $query->row();
+     
+             if ($record) {
+                 # start   
+                 $record->full_profile_url = $record->profile ? $profile_base_url.$record->profile : base_url('public/front/user.png'); 
+                 
+                 // Fetch previous lead ID
+                 $this->db->select('lead_id');
+                 $this->db->from('tbl_leads');
+                 $this->db->where('account_id', $account_id);
+                 $this->db->where('lead_id <', $current_lead_id);
+                 $this->db->order_by('lead_id', 'DESC');
+                 $this->db->limit(1);
+                 $previous_lead_query = $this->db->get();
+                 $previous_lead = $previous_lead_query->row();
+     
+                 // Fetch next lead ID
+                 $this->db->select('lead_id');
+                 $this->db->from('tbl_leads');
+                 $this->db->where('account_id', $account_id);
+                 $this->db->where('lead_id >', $current_lead_id);
+                 $this->db->order_by('lead_id', 'ASC');
+                 $this->db->limit(1);
+                 $next_lead_query = $this->db->get();
+                 $next_lead = $next_lead_query->row();
+                 
+                 // $next_lead_id = $next_lead ? $next_lead->lead_id : null;
+                 // $previous_lead_id = $previous_lead ? $previous_lead->lead_id : null;
+                 # end 
+                 
+                 
+                 $where = "user_status='1' AND ((parent_id='" . $account_id . "') OR (user_id='" . $account_id . "' AND role_id='2'))";
+                 $where_ids = "";
+                 $user_ids = $this->get_level_user_ids($this->input->post('user_hash'));
+     
+                 if (count($user_ids)) {
+                     $where_ids .= " AND (tbl_users.user_id='" . implode("' OR tbl_users.user_id='", $user_ids) . "')";
+                 }
+                 
+                 
+                 $where .= $where_ids;
+     
+                 $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,user_title,first_name,last_name,parent_id,is_individual,firm_name');
+     
+                 $lead_data = array();
+
+                 foreach ($user_list as $row) {
+                     $row->is_individual = (($row->is_individual != '') ? $row->is_individual : "");
+                     $row->firm_name = (($row->firm_name != '') ? $row->firm_name : "");
+                     $row->parent_id = (($row->parent_id != '') ? $row->parent_id : "");
+                     $lead_data[] = $row;
+                 }
+     
+                 $where = "country_id='1' AND state_status=1";
+                 $state_list = $this->Action_model->detail_result('tbl_states', $where);
+                 $where = "state_id='" . $record->lead_state_id . "'";
+                 $city_list = $this->Action_model->detail_result('tbl_city', $where);
+     
+                 $where = "occupation_status='1'";
+                 $occupation_list = $this->Action_model->detail_result('tbl_occupations', $where);
+     
+                 $where = "department_status='1'";
+                 $department_list = $this->Action_model->detail_result('tbl_departments', $where);
+     
+                 $where = "lead_source_status='1'";
+                 $lead_source_list = $this->Action_model->detail_result('tbl_lead_sources', $where);
+     
+                 $where = "lead_stage_status='1'";
+                 $lead_stage_list = $this->Action_model->detail_result('tbl_lead_stages', $where);
+     
+                 $where = "lead_type_status='1'";
+                 $lead_type_list = $this->Action_model->detail_result('tbl_lead_types', $where, 'lead_type_id,lead_type_name');
+                 $data['lead_type_list'] = (($lead_type_list) ? $lead_type_list : array());
+     
+                 $state_list = (($state_list) ? $state_list : array());
+                 $city_list = (($city_list) ? $city_list : array());
+                 $occupation_list = (($occupation_list) ? $occupation_list : array());
+                 $department_list = (($department_list) ? $department_list : array());
+                 $lead_source_list = (($lead_source_list) ? $lead_source_list : array());
+                 $lead_stage_list = (($lead_stage_list) ? $lead_stage_list : array());
+                 
+                 # Primary Mobile Number Country Code
+                 $primary_country_code                          =   ( $record->primary_mobile_number_country_data ?? null ) ? json_decode($record->primary_mobile_number_country_data): '';
+                 $record->primary_mobile_number_country_data    =   $primary_country_code->dialCode ?? 0;
+                 # End Primary Mobile Number Country Code
+                 
+                 # Secondary Mobile Number Country Code
+                 $primary_country_code                          =   ( $record->secondary_mobile_number_country_data ?? null ) ? json_decode($record->secondary_mobile_number_country_data): '';
+                 $record->secondary_mobile_number_country_data    =   $primary_country_code->dialCode ?? 0;
+                 # End Secondary Mobile Number Country Code
+
+                 foreach ($record as $k => $v) {
+                     $record->$k = ($v || $v == 0) ? $v : '';
+
+                 } 
+                 
+                 $record_p = '';
+                 
+                 if($previous_lead_id){
+                     
+                         $where = "lead_id='" . $previous_lead_id . "' AND account_id='" . $account_id . "'";
+     
+                         $this->db->select("tbl_users.username as added_by_name, tbl_leads.*, tbl_states.*, tbl_city.*, tbl_occupations.*, tbl_lead_types.*, tbl_lead_stages.*, tbl_lead_sources.*, tbl_designations.*");
+                         $this->db->from('tbl_leads');
+                         $this->db->join('tbl_states', 'tbl_states.state_id = tbl_leads.lead_state_id', 'left');
+                         $this->db->join('tbl_city', 'tbl_city.city_id = tbl_leads.lead_city_id', 'left');
+                         $this->db->join('tbl_occupations', 'tbl_occupations.occupation_id = tbl_leads.lead_occupation_id', 'left');
+                         $this->db->join('tbl_lead_types', 'tbl_lead_types.lead_type_id = tbl_leads.lead_status', 'left');
+                         $this->db->join('tbl_lead_stages', 'tbl_lead_stages.lead_stage_id = tbl_leads.lead_stage_id', 'left');
+                         $this->db->join('tbl_lead_sources', 'tbl_lead_sources.lead_source_id = tbl_leads.lead_source_id', 'left');
+                         $this->db->join('tbl_designations', 'tbl_designations.designation_id = tbl_leads.lead_designation', 'left');
+                         $this->db->join('tbl_users', 'tbl_leads.added_by = tbl_users.user_id', 'left');
+                         $this->db->where($where);
+                         $query = $this->db->get();
+                         $record_p = $query->row();
+                         
+                         if($record_p){
+                           foreach ($record_p as $k => $v) {
+                             $record_p->$k = ($v || $v == 0) ? $v : '';
+                             } 
+                             $record_p->full_profile_url = $record_p->profile ? $profile_base_url.$record_p->profile : base_url('public/front/user.png');
+                         }
+
+
+                         
+                     
+                 }
+                 
+                 
+                 $record_n = '';
+                 
+                 if($next_lead_id){
+                     
+                     $where = "lead_id='" . $next_lead_id . "' AND account_id='" . $account_id . "'";
+     
+                         $this->db->select("tbl_users.username as added_by_name, tbl_leads.*, tbl_states.*, tbl_city.*, tbl_occupations.*, tbl_lead_types.*, tbl_lead_stages.*, tbl_lead_sources.*, tbl_designations.*");
+                         $this->db->from('tbl_leads');
+                         $this->db->join('tbl_states', 'tbl_states.state_id = tbl_leads.lead_state_id', 'left');
+                         $this->db->join('tbl_city', 'tbl_city.city_id = tbl_leads.lead_city_id', 'left');
+                         $this->db->join('tbl_occupations', 'tbl_occupations.occupation_id = tbl_leads.lead_occupation_id', 'left');
+                         $this->db->join('tbl_lead_types', 'tbl_lead_types.lead_type_id = tbl_leads.lead_status', 'left');
+                         $this->db->join('tbl_lead_stages', 'tbl_lead_stages.lead_stage_id = tbl_leads.lead_stage_id', 'left');
+                         $this->db->join('tbl_lead_sources', 'tbl_lead_sources.lead_source_id = tbl_leads.lead_source_id', 'left');
+                         $this->db->join('tbl_designations', 'tbl_designations.designation_id = tbl_leads.lead_designation', 'left');
+                         $this->db->join('tbl_users', 'tbl_leads.added_by = tbl_users.user_id', 'left');
+                         $this->db->where($where);
+                         $query = $this->db->get();
+                         $record_n = $query->row();
+                         
+                         if($record_n){
+
+                           foreach ($record_n as $k => $v) {     
+                                $record_n->$k = ($v || $v == 0) ? $v : '';   
+                             } 
+
+                             $record_n->full_profile_url = $record_n->profile ? $profile_base_url.$record_n->profile : base_url('public/front/user.png');
+
+                         }        
+                 }
+                 
+                 $array['data'] = array(
+                     'status' => 'true',
+                     'msg' => 'Lead Found',
+                     'current_lead_data' => $record,
+                     'next_lead_data' => $record_p ?? null ,
+                     'previous_lead_data' => $record_n ?? null ,
+                     'records' => $lead_data,
+                     'state_list' => $state_list,
+                     'occupation_list' => $occupation_list,
+                     'department_list' => $department_list,
+                     'lead_source_list' => $lead_source_list,
+                     'lead_stage_list' => $lead_stage_list,
+                     'city_list' => $city_list,
+                     'next_lead_id' =>$previous_lead_id ?? '',
+                     'previous_lead_id' =>  $next_lead_id  ?? '' 
+                 );
+             } 
+             else 
+             {
+                 $array['data'] = array('status' => 'false', 'msg' => 'Record Not Found.');
+             }
+         } 
+         
+         else {
+             
+             $array['data'] = array('status' => 'false', 'msg' => 'Some error occurred, please try again.');
+             
+         }
+     
+         echo json_encode($array);
+                
+     }
+
+  
+     # end lead details
+
+     # download sample excel file 
+
+        public function data_excel_sample(){  
+            
+            $res = array();
+           
+            $sample_file_url = base_url('public/other/sample-file/download-sample-leads.xlsx') ; 
+
+
+            if(file_exists('public/other/sample-file/download-sample-leads.xlsx')){
+
+                $res = array('status' => 'true' , 'msg' => 'File fetched file successfully' , 'sample_file_url' => $sample_file_url );
+
+            }
+            else{
+
+                $res = array('status' => 'false' , 'msg' => 'Some Error');
+
+            }
+
+            echo json_encode($res);
+
+        }
+
+     # download sample excel file 
+
+     # Upload Data File
+
+     public function data_upload(){
+
+        $res = array();
+
+
+        $account_id = getAccountIdHash($this->input->post('user_hash'));
+        
+        $account_id     = 0;
+        $user_id        = 0;
+        $where          = "user_hash='" . $this->input->post('user_hash') . "'";
+        $user_detail    = $this->Action_model->select_single('tbl_users', $where);
+
+        $total_data_count    = 0;
+        $total_uploaded_data_count = 0;  
+
+        if ($user_detail) {
+            $user_id    =   $user_detail->user_id;
+            $account_id =   $user_detail->user_id;
+
+            if ($user_detail->role_id != 2) {
+
+                $account_id = $user_detail->parent_id;
+            }
+        }
+
+
+        $data_excel = array();
+
+        
+        
+        if ($account_id) {
+
+                $upload_path = FCPATH . './uploads/raw-data/';
+                # Create Folder if Folder Not Exits
+                if (!file_exists($upload_path)) {
+                    mkdir($upload_path, 0777, true);
+                }
+                # End Create Folder if Folder Not Exits
+        
+                $config['upload_path']             =  $upload_path;
+                $config['allowed_types']           = 'xlsx';
+
+                $this->load->library('upload', $config);
+
+                $file_res = $this->upload->do_upload('file') ; 
+
+                if($file_res) 
+                {
+
+                  $data = $this->upload->data();
+
+                
+                  if ($data['file_ext'] == '.xlsx') {
+  
+                    require('application/libraries/php-excel-reader/excel_reader2.php');
+                    require('application/libraries/SpreadsheetReader.php');
+
+
+                    $Reader = new SpreadsheetReader($data['full_path']);
+                    $Sheets = $Reader->Sheets();
+
+                    // print_r($Sheets) ; die; 
+
+            
+                    foreach ($Sheets as $Index => $Name) {
+
+                        if ($Index == 0) {
+                            $Reader->ChangeSheet($Index);
+                            foreach ($Reader as $Key => $Row) {
+                              
+                                if ($Key  > 0) {
+                                    $total_data_count++;
+                                    $data_array = array(
+                                        'data_title'            =>  $Row[1] ?? '',
+                                        'data_first_name'       =>  $Row[2] ?? '',
+                                        'data_last_name'        =>  $Row[3] ?? '',
+                                        'data_mobile'           =>  $Row[4] ?? '',
+                                        'data_email'            =>  $Row[5] ?? ''
+                                    );
+
+                                    $where          =   "data_mobile='" . $Row[4] . "' AND account_id='" . $account_id . "'";
+                                    $lead_detail    =   $this->Action_model->select_single('tbl_data', $where);
+
+                                    if ($lead_detail) {
+
+                                        $this->Action_model->update_data($data_array, 'tbl_data', $where);
+                                    } else {
+                                        $total_uploaded_data_count++;
+                                        $data_array2 = array(
+                                            'added_by'          =>  $user_id,
+                                            'account_id'        =>  $account_id,
+                                            'data_status'       =>  1,
+                                            'file_name'         =>  $this->input->post('file_name'),
+                                        );
+
+                                        $data_array     =   array_merge($data_array, $data_array2);
+                                        $lead_id        =   $this->Action_model->insert_data($data_array, 'tbl_data');
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    unlink($data['full_path']);
+                    $res = array('status'=>'true' , 'msg' => "Data Uploaded  $total_uploaded_data_count out of $total_data_count") ;  
+                      
+                }
+                else{
+                    $res = array('status'=>'false' , 'msg' => "Please upload only xlsx file") ;
+                }
+                }else{
+
+                    $res = array('status'=>'false' , 'msg' => "No file selected") ;    
+            }
+
+        } else {
+            $res = array('status'=>'false' , 'msg' => "Some Error") ;  
+        }
+        
+        echo  json_encode($res); 
+
+     }
+
+     # End  Upload Data File
+
+     # Data List
+
+     public function get_data_list(){
+
+        $res            = array();
+        $filters        = array();
+
+        $where          = "user_hash='" . $this->input->post('user_hash') . "'";
+        $user_detail    = $this->Action_model->select_single('tbl_users', $where);
+
+       
+        $account_id     =   $user_detail->user_id;
+        $user_id        =   $user_detail->user_id;
+      
+        $where            = ' 1 = 1 ';
+
+        if( $user_detail->role_id == 2){
+            $where            .= " and account_id = $user_id";
+        }
+        else{
+            $where            .= " and  added_by = $user_id";
+        }
+        
+        $filters['all_file_type'] = $this->db->distinct()->select('file_name')->where($where)->get('tbl_data')->result();
+
+        $filters['all_status']  =  $this->db->distinct()->select('lead_stage_id as lead_status_id,lead_stage_name as lead_status_name')->where(['lead_stage_status' => 1])->get('tbl_lead_stages')->result();
+
+        
+
+        # Reasons
+
+        $reason_where           =   ' 1 = 1';
+        
+        if($user_detail->role_id == 2 ):
+            $reason_where           .=   " and account_id = $user_id  AND  comment IS NOT NULL AND  comment != '' ";
+        else:
+            $reason_where           .=   " and assign_user_id = $user_id or user_id =  $user_id  AND (comment IS NOT NULL AND  comment != '') ";
+        endif;
+
+        $all_reasons  =  $this->db->distinct()->select('comment')->where($reason_where)->get('tbl_followup')->result();
+
+        $filters['all_reasons'] = $all_reasons;
+
+        # End Reasons
+
+
+        # All Team Member 
+
+        if($user_detail->parent_id == 0){
+        
+                $where  = "user_id=$user_detail->user_id OR parent_id=$user_detail->user_id";
+            }
+            else
+            {
+        
+                $where = " user_id=$user_detail->user_id OR report_to=$user_detail->user_id";
+            }
+    
+            $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,CONCAT(user_title," ",first_name," ",last_name) as user_full_name');
+            $filters['user_list'] = $user_list;
+            
+        # End Team Meber 
+
+
+       # data list 
+
+
+       $postData = $this->input->post();
+
+      
+       $searchValue = '';
+       $searchQuery = '';
+
+
+       if($this->input->post('search')){
+         $searchValue =  $this->input->post('search');
+       }
+
+
+       if ($this->input->post('file_name') != '') {
+
+           $file_name = $this->input->post('file_name');
+           $searchQuery .= " file_name= '$file_name'";
+       }
+
+       if ($this->input->post('user')) {
+
+           $account_id = $this->input->post('user');
+           $searchQuery .= " AND tbl_data.added_by= '$account_id'";
+
+       }
+
+       if ($this->input->post('reason')) {
+
+           $reason = $this->input->post('reason');
+           $searchQuery .= " AND followup.comment= '$reason'";
+       }
+
+
+       if ($this->input->post('status')) {
+        
+           $status      =  $this->input->post('status');
+        
+           $searchQuery .= " AND tbl_leads.lead_stage_id= '$status'";
+       }
+
+
+       if ($searchValue != '') {
+
+           if ($this->input->post('file_name') != '') {
+
+               $searchQuery .= " AND (tbl_data.data_first_name LIKE '%" . $searchValue . "%' OR tbl_data.data_mobile LIKE '%" . $searchValue . "%') ";
+           } else {
+
+               $searchQuery .= "(tbl_data.data_first_name LIKE '%" . $searchValue . "%' OR tbl_data.data_mobile LIKE '%" . $searchValue . "%') ";
+           }
+       }
+
+
+
+        $page   = $this->input->post('page') ?? 1 ;
+        $limit  = 10 ;
+        $join   = array('tbl_leads', 'tbl_leads.data_id=tbl_data.data_id', 'tbl_users', 'tbl_users.user_id=tbl_leads.user_id', 'tbl_lead_stages', 'tbl_lead_stages.lead_stage_id=tbl_leads.lead_stage_id', '(SELECT * FROM tbl_followup WHERE followup_id IN (SELECT MAX(followup_id) FROM tbl_followup GROUP BY lead_id))  as followup', 'followup.lead_id = tbl_leads.lead_id');
+        $where  = $searchQuery;
+        $select = "tbl_data.data_id,CONCAT(data_first_name,' ',data_last_name) as data_name, data_mobile as mobile  ,data_status as  status , file_name , data_reason as reason , tbl_leads.lead_id, tbl_leads.lead_stage_id, , tbl_users.user_id, concat(tbl_users.user_title, ' ',tbl_users.first_name, ' ',tbl_users.last_name) as assigned_user_full_name,tbl_lead_stages.lead_stage_name,followup.comment as followup_comment";
+
+
+        $data = $this->Action_model->apiPagination($select,$page,$limit,$join,$where,'tbl_data');
+
+        if($this->input->post('file_name') && count($data['data']) > 0 ){
+            $res = array( 'status' => 'true' , 'msg' =>   'Record fetched successfully '  , 'filters' => $filters , 'data_list' =>  $data['data'] ,'pagination' => $data['pagination']);
+        }
+        elseif(count($data['data']) == 0){
+            $res = array( 'status' => 'false' , 'msg' =>   'Record not found'  , 'filters' => $filters , 'data_list' =>  [] ,'pagination' => $data['pagination']);
+        }
+        else{
+
+            $res = array( 'status' => 'false' , 'msg' =>   'Please select file name '  , 'filters' => $filters , 'data_list' =>  [] ,'pagination' => $data['pagination']);
+
+        }
+
+
+        echo json_encode($res);
+
+     }    
+
+     # End Data List
+
+
+     public function data_assign(){
+            // print_r($this->input->post()); die;
+
+            $account_id     = 0;
+            $user_id        = 0;
+            $where          = "user_hash='" .$this->input->post('user_hash') . "'";
+            $user_detail    = $this->Action_model->select_single('tbl_users', $where);
+
+            // $data['json_data']  = json_encode($this->input->post());   
+
+            // $this->db->insert('tbl_get_all_data_json' , $data);
+
+
+            // $old_data = $this->db->get('tbl_get_all_data_json')->row();  
+            
+          
+
+            // print_r(json_decode(explode(',' ,json_decode($old_data->json_data)->selected_lead_ids)[0])); die;
+
+        
+            // echo '<pre>';
+            // print_r($user_detail); die;  
+    
+    
+            if ($user_detail) {
+                $user_id    =   $user_detail->user_id;
+                $account_id =   $user_detail->user_id;
+                if ($user_detail->role_id != 2) {
+                    $account_id = $user_detail->parent_id;
+                }
+            }
+    
+    
+    
+            $transfer_lead_ids =  $this->input->post('selected_lead_ids');
+            $transfer_lead_ids = explode(',', $transfer_lead_ids);
+            $assign_to = $this->input->post('transfer_to');
+
+            
+
+            if( count($transfer_lead_ids) > 0 ){
+            foreach ($transfer_lead_ids as   $transfer_lead_id) {
+                $raw_data =     $this->db->select('*')->where('data_id', json_decode($transfer_lead_id))->get('tbl_data')->row();
+    
+    
+                if ($raw_data) {
+    
+                    $data_array = array(
+                        'lead_title'            =>  $raw_data->data_title,
+                        'data_id'               =>  $raw_data->data_id,
+                        'lead_first_name'       =>  $raw_data->data_first_name,
+                        'lead_last_name'        =>  $raw_data->data_last_name,
+                        'lead_mobile_no'        =>  $raw_data->data_mobile,
+                        'lead_email'            =>  $raw_data->data_email,
+                        'lead_date'             =>  date("d-m-Y"),
+                        'lead_time'             =>  date("h:i:s a"),
+                        'lead_status'           =>  1,
+                        'lead_stage_id'         =>  1,
+                        'user_id'               =>  $assign_to,
+                    );
+    
+                    $where          =   "lead_mobile_no='" . $raw_data->data_mobile . "' AND account_id='" . $account_id . "'";
+                    $lead_detail    =   $this->Action_model->select_single('tbl_leads', $where);
+                    if ($lead_detail) {
+                        $this->Action_model->update_data($data_array, 'tbl_leads', $where);
+    
+                        $this->db->where('data_id', $raw_data->data_id);
+                        $this->db->update('tbl_data', array('data_reason' => 'Already in Leads', 'data_status' => 0));
+                    } else {
+    
+                        $data_array2 = array(
+                            'account_id'        =>  $account_id,
+                            'added_by'          =>  $user_detail->user_id,
+                        );
+    
+                        $data_array     =   array_merge($data_array, $data_array2);
+                        $lead_id        =   $this->Action_model->insert_data($data_array, 'tbl_leads');
+                        $this->db->where('data_id', $raw_data->data_id);
+                        $this->db->update('tbl_data', array('is_in_lead' => 1));
+                    }
+                }
+            }
+            $array = array('status' => 'true',  'msg' => 'Lead Transfered Successfully!!');
+        }
+        else{
+            $array = array('status' => 'false', 'msg' => 'No Data Selected');
+        }
+            echo json_encode($array);
+
+     }
+
+     public  function delete_data(){
+
+         $data['json_data']  = json_encode($this->input->post());   
+
+            $this->db->insert('tbl_get_all_data_json' , $data);
+
+        
+        if ($this->input->post('data_ids')) {
+
+            $data_ids = explode(',', $this->input->post('data_ids'));
+
+            foreach ($data_ids as $data_id) {
+                $file_name = $this->input->post('file_name');
+                $res =  $this->db->where('file_name', $file_name)->where('data_id', json_decode($data_id))->delete('tbl_data');
+            }
+        } else {
+            $file_name = $this->input->post('file_name');
+
+            $res =  $this->db->where('file_name', $file_name)->delete('tbl_data');
+        }
+
+
+        if ($res) {
+            $array = array('status' => 'true', 'message' => 'Data deleted ');
+        } else {
+            $array = array('status' => 'false', 'message' => 'Some error occurred, please try again.');
+        }
+
+        echo json_encode($array);
+     }
+
+     # get followup retalted data 
+
+        public function get_followup_related_data(){
+            
+            $where          = "user_hash='" .$this->input->post('user_hash') . "'";
+            $user_detail    = $this->Action_model->select_single('tbl_users', $where);
+
+            $account_id     = $user_detail->user_id ;
+
+
+            $where = "lead_stage_status='1'";
+            $lead_stage_list = $this->Action_model->detail_result('tbl_lead_stages', $where, 'lead_stage_id,lead_stage_name');
+            $data['lead_stage_list'] = $lead_stage_list;  
+
+            $where = "lead_action_status='1'";
+            $lead_action_list = $this->Action_model->detail_result('tbl_lead_actions', $where, 'lead_action_id,lead_action_name');
+            $data['lead_action_list'] = $lead_action_list;
+
+            $where = "lead_type_status='1'";
+            $lead_type_list = $this->Action_model->detail_result('tbl_lead_types', $where, 'lead_type_id,lead_type_name');
+            $data['lead_type_list'] = $lead_type_list;
+
+            // $where = "product_type_status='1'";
+            // $project_type_list = $this->Action_model->detail_result('tbl_product_types', $where, 'product_type_id,product_type_name');
+            // $data['project_type_list'] = $project_type_list;
+
+            $where = "user_status='1' AND ((parent_id='" . $account_id . "') OR (user_id='" . $account_id . "' AND role_id='2'))";
+            $where_ids = "";
+            
+            if($user_detail->parent_id == 0){
+        
+                $where  = "user_id=$user_detail->user_id OR parent_id=$user_detail->user_id";
+            }
+            else
+            {
+        
+                $where = " user_id=$user_detail->user_id OR report_to=$user_detail->user_id";
+            }
+    
+            $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,CONCAT(user_title," ",first_name," ",last_name) as user_full_name');
+            $data['user_list'] = $user_list;
+            
+            // $where .= $where_ids;
+
+            // $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,user_title,first_name,last_name,parent_id,is_individual,firm_name');
+            // $data['user_list'] = $user_list;
+
+            echo json_encode($data);
+                
+            
+        }
+
+     # end get followup retalted data
 
 }
-?>
+

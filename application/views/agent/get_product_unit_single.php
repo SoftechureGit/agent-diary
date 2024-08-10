@@ -117,60 +117,17 @@
       <div id="navtabs-inventory" class="tab-pane">
 
         <!-- Filter -->
-        <div class="filter-wrapper mb-4">
+        <div class="filter-wrapper mb-2">
           <!-- <details open>
           <summary> -->
           <!-- Filter -->
           <!-- </summary> -->
           <div class="row">
-
-            <!-- Status -->
-            <div class="col-md-3">
-              <label for="status">Status</label>
-
-              <select id="inventory_filter_status" class="form-control select2 filter-invetory">
-                <option value="">All</option>
-                <?php foreach (inventory_status() as $inventory_status) : ?>
-                  <option value="<?= $inventory_status->id; ?>"><?= $inventory_status->name; ?></option>
-                <?php endforeach; ?>
-              </select>
+            <div class="col-md-12">
+              <div class="text-right">
+                <button class="btn btn-info btn-sm inventory-filter-modal-btn" data-property-type="<?= $record->property_type_id ?>">Filter</button>
+              </div>
             </div>
-            <!-- Status -->
-
-             <!-- Facing -->
-             <div class="col-md-3">
-                        <div class="form-group">
-                            <label for="">Facing</label>
-                            <select id="inventory_filter_facing" class="form-control select2 filter-invetory" >
-                                <option value="">All</option>
-                                <?php 
-                                    foreach(facings() ?? [] as $facing_item): 
-                                    $selected         = $facing_item->facing_id == ( $facing_id ?? 0 ) ? 'selected' : '';
-                                ?>
-                                    <option value="<?= $facing_item->facing_id ?>"  <?= $selected ?>><?= $facing_item->title ?></option>   
-                                    <?php endforeach; ?>
-                                </select>
-                        </div>
-                    </div>
-                    <!-- End Facing -->
-
-            <!-- Floor -->
-            <div class="col-md-3">
-              <label for="status">Floor</label>
-
-              <select id="inventory_filter_floor" class="form-control select2 filter-invetory">
-                <option value="" selected disabled>Choose</option>
-                <?php
-                foreach (getFloors() ?? [] as $floor) :
-                  $selected         = (($floor_id ?? 0) == $floor->id) ? 'selected' : '';
-                ?>
-                  <option value="<?= $floor->id ?>"><?= $floor->name ?? '' ?></option>
-                <?php endforeach; ?>
-              </select>
-            </div>
-            <!-- Floor -->
-
-
           </div>
           <!-- </details> -->
         </div>
@@ -328,6 +285,273 @@
     </div>
   </div>
 </div>
+
+<!-- Filter Modal -->
+<div class="modal fade" id="inventoryFilterModal" role="dialog" aria-labelledby="inventoryFilterModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="inventoryFilterModalLabel">Inventory Filters</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <!-- Status -->
+          <div class="col-md-4 filter-col">
+            <div class="form-group">
+              <label for="status">Status</label>
+
+              <select id="inventory_filter_status" class="form-control select2 filter-invetory">
+                <option value="">All</option>
+                <?php 
+                $inventory_status_data   = (object) [
+                  'property_id' => ($record->product_id ?? 0),
+                  'unit_code'   => ($record->product_unit_detail_id ?? 0),
+                ];
+                foreach (inventory_filter_status($inventory_status_data) as $inventory_status) : ?>
+                  <option value="<?= $inventory_status->id; ?>"><?= $inventory_status->name; ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+          </div>
+          <!-- Status -->
+
+          <!-- Facing -->
+          <div class="col-md-4 filter-col">
+            <div class="form-group">
+              <label for="">Facing</label>
+              <select id="inventory_filter_facing" class="form-control select2 filter-invetory">
+                <option value="">All</option>
+                <?php
+                 $inventory_facing_data   = (object) [
+                  'property_id' => ($record->product_id ?? 0),
+                  'unit_code'   => ($record->product_unit_detail_id ?? 0),
+                ];
+                foreach (inventory_facings($inventory_facing_data) ?? [] as $facing_item) :
+                  $selected         = $facing_item->id == ($facing_id ?? 0) ? 'selected' : '';
+                ?>
+                  <option value="<?= $facing_item->id ?>" <?= $selected ?>><?= $facing_item->name ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+          </div>
+          <!-- End Facing -->
+
+          <!-- Floor -->
+          <div class="col-md-4 filter-col">
+            <div class="form-group">
+              <label for="status">Floor</label>
+
+              <select id="inventory_filter_floor" class="form-control select2 filter-invetory">
+                <option value="">All</option>
+                <?php
+                $inventory_floor_data   = (object) [
+                  'property_id' => ($record->product_id ?? 0),
+                  'unit_code'   => ($record->product_unit_detail_id ?? 0),
+                ];
+
+                foreach (inventory_floors($inventory_floor_data) ?? [] as $floor) :
+                  $selected         = (($floor_id ?? 0) == $floor->id) ? 'selected' : '';
+                ?>
+                  <option value="<?= $floor->id ?>"><?= $floor->name ?? '' ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+          </div>
+          <!-- End Floor -->
+
+          <!-- Tower -->
+          <div class="col-md-4 filter-col">
+            <div class="form-group">
+              <label for="status">Tower</label>
+
+              <select id="inventory_filter_tower" class="form-control select2 filter-invetory">
+                <option value="">All</option>
+                <?php
+                  $inventory_tower_data   = (object) [
+                    'property_id' => ($record->product_id ?? 0),
+                    'unit_code'   => ($record->product_unit_detail_id ?? 0),
+                  ];
+                foreach (inventory_tower($inventory_tower_data) ?? [] as $block_or_tower) :
+                ?>
+                  <option value="<?= $block_or_tower->id ?>"><?= $block_or_tower->name ?? '' ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+          </div>
+          <!-- End Tower -->
+
+          <!-- Accomodations -->
+          <div class="col-md-4 filter-col">
+            <div class="form-group">
+              <label for="status">Accomodations</label>
+
+              <select id="inventory_filter_accomodation" class="form-control select2 filter-invetory">
+                <option value="">All</option>
+                <?php
+                $inventory_accomodation_data   = (object) [
+                  'property_id' => ($record->product_id ?? 0),
+                  'unit_code'   => ($record->product_unit_detail_id ?? 0),
+                ];
+
+                foreach (inventory_accomodations($inventory_accomodation_data) ?? [] as $accomodation) :
+                ?>
+                  <option value="<?= $accomodation->id ?>"><?= $accomodation->name ?? '' ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+          </div>
+          <!-- End Accomodations -->
+
+          <!-- Sa Size -->
+          <div class="col-md-4 filter-col">
+            <div class="form-group">
+              <label for="sa_size">Size</label>
+              <select id="inventory_filter_sa_size" class="form-control select2 filter-invetory">
+                <option value="">All</option>
+                <?php
+                $inventory_sa_size_data   = (object) [
+                  'property_id' => ($record->product_id ?? 0),
+                  'unit_code'   => ($record->product_unit_detail_id ?? 0),
+                ];
+
+                foreach (inventory_sa_sizes($inventory_sa_size_data) ?? [] as $sa_size) :
+                ?>
+                  <option value="<?= $sa_size->sa_size ?>|<?= $sa_size->unit_id ?>"><?= $sa_size->sa_size ?? '' ?> <?= $sa_size->unit_name ?? '' ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+          </div>
+          <!-- End Sa Size -->
+
+          <!-- Plot Size -->
+          <div class="col-md-4 filter-col">
+            <div class="form-group">
+              <label for="sa_size">Plot Size</label>
+              <select id="inventory_filter_plot_size" class="form-control select2 filter-invetory">
+                <option value="">All</option>
+                <?php
+                $inventory_plot_data   = (object) [
+                  'property_id' => ($record->product_id ?? 0),
+                  'unit_code'   => ($record->product_unit_detail_id ?? 0),
+                ];
+
+
+                foreach (inventory_plot_size($inventory_plot_data) ?? [] as $plot_size) :
+                ?>
+                  <option value="<?= $plot_size->plot_size ?>|<?= $plot_size->unit_id ?>"><?= $plot_size->plot_size ?? '' ?> <?= $plot_size->unit_name ?? '' ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+          </div>
+          <!-- End Plot Size -->
+
+          <!-- Unit Size -->
+          <div class="col-md-4 filter-col">
+            <div class="form-group">
+              <label for="unit_size">Unit Size</label>
+              <select id="inventory_filter_unit_size" class="form-control select2 filter-invetory">
+                <option value="">All</option>
+                <?php
+                $inventory_unit_data   = (object) [
+                  'property_id' => ($record->product_id ?? 0),
+                  'unit_code'   => ($record->product_unit_detail_id ?? 0),
+                ];
+
+
+                foreach (inventory_unit_size($inventory_unit_data) ?? [] as $unit_size) :
+                ?>
+                  <option value="<?= $unit_size->unit_size ?>|<?= $unit_size->unit_id ?>"><?= $unit_size->unit_size ?? '' ?> <?= $unit_size->unit_name ?? '' ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+          </div>
+          <!-- End Unit Size -->
+
+          <!-- Unit Type -->
+          <div class="col-md-4 filter-col">
+            <div class="form-group">
+              <label for="unit_size">Unit Type</label>
+              <select id="inventory_filter_unit_type" class="form-control select2 filter-invetory">
+                <option value="">All</option>
+               
+                <option value="locable">Locable</option>
+                <option value="virtual">Virtual</option>
+                </select>
+            </div>
+          </div>
+          <!-- End Unit Size -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary text-white" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary inventory-filter-apply-btn">Apply</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Filter Modal -->
+
 <script>
   //getRequirementList(<?= $record->lead_id ?? 0 ?>);
+
+  $(document).on('click', '.inventory-filter-modal-btn', function() {
+    var property_type = $(this).data('property-type');
+
+    /** Property Form */
+
+    $('#inventoryFilterModal .filter-col').addClass('d-none')
+
+    switch (property_type) {
+      case 1: // Multistory Apartment
+        $('#inventoryFilterModal #inventory_filter_status').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_accomodation').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_floor').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_tower').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_sa_size').parents('.filter-col').removeClass('d-none')
+        break;
+
+      case 3: // Plot
+        $('#inventoryFilterModal #inventory_filter_status').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_facing').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_plot_size').parents('.filter-col').removeClass('d-none')
+        break;
+        
+        case 7: // Builder Floor
+          $('#inventoryFilterModal #inventory_filter_status').parents('.filter-col').removeClass('d-none')
+          $('#inventoryFilterModal #inventory_filter_facing').parents('.filter-col').removeClass('d-none')
+          $('#inventoryFilterModal #inventory_filter_plot_size').parents('.filter-col').removeClass('d-none')
+          $('#inventoryFilterModal #inventory_filter_unit_size').parents('.filter-col').removeClass('d-none')
+         $('#inventoryFilterModal #inventory_filter_floor').parents('.filter-col').removeClass('d-none')
+        break;
+        
+        case 2: // Villa
+          $('#inventoryFilterModal #inventory_filter_status').parents('.filter-col').removeClass('d-none')
+          $('#inventoryFilterModal #inventory_filter_facing').parents('.filter-col').removeClass('d-none')
+          $('#inventoryFilterModal #inventory_filter_plot_size').parents('.filter-col').removeClass('d-none')
+          $('#inventoryFilterModal #inventory_filter_unit_size').parents('.filter-col').removeClass('d-none')
+        break;
+        
+      case 4: // Shop
+        $('#inventoryFilterModal #inventory_filter_status').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_tower').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_floor').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_unit_type').parents('.filter-col').removeClass('d-none')
+        break;
+
+      case 5: // Office
+        $('#inventoryFilterModal #inventory_filter_status').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_tower').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_floor').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_unit_type').parents('.filter-col').removeClass('d-none')
+        break;
+    }
+    /** End Property Form */
+
+    $('#inventoryFilterModal').modal('show')
+
+    convertToSelect2()
+  })
 </script>

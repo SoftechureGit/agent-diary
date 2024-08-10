@@ -6,8 +6,8 @@ if (!function_exists('facings')) {
     function facings($id = '')
     {
         $where              =   "facing_status = 1";
-        
-        if($id):
+
+        if ($id) :
             $where          .=   " and facing_id = '$id'";
         endif;
 
@@ -72,7 +72,7 @@ function property($id)
 {
     return db_instance()
         ->select(
-                    'property.product_id as id,
+            'property.product_id as id,
                     property.project_name as name, 
                     property.property_type as property_type_id, 
                     property.project_type as project_type_id,
@@ -101,48 +101,50 @@ function parkings($id)
     $parkings                   =   [];
     $parkings                   =   [];
     $record                     =   db_instance()
-                                    ->select(
-                                                'property.product_id as id, 
+        ->select(
+            'property.product_id as id, 
                                                 property.project_name as name, 
                                                 property.parking_open,
                                                 property.parking_stilt,
                                                 property.parking_basment as parking_basement
                                                 '
-                                    )
-                                    ->where("property.product_id='$id'")
-                                    ->get('tbl_products as property')
-                                    ->row();
-    
-    if($record):
+        )
+        ->where("property.product_id='$id'")
+        ->get('tbl_products as property')
+        ->row();
 
-            # Open Parking
-            if(( $record->parking_open ?? 0 )):
-                $parkings[]           = (object) [
-                                                    'label' => 'Open', 
-                                                    'value' => 'open'];
-            endif;
-            # End Open Parking
+    if ($record) :
 
-            # Stilt Parking
-            if(( $record->parking_stilt ?? 0 )):
-                $parkings[]           = (object) [
-                                                    'label' => 'Stilt', 
-                                                    'value' => 'stilt'];
-            endif;
-            # End Stilt Parking
+        # Open Parking
+        if (($record->parking_open ?? 0)) :
+            $parkings[]           = (object) [
+                'label' => 'Open',
+                'value' => 'open'
+            ];
+        endif;
+        # End Open Parking
 
-            # Basement Parking
-            if(( $record->parking_basement ?? 0 )):
-                $parkings[]           = (object) [
-                                                    'label' => 'Basement', 
-                                                    'value' => 'basement'];
-            endif;
-            # End Basement Parking
-            
+        # Stilt Parking
+        if (($record->parking_stilt ?? 0)) :
+            $parkings[]           = (object) [
+                'label' => 'Stilt',
+                'value' => 'stilt'
+            ];
+        endif;
+        # End Stilt Parking
+
+        # Basement Parking
+        if (($record->parking_basement ?? 0)) :
+            $parkings[]           = (object) [
+                'label' => 'Basement',
+                'value' => 'basement'
+            ];
+        endif;
+    # End Basement Parking
+
     endif;
 
     return (object) $parkings;
-    
 }
 # End Get Property Parkings Details
 
@@ -184,99 +186,415 @@ function getPropertyPlcs($property_id, $selected_applicable_plcs = null)
 # End Get Inventory Details
 
 # Get Property Accomodations
-function getPropertyAccomodations($project_type_id, $property_type_id, $property_id, $id = null)
-{
-    $unit_code_list   = null;
+if (!function_exists('getPropertyAccomodations')) {
+    function getPropertyAccomodations($project_type_id, $property_type_id, $property_id, $id = null)
+    {
+        $unit_code_list   = null;
 
-    $where = "product_id='" . $property_id . "' AND project_type='" . $project_type_id . "' AND property_type='" . $property_type_id . "'";
+        $where = "product_id='" . $property_id . "' AND project_type='" . $project_type_id . "' AND property_type='" . $property_type_id . "'";
 
-    if ($id) :
-        $where  .= " and inventory.product_unit_detail_id = '$id'";
-    endif;
+        if ($id) :
+            $where  .= " and inventory.product_unit_detail_id = '$id'";
+        endif;
 
-    db_instance()->select("inventory.product_unit_detail_id as id, inventory.code as inventory_unit_code, accomodation.accomodation_name, concat(accomodation.accomodation_name,' ', inventory.code) as unit_code_with_accomodation_name");
-    db_instance()->from('tbl_product_unit_details as inventory');
-    db_instance()->join('tbl_accomodations as accomodation', 'accomodation.accomodation_id = inventory.accomodation', 'left');
-    db_instance()->where($where);
-    $query = db_instance()->get();
+        db_instance()->select("inventory.product_unit_detail_id as id, inventory.code as inventory_unit_code, accomodation.accomodation_id, accomodation.accomodation_name, concat(accomodation.accomodation_name,' ', inventory.code) as unit_code_with_accomodation_name");
+        db_instance()->from('tbl_product_unit_details as inventory');
+        db_instance()->join('tbl_accomodations as accomodation', 'accomodation.accomodation_id = inventory.accomodation', 'left');
+        db_instance()->where($where);
+        $query = db_instance()->get();
 
-    if ($id) :
-        $result = $query->row();
-    else :
-        $result = $query->result();
-    endif;
+        if ($id) :
+            $result = $query->row();
+        else :
+            $result = $query->result();
+        endif;
 
-    return $result ?? null;
+        return $result ?? null;
+    }
 }
 # End Get Property Accomodations
 
 # Get Floors
-function getFloors($id = null)
-{
-    $where  = "floor_status = '1'";
-
-    if ($id) :
-        $where  .= " and floor_id = $id";
-    endif;
-
-    $result  = db_instance()
-        ->select('floor_id as id, floor_name as name')
-        ->where($where)
-        ->get('tbl_floors');
-
-    if ($id) :
-        $result  = $result->row();
-    else :
-        $result  = $result->result();
-    endif;
-
-    return $result;
-}
-# End Get Floors
-
-# Get Blocks or Towers
-function getBlocksOrTowers($id = null)
-{
-    $where  = "1 = 1";
-
-    if ($id) :
-        $where  .= " and block_id = $id";
-    endif;
-
-    $result  = db_instance()
-        ->select('block_id as id, block_name as name')
-        ->where($where)
-        ->get('tbl_product_block_details');
-
-    if ($id) :
-        $result  = $result->row();
-    else :
-        $result  = $result->result();
-    endif;
-
-    return $result;
-}
-        # End Get Blocks or Towers
-
-    # Inventory Status
-    function inventory_status($id = ''){
-        $where  = "1 = '1'";
+if (!function_exists('getFloors')) {
+    function getFloors($id = null)
+    {
+        $where  = "floor_status = '1'";
 
         if ($id) :
-            $where  .= " and tbl_inventory_status = $id";
+            $where  .= " and floor_id = $id";
         endif;
-    
+
         $result  = db_instance()
-            ->select('inventory_status_id as id, inventory_status_name as name')
+            ->select('floor_id as id, floor_name as name')
             ->where($where)
-            ->get('tbl_inventory_status');
-    
+            ->get('tbl_floors');
+
         if ($id) :
             $result  = $result->row();
         else :
             $result  = $result->result();
         endif;
-    
+
         return $result;
     }
-    # End Inventory Status
+}
+# End Get Floors
+
+# Get Blocks or Towers
+if (!function_exists('getBlocksOrTowers')) {
+    function getBlocksOrTowers($id = null)
+    {
+        $where  = "1 = 1";
+
+        if ($id) :
+            $where  .= " and block_id = $id";
+        endif;
+
+        $result  = db_instance()
+            ->select('block_id as id, block_name as name')
+            ->where($where)
+            ->get('tbl_product_block_details');
+
+        if ($id) :
+            $result  = $result->row();
+        else :
+            $result  = $result->result();
+        endif;
+
+        return $result;
+    }
+}
+# End Get Blocks or Towers
+
+# Inventory Status
+if (!function_exists('inventory_status')) {
+    function inventory_status($id = '')
+    {
+        $where  = "1 = '1'";
+
+        if ($id) :
+            $where  .= " and tbl_inventory_status = $id";
+        endif;
+
+        $result  = db_instance()
+            ->select('inventory_status_id as id, inventory_status_name as name')
+            ->where($where)
+            ->get('tbl_inventory_status');
+
+        if ($id) :
+            $result  = $result->row();
+        else :
+            $result  = $result->result();
+        endif;
+
+        return $result;
+    }
+}
+# End Inventory Status
+
+# Accomodations
+if (!function_exists('accomodations')) {
+    function accomodations($id = ''){
+        $where  = "accomodation_status = '1'";
+
+        if ($id) :
+            $where  .= " and accomodation_id = $id";
+        endif;
+
+        $result  = db_instance()
+            ->select('accomodation_id as id, accomodation_name as name')
+            ->where($where)
+            ->get('tbl_accomodations');
+
+        if ($id) :
+            $result  = $result->row();
+        else :
+            $result  = $result->result();
+        endif;
+
+        return $result;
+    }
+}
+# End Accomodations
+
+/*******************************************
+ *  Inventory Filters
+*******************************************/
+    # Sa Size List
+    if(!function_exists('inventory_sa_sizes')):
+        function inventory_sa_sizes($data = null){
+            # Data 
+            $property_id    = $data->property_id ?? 0;
+            $unit_code      = $data->unit_code ?? 0;
+            # End Data 
+
+            # Conditions
+            $where          =   '1 = 1';
+
+            if($property_id):
+                $where          .=   " and inventory.product_id = $property_id";
+            endif;
+            
+            if($unit_code):
+                $where          .=   " and inventory.unit_code = $unit_code";
+            endif;
+            # End Conditions
+
+            db_instance()->distinct("JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.sa')) as sa_size");
+            db_instance()->select("
+                                    JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.sa')) as sa_size, 
+                                    size_unit.unit_name,
+                                    size_unit.unit_id");
+            db_instance()->where($where);
+            db_instance()->join('tbl_units as size_unit', "size_unit.unit_id = JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.sa_size_unit'))", "left");
+            db_instance()->from('tbl_inventory as inventory');
+        
+            $records = db_instance()->get()->result();
+     
+            return $records;
+        }
+    endif;
+    # Sa Size List
+
+    # Floors List
+    if(!function_exists('inventory_floors')):
+        function inventory_floors($data = null){
+
+            # Data 
+            $property_id    = $data->property_id ?? 0;
+            $unit_code      = $data->unit_code ?? 0;
+            # End Data 
+
+            # Conditions
+            $where          =   '1 = 1';
+
+            if($property_id):
+                $where          .=   " and inventory.product_id = $property_id";
+            endif;
+            
+            if($unit_code):
+                $where          .=   " and inventory.unit_code = $unit_code";
+            endif;
+            # End Conditions
+
+            db_instance()->distinct("JSON_EXTRACT(property_details, '$.floor_id')");
+            db_instance()->select("JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.floor_id')) as id, floor.floor_name as name");
+            db_instance()->where($where);
+            db_instance()->join('tbl_floors as floor', "floor.floor_id = JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.floor_id'))", "left");
+            db_instance()->from('tbl_inventory as inventory');
+            $records = db_instance()->get()->result();
+     
+            return $records;
+        }
+    endif;
+    # Size Floors
+
+    # Accomodations List
+    if(!function_exists('inventory_accomodations')):
+        function inventory_accomodations($data = null){
+
+            # Data 
+            $property_id    = $data->property_id ?? 0;
+            $unit_code      = $data->unit_code ?? 0;
+            # End Data 
+
+            # Conditions
+            $where          =   '1 = 1';
+
+            if($property_id):
+                $where          .=   " and inventory.product_id = $property_id";
+            endif;
+            
+            if($unit_code):
+                $where          .=   " and inventory.unit_code = $unit_code";
+            endif;
+            # End Conditions
+
+            db_instance()->distinct("JSON_EXTRACT(property_details, '$.accomodation_id')");
+            db_instance()->select("JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.accomodation_id')) as id, accomodation.accomodation_name as name");
+            db_instance()->where($where);
+            db_instance()->join('tbl_accomodations as accomodation', "accomodation.accomodation_id = JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.accomodation_id'))", "left");
+            db_instance()->from('tbl_inventory as inventory');
+            $records = db_instance()->get()->result();
+     
+            return $records;
+        }
+    endif;
+    # End Accomodations Floors
+
+    # Tower List
+    if(!function_exists('inventory_tower')):
+        function inventory_tower($data = null){
+
+            # Data 
+            $property_id    = $data->property_id ?? 0;
+            $unit_code      = $data->unit_code ?? 0;
+            # End Data 
+
+            # Conditions
+            $where          =   '1 = 1';
+
+            if($property_id):
+                $where          .=   " and inventory.product_id = $property_id";
+            endif;
+            
+            if($unit_code):
+                $where          .=   " and inventory.unit_code = $unit_code";
+            endif;
+            # End Conditions
+
+            db_instance()->distinct("JSON_EXTRACT(property_details, '$.block_or_tower_id')");
+            db_instance()->select("JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.block_or_tower_id')) as id, tower_or_block.block_name as name");
+            db_instance()->where($where);
+            db_instance()->join('tbl_product_block_details as tower_or_block', "tower_or_block.block_id = JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.block_or_tower_id'))", "left");
+            db_instance()->from('tbl_inventory as inventory');
+            $records = db_instance()->get()->result();
+     
+            return $records;
+        }
+    endif;
+    # End Tower Floors
+
+    # Status List
+    if(!function_exists('inventory_filter_status')):
+        function inventory_filter_status($data = null){
+
+            # Data 
+            $property_id    = $data->property_id ?? 0;
+            $unit_code      = $data->unit_code ?? 0;
+            # End Data 
+
+            # Conditions
+            $where          =   '1 = 1';
+
+            if($property_id):
+                $where          .=   " and inventory.product_id = $property_id";
+            endif;
+            
+            if($unit_code):
+                $where          .=   " and inventory.unit_code = $unit_code";
+            endif;
+            # End Conditions
+
+            db_instance()->distinct("inventory.inventory_status");
+            db_instance()->select("inventory.inventory_status as id, inventory_status.inventory_status_name as name");
+            db_instance()->where($where);
+            db_instance()->join('tbl_inventory_status as inventory_status', "inventory_status.inventory_status_id = inventory.inventory_status", "left");
+            db_instance()->from('tbl_inventory as inventory');
+            $records = db_instance()->get()->result();
+     
+            return $records;
+        }
+    endif;
+    # End Status Floors
+
+    # Facing List
+    if(!function_exists('inventory_facings')):
+        function inventory_facings($data = null){
+
+            # Data 
+            $property_id    = $data->property_id ?? 0;
+            $unit_code      = $data->unit_code ?? 0;
+            # End Data 
+
+            # Conditions
+            $where          =   ' 1 = 1';
+
+            if($property_id):
+                $where          .=   " and inventory.product_id = $property_id";
+            endif;
+            
+            if($unit_code):
+                $where          .=   " and inventory.unit_code = $unit_code";
+            endif;
+            # End Conditions
+
+            db_instance()->distinct("JSON_EXTRACT(property_details, '$.facing_id')");
+            db_instance()->select("JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.facing_id')) as id, facing.title as name");
+            db_instance()->where($where);
+            db_instance()->join('tbl_facings as facing', "facing.facing_id = JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.facing_id'))", "left");
+            db_instance()->from('tbl_inventory as inventory');
+            $records = db_instance()->get()->result();
+     
+            return $records;
+        }
+    endif;
+    # End Facing List
+
+    # Plot Size List
+    if(!function_exists('inventory_plot_size')):
+        function inventory_plot_size($data = null){
+
+           # Data 
+           $property_id    = $data->property_id ?? 0;
+           $unit_code      = $data->unit_code ?? 0;
+           # End Data 
+
+           # Conditions
+           $where          =   '1 = 1';
+
+           if($property_id):
+               $where          .=   " and inventory.product_id = $property_id";
+           endif;
+           
+           if($unit_code):
+               $where          .=   " and inventory.unit_code = $unit_code";
+           endif;
+           # End Conditions
+
+           db_instance()->distinct("JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.plot_size')) as plot_size");
+           db_instance()->select("
+                                   JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.plot_size')) as plot_size, 
+                                   size_unit.unit_name,
+                                   size_unit.unit_id");
+           db_instance()->where($where);
+           db_instance()->join('tbl_units as size_unit', "size_unit.unit_id = JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.size_unit'))", "left");
+           db_instance()->from('tbl_inventory as inventory');
+       
+           $records = db_instance()->get()->result();
+    
+           return $records;
+        }
+    endif;
+    # End Plot Size List
+
+    # Unit Size List
+    if(!function_exists('inventory_unit_size')):
+        function inventory_unit_size($data = null){
+
+           # Data 
+           $property_id    = $data->property_id ?? 0;
+           $unit_code      = $data->unit_code ?? 0;
+           # End Data 
+
+           # Conditions
+           $where          =   '1 = 1';
+
+           if($property_id):
+               $where          .=   " and inventory.product_id = $property_id";
+           endif;
+           
+           if($unit_code):
+               $where          .=   " and inventory.unit_code = $unit_code";
+           endif;
+           # End Conditions
+
+           db_instance()->distinct("JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.unit_size')) as unit_size");
+           db_instance()->select("
+                                   JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.unit_size')) as unit_size, 
+                                   size_unit.unit_name,
+                                   size_unit.unit_id");
+           db_instance()->where($where);
+           db_instance()->join('tbl_units as size_unit', "size_unit.unit_id = JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.unit_size_unit'))", "left");
+           db_instance()->from('tbl_inventory as inventory');
+       
+           $records = db_instance()->get()->result();
+    
+           return $records;
+        }
+    endif;
+    # End Unit Size List
+
+/*******************************************
+ *  Inventory Filters
+*******************************************/

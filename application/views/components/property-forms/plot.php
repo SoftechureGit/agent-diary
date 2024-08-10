@@ -126,7 +126,7 @@ endif;
                     <!-- dimension F x B x S1 x S2 -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">dimension F x B x S1 x S2</label>
+                            <label for="">Dimension F x B x S1 x S2</label>
                             <input type="text" placeholder="Enter dimension F x B x S1 x S2" name="property_details[dimension]" value="<?= $dimension ?? $dimension ?? '' ?>" class="form-control" >
                         </div>
                     </div>
