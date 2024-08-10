@@ -2166,21 +2166,21 @@ class Api extends CI_Controller {
                 # Data From DB
                 $genders                        =   [ 
                                                         (object) [
-                                                                    'id'    => 1,
+                                                                    'id'    => "1",
                                                                     'name' => 'Male'
                                                         ],
                                                         (object) [
-                                                                    'id'    => 2,
+                                                                    'id'    => "2",
                                                                     'name' => 'Female'
                                                         ],
                                                     ];
                 $martial_status                        =   [ 
                                                         (object) [
-                                                                    'id'    => 1,
+                                                                    'id'    => "1",
                                                                     'name' => 'Married'
                                                         ],
                                                         (object) [
-                                                                    'id'    => 2,
+                                                                    'id'    => "2",
                                                                     'name' => 'Unmarried'
                                                         ],
                                                     ];
