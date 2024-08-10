@@ -4569,8 +4569,8 @@ WHERE lead_id='" . $lead_id . "'
         $record_data = $this->db->from('tbl_inventory as inventory')->get()->result();
         // $record_data                    = $this->Action_model->detail_result('tbl_inventory', $where);
 
-        echo $this->db->last_query();
-        die;
+        // echo $this->db->last_query();
+        // die;
 
         if ($record_data) {
             $records                    = $record_data;
