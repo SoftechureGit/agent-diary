@@ -4569,8 +4569,8 @@ WHERE lead_id='" . $lead_id . "'
         $record_data = $this->db->from('tbl_inventory as inventory')->get()->result();
         // $record_data                    = $this->Action_model->detail_result('tbl_inventory', $where);
 
-        // echo $this->db->last_query();
-        // die;
+        echo $this->db->last_query();
+        die;
 
         if ($record_data) {
             $records                    = $record_data;
@@ -4643,7 +4643,9 @@ WHERE lead_id='" . $lead_id . "'
 
         # Table View
 
+        
         $table_headings             =   $this->inventory_table_headings($property->property_type_id);
+      
         $table_view                 =   "<div class='table-responsive inventory-table'>
                                         <table class='table table-bordered'>
                                         <caption>* $property_type_name *</caption>
@@ -4712,7 +4714,7 @@ WHERE lead_id='" . $lead_id . "'
             $inv_plot_size                          =   ( $inventory_details->plot_size ?? '-' ).' '. ( sizeUnits($inventory_details->size_unit ?? 0)->unit_name  ?? '-' ) ?? '-';
 
             $inv_unit_size                          =   ( $inventory_details->unit_size ?? '-' ).' '. ( sizeUnits($inventory_details->unit_size_unit ?? 0)->unit_name  ?? '-' ) ?? '-';
-            $inv_quote                              =   "<div class='text-center' onclick='getQuatation(".$inventory_details->id.")'><button class='btn btn-warning btn-sm' style='color:#fff;'><i class='fa fa-eye'></i></button></div>";
+            $inv_quote                              =   ( $inventory_details->id ?? 0 ) ? "<div class='text-center' onclick='getQuatation(".$inventory_details->id.")'><button class='btn btn-warning btn-sm' style='color:#fff;'><i class='fa fa-eye'></i></button></div>" : '';
             # End Inventory Details Init
             
            
