@@ -11210,9 +11210,10 @@ WHERE lead_id='" . $lead_id . "'
                                                         'plot_number' => $Row[3],
                                                         'plot_size' => $Row[4],
                                                         'size_unit' => $Row[5],
-                                                        'block'   => $Row[6],
-                                                        'applicable_plc' => $Row[7],
-                                                        'facing' => $Row[8],
+                                                        'number_of_floor'   => $Row[6],
+                                                        'block' => $Row[7],
+                                                        'applicable_plc' => $Row[8],
+                                                        'facing_id' => $Row[9],
                                                         'dimension' => $Row[9]
                                                     );
                                                 break;
@@ -11231,20 +11232,21 @@ WHERE lead_id='" . $lead_id . "'
                                                         'dimension' => $Row[9]
                                                     );            
                                                 break;
-                                            case '4':
+                                            case '4': # shop
                                                
                                                 $property_details = array(
                                                     'id' => '',
                                                     'product_id' => $product_id,
                                                     'unit_code' => $Row[1],
                                                     'referance_number' => $Row[2],
-                                                    'plot_number' => $Row[3],
-                                                    'plot_size' => $Row[4],
-                                                    'size_unit' => $Row[5],
-                                                    'block'   => $Row[6],
-                                                    'applicable_plc' => $Row[7],
-                                                    'facing' => $Row[8],
-                                                    'dimension' => $Row[9]
+                                                    'floor' => $Row[3],
+                                                    'tower' => $Row[4],
+                                                    'unit_type' => $Row[5],
+                                                    'area'   => $Row[6],
+                                                    'size_unit' => $Row[7],
+                                                    'applicable_plc' => $Row[8],
+                                                    'facing_id' => $Row[9],
+                                                    'parking' => $Row[9]
                                                 );
                                                 break;
                                             case '5': # Office
@@ -11254,16 +11256,20 @@ WHERE lead_id='" . $lead_id . "'
                                                 'product_id' => $product_id,
                                                 'unit_code' => $Row[1],
                                                 'referance_number' => $Row[2],
-                                                'plot_number' => $Row[3],
-                                                'plot_size' => $Row[4],
-                                                'size_unit' => $Row[5],
-                                                'block'   => $Row[6],
-                                                'applicable_plc' => $Row[7],
-                                                'facing' => $Row[8],
-                                                'dimension' => $Row[9]
+                                                'unit_number' => $Row[3],
+                                                'floor' => $Row[4],
+                                                'tower' => $Row[5],
+                                                'unit_type'   => $Row[6],
+                                                'area' => $Row[7],
+                                                'size_unit' => $Row[8],
+                                                'applicable_plc' => $Row[9],
+                                                'facing_id' => $Row[10],
+                                                'parking' => $Row[11],
+                                                'pentry' => $Row[12],
+                                                'washroom' => $Row[13],
                                             );
                                                 break;
-                                            case '7':
+                                            case '7': # Builder floor
                                                 $property_details = array(
                                                     'id' => '',
                                                     'product_id' => $product_id,
@@ -11272,42 +11278,54 @@ WHERE lead_id='" . $lead_id . "'
                                                     'plot_number' => $Row[3],
                                                     'plot_size' => $Row[4],
                                                     'size_unit' => $Row[5],
-                                                    'block'   => $Row[6],
-                                                    'applicable_plc' => $Row[7],
-                                                    'facing' => $Row[8],
-                                                    'dimension' => $Row[9]
+                                                    'floor'   => $Row[6],
+                                                    'block' => $Row[7],
+                                                    'applicable_plc' => $Row[8],
+                                                    'facing_id' => $Row[9],
+                                                    'dimension' => $Row[10],
+                                                    'tarrace' => $Row[11],
+                                                    'basment' => $Row[12],
+                                                    'parking' => $Row[13],
                                                 );
                                 
                                                 break;
-                                            case '1':
+                                            case '1': # apartment 
                                                 $property_details = array(
                                                     'id' => '',
                                                     'product_id' => $product_id,
-                                                    'unit_code' => $Row[1],
-                                                    'referance_number' => $Row[2],
-                                                    'plot_number' => $Row[3],
-                                                    'plot_size' => $Row[4],
-                                                    'size_unit' => $Row[5],
-                                                    'block'   => $Row[6],
-                                                    'applicable_plc' => $Row[7],
-                                                    'facing' => $Row[8],
-                                                    'dimension' => $Row[9]
+                                                    'unit_no' => $Row[1],
+                                                    'floor_id' => $Row[2],
+                                                    'block_or_tower_id' => $Row[3],
+                                                    'unit_type' => $Row[4],
+                                                    'sa' => $Row[5],
+                                                    'sa_size_unit'   => $Row[6],
+                                                    'ba' => $Row[7],
+                                                    'ba_size_unit' => $Row[8],
+                                                    'ca' => $Row[9],
+                                                    'ca_size_unit' => $Row[10],
+                                                    'applicable_plc' => $Row[11],
+                                                    'facing_id' => $Row[12],
+                                                    'parking' => $Row[13],
                                                 );
                                 
                                                 break;
-                                            case '9':
+                                            case '9': # apartment
                                                 $property_details = array(
                                                     'id' => '',
                                                     'product_id' => $product_id,
-                                                    'unit_code' => $Row[1],
-                                                    'referance_number' => $Row[2],
-                                                    'plot_number' => $Row[3],
-                                                    'plot_size' => $Row[4],
-                                                    'size_unit' => $Row[5],
-                                                    'block'   => $Row[6],
-                                                    'applicable_plc' => $Row[7],
-                                                    'facing' => $Row[8],
-                                                    'dimension' => $Row[9]
+                                                    'unit_no' => $Row[1],
+                                                    'floor_id' => $Row[2],
+                                                    'block_or_tower_id' => $Row[3],
+                                                    'unit_type' => $Row[4],
+                                                    'sa' => $Row[5],
+                                                    'sa_size_unit'   => $Row[6],
+                                                    'ba' => $Row[7],
+                                                    'ba_size_unit' => $Row[8],
+                                                    'ca' => $Row[9],
+                                                    'ca_size_unit' => $Row[10],
+                                                    'applicable_plc' => $Row[11],
+                                                    'facing_id' => $Row[12],
+                                                    'parking' => $Row[13],
                                                 );
                                                 break;
                                         endswitch;
