@@ -728,9 +728,9 @@ if (!function_exists('accomodations')) {
  *  Builder Form
 *******************************************/
 
-    #   Tarrace
-    if(!function_exists('tarraces')):
-        function tarraces($id = ''){
+    #   Terrace
+    if(!function_exists('terraces')):
+        function terraces($id = ''){
             $where  = "1 = '1'";
     
             if ($id) :
@@ -740,7 +740,7 @@ if (!function_exists('accomodations')) {
             $result  = db_instance()
                 ->select('id, name')
                 ->where($where)
-                ->get('tbl_tarraces');
+                ->get('tbl_terraces');
     
             if ($id) :
                 $result  = $result->row();
@@ -751,7 +751,7 @@ if (!function_exists('accomodations')) {
             return $result;
         }
     endif;
-    #   End Tarrace
+    #   End Terrace
 
     #   Basment
     if(!function_exists('basments')):

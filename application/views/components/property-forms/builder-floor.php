@@ -171,22 +171,22 @@ endif;
                     </div>
                     <!-- End dimension F x B x S1 x S2 -->
 
-                    <!-- Tarrace -->
+                    <!-- Terrace -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Tarrace</label>
-                            <select name="property_details[tarrace_id]" id="" class="form-control" >
+                            <label for="">Terrace</label>
+                            <select name="property_details[terrace_id]" id="" class="form-control" >
                                 <option value="" disabled selected>Choose...</option>
                                 <?php 
-                                    foreach(tarraces() ?? [] as $tarrace): 
-                                    $selected         = $tarrace->id == ( $tarrace_id ?? 0 ) ? 'selected' : '';
+                                    foreach(terraces() ?? [] as $terrace): 
+                                    $selected         = $terrace->id == ( $terrace_id ?? 0 ) ? 'selected' : '';
                                 ?>
-                                    <option value="<?= $tarrace->id ?>"  <?= $selected ?>><?= $tarrace->name ?></option>   
+                                    <option value="<?= $terrace->id ?>"  <?= $selected ?>><?= $terrace->name ?></option>   
                                     <?php endforeach; ?>
                                 </select>
                         </div>
                     </div>
-                    <!-- End Tarrace -->
+                    <!-- End Terrace -->
 
                     <!-- Basment -->
                     <div class="col-md-4">

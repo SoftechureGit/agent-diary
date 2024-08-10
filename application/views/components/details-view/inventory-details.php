@@ -206,14 +206,14 @@ $property_layout_url        =   $property_layout ? base_url("uploads/images/prop
                 <?php endif; ?>
                 <!-- End Dimension -->
 
-                <!-- Tarrace -->
-                <?php if ($tarrace_id ?? 0) : ?>
+                <!-- Terrace -->
+                <?php if ($terrace_id ?? 0) : ?>
                 <tr>
-                    <th>Tarrace</th>
-                    <td><?= tarraces($tarrace_id)->name ?? '' ?></td>
+                    <th>Terrace</th>
+                    <td><?= terraces($terrace_id)->name ?? '' ?></td>
                 </tr>
                 <?php endif; ?>
-                <!-- End Tarrace -->
+                <!-- End Terrace -->
 
                 <!-- Basment -->
                 <?php if ($basment_id ?? 0) : ?>
