@@ -611,9 +611,20 @@
   $(document).on('click', '.inventory-filter-modal-btn', function() {
     var property_type = $(this).data('property-type');
 
+    $('#inventoryFilterModal .filter-col').addClass('d-none')
+
+    /** Commercial */
+    if(!property_type){
+      $('#inventoryFilterModal #inventory_filter_status').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_tower').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_floor').parents('.filter-col').removeClass('d-none')
+        $('#inventoryFilterModal #inventory_filter_unit_type').parents('.filter-col').removeClass('d-none')
+       
+    }
+    /** End Commercial */
+
     /** Property Form */
 
-    $('#inventoryFilterModal .filter-col').addClass('d-none')
 
     switch (property_type) {
       case 1: // Multistory Apartment

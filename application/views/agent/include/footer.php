@@ -782,7 +782,9 @@
             setTimeout(function() {
                                     // $(".project_inventory").html(response.data_view);
                                     $(".inventory-list-container").html(response.table_view);
-                                    $(".inventory-list-container table").dataTable()
+                                    if(response.status){
+                                      $(".inventory-list-container table").dataTable()
+                                    }
                                   }, 100);
                       },
              error: function() {
