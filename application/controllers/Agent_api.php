@@ -4655,14 +4655,7 @@ WHERE lead_id='" . $lead_id . "'
                                         </tbody>
                                         ";
 
-                                       
-        if (!count($records ?? [])) :
-            $table_view                     .= "<tr><td colspan='10' class='text-center'>No inventory found</td></tr>";
-        endif;
-
-        // print_r($records );
-        // die;
-
+       
         foreach ($records ?? [] as $inventory_key => $inventory) :
 
             $inventory_id                   =   $inventory->inventory_id;

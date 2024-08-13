@@ -727,29 +727,29 @@
        }
        /** End Get Inventory Details */
 
-      /** Inventory Filter */
-      $(document).on('click', '.inventory-filter-apply-btn', function(){
-        $('#inventoryFilterModal').modal('hide');
-        get_project_inventory();
-      })
-      /** End Inventory Filter */
+       /** Inventory Filter */
+       $(document).on('click', '.inventory-filter-apply-btn', function() {
+         $('#inventoryFilterModal').modal('hide');
+         get_project_inventory();
+       })
+       /** End Inventory Filter */
 
        function get_project_inventory() {
 
-         var product_id               = $("#product_id").val();
-         var property_unit_code_id    = $("#property_unit_code_id").val();
+         var product_id = $("#product_id").val();
+         var property_unit_code_id = $("#property_unit_code_id").val();
 
-        /** Filter */
-        var inventory_filter_status           = $('#inventory_filter_status').val()
-        var inventory_filter_facing           = $('#inventory_filter_facing').val()
-        var inventory_filter_floor            = $('#inventory_filter_floor').val()
-        var inventory_filter_tower            = $('#inventory_filter_tower').val()
-        var inventory_filter_accomodation     = $('#inventory_filter_accomodation').val()
-        var inventory_filter_sa_size          = $('#inventory_filter_sa_size').val()
-        var inventory_filter_plot_size        = $('#inventory_filter_plot_size').val()
-        var inventory_filter_unit_size        = $('#inventory_filter_unit_size').val()
-        var inventory_filter_unit_type        = $('#inventory_filter_unit_type').val()
-        /** End Filter */
+         /** Filter */
+         var inventory_filter_status = $('#inventory_filter_status').val()
+         var inventory_filter_facing = $('#inventory_filter_facing').val()
+         var inventory_filter_floor = $('#inventory_filter_floor').val()
+         var inventory_filter_tower = $('#inventory_filter_tower').val()
+         var inventory_filter_accomodation = $('#inventory_filter_accomodation').val()
+         var inventory_filter_sa_size = $('#inventory_filter_sa_size').val()
+         var inventory_filter_plot_size = $('#inventory_filter_plot_size').val()
+         var inventory_filter_unit_size = $('#inventory_filter_unit_size').val()
+         var inventory_filter_unit_type = $('#inventory_filter_unit_type').val()
+         /** End Filter */
 
          if (product_id == "") {
            $(".project_inventory").html("");
@@ -758,35 +758,42 @@
          } else {
            $('.add-inventory-container').removeClass('d-none')
 
-          $.ajax({
-            type      : "POST",
-            url       : "<?= base_url(AGENT_URL . 'api/get_project_inventory') ?>",
-            data     : {
-                          product_id                      : product_id,
-                          property_unit_code_id           : property_unit_code_id,
-                          inventory_filter_status         : inventory_filter_status,
-                          inventory_filter_facing         : inventory_filter_facing,
-                          inventory_filter_floor          : inventory_filter_floor,
-                          inventory_filter_tower          : inventory_filter_tower,
-                          inventory_filter_accomodation   : inventory_filter_accomodation,
-                          inventory_filter_sa_size        : inventory_filter_sa_size,
-                          inventory_filter_plot_size      : inventory_filter_plot_size,
-                          inventory_filter_unit_size      : inventory_filter_unit_size,
-                          inventory_filter_unit_type      : inventory_filter_unit_type,
-                        },
-            dataType : 'json',
-            beforeSend: function(data) {
+           $.ajax({
+             type: "POST",
+             url: "<?= base_url(AGENT_URL . 'api/get_project_inventory') ?>",
+             data: {
+               product_id: product_id,
+               property_unit_code_id: property_unit_code_id,
+               inventory_filter_status: inventory_filter_status,
+               inventory_filter_facing: inventory_filter_facing,
+               inventory_filter_floor: inventory_filter_floor,
+               inventory_filter_tower: inventory_filter_tower,
+               inventory_filter_accomodation: inventory_filter_accomodation,
+               inventory_filter_sa_size: inventory_filter_sa_size,
+               inventory_filter_plot_size: inventory_filter_plot_size,
+               inventory_filter_unit_size: inventory_filter_unit_size,
+               inventory_filter_unit_type: inventory_filter_unit_type,
+             },
+             dataType: 'json',
+             beforeSend: function(data) {
                // $(".project_inventory").html("<div style='padding:50px;' align='center'><img src='<?= base_url('public/front/ajax-loader.gif') ?>' style='height:60px;'></div>");
-            },
-            success: function(response) {
-            setTimeout(function() {
-                                    // $(".project_inventory").html(response.data_view);
-                                    $(".inventory-list-container").html(response.table_view);
-                                    $(".inventory-list-container table").dataTable()
-                                  }, 100);
-                      },
+             },
+             success: function(response) {
+               setTimeout(function() {
+                 // $(".project_inventory").html(response.data_view);
+                 $(".inventory-list-container").html(response.table_view);
+                 if (response.status) {
+                   $(".inventory-list-container table").dataTable({
+                     columnDefs: [{
+                       "defaultContent": "-",
+                       "targets": "_all"
+                     }]
+                   })
+                 }
+               }, 100);
+             },
              error: function() {
-                 $(".project_inventory").html("<div class=' alert alert-danger'>Some error occurred, please try again.</div>");
+               $(".project_inventory").html("<div class=' alert alert-danger'>Some error occurred, please try again.</div>");
              }
            });
          }
@@ -797,45 +804,44 @@
 
        $(document).on('change', '[name="property_details[unit_code]"]', function() {
 
-        /** Commercial */
-        var property_type_name     = $(this).find('option:checked').data('property-type-name')
+         /** Commercial */
+         var property_type_name = $(this).find('option:checked').data('property-type-name')
 
-        if(property_type_name){
-            $('#property_type_name').val(property_type_name)
-            console.log(property_type_name)
-            $('.commercial-property-type').text(property_type_name)
+         if (property_type_name) {
+           $('#property_type_name').val(property_type_name)
+           $('.commercial-property-type').text(property_type_name)
 
-            /** Property Type Name */
+           /** Property Type Name */
 
-            $('.commercial-col').addClass('d-none')
-            
-            switch(property_type_name){
-              case 'Shop':
+           $('.commercial-col').addClass('d-none')
 
-                break;
+           switch (property_type_name) {
+             case 'Shop':
 
-                case 'Office':
-                  $('.pentry-col').removeClass('d-none')
-                  $('.washroom-col').removeClass('d-none')
-                break;
-            }
-            /** End Property Type Name */
-        }
-        /** End Commercial */
+               break;
 
-        if ($('#modal-inventory-form [name="property_details[id]"]').val() != '') {
+             case 'Office':
+               $('.pentry-col').removeClass('d-none')
+               $('.washroom-col').removeClass('d-none')
+               break;
+           }
+           /** End Property Type Name */
+         }
+         /** End Commercial */
+
+         if ($('#modal-inventory-form [name="property_details[id]"]').val() != '') {
            return false;
          }
 
-          var accomodation_id     = $(this).find('option:checked').data('accomodation-id')
-          var accomodation_name     = $(this).find('option:checked').data('accomodation-name')
-          
-          $('#modal-inventory-form [name="property_details[accomodation_id]"]').val(accomodation_id)
-          $('#modal-inventory-form input[name="property_details[unit_type]"]').val(accomodation_name)
-          
-           getPropertyUnitDetails({
-             'id': this.value
-           })
+         var accomodation_id = $(this).find('option:checked').data('accomodation-id')
+         var accomodation_name = $(this).find('option:checked').data('accomodation-name')
+
+         $('#modal-inventory-form [name="property_details[accomodation_id]"]').val(accomodation_id)
+         $('#modal-inventory-form input[name="property_details[unit_type]"]').val(accomodation_name)
+
+         getPropertyUnitDetails({
+           'id': this.value
+         })
        })
 
        function getPropertyUnitDetails({
@@ -849,7 +855,7 @@
            },
            dataType: 'json',
            success: (res) => {
-             console.log(res  )
+             console.log(res)
              if (res.status) {
 
                /** Parking */
@@ -867,21 +873,21 @@
                  parkings[1] = 'basement';
                }
 
-              $(`#modal-inventory-form select[name="property_details[parking][]"]`).val('').trigger('change');
-              $(`#modal-inventory-form select[name="property_details[applicable_plc][]"]`).val('').trigger('change');
-                 
+               $(`#modal-inventory-form select[name="property_details[parking][]"]`).val('').trigger('change');
+               $(`#modal-inventory-form select[name="property_details[applicable_plc][]"]`).val('').trigger('change');
+
                /** End Parking */
 
 
-               
+
                $.each(res.data, function(key, value) {
                  /** Size Unit */
-                 if ((key == 'size_unit' || key == 'plot_unit') && ( value != ''  && value)) {
-                        $(`#modal-inventory-form select[name="property_details[size_unit]"]`).val(value).trigger('change.select2');
-                      $(`#modal-inventory-form select[name="property_details[sa_size_unit]"]`).val(value).trigger('change.select2');
-                      $(`#modal-inventory-form select[name="property_details[ba_size_unit]"]`).val(value).trigger('change.select2');
-                      $(`#modal-inventory-form select[name="property_details[ca_size_unit]"]`).val(value).trigger('change.select2');
-                  
+                 if ((key == 'size_unit' || key == 'plot_unit') && (value != '' && value)) {
+                   $(`#modal-inventory-form select[name="property_details[size_unit]"]`).val(value).trigger('change.select2');
+                   $(`#modal-inventory-form select[name="property_details[sa_size_unit]"]`).val(value).trigger('change.select2');
+                   $(`#modal-inventory-form select[name="property_details[ba_size_unit]"]`).val(value).trigger('change.select2');
+                   $(`#modal-inventory-form select[name="property_details[ca_size_unit]"]`).val(value).trigger('change.select2');
+
                  } else if (key == 'facing') {
                    $(`#modal-inventory-form select[name="property_details[facing_id]"]`).val(value).trigger('change.select2');
                  } else {
@@ -892,10 +898,10 @@
                  /** End Size Unit */
 
                  /** Property Layout */
-                if (key == 'image_url' && ( value == '' || value != null)) {
+                 if (key == 'image_url' && (value == '' || value != null)) {
                    $('.property-layout-anchor').removeClass('d-none').attr('href', value)
                    $('.old_property_layout').val(value.split('/').pop())
-                 } else if (key == 'image_url' && ( value == '' || value == null)) {
+                 } else if (key == 'image_url' && (value == '' || value == null)) {
                    $('.property-layout-anchor').addClass('d-none').attr('href', '#')
                    $('.old_property_layout').val('')
                  }
@@ -918,26 +924,26 @@
            url: "<?= base_url('helper/get_inventory_details'); ?>",
            data: {
              id: id
-            },
-            dataType: 'json',
-            success: (res) => {
-             
+           },
+           dataType: 'json',
+           success: (res) => {
+
              if (res.status) {
 
                /** End Parking */
-               
-               
+
+
                $.each(res.data, function(key, value) {
-                $(`#modal-inventory-form input[name="property_details[${key}]"]`).val('');
+                 $(`#modal-inventory-form input[name="property_details[${key}]"]`).val('');
 
-                if(key == 'applicable_plc' && value != ''){
-                  $(`#modal-inventory-form select[name="property_details[applicable_plc][]"]`).val(value).trigger('change');
-                }
+                 if (key == 'applicable_plc' && value != '') {
+                   $(`#modal-inventory-form select[name="property_details[applicable_plc][]"]`).val(value).trigger('change');
+                 }
 
-                if(key == 'parking' && value != ''){
-                  $(`#modal-inventory-form select[name="property_details[parking][]"]`).val(value).trigger('change');
-                }
-                 
+                 if (key == 'parking' && value != '') {
+                   $(`#modal-inventory-form select[name="property_details[parking][]"]`).val(value).trigger('change');
+                 }
+
                  /** Size Unit */
                  if ((key == 'size_unit' || key == 'plot_unit') && value != '') {
                    $(`#modal-inventory-form select[name="property_details[size_unit]"]`).val(value).trigger('change');

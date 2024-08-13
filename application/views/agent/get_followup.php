@@ -119,6 +119,9 @@
     margin-bottom: 0;
   }
 
+#lead-profile-table{
+  font-size: 13px !important;
+}
 </style>
 
 
@@ -269,9 +272,9 @@
 
         <div class="row">
 
-          <div class="col-md-12 d-none">
+          <div class="col-md-12">
             <!-- Table -->
-             <table class="table table-bordered">
+             <table class="table table-bordered" id="lead-profile-table">
                 <!-- Name -->
                 <tr>
                   <th>Name</th>
@@ -279,78 +282,166 @@
                 </tr>
                 <!-- End Name -->
 
+                <!-- Email -->
+                <?php if($record->email): ?>
+                <tr>
+                  <th>Email</th>
+                  <td><?= $record->email ?></td>
+                </tr>
+                <?php endif; ?>
+                <!-- End Email -->
+
                 <!-- Mobile -->
+                <?php if($record->lead_mobile_no): ?>
                 <tr>
                   <th>Mobile</th>
-                  <td>+91 <?= $record->lead_mobile_no ?></td>
+                  <td>
+                  <?= $record->secondary_mobile_number_country_data ? ( '+'.json_decode($record->primary_mobile_number_country_data)->dialCode ?? '' ) :'' ?>
+                    
+                    <?= $record->lead_mobile_no ?></td>
                 </tr>
-                <!-- End Mobile -->
+                <?php endif; ?>
+                <!-- Mobile -->
+
+                <!-- Secondary Mobile -->
+                <?php if($record->lead_mobile_no_2): ?>
+                <tr>
+                  <th>Secondary Mobile</th>
+                  <td>
+                    <?= $record->secondary_mobile_number_country_data ? ( '+'.json_decode($record->secondary_mobile_number_country_data)->dialCode ?? '' ) :'' ?>
+                    
+                    <?= $record->lead_mobile_no_2 ?></td>
+                </tr>
+                <?php endif; ?>
+                <!-- Secondary Mobile -->
+
+                <!-- Gender -->
+                <?php if($record->lead_gender): ?>
+                <tr>
+                  <th>Gender</th>
+                  <td><?= $record->lead_gender ?></td>
+                </tr>
+                <?php endif; ?>
+                <!-- End Gender -->
+
+                <!-- Occupation -->
+                <?php if($record->occupation_name): ?>
+                <tr>
+                  <th>Occupation</th>
+                  <td><?= $record->occupation_name ?></td>
+                </tr>
+                <?php endif; ?>
+                <!-- End Occupation -->
+
+                <!-- Address -->
+                <?php if($record->lead_address): ?>
+                <tr>
+                  <th>Address</th>
+                  <td><?= $record->lead_address ?></td>
+                </tr>
+                <?php endif; ?>
+                <!-- End Address -->
+
+                <!-- City -->
+                <?php if($record->city_name): ?>
+                <tr>
+                  <th>City</th>
+                  <td><?= $record->city_name ?></td>
+                </tr>
+                <?php endif; ?>
+                <!-- End City -->
+
+                <!-- State -->
+                <?php if($record->state_name): ?>
+                <tr>
+                  <th>State</th>
+                  <td><?= $record->state_name ?></td>
+                </tr>
+                <?php endif; ?>
+                <!-- End State -->
+
+                <!-- Marital Status -->
+                <?php if($record->lead_marital_status): ?>
+                <tr>
+                  <th>Marital Status</th>
+                  <td><?= $record->lead_marital_status ?></td>
+                </tr>
+                <?php endif; ?>
+                <!-- End Marital Status -->
+
+                <!-- Designation -->
+                <?php if($record->designation_name): ?>
+                <tr>
+                  <th>Designation</th>
+                  <td><?= $record->designation_name ?></td>
+                </tr>
+                <?php endif; ?>
+                <!-- End Designation -->
+
+                <!-- Company -->
+                <?php if($record->lead_company): ?>
+                <tr>
+                  <th>Company</th>
+                  <td><?= $record->lead_company ?></td>
+                </tr>
+                <?php endif; ?>
+                <!-- End Company -->
+
+                <!-- Annual Income -->
+                <?php if($record->lead_annual_income): ?>
+                <tr>
+                  <th>Annual Income</th>
+                  <td><?= $record->lead_annual_income ?></td>
+                </tr>
+                <?php endif; ?>
+                <!-- End Annual Income -->
+
+                <!-- Pan Card Number -->
+                <?php if($record->lead_pan_no): ?>
+                <tr>
+                  <th>Pan Card Number</th>
+                  <td><?= $record->lead_pan_no ?></td>
+                </tr>
+                <?php endif; ?>
+                <!-- End Pan Card Number -->
+
+                <!-- Aadhaar Card Number -->
+                <?php if($record->lead_adhar_no): ?>
+                <tr>
+                  <th>Aadhaar Card Number</th>
+                  <td><?= $record->lead_adhar_no ?></td>
+                </tr>
+                <?php endif; ?>
+                <!-- End Aadhaar Card Number -->
+
+                <!-- Voter Id Number -->
+                <?php if($record->lead_voter_id): ?>
+                <tr>
+                  <th>Voter Id</th>
+                  <td><?= $record->lead_voter_id ?></td>
+                </tr>
+                <?php endif; ?>
+                <!-- End Voter Id -->
+
+                <!-- Passport Number -->
+                <?php if($record->lead_passport_no): ?>
+                <tr>
+                  <th>Passport Number</th>
+                  <td><?= $record->lead_passport_no ?></td>
+                </tr>
+                <?php endif; ?>
+                <!-- End Passport Number -->
+
+                <!-- Added By -->
+                <?php if($record->lead_passport_no): ?>
+                <tr>
+                  <th>Added By</th>
+                  <td>><?= ($record->added_by) ? $this->Action_model->get_name($record->added_by) : '' ?></td>
+                </tr>
+                <?php endif; ?>
+                <!-- End Added By -->
              </table>
             <!-- End Table -->
-          </div>
-
-          <div class="col-md-12">
-            <label>Name:</label> <strong><?= ucwords($record->lead_title . ' ' . $record->lead_first_name . ' ' . $record->lead_last_name) ?></strong>
-          </div>
-          <div class="col-md-6">
-            <label>Contact No:</label> <strong>+91<?= $record->lead_mobile_no ?></strong>
-          </div>
-          <div class="col-md-6">
-            <label>Other No:</label> <strong>+91<?= $record->lead_mobile_no_2 ?></strong>
-          </div>
-          <div class="col-md-12">
-            <label>Email Id:</label> <strong><?= $record->lead_email ?></strong>
-          </div>
-          <div class="col-md-12">
-            <label>Address:</label> <strong><?= $record->lead_address ?></strong>
-          </div>
-          <div class="col-md-6">
-            <label>City:</label> <strong><?= $record->city_name ?></strong>
-          </div>
-          <div class="col-md-6">
-            <label>State:</label> <strong><?= $record->state_name ?></strong>
-          </div>
-          <div class="col-md-6">
-            <label>Sex:</label> <strong><?= $record->lead_gender ?></strong>
-          </div>
-          <div class="col-md-6">
-            <label>Marital Status:</label> <strong><?= $record->lead_marital_status ?></strong>
-          </div>
-          <div class="col-md-6">
-            <label>Occupation:</label> <strong><?= $record->occupation_name ?></strong>
-          </div>
-          <div class="col-md-6">
-            <label>Designation:</label> <strong><?= $record->designation_name ?></strong>
-          </div>
-          <div class="col-md-12">
-            <label>Name of Company:</label> <strong><?= $record->lead_company ?></strong>
-          </div>
-          <div class="col-md-12">
-            <label>Annual Income:</label> <strong><?= $record->lead_annual_income ?></strong>
-          </div>
-          <div class="col-md-12">
-            <h4>KYC</h4>
-          </div>
-          <div class="col-md-6">
-            <label>PAN No:</label> <strong><?= $record->lead_pan_no ?></strong>
-          </div>
-          <div class="col-md-6">
-            <label>Adhar No:</label> <strong><?= $record->lead_adhar_no ?></strong>
-          </div>
-          <div class="col-md-6">
-            <label>Voter Id:</label> <strong><?= $record->lead_voter_id ?></strong>
-          </div>
-          <div class="col-md-6">
-            <label>Passport No:</label> <strong><?= $record->lead_passport_no ?></strong>
-          </div>
-          <div class="col-md-6">
-            <label>Added By:</label> <strong><?= ($record->added_by) ? $this->Action_model->get_name($record->added_by) : '' ?></strong>
-          </div>
-          <div class="col-md-12" align="right">
-            <!--<button type="button" class="btn btn-dark btn-sm" data-toggle="modal" data-target="#profileEditModal" style="color: white;"><i class="fa fa-edit"></i> Edit</button>-->
-            <!-- <a href="<?= base_url(AGENT_URL . 'lead-detail/' . $record->lead_id) ?>">-->
-            <button type="button" class="btn btn-dark btn-sm" style="color: white;" onclick="get_lead_form(<?= $record->lead_id ?>)"><i class="fa fa-edit"></i> Edit</button>
-            <!--</a>-->
           </div>
         </div>
 
