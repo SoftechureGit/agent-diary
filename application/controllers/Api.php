@@ -2085,6 +2085,17 @@ class Api extends CI_Controller {
                             'name' => 'Unmarried'
                 ],
             ];
+
+                # States
+                $where          =   "country_id = '1' AND state_status = '1' ORDER BY state_name ASC ";
+                $state_list = $this->db->select('state_id, state_name')->where($where)->from('tbl_states')->get()->result();
+                # End States
+
+                # States
+                $where          =   "country_id = '1' AND state_status = '1' ORDER BY state_name ASC ";
+                $state_list = $this->db->select('state_id, state_name')->where($where)->from('tbl_states')->get()->result();
+                # End States
+
             # End Data From DB
     
             $where = "lead_id='" . $id . "' AND account_id='" . $account_id . "'";
@@ -2150,10 +2161,11 @@ class Api extends CI_Controller {
                     $lead_data[] = $row;
                 }
     
-                $where = "country_id='1' AND state_status=1";
-                $state_list = $this->Action_model->detail_result('tbl_states', $where);
-                $where = "state_id='" . $record->lead_state_id . "'";
-                $city_list = $this->Action_model->detail_result('tbl_city', $where);
+                // $where = "country_id='1' AND state_status=1";
+                // $state_list = $this->Action_model->detail_result('tbl_states', $where);
+
+                // $where = "state_id='" . $record->lead_state_id . "'";
+                // $city_list = $this->Action_model->detail_result('tbl_city', $where);
     
                 $where = "occupation_status='1'";
                 $occupation_list = $this->Action_model->detail_result('tbl_occupations', $where);
@@ -2198,7 +2210,7 @@ class Api extends CI_Controller {
                     'designations_list' => $designations_list,
                     'lead_source_list' => $lead_source_list,
                     'lead_stage_list' => $lead_stage_list,
-                    'city_list' => $city_list,
+                    'city_list' => null, #$city_list,
                     'genders'                   => $genders,
                     'martial_status'            => $martial_status,
                     'next_lead_id' =>$previous_lead_id,
@@ -2225,8 +2237,8 @@ class Api extends CI_Controller {
                     $lead_data[] = $row;
                 }
     
-                $where = "country_id='1' AND state_status=1";
-                $state_list = $this->Action_model->detail_result('tbl_states', $where);
+                // $where = "country_id='1' AND state_status=1";
+                // $state_list = $this->Action_model->detail_result('tbl_states', $where);
 
                 $where = "occupation_status='1'";
                 $occupation_list = $this->Action_model->detail_result('tbl_occupations', $where);
@@ -2269,7 +2281,7 @@ class Api extends CI_Controller {
                     'lead_type_list'    =>  $lead_type_list,
                     'genders'                   => $genders,
                     'martial_status'            => $martial_status,
-                    'city_list'         =>  '',
+                    'city_list'         =>  null,
                     'next_lead_id'      =>'',
                     'previous_lead_id'  =>  '' 
                 );
@@ -3391,7 +3403,7 @@ class Api extends CI_Controller {
 
         if ($this->input->post()) {
             $city_id=$this->input->post('city_id');
-            $where = "city_id='".$city_id."' AND location_status='1'";
+            $where = "city_id='".$city_id."' AND location_status='1' order by location_name asc";
             $location_data = $this->Action_model->detail_result('tbl_locations',$where,'location_id,location_name');
             
             if ($location_data) {
@@ -9471,7 +9483,7 @@ class Api extends CI_Controller {
 
         $city_list = array();
         if ($id) {
-            $where = "state_id='".$id."'";
+            $where = "state_id='".$id."' order by city_name asc ";
             $city_list = $this->Action_model->detail_result('tbl_city',$where);
         }
 
