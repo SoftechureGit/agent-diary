@@ -2091,10 +2091,6 @@ class Api extends CI_Controller {
                 $state_list = $this->db->select('state_id, state_name')->where($where)->from('tbl_states')->get()->result();
                 # End States
 
-                # States
-                $where          =   "country_id = '1' AND state_status = '1' ORDER BY state_name ASC ";
-                $state_list = $this->db->select('state_id, state_name')->where($where)->from('tbl_states')->get()->result();
-                # End States
 
             # End Data From DB
     
@@ -2184,7 +2180,7 @@ class Api extends CI_Controller {
                 $data['lead_type_list'] = (($lead_type_list) ? $lead_type_list : array());
 
                 $state_list = (($state_list) ? $state_list : array());
-                $city_list = (($city_list) ? $city_list : array());
+                // $city_list = (($city_list) ? $city_list : array());
                 $occupation_list = (($occupation_list) ? $occupation_list : array());
                 $department_list = (($department_list) ? $department_list : array());
                 $lead_source_list = (($lead_source_list) ? $lead_source_list : array());
