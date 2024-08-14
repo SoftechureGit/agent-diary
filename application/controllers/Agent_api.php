@@ -2331,7 +2331,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                     case 'new_leads':
                         $where .= " and tbl_leads.added_to_followup = 0";
                         $where .= " GROUP BY tbl_leads.lead_id";
-                        $where .= " ORDER BY DATE(STR_TO_DATE(`lead_date`, '%d-%m-%Y')) DESC, lead_time DESC";
+                        $where .= " ORDER BY DATE(STR_TO_DATE(`lead_date`, '%d-%m-%Y')) DESC, STR_TO_DATE(`lead_time`, '%h:%i:%s %p') DESC";
                         break;
                     default:
                         $where .= " GROUP BY tbl_leads.lead_id";
