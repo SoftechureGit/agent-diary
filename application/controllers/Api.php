@@ -2322,6 +2322,7 @@ class Api extends CI_Controller {
         # End User Details
 
         $array                          =   array();
+        $record_array                   =   array();
         $account_id                     =   0;
         $user_id                        =   0;
 
@@ -2349,13 +2350,6 @@ class Api extends CI_Controller {
             $email                                  =   $this->input->post('lead_email');
             # End Init
 
-            # Profile
-            if(!empty($_FILES['profile']['name'])):
-                $profile                                =   upload_file('profile', 'profile', time());
-            endif;
-
-            # End Profile
-
             $record_array                           = array(
                                                             'lead_date'                                 =>  $this->input->post('lead_date'),
                                                             'lead_time'                                 =>  $this->input->post('lead_time'),
@@ -2369,8 +2363,6 @@ class Api extends CI_Controller {
                                                             
                                                             'secondary_mobile_number_country_data'      =>  $this->input->post('secondary_mobile_number_country_data'),
                                                             'lead_mobile_no_2'                          =>  $this->input->post('lead_mobile_no_2'),
-
-                                                            'profile'                                   => $profile->file_name ?? null,
 
                                                             'lead_source_id'                            =>  $this->input->post('lead_source_id'),
                                                             'lead_stage_id'                             =>  $this->input->post('lead_stage_id'),
@@ -2443,6 +2435,14 @@ class Api extends CI_Controller {
             endif;
             # End Is Email Exists
 
+            
+            # Profile
+            if(!empty($_FILES['profile']['name'])):
+                $profile                                =   upload_file('profile', 'profile', time());
+                $record_array['profile']                =   $profile->file_name ?? null;
+            endif; 
+            # End Profile
+            
             if ($record) {
                 
                 # Update Lead
