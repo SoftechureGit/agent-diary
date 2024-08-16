@@ -2860,7 +2860,7 @@ class Api extends CI_Controller {
                        case 'new_leads':
                            $where .= " and tbl_leads.added_to_followup = 0";
                            $where .= " GROUP BY tbl_leads.lead_id";
-                           $where .= " ORDER BY DATE(STR_TO_DATE(`lead_date`, '%d-%m-%Y')) DESC, STR_TO_DATE(`lead_time`, '%h:%i:%s %p') DESC";
+                           $where .= " ORDER BY DATE(STR_TO_DATE(`lead_date`, '%d-%m-%Y')) DESC, lead_time DESC";
                            break;
                        default:
                            $where .= " GROUP BY tbl_leads.lead_id";
@@ -2911,7 +2911,7 @@ class Api extends CI_Controller {
                        case 'new_leads':
                            $where .= " and tbl_leads.added_to_followup = 0";
                            $where .= " GROUP BY tbl_leads.lead_id";
-                           $where .= " ORDER BY DATE(STR_TO_DATE(`lead_date`, '%d-%m-%Y')) DESC, STR_TO_DATE(`lead_time`, '%h:%i:%s %p') DESC";
+                           $where .= " ORDER BY DATE(STR_TO_DATE(`lead_date`, '%d-%m-%Y')) DESC, lead_time DESC";
                            break;
                        default:
                            $where .= " GROUP BY tbl_leads.lead_id";
@@ -11500,20 +11500,100 @@ $property_list = $query->result();
              $record = $query->row();
      
              if ($record) {
-                # start   
-                $record->full_profile_url = $record->profile ? $profile_base_url.$record->profile : base_url('public/front/user.png'); 
+                 # start   
+                 $record->full_profile_url = $record->profile ? $profile_base_url.$record->profile : base_url('public/front/user.png'); 
                  
-                # Primary Mobile Number Country Code
-                $primary_country_code                          =   ( $record->primary_mobile_number_country_data ?? null ) ? json_decode($record->primary_mobile_number_country_data): '';
-                $record->primary_mobile_number_country_data    =   $primary_country_code->dialCode ?? 0;
-                # End Primary Mobile Number Country Code
+                 // Fetch previous lead ID
+                 $this->db->select('lead_id');
+                 $this->db->from('tbl_leads');
+                 $this->db->where('account_id', $account_id);
+                 $this->db->where('lead_id <', $current_lead_id);
+                 $this->db->order_by('lead_id', 'DESC');
+                 $this->db->limit(1);
+                 $previous_lead_query = $this->db->get();
+                 $previous_lead = $previous_lead_query->row();
+     
+                 // Fetch next lead ID
+                 $this->db->select('lead_id');
+                 $this->db->from('tbl_leads');
+                 $this->db->where('account_id', $account_id);
+                 $this->db->where('lead_id >', $current_lead_id);
+                 $this->db->order_by('lead_id', 'ASC');
+                 $this->db->limit(1);
+                 $next_lead_query = $this->db->get();
+                 $next_lead = $next_lead_query->row();
                  
-                # Secondary Mobile Number Country Code
-                $primary_country_code                          =   ( $record->secondary_mobile_number_country_data ?? null ) ? json_decode($record->secondary_mobile_number_country_data): '';
-                $record->secondary_mobile_number_country_data    =   $primary_country_code->dialCode ?? 0;
-                # End Secondary Mobile Number Country Code
- 
-                $record_p = '';
+                 // $next_lead_id = $next_lead ? $next_lead->lead_id : null;
+                 // $previous_lead_id = $previous_lead ? $previous_lead->lead_id : null;
+                 # end 
+                 
+                 
+                 $where = "user_status='1' AND ((parent_id='" . $account_id . "') OR (user_id='" . $account_id . "' AND role_id='2'))";
+                 $where_ids = "";
+                 $user_ids = $this->get_level_user_ids($this->input->post('user_hash'));
+     
+                 if (count($user_ids)) {
+                     $where_ids .= " AND (tbl_users.user_id='" . implode("' OR tbl_users.user_id='", $user_ids) . "')";
+                 }
+                 
+                 
+                 $where .= $where_ids;
+     
+                 $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,user_title,first_name,last_name,parent_id,is_individual,firm_name');
+     
+                 $lead_data = array();
+
+                 foreach ($user_list as $row) {
+                     $row->is_individual = (($row->is_individual != '') ? $row->is_individual : "");
+                     $row->firm_name = (($row->firm_name != '') ? $row->firm_name : "");
+                     $row->parent_id = (($row->parent_id != '') ? $row->parent_id : "");
+                     $lead_data[] = $row;
+                 }
+     
+                 $where = "country_id='1' AND state_status=1";
+                 $state_list = $this->Action_model->detail_result('tbl_states', $where);
+                 $where = "state_id='" . $record->lead_state_id . "'";
+                 $city_list = $this->Action_model->detail_result('tbl_city', $where);
+     
+                 $where = "occupation_status='1'";
+                 $occupation_list = $this->Action_model->detail_result('tbl_occupations', $where);
+     
+                 $where = "department_status='1'";
+                 $department_list = $this->Action_model->detail_result('tbl_departments', $where);
+     
+                 $where = "lead_source_status='1'";
+                 $lead_source_list = $this->Action_model->detail_result('tbl_lead_sources', $where);
+     
+                 $where = "lead_stage_status='1'";
+                 $lead_stage_list = $this->Action_model->detail_result('tbl_lead_stages', $where);
+     
+                 $where = "lead_type_status='1'";
+                 $lead_type_list = $this->Action_model->detail_result('tbl_lead_types', $where, 'lead_type_id,lead_type_name');
+                 $data['lead_type_list'] = (($lead_type_list) ? $lead_type_list : array());
+     
+                 $state_list = (($state_list) ? $state_list : array());
+                 $city_list = (($city_list) ? $city_list : array());
+                 $occupation_list = (($occupation_list) ? $occupation_list : array());
+                 $department_list = (($department_list) ? $department_list : array());
+                 $lead_source_list = (($lead_source_list) ? $lead_source_list : array());
+                 $lead_stage_list = (($lead_stage_list) ? $lead_stage_list : array());
+                 
+                 # Primary Mobile Number Country Code
+                 $primary_country_code                          =   ( $record->primary_mobile_number_country_data ?? null ) ? json_decode($record->primary_mobile_number_country_data): '';
+                 $record->primary_mobile_number_country_data    =   $primary_country_code->dialCode ?? 0;
+                 # End Primary Mobile Number Country Code
+                 
+                 # Secondary Mobile Number Country Code
+                 $primary_country_code                          =   ( $record->secondary_mobile_number_country_data ?? null ) ? json_decode($record->secondary_mobile_number_country_data): '';
+                 $record->secondary_mobile_number_country_data    =   $primary_country_code->dialCode ?? 0;
+                 # End Secondary Mobile Number Country Code
+
+                 foreach ($record as $k => $v) {
+                     $record->$k = ($v || $v == 0) ? $v : '';
+
+                 } 
+                 
+                 $record_p = '';
                  
                  if($previous_lead_id){
                      
@@ -11534,18 +11614,10 @@ $property_list = $query->result();
                          $record_p = $query->row();
                          
                          if($record_p){
-                           # start   
-                            $record_p->full_profile_url = $record_p->profile ? $profile_base_url.$record_p->profile : base_url('public/front/user.png'); 
-                            
-                            # Primary Mobile Number Country Code
-                            $primary_country_code                          =   ( $record_p->primary_mobile_number_country_data ?? null ) ? json_decode($record_p->primary_mobile_number_country_data): '';
-                            $record_p->primary_mobile_number_country_data    =   $primary_country_code->dialCode ?? 0;
-                            # End Primary Mobile Number Country Code
-                            
-                            # Secondary Mobile Number Country Code
-                            $primary_country_code                          =   ( $record_p->secondary_mobile_number_country_data ?? null ) ? json_decode($record_p->secondary_mobile_number_country_data): '';
-                            $record_p->secondary_mobile_number_country_data    =   $primary_country_code->dialCode ?? 0;
-                            # End Secondary Mobile Number Country Code
+                           foreach ($record_p as $k => $v) {
+                             $record_p->$k = ($v || $v == 0) ? $v : '';
+                             } 
+                             $record_p->full_profile_url = $record_p->profile ? $profile_base_url.$record_p->profile : base_url('public/front/user.png');
                          }
 
 
@@ -11574,30 +11646,32 @@ $property_list = $query->result();
                          $query = $this->db->get();
                          $record_n = $query->row();
                          
-                        if($record_n){
-                            # start   
-                            $record_n->full_profile_url = $record_n->profile ? $profile_base_url.$record_n->profile : base_url('public/front/user.png'); 
-                            
-                            # Primary Mobile Number Country Code
-                            $primary_country_code                          =   ( $record_n->primary_mobile_number_country_data ?? null ) ? json_decode($record_n->primary_mobile_number_country_data): '';
-                            $record_n->primary_mobile_number_country_data    =   $primary_country_code->dialCode ?? 0;
-                            # End Primary Mobile Number Country Code
-                            
-                            # Secondary Mobile Number Country Code
-                            $primary_country_code                          =   ( $record_n->secondary_mobile_number_country_data ?? null ) ? json_decode($record_n->secondary_mobile_number_country_data): '';
-                            $record_n->secondary_mobile_number_country_data    =   $primary_country_code->dialCode ?? 0;
-                            # End Secondary Mobile Number Country Code
-                        }        
+                         if($record_n){
+
+                           foreach ($record_n as $k => $v) {     
+                                $record_n->$k = ($v || $v == 0) ? $v : '';   
+                             } 
+
+                             $record_n->full_profile_url = $record_n->profile ? $profile_base_url.$record_n->profile : base_url('public/front/user.png');
+
+                         }        
                  }
                  
                  $array['data'] = array(
-                    'status'                    =>  true,
-                    'msg'                       =>  'Lead Found',
-                    'current_lead_data'         =>  $record,
-                    'next_lead_data'            =>  $record_n ?? null ,
-                    'previous_lead_data'        =>  $record_p ?? null ,
-                    'next_lead_id'              =>  $previous_lead_id ?? 0,
-                    'previous_lead_id'          =>  $next_lead_id  ?? 0 
+                     'status' => 'true',
+                     'msg' => 'Lead Found',
+                     'current_lead_data' => $record,
+                     'next_lead_data' => $record_p ?? null ,
+                     'previous_lead_data' => $record_n ?? null ,
+                     'records' => $lead_data,
+                     'state_list' => $state_list,
+                     'occupation_list' => $occupation_list,
+                     'department_list' => $department_list,
+                     'lead_source_list' => $lead_source_list,
+                     'lead_stage_list' => $lead_stage_list,
+                     'city_list' => $city_list,
+                     'next_lead_id' =>$previous_lead_id ?? '',
+                     'previous_lead_id' =>  $next_lead_id  ?? '' 
                  );
              } 
              else 
