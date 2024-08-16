@@ -447,6 +447,7 @@ if (!function_exists('getAccountId')) {
             $unit_codes       =  getPropertyAccomodations($property_details->project_type_id, $property_details->property_type_id, $property_id);     
        # End Unit  code
 
+       
 
        # Get Parking
             
@@ -470,11 +471,11 @@ if (!function_exists('getAccountId')) {
 
                 # unit code
                    $excel_sheet[1]['title']      = 'Unit Code';  
-                   $excel_sheet[1]['headers']    = ['S.N' ,'Unit Code', 'Code Id' ];  
+                   $excel_sheet[1]['headers']    = ['S.N' ,'Unit Code', 'Code Id' , 'Property Type Name'];  
                    
                    $count = 1;
                    foreach($unit_codes as $unit_code){
-                      $excel_sheet[1]['data'][] = [$count,$unit_code->inventory_unit_code , $unit_code->id] ;
+                      $excel_sheet[1]['data'][] = [$count,$unit_code->inventory_unit_code , $unit_code->id , $unit_code->property_type_name ?? ''] ;
                       $count++;
                    } 
                 # end unit code
@@ -529,11 +530,11 @@ if (!function_exists('getAccountId')) {
 
                 # unit code
                    $excel_sheet[1]['title']      = 'Unit Code';  
-                   $excel_sheet[1]['headers']    = ['S.N' ,'Unit Code', 'Code Id' ];  
+                   $excel_sheet[1]['headers']    = ['S.N' ,'Unit Code', 'Code Id' , 'Property Type Name' ];  
                    
                    $count = 1;
                    foreach($unit_codes as $unit_code){
-                      $excel_sheet[1]['data'][] = [$count,$unit_code->inventory_unit_code , $unit_code->id] ;
+                      $excel_sheet[1]['data'][] = [$count,$unit_code->inventory_unit_code , $unit_code->id , $unit_code->property_type_name ?? ''] ;
                       $count++;
                    } 
                 # end unit code
@@ -588,11 +589,11 @@ if (!function_exists('getAccountId')) {
 
                 # unit code
                    $excel_sheet[1]['title']      = 'Unit Code';  
-                   $excel_sheet[1]['headers']    = ['S.N' ,'Unit Code', 'Code Id' ];  
+                   $excel_sheet[1]['headers']    = ['S.N' ,'Unit Code', 'Code Id' , 'Property Type Name'  ];  
                    
                    $count = 1;
                    foreach($unit_codes as $unit_code){
-                      $excel_sheet[1]['data'][] = [$count,$unit_code->inventory_unit_code , $unit_code->id] ;
+                      $excel_sheet[1]['data'][] = [$count,$unit_code->inventory_unit_code , $unit_code->id , $unit_code->property_type_name ?? ''] ;
                       $count++;
                    } 
                 # end unit code
@@ -690,11 +691,11 @@ if (!function_exists('getAccountId')) {
 
                 # unit code
                    $excel_sheet[1]['title']      = 'Unit Code';  
-                   $excel_sheet[1]['headers']    = ['S.N' ,'Unit Code', 'Code Id' ];  
+                   $excel_sheet[1]['headers']    = ['S.N' ,'Unit Code', 'Code Id' , 'Property Type Name'];  
                    
                    $count = 1;
                    foreach($unit_codes as $unit_code){
-                      $excel_sheet[1]['data'][] = [$count,$unit_code->inventory_unit_code , $unit_code->id] ;
+                      $excel_sheet[1]['data'][] = [$count,$unit_code->inventory_unit_code , $unit_code->id , $unit_code->property_type_name ?? ''] ;
                       $count++;
                    } 
                 # end unit code
@@ -760,6 +761,7 @@ if (!function_exists('getAccountId')) {
                    # end parkings 
 
                 break;
+
             case '7':
                 $form          =   'builder-floor';
 
@@ -769,11 +771,11 @@ if (!function_exists('getAccountId')) {
 
                 # unit code
                    $excel_sheet[1]['title']      = 'Unit Code';  
-                   $excel_sheet[1]['headers']    = ['S.N' ,'Unit Code', 'Code Id' ];  
+                   $excel_sheet[1]['headers']    = ['S.N' ,'Unit Code', 'Code Id' , 'Property Type Name' ];  
                    
                    $count = 1;
                    foreach($unit_codes as $unit_code){
-                      $excel_sheet[1]['data'][] = [$count,$unit_code->inventory_unit_code , $unit_code->id] ;
+                      $excel_sheet[1]['data'][] = [$count,$unit_code->inventory_unit_code , $unit_code->id ] ;
                       $count++;
                    } 
                 # end unit code
@@ -859,11 +861,11 @@ if (!function_exists('getAccountId')) {
 
                 # unit code
                    $excel_sheet[1]['title']      = 'Unit Code';  
-                   $excel_sheet[1]['headers']    = ['S.N' ,'Unit Code', 'Code Id' ];  
+                   $excel_sheet[1]['headers']    = ['S.N' ,'Unit Code', 'Code Id' , 'Property Type Name'];  
                    
                    $count = 1;
                    foreach($unit_codes as $unit_code){
-                      $excel_sheet[1]['data'][] = [$count,$unit_code->inventory_unit_code , $unit_code->id] ;
+                      $excel_sheet[1]['data'][] = [$count,$unit_code->inventory_unit_code , $unit_code->id , $unit_code->property_type_name ?? ''] ;
                       $count++;
                    } 
                 # end unit code
@@ -964,11 +966,11 @@ if (!function_exists('getAccountId')) {
 
                 # unit code
                    $excel_sheet[1]['title']      = 'Unit Code';  
-                   $excel_sheet[1]['headers']    = ['S.N' ,'Unit Code', 'Code Id' ];  
+                   $excel_sheet[1]['headers']    = ['S.N' ,'Unit Code', 'Code Id' , 'Property Type Name'];  
                    
                    $count = 1;
                    foreach($unit_codes as $unit_code){
-                      $excel_sheet[1]['data'][] = [$count,$unit_code->inventory_unit_code , $unit_code->id] ;
+                      $excel_sheet[1]['data'][] = [$count,$unit_code->inventory_unit_code , $unit_code->id , $unit_code->property_type_name ?? ''] ;
                       $count++;
                    } 
                 # end unit code
