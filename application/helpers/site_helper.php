@@ -432,15 +432,8 @@ if (!function_exists('getAccountId')) {
 
     function property_excel($property_id){
 
-        // print_r(sizeUnit()); die;
-
        # Get property information
             $property_details = property($property_id);
-
-            // print_r($property_details); die;
-
-            
-            // print_r($property_details); die;
        # End  Get property information  
 
        # Get Unit code 
@@ -450,12 +443,7 @@ if (!function_exists('getAccountId')) {
        
 
        # Get Parking
-            
-            $parkings         =         parkings($property_details->id ?? 0); 
-
-
-            // print_r($parkings); die;
-       
+            $parkings         =         parkings($property_details->id ?? 0);        
        # End Get Parking 
 
         $form               =   '';
@@ -1065,13 +1053,10 @@ if (!function_exists('getAccountId')) {
         endswitch;
         
 
-        // echo '<pre>';
-        // print_r($excel_sheet); die;
-
         if ($form) :  
             return inventory_create_sample_file($excel_sheet , $property_details->name);
         else :
-            return "<div class='text-center my-3'><h4>Form not available.</h4></div>";
+            return false;
         endif;
     }
 
