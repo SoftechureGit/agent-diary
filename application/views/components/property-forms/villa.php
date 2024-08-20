@@ -42,7 +42,7 @@
                                 <!-- <label id="property_details[unit_code]-error" class="error" for="property_details[unit_code]"></label> -->
 
                                 <!-- Unit Code Name -->
-                             <input type="text" class="form-control d-none" name="property_details[unit_code_name]" value="<?= $unit_code_name ?? '' ?>" placeholder="Enter unit code" id="unit_code_name">
+                             <input type="text" class="form-control <?= ( $unit_code_name ?? '' ) != '' ? '' : 'd-none' ?>" name="property_details[unit_code_name]" value="<?= $unit_code_name ?? '' ?>" placeholder="Enter unit code" id="unit_code_name">
                             <!-- End Unit Code Name -->
                             </div>
                     </div>
