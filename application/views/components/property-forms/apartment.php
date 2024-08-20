@@ -21,6 +21,11 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Unit Code  <span class="text-danger">*</span></label>
+                            <!--  -->
+                            <?php
+                                if(( $unit_code_name ?? '' ) == ''):
+                            ?>
+                            <!--  -->
                             <select name="property_details[unit_code]" id="property-unit-code" class="form-control" data-selected_id="<?= $unit_code ?? 0 ?>" required>
                                 <option value="" disabled selected>Choose...</option>
                                 <?php
@@ -36,6 +41,9 @@
                                     <?= $unit_code_with_accomodation->unit_code_with_accomodation_name ?? $unit_code_with_accomodation->inventory_unit_code ?? '' ?></option>
                                 <?php endforeach; ?>
                             </select>
+                            <!--  -->
+                            <?php endif; ?>
+                            <!--  -->
                             <input type="hidden" name="property_details[accomodation_id]" value="<?= $accomodation_id ?? 0 ;?>">
                             <!-- <label id="property_details[unit_code]-error" class="error" for="property_details[unit_code]"></label> -->
 
