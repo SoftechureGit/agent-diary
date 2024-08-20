@@ -408,8 +408,6 @@ class Helper extends CI_Controller
             $this->db->where("id = $id")->delete('tbl_leads');
         # End Delete Record
         endif;
-
-
         echo json_encode(['status' => true, 'message' => 'Successfully record deleted.']);
     }
     # End Delete Lead
@@ -438,8 +436,13 @@ class Helper extends CI_Controller
                 $property_id                    = $this->input->get('property_id');
            # end post data
 
-          echo  property_excel($property_id);
-           
+        
+          $excel =   property_excel($property_id);
+
+          if($excel==false){
+                redirect('agent/manage-inventory/', 'refresh');      
+          }
+        
 
         }
     # end  get invetory file sample 
