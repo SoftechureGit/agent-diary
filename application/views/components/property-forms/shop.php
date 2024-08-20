@@ -1,10 +1,4 @@
-<?php
-if(is_object($property_details ?? null)):
-    extract((array) $property_details ?? []);
-elseif(is_array($property_details ?? null)):
-    extract($property_details ?? []);
-endif;
-?>
+<?php extract($data->property_details ?? []); ?>
 <!-- Shop Details -->
 <section id="shop-property-form" class="theme-form">
 <input type="hidden" name="property_details[id]" value="<?= $lead_or_inventory_id ?? '' ?>" class="id">
@@ -37,6 +31,10 @@ endif;
                                     <?php endforeach; ?>
                                 </select>
                                 <!-- <label id="property_details[unit_code]-error" class="error" for="property_details[unit_code]"></label> -->
+
+                                <!-- Unit Code Name -->
+                             <input type="text" class="form-control d-none" name="property_details[unit_code_name]" value="<?= $unit_code_name ?? '' ?>" placeholder="Enter unit code" id="unit_code_name">
+                            <!-- End Unit Code Name -->
                             </div>
                     </div>
                     <!-- End Unit Code -->

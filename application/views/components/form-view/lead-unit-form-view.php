@@ -32,7 +32,7 @@
     <div class="col-md-4">
       <div class="form-group">
         <label for="">Booking Date <span class="text-danger">*</span></label>
-        <input type="date" class="form-control" name="booking_date" value="<?= $record->booking_date ?? '' ?>" required>
+        <input type="date" class="form-control" name="booking_date" value="<?= $record->booking_date ?? date('Y-m-d') ?>" required>
       </div>
     </div>
     <!-- End Date -->
@@ -105,7 +105,7 @@
     <!-- End Location -->
 
     <!-- List of Project -->
-    <div class="col-md-4">
+    <div class="col-md-4 project_list_wrapper">
       <div class="form-group">
         <label for="">List of Project</label>
         <select name="project_id" id="" class="form-control" data-selected_id="<?= $record->project_id ?? 0 ?>">
@@ -116,24 +116,13 @@
     <!-- End List of Project -->
 
     <!-- Project Name -->
-    <div class="col-md-4 project_name_wrapper">
+    <div class="col-md-4 project_name_wrapper d-none">
       <div class="form-group">
-        <label for="">Project Name</label>
+        <label for="">Project Name <span class="text-danger">*</span></label>
         <input name="project_name" id="" class="form-control" placeholder="Enter project name" value="<?= $record->project_name ?? $record->lead_unit_project_name ?? '' ?>" required>
       </div>
     </div>
     <!-- End Project Name -->
-
-    <!-- Project Properties -->
-    <div class="col-md-4 project_properties">
-      <div class="form-group">
-        <label for="">Properties ( Unit Code )</label>
-        <select name="property_id" id="" class="form-control" data-selected_id="<?= $record->property_id ?? 0 ?>">
-          <option value="" selected disabled>Choose..</option>
-        </select>
-      </div>
-    </div>
-    <!-- End Project Properties -->
 
     <!-- Layout Upload -->
     <div class="col-md-4">

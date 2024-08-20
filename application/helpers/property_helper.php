@@ -781,3 +781,57 @@ if (!function_exists('accomodations')) {
 /*******************************************
  *  End Builder Form
 *******************************************/
+    #   Basment
+    if(!function_exists('basments')):
+        function basments($id = ''){
+            $where  = "1 = '1'";
+    
+            if ($id) :
+                $where  .= " and id = $id";
+            endif;
+    
+            $result  = db_instance()
+                ->select('id, name')
+                ->where($where)
+                ->get('tbl_basments');
+    
+            if ($id) :
+                $result  = $result->row();
+            else :
+                $result  = $result->result();
+            endif;
+    
+            return $result;
+        }
+    endif;
+    #   End Basment
+/*******************************************
+ *  Unit Code
+*******************************************/
+    #   Unit Code => Table : tbl_product_unit_details
+    if(!function_exists('unit_code')):
+        function unit_code($id = ''){
+            $where  = "1 = '1'";
+    
+            if ($id) :
+                $where  .= " and product_unit_detail_id = $id";
+            endif;
+    
+            $result  = db_instance()
+                ->select('product_unit_detail_id as id, code as name')
+                ->where($where)
+                ->get('tbl_product_unit_details');
+    
+            if ($id) :
+                $result  = $result->row();
+            else :
+                $result  = $result->result();
+            endif;
+    
+            return $result;
+        }
+    endif;
+    #   End Unit Code => Table : tbl_product_unit_details
+/*******************************************
+ *  End Unit Code
+*******************************************/

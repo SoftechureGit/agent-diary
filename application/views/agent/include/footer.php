@@ -2,7 +2,7 @@
                     Form
                 ***********************************-->
      <!-- Modal -->
-     <div class="modal fade" id="view-inventory-details-Modal" tabindex="-1" role="dialog" aria-labelledby="view-inventory-details-ModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+     <div class="modal fade" id="view-inventory-details-Modal" role="dialog" aria-labelledby="view-inventory-details-ModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
        <div class="modal-dialog modal-lg" role="document">
          <div class="modal-content">
            <div class="modal-header">
@@ -70,8 +70,18 @@
      <!--  -->
      <script>
        function convertToSelect2() {
-         $('select').select2();
+         //  $('select').select2({
+         //   placeholder: "Choose..."
+         // });
+
+         $('select').each(function() {
+           $(this).select2({
+             placeholder: "Choose...",
+             dropdownParent: $(this).parent(),
+           });
+         });
        }
+
        convertToSelect2()
        // $('.select2').select2();
        /* Add or Edit Lead Unit */
@@ -99,15 +109,19 @@
                }
 
                if ($('#lead-unit-form [name="property_type_id"]').val() != '') {
+                
                  setTimeout(function() {
 
                    $('#lead-unit-form [name="property_type_id"]').trigger('change')
+
                  }, 500)
 
                }
                if ($('#lead-unit-form [name="city_id"]').data('selected_id') != '') {
                  $('#lead-unit-form [name="state_id"]').trigger('change')
                }
+
+
 
                // 
                /*  Lead Unit Form */
@@ -400,15 +414,36 @@
            },
            dataType: 'json',
            success: (res) => {
-             if (res.status) {
-               console.log(res)
-               $('#lead-unit-form [name="project_id"]').html(res.view)
-               //  if (selected_id) {
-               //    $('#lead-unit-form .project_name_wrapper').addClass('d-none')
-               // }else{
-               //    $('#lead-unit-form .project_name_wrapper').removeClass('d-none')
 
-               //  }
+             if (res.status) {
+               $('#lead-unit-form [name="project_id"]').html(res.view)
+
+               if ($('#lead-unit-form [name="project_id"] > option').length > 1) {
+                 $('#lead-unit-form .project_name_wrapper').addClass('d-none')
+                 $('#lead-unit-form .project_list_wrapper').removeClass('d-none')
+                 $('#lead-unit-form .project_properties').removeClass('d-none')
+
+                 $('#lead-unit-form [name="property_details[unit_code]"]').prop('required', false).removeClass('d-none')
+                 $('#lead-unit-form [name="property_details[unit_code]"] + .select2').removeClass('d-none')
+                 $('#lead-unit-form [name="property_details[unit_code_name]"]').prop('required', false).addClass('d-none')
+
+                   /** Lead Unit Property List : Trigger  */
+                   if ($('#lead-unit-form [name="project_id"]').data('selected_id') != '') {
+                    $('#lead-unit-form [name="project_id"]').trigger('change')
+                  }
+                  /** End Lead Unit Property List : Trigger  */
+               } else {
+                 $('#lead-unit-form .project_name_wrapper').removeClass('d-none')
+                 $('#lead-unit-form .project_list_wrapper').addClass('d-none')
+                 $('#lead-unit-form .project_properties').addClass('d-none')
+                 $('#lead-unit-form .project_properties').addClass('d-none')
+
+                 $('#lead-unit-form [name="property_details[unit_code]"]').html('')
+                 $('#lead-unit-form [name="property_details[unit_code]"]').prop('required', true).addClass('d-none')
+                 $('#lead-unit-form [name="property_details[unit_code]"] + .select2').addClass('d-none')
+                 $('#lead-unit-form [name="property_details[unit_code_name]"]').prop('required', true).removeClass('d-none')
+
+               }
                //  $('#lead-unit-form [name="project_id"]').trigger('change')
 
              }
@@ -418,26 +453,27 @@
        /*  End Projects */
 
        /* Project Properties */
-       $(document).on('change', '#lead-unit-form [name="project_id"]', function() {
-         var project_id = $(this).val();
-         var selected_id = $('#lead-unit-form [name="property_id"]').data('selected_id');
-
-         $.ajax({
-           method: 'GET',
-           url: "<?= base_url('helper/project_properties'); ?>",
-           data: {
-             project_id: project_id,
-             selected_id: selected_id,
-             view: true
-           },
-           dataType: 'json',
-           success: (res) => {
-             if (res.status) {
-               $('#lead-unit-form [name="property_id"]').html(res.view)
-             }
-           }
-         })
-       })
+        $(document).on('change', '#lead-unit-form [name="project_id"]', function() {
+          var project_id = $(this).val();
+        
+          selected_id = $('[name="property_details[unit_code]"]').data('selected_id');
+        
+          $.ajax({
+            method: 'GET',
+            url: "<?= base_url('helper/project_properties'); ?>",
+            data: {
+              project_id: project_id,
+              selected_id: selected_id,
+              view: true
+            },
+            dataType: 'json',
+            success: (res) => {
+              if (res.status) {
+                $('#lead-unit-form [name="property_details[unit_code]"]').html(res.view)
+              }
+            }
+          })
+        })
        /*  End Project Properties */
 
        /* Project Property Details */
@@ -855,7 +891,6 @@
            },
            dataType: 'json',
            success: (res) => {
-             console.log(res)
              if (res.status) {
 
                /** Parking */
@@ -877,8 +912,6 @@
                $(`#modal-inventory-form select[name="property_details[applicable_plc][]"]`).val('').trigger('change');
 
                /** End Parking */
-
-
 
                $.each(res.data, function(key, value) {
                  /** Size Unit */

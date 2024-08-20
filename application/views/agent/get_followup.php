@@ -629,7 +629,7 @@
 </div>
 
 <!-- start transfer lead modal -->
-<div class="modal fade" id="transferModal" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" id="transferModal" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-md" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -690,8 +690,8 @@
 </div>
 <!-- End Add Unit -->
 
-<!-- Unit Detials -->
-<div class="modal fade" id="lead-unit-details-modal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+<!-- Unit Details -->
+<div class="modal fade" id="lead-unit-details-modal" role="dialog" data-backdrop="static" data-keyboard="false">
   <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -705,7 +705,7 @@
       </div>
     </div>
   </div>
-  <!-- End Unit Detials -->
+  <!-- End Unit Details -->
 
   <script>
     function transfer_lead(id) {

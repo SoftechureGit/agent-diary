@@ -1,10 +1,4 @@
-<?php
-if(is_object($property_details ?? null)):
-    extract((array) $property_details ?? []);
-elseif(is_array($property_details ?? null)):
-    extract($property_details ?? []);
-endif;
-?>
+<?php extract($data->property_details ?? []); ?>
 <!-- Shop Details -->
 <section id="shop-property-form" class="theme-form">
 <input type="hidden" name="property_details[id]" value="<?= $lead_or_inventory_id ?? '' ?>" class="id">
@@ -27,6 +21,9 @@ endif;
                   <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Unit Code  <span class="text-danger">*</span></label>
+                            <?php
+                                if(( $unit_code_name ?? '' ) == ''):
+                            ?>
                             <select name="property_details[unit_code]" id="" class="form-control" data-selected_id="<?= $unit_code ?? 0 ?>" required>
                                 <option value="" disabled selected>Choose...</option>
                                 <?php 
@@ -36,9 +33,14 @@ endif;
                                     <option value="<?= $unit_code_with_accomodation->id ?>"   <?= $selected ?> data-property-type-name="<?= $unit_code_with_accomodation->property_type_name ?? ''; ?>"><?= $unit_code_with_accomodation->unit_code_with_accomodation_name ?? $unit_code_with_accomodation->inventory_unit_code ?? '' ?></option>   
                                     <?php endforeach; ?>
                                 </select>
-
-                                <input type="hidden" value="" name="property_details[property_type_name]" id="property_type_name">
+                            <?php endif; ?>
+                            
+                                <input type="hidden" value="<?= $data->property_type_name ?? '' ?>" name="property_details[property_type_name]" id="property_type_name">
                                 <!-- <label id="property_details[unit_code]-error" class="error" for="property_details[unit_code]"></label> -->
+
+                                <!-- Unit Code Name -->
+                             <input type="text" class="form-control <?= ( $unit_code_name ?? '' ) != '' ? '' : 'd-none' ?>" name="property_details[unit_code_name]" value="<?= $unit_code_name ?? '' ?>" placeholder="Enter unit code" id="unit_code_name">
+                            <!-- End Unit Code Name -->
                             </div>
                     </div>
                     <!-- End Unit Code -->
@@ -225,7 +227,7 @@ endif;
                     <!-- End Parking -->
 
                     <!-- Pentry -->
-                    <div class="col-md-4 commercial-col pentry-col d-none">
+                    <div class="col-md-4 commercial-col pentry-col <?= ( $data->property_type_name ?? '' ) == 'Office' ? '' : 'd-none' ?>">
                         <div class="form-group">
                             <label for="">Pentry</label>
                             <select name="property_details[pentry]" class="form-control">
@@ -238,7 +240,7 @@ endif;
                     <!-- End Pentry -->
 
                     <!-- Washroom -->
-                    <div class="col-md-4 commercial-col washroom-col d-none">
+                    <div class="col-md-4 commercial-col washroom-col <?= ( $data->property_type_name ?? '' ) == 'Office' ? '' : 'd-none' ?>">
                         <div class="form-group">
                             <label for="">Washroom</label>
                             <select name="property_details[washroom]" class="form-control">

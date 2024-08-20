@@ -4561,6 +4561,8 @@ WHERE lead_id='" . $lead_id . "'
             $where                      .= " and unit_code='" . $property_unit_code_id . "'";
         endif;
 
+        $where                      .= " order by inventory_id desc";
+
         $this->db->select('inventory.*, inventory_status.inventory_status_name');
         $this->db->where($where);
         $this->db->join('tbl_inventory_status as inventory_status', 'inventory_status.inventory_status_id = inventory.inventory_status');

@@ -243,7 +243,7 @@ $property_layout_url        =   $property_layout ? base_url("uploads/images/prop
                 <!-- End Washroom -->
 
                 <!-- Parking -->
-                <?php if (is_array($parking ?? [])) : ?>
+                <?php if (is_array($parking ?? 0)) : ?>
                 <tr>
                     <th>Parking</th>
                     <td><?= implode(', ', array_map('ucwords', $parking) ) ?></td>

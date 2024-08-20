@@ -387,7 +387,9 @@ if (!function_exists('getAccountId')) {
     # Get Property Form
     function property_form($property_type_id, $property_details = null)
     {
+        $data          =   [];
         $form          =   '';
+        $property_type_name          =   '';
         
         # Commercial
         if(!$property_type_id):
@@ -403,10 +405,12 @@ if (!function_exists('getAccountId')) {
                 $form          =   'plot';
                 break;
             case '4':
-                $form          =   'shop';
+                $form          =   'commercial';
+                $property_type_name          =   'Shop';
                 break;
-            case '5':
-                $form          =   'office';
+                case '5':
+                    $form          =   'commercial';
+                    $property_type_name          =   'Office';
                 break;
             case '7':
                 $form          =   'builder-floor';
@@ -420,7 +424,13 @@ if (!function_exists('getAccountId')) {
         endswitch;
 
         if ($form) :
-            return CI()->load->view("components/property-forms/$form", $property_details ?? [], true);
+
+            $data               =   (object) [
+                                        'property_type_name'    => $property_type_name,
+                                        'property_details'      => (array) $property_details ?? [],
+                                    ];
+
+            return CI()->load->view("components/property-forms/$form", [ 'data' => $data ], true);
         else :
             return "<div class='text-center my-3'><h4>Form not available.</h4></div>";
         endif;
