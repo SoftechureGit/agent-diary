@@ -2987,12 +2987,12 @@ class Api extends CI_Controller {
    
                             #
                             # Primary Mobile Number Country Code
-                            $primary_country_code                           =   ( $item->primary_mobile_number_country_data ?? null ) ? json_decode($item->primary_mobile_number_country_data)->dialCode : '';
+                            $primary_country_code                           =   ( $item->primary_mobile_number_country_data ?? null ) ? ( json_decode($item->primary_mobile_number_country_data)->dialCode ?? '' ) : '';
                             $primary_mobile_number_with_country_code             =  ( $item->lead_mobile_no ?? null ) ? '+'.$primary_country_code.' '.$item->lead_mobile_no : null ;
                             # End Primary Mobile Number Country Code
                             
                             # Secondary Mobile Number Country Code
-                            $secondary_country_code                           =   ( $item->secondary_mobile_number_country_data ?? null ) ? json_decode($item->secondary_mobile_number_country_data)->dialCode : '';
+                            $secondary_country_code                           =   ( $item->secondary_mobile_number_country_data ?? null ) ? ( json_decode($item->secondary_mobile_number_country_data)->dialCode ?? '' ) : '';
                             $secondary_mobile_number_with_country_code             =  ( $item->lead_mobile_no ?? null ) ? '+'.$secondary_country_code.' '.$item->lead_mobile_no : null ;
                             # End Secondary Mobile Number Country Code
                             #
