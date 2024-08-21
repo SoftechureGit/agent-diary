@@ -4711,7 +4711,7 @@ WHERE lead_id='" . $lead_id . "'
 
             $inv_plot_size                          =   ( $inventory_details->plot_size ?? '-' ).' '. ( sizeUnits($inventory_details->size_unit ?? 0)->unit_name  ?? '-' ) ?? '-';
 
-            $inv_unit_size                          =   ( $inventory_details->unit_size ?? '-' ).' '. ( sizeUnits($inventory_details->unit_size_unit ?? 0)->unit_name  ?? '-' ) ?? '-';
+            $inv_unit_size                          =   ( $inventory_details->size_unit ?? '-' ).' '. ( sizeUnits($inventory_details->size_unit ?? 0)->unit_name  ?? '-' ) ?? '-';
             $inv_quote                              =   ( $inventory_details->id ?? 0 ) ? "<div class='text-center' onclick='getQuatation(".$inventory_details->id.")'><button class='btn btn-warning btn-sm' style='color:#fff;'><i class='fa fa-eye'></i></button></div>" : '';
             # End Inventory Details Init
             
