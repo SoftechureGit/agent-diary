@@ -445,7 +445,7 @@ endif;
               <tr>
                 <th>Action</th>
                 <td>
-                  <button class="btn btn-sm btn-info edit-lead-btn">Edit</button>
+                <button type="button" class="btn btn-info btn-sm" onclick="get_lead_form(<?= $record->lead_id ?>)"><i class="fa fa-edit"></i> Edit</button>
                 </td>
               </tr>
               <!-- End Action -->
@@ -454,122 +454,7 @@ endif;
           </div>
         </div>
 
-        <div class="modal fade" id="profileEditModal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-          <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Edit Profile</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div class="modal-body">
-                <form>
-                  <div class="row">
-                    <div class="col-md-12">
-                      <label>Name:</label>
-                      <input type="text" class="form-control" value="Rakesh">
-                    </div>
-                    <div class="col-md-6" style="margin-top: 10px;">
-                      <label>Contact No:</label>
-                      <input type="text" class="form-control" value="+91878454545454">
-                    </div>
-                    <div class="col-md-6" style="margin-top: 10px;">
-                      <label>Other No:</label>
-                      <input type="text" class="form-control" value="+91878454545454">
-                    </div>
-                    <div class="col-md-12" style="margin-top: 10px;">
-                      <label>Email Id:</label>
-                      <input type="email" class="form-control" value="abc@gmail.com">
-                    </div>
-                    <div class="col-md-12" style="margin-top: 10px;">
-                      <label>Address:</label>
-                      <textarea class="form-control" rows="2">Pratap Nagar Jaipur, Rajasthan, India</textarea>
-                    </div>
-                    <div class="col-md-6" style="margin-top: 10px;">
-                      <label>City:</label>
-                      <select class="form-control">
-                        <option value="">Select City</option>
-                        <option value="Jaipur">Jaipur</option>
-                        <option value="Sikar">Sikar</option>
-                      </select>
-                    </div>
-                    <div class="col-md-6" style="margin-top: 10px;">
-                      <label>State:</label>
-                      <select class="form-control">
-                        <option value="">Select State</option>
-                        <option value="Rajasthan">Rajasthan</option>
-                        <option value="Gujrat">Gujrat</option>
-                      </select>
-                    </div>
-                    <div class="col-md-6" style="margin-top: 10px;">
-                      <label>Sex:</label>
-                      <select class="form-control">
-                        <option value="">Select Sex</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                      </select>
-                    </div>
-                    <div class="col-md-6" style="margin-top: 10px;">
-                      <label>Marital Status:</label>
-                      <select class="form-control">
-                        <option value="">Select Marital Status</option>
-                        <option value="Married">Married</option>
-                        <option value="Unmarried">Unmarried</option>
-                      </select>
-                    </div>
-                    <div class="col-md-6" style="margin-top: 10px;">
-                      <label>Occopuction:</label>
-                      <select class="form-control">
-                        <option value="">Select Occopuction</option>
-                        <option value="Service">Service</option>
-                        <option value="Business">Business</option>
-                      </select>
-                    </div>
-                    <div class="col-md-6" style="margin-top: 10px;">
-                      <label>Designation:</label>
-                      <select class="form-control">
-                        <option value="">Select Designation</option>
-                      </select>
-                    </div>
-                    <div class="col-md-12" style="margin-top: 10px;">
-                      <label>Name of Company:</label>
-                      <input type="text" class="form-control" value="">
-                    </div>
-                    <div class="col-md-6" style="margin-top: 10px;">
-                      <label>Annual Income:</label>
-                      <input type="text" class="form-control" value="">
-                    </div>
-                    <div class="col-md-6">
-                    </div>
-                    <div class="col-md-12" style="margin-top: 10px;">
-                      <h4>KYC</h4>
-                    </div>
-                    <div class="col-md-6" style="margin-top: 10px;">
-                      <label>PAN No:</label>
-                      <input type="text" class="form-control" value="">
-                    </div>
-                    <div class="col-md-6" style="margin-top: 10px;">
-                      <label>Adhar No:</label>
-                      <input type="text" class="form-control" value="">
-                    </div>
-                    <div class="col-md-6" style="margin-top: 10px;">
-                      <label>Voter Id:</label>
-                      <input type="text" class="form-control" value="">
-                    </div>
-                    <div class="col-md-6" style="margin-top: 10px;">
-                      <label>Passport No:</label>
-                      <input type="text" class="form-control" value="">
-                    </div>
-                  </div>
-                </form>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Update</button>
-              </div>
-            </div>
-          </div>
-        </div>
+       
 
       </div>
 
