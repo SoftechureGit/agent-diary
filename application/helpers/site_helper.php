@@ -1130,7 +1130,7 @@ if (!function_exists('getAccountId')) {
                         plot_unit,
                         facing,
                         no_of_floor as number_of_floor,
-                        concat('$image_base_url', image) as image_url   
+                        IF(image != '', concat('$image_base_url', image), '') as image_url   
                     ")
             ->where("product_unit_detail_id = $id") 
             ->order_by("code", "asc")

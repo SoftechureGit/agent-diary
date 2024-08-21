@@ -892,7 +892,6 @@
            dataType: 'json',
            success: (res) => {
 
-            console.log(res)
              if (res.status) {
 
                /** Parking */
@@ -933,10 +932,10 @@
                  /** End Size Unit */
 
                  /** Property Layout */
-                 if (key == 'image_url' && (value == '' || value != null)) {
+                 if (key == 'image_url' && value) {
                    $('.property-layout-anchor').removeClass('d-none').attr('href', value)
                    $('.old_property_layout').val(value.split('/').pop())
-                 } else if (key == 'image_url' && (value == '' || value == null)) {
+                 } else if (key == 'image_url' && !value) {
                    $('.property-layout-anchor').addClass('d-none').attr('href', '#')
                    $('.old_property_layout').val('')
                  }
