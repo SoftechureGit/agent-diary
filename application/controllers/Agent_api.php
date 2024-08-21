@@ -1577,7 +1577,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 'lead_title'                                 => $this->input->post('lead_title'),
                 'lead_first_name'                            => $this->input->post('lead_first_name'),
                 'lead_last_name'                             => $this->input->post('lead_last_name'),
-                'lead_email'                                 => $this->input->post('lead_email'),
+                'lead_email'                                => $this->input->post('lead_email'),
                 'lead_date'                                  => $this->input->post('lead_date'),
                 'lead_time'                                  => $this->input->post('lead_time'),
                 'lead_mobile_no_2'                           => $this->input->post('lead_mobile_no_2'),
@@ -4711,7 +4711,7 @@ WHERE lead_id='" . $lead_id . "'
 
             $inv_plot_size                          =   ( $inventory_details->plot_size ?? '-' ).' '. ( sizeUnits($inventory_details->size_unit ?? 0)->unit_name  ?? '-' ) ?? '-';
 
-            $inv_unit_size                          =   ( $inventory_details->size_unit ?? '-' ).' '. ( sizeUnits($inventory_details->size_unit ?? 0)->unit_name  ?? '-' ) ?? '-';
+            $inv_unit_size                          =   ( $inventory_details->unit_size ?? '-' ).' '. ( sizeUnits($inventory_details->unit_size_unit ?? 0)->unit_name  ?? '-' ) ?? '-';
             $inv_quote                              =   ( $inventory_details->id ?? 0 ) ? "<div class='text-center' onclick='getQuatation(".$inventory_details->id.")'><button class='btn btn-warning btn-sm' style='color:#fff;'><i class='fa fa-eye'></i></button></div>" : '';
             # End Inventory Details Init
             
