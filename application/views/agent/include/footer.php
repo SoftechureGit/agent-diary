@@ -114,6 +114,9 @@
 
                    $('#lead-unit-form [name="property_type_id"]').trigger('change')
 
+                   if ($('#lead-unit-form [name="location_id"]').data('selected_id') != '') {
+                   $('#lead-unit-form [name="location_id"]').trigger('change')
+                   }
                  }, 500)
 
                }
@@ -121,9 +124,6 @@
                  $('#lead-unit-form [name="state_id"]').trigger('change')
                 }
                 
-                if ($('#lead-unit-form [name="location_id"]').data('selected_id') != '') {
-                $('#lead-unit-form [name="location_id"]').trigger('change')
-                }
 
 
 
