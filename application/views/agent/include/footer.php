@@ -277,8 +277,9 @@
              if (res.status) {
                $('.set_property_form').html(res.form_view)
 
+               $('.property_footer_form').removeClass('d-none')
                setTimeout(function(){
-                $('.set_property_form').parents('form').find('.property_footer_form').addClass('d-none')
+                $('.form-not-found').parents('form').find('.property_footer_form').addClass('d-none')
                }, 100);
 
                convertToSelect2()
