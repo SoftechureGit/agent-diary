@@ -263,13 +263,29 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id, $use
             font-style: italic;
         }
 
-        .site_visit_table_view table tr td{
+        .site_visit_table_view table tr td {
             font-size: 13px;
         }
 
         .inventory-list-container table colgroup col {
             width: auto !important;
         }
+
+        /*  */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background-color: #ff9556;
+            border-radius: 20px;
+        }
+
+        /*  */
     </style>
 
 </head>
