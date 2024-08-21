@@ -48,7 +48,7 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Referance Number</label>
-                            <input type="text" placeholder="Enter Referance Number" name="property_details[referance_number]" value="<?= $referance_number ?? '' ?>" class="form-control" >
+                            <input type="text" placeholder="Enter Referance Number" name="property_details[referance_number]" value="<?= $referance_number ?? '' ?>" class="form-control" data-saved-value="<?= $referance_number ?? '' ?>">
                         </div>
                     </div>
                     <!-- End Referance No -->
@@ -57,7 +57,7 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Unit Number</label>
-                            <input type="text" placeholder="Enter Unit Number" name="property_details[unit_number]" value="<?= $unit_number ?? '' ?>" class="form-control" >
+                            <input type="text" placeholder="Enter Unit Number" name="property_details[unit_number]" value="<?= $unit_number ?? '' ?>" class="form-control" data-saved-value="<?= $unit_number ?? '' ?>">
                         </div>
                     </div>
                     <!-- End Unit Number -->
@@ -66,8 +66,7 @@
                   <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Floor</label>
-                            <!-- <input type="text" placeholder="Enter Floor" name="property_details[floor]" value="<?= $floor ?? '' ?>" class="form-control" > -->
-                            <select name="property_details[floor_id]" id="" class="form-control">
+                            <select name="property_details[floor_id]" id="" class="form-control" data-saved-value="<?= $floor_id ?? 0 ?>">
                                 <option value="" disabled selected>Choose...</option>
                                 <?php
                                 foreach (getFloors() ?? [] as $floor) :
@@ -84,8 +83,7 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Tower</label>
-                            <!-- <input type="text" placeholder="Enter Tower" name="property_details[tower]" value="<?= $tower ?? '' ?>" class="form-control" > -->
-                            <select name="property_details[block_or_tower_id]" id="" class="form-control">
+                            <select name="property_details[block_or_tower_id]" id="" class="form-control" data-saved-value="<?= $block_or_tower_id ?? '' ?>">
                                 <option value="" disabled selected>Choose...</option>
                                 <?php
                                 foreach (getBlocksOrTowers() ?? [] as $block_or_tower) :
@@ -102,7 +100,7 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Unit Type</label>
-                            <select  class="form-control" name="property_details[unit_type]" >
+                            <select  class="form-control" name="property_details[unit_type]" data-saved-value="<?= $unit_type ?? '' ?>">
                                 <option value="" selected disabled>Choose...</option>
                                 <option value="locable" <?= ( ( $unit_type ?? '' ) == 'locable') ? 'selected' : '' ?>>Locable</option>
                                 <option value="virtual" <?= ( ( $unit_type ?? '' ) == 'virtual') ? 'selected' : '' ?>>Virtual</option>
@@ -115,7 +113,7 @@
                     <div class="col-md-2">
                         <div class="form-group">
                             <label for="">SA Size</label>
-                            <input type="text" placeholder="Enter SA Size" name="property_details[sa]" value="<?= $sa ?? '' ?>" class="form-control">
+                            <input type="text" placeholder="Enter SA Size" name="property_details[sa]" value="<?= $sa ?? '' ?>" class="form-control" data-saved-value="<?= $sa ?? '' ?>">
                         </div>
                     </div>
                     <!-- End SA -->
@@ -123,7 +121,7 @@
                     <!-- SA Size  -->
                     <div class="col-md-2">
                         <label for="">SA Unit </label>
-                        <select class="form-control" id="" name="property_details[sa_size_unit]">
+                        <select class="form-control" id="" name="property_details[sa_size_unit]" data-saved-value="<?= $sa_size_unit ?? '' ?>">
                             <option value="">Select Unit</option>
                             <?php foreach (sizeUnits() ?? []  as $item) :
 
@@ -139,7 +137,7 @@
                     <div class="col-md-2">
                         <div class="form-group">
                             <label for="">BA Size</label>
-                            <input type="text" placeholder="Enter BA Size" name="property_details[ba]" value="<?= $ba ?? '' ?>" class="form-control">
+                            <input type="text" placeholder="Enter BA Size" name="property_details[ba]" value="<?= $ba ?? '' ?>" class="form-control" data-saved-value="<?= $ba ?? '' ?>">
                         </div>
                     </div>
                     <!-- End BA -->
@@ -147,7 +145,7 @@
                     <!-- BA Size  -->
                     <div class="col-md-2">
                         <label for="">BA Unit </label>
-                        <select class="form-control" id="" name="property_details[ba_size_unit]">
+                        <select class="form-control" id="" name="property_details[ba_size_unit]" data-saved-value="<?= $ba_size_unit ?? '' ?>">
                             <option value="">Select Unit</option>
                             <?php foreach (sizeUnits() ?? []  as $item) :
 
@@ -164,7 +162,7 @@
                     <div class="col-md-2">
                         <div class="form-group">
                             <label for="">CA Size</label>
-                            <input type="text" placeholder="Enter CA Size" name="property_details[ca]" value="<?= $ca ?? '' ?>" class="form-control">
+                            <input type="text" placeholder="Enter CA Size" name="property_details[ca]" value="<?= $ca ?? '' ?>" class="form-control" data-saved-value="<?= $ca ?? '' ?>">
                         </div>
                     </div>
                     <!-- End CA -->
@@ -172,7 +170,7 @@
                     <!-- CA Size  -->
                     <div class="col-md-2">
                         <label for="">CA Unit </label>
-                        <select class="form-control" id="" name="property_details[ca_size_unit]">
+                        <select class="form-control" id="" name="property_details[ca_size_unit]" data-saved-value="<?= $ca_size_unit ?? '' ?>">
                             <option value="">Select Unit</option>
                             <?php foreach (sizeUnits() ?? []  as $item) :
 
@@ -188,7 +186,7 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Applicable PLC</label>
-                            <select name="property_details[applicable_plc][]" id="" class="form-control" multiple>
+                            <select name="property_details[applicable_plc][]" id="" class="form-control" multiple  data-saved-value="[<?= implode(',',  $applicable_plc ?? []) ?>]">
                                 <?php 
                                     foreach(getPropertyPlcs($product_id ?? 0) ?? [] as $plc): 
                                     $selected         = in_array($plc->price_component_id, $applicable_plc ?? []) ? 'selected' : '';
@@ -204,7 +202,7 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Facing</label>
-                            <select name="property_details[facing_id]" id="" class="form-control" >
+                            <select name="property_details[facing_id]" id="" class="form-control" data-saved-value="<?= $facing_id ?? '' ?>">
                                 <option value="" disabled selected>Choose...</option>
                                 <?php 
                                     foreach(facings() ?? [] as $facing_item): 
@@ -221,7 +219,7 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Parking</label>
-                            <input type="text" placeholder="Enter parking" name="property_details[parking_count]" class="form-control" value="<?= $parking_count ?? '' ?>">
+                            <input type="text" placeholder="Enter parking" name="property_details[parking_count]" class="form-control" value="<?= $parking_count ?? '' ?>" data-saved-value="<?= $parking_count ?? '' ?>">
                         </div>
                     </div>
                     <!-- End Parking -->
@@ -230,7 +228,7 @@
                     <div class="col-md-4 commercial-col pentry-col <?= ( $data->property_type_name ?? '' ) == 'Office' ? '' : 'd-none' ?>">
                         <div class="form-group">
                             <label for="">Pentry</label>
-                            <select name="property_details[pentry]" class="form-control">
+                            <select name="property_details[pentry]" class="form-control" data-saved-value="<?= $pentry ?? '' ?>">
                                 <option value="" selected disabled>Choose...</option>
                                 <option value="with_pentry" <?= ( $pentry ?? '' ) == 'with_pentry' ? 'selected' : '' ?>>With Pentry</option>
                                 <option value="without_pentry" <?= ( $pentry ?? '' ) == 'without_pentry' ? 'selected' : '' ?>>Without Pentry</option>
@@ -243,7 +241,7 @@
                     <div class="col-md-4 commercial-col washroom-col <?= ( $data->property_type_name ?? '' ) == 'Office' ? '' : 'd-none' ?>">
                         <div class="form-group">
                             <label for="">Washroom</label>
-                            <select name="property_details[washroom]" class="form-control">
+                            <select name="property_details[washroom]" class="form-control" data-saved-value="<?= $washroom ?? '' ?>">
                                 <option value="" selected disabled>Choose...</option>
                                 <option value="with_washroom" <?= ( $washroom ?? '' ) == 'with_washroom' ? 'selected' : '' ?>>With Washroom</option>
                                 <option value="without_washroom" <?= ( $washroom ?? '' ) == 'without_washroom' ? 'selected' : '' ?>>Without Washroom</option>
@@ -256,7 +254,7 @@
                      <div class="col-md-12">
                         <div class="form-group">
                             <label for="">Remark</label>
-                            <textarea type="text" placeholder="Enter remark" name="property_details[remark]" class="form-control"><?= $remark ?? '' ?></textarea>
+                            <textarea type="text" placeholder="Enter remark" name="property_details[remark]" class="form-control" data-saved-value="<?= $remark ?? '' ?>"><?= $remark ?? '' ?></textarea>
                         </div>
                     </div>
                     <!-- End Remark -->

@@ -52,7 +52,7 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Referance Number</label>
-                            <input type="text" placeholder="Enter Referance Number" name="property_details[referance_number]" value="<?= $referance_number ?? '' ?>" class="form-control" >
+                            <input type="text" placeholder="Enter Referance Number" name="property_details[referance_number]" value="<?= $referance_number ?? '' ?>" class="form-control" data-selected_id="<?= $referance_number ?? 0 ?>">
                         </div>
                     </div>
                     <!-- End Referance No -->
@@ -61,7 +61,7 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Plot No</label>
-                            <input type="text" placeholder="Enter Plot No" name="property_details[plot_number]" value="<?= $plot_number ?? '' ?>" class="form-control" >
+                            <input type="text" placeholder="Enter Plot No" name="property_details[plot_number]" value="<?= $plot_number ?? '' ?>" class="form-control" data-selected_id="<?= $plot_number ?? 0 ?>">
                         </div>
                     </div>
                     <!-- End Plot No -->
@@ -70,13 +70,13 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Plot Size </label>
-                            <input type="text" placeholder="Enter Plot Size " name="property_details[plot_size]" value="<?= $plot_size ?? '' ?>" class="form-control" >
+                            <input type="text" placeholder="Enter Plot Size " name="property_details[plot_size]" value="<?= $plot_size ?? '' ?>" class="form-control" data-selected_id="<?= $plot_size ?? '' ?>">
                         </div>
                     </div>
 
                     <div class="col-md-4">
                         <label for="">Size Unit ( Plot ) </label>
-                        <select class="form-control" id="" name="property_details[size_unit]">
+                        <select class="form-control" id="" name="property_details[size_unit]" data-selected_id="<?= $size_unit ?? 0 ?>">
                                 <option value="">Select Unit</option>
                             <?php foreach (sizeUnits() ?? []  as $item) :
                                 
@@ -92,12 +92,12 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Unit Size</label>
-                            <input type="text" placeholder="Enter Unit Size" name="property_details[unit_size]" value="<?= $unit_size ?? '' ?>" class="form-control" >
+                            <input type="text" placeholder="Enter Unit Size" name="property_details[unit_size]" value="<?= $unit_size ?? '' ?>" class="form-control" data-selected_id="<?= $unit_size ?? '' ?>">
                         </div>
                     </div>
                     <div class="col-md-4">
                         <label for="">Size Unit </label>
-                        <select class="form-control" id="" name="property_details[unit_size_unit]">
+                        <select class="form-control" id="" name="property_details[unit_size_unit]"  data-selected_id="<?= $size_unit ?? '' ?>">
                                 <option value="">Select Unit</option>
                             <?php foreach (sizeUnits() ?? []  as $item) :
                                 
@@ -113,8 +113,7 @@
                   <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Floor</label>
-                            <!-- <input type="text" placeholder="Enter Floor" name="property_details[floor]" value="<?= $floor ?? '' ?>" class="form-control" > -->
-                            <select name="property_details[floor_id]" id="" class="form-control">
+                            <select name="property_details[floor_id]" id="" class="form-control"  data-selected_id="<?= $floor_id ?? 0 ?>">
                                 <option value="" disabled selected>Choose...</option>
                                 <?php
                                 foreach (getFloors() ?? [] as $floor) :
@@ -131,7 +130,7 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Block</label>
-                            <input type="text" placeholder="Enter Block" name="property_details[block]" value="<?= $block ?? '' ?>" class="form-control" >
+                            <input type="text" placeholder="Enter Block" name="property_details[block]" value="<?= $block ?? '' ?>" class="form-control"  data-selected_id="<?= $block ?? '' ?>">
                         </div>
                     </div>
                     <!-- End Block -->
@@ -140,7 +139,7 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Applicable PLC</label>
-                            <select name="property_details[applicable_plc][]" id="" class="form-control" multiple>
+                            <select name="property_details[applicable_plc][]" id="" class="form-control" multiple data-saved-value="[<?= implode(',',  $applicable_plc ?? []) ?>]">
                                 <?php 
                                     foreach(getPropertyPlcs($product_id ?? 0) ?? [] as $plc): 
                                     $selected         = in_array($plc->price_component_id, $applicable_plc ?? []) ? 'selected' : '';
@@ -156,7 +155,7 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Facing</label>
-                            <select name="property_details[facing_id]" id="" class="form-control" >
+                            <select name="property_details[facing_id]" id="" class="form-control"  data-selected_id="<?= $facing_id ?? '' ?>">
                                 <option value="" disabled selected>Choose...</option>
                                 <?php 
                                     foreach(facings() ?? [] as $facing_item): 
@@ -173,7 +172,7 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Dimension F x B x S1 x S2</label>
-                            <input type="text" placeholder="Enter dimension F x B x S1 x S2" name="property_details[dimension]" value="<?= $dimension ?? '' ?>" class="form-control" >
+                            <input type="text" placeholder="Enter dimension F x B x S1 x S2" name="property_details[dimension]" value="<?= $dimension ?? '' ?>" class="form-control"  data-selected_id="<?= $dimension ?? '' ?>">
                         </div>
                     </div>
                     <!-- End dimension F x B x S1 x S2 -->
@@ -182,7 +181,7 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Terrace</label>
-                            <select name="property_details[terrace_id]" id="" class="form-control" >
+                            <select name="property_details[terrace_id]" id="" class="form-control"  data-selected_id="<?= $terrace_id ?? '' ?>">
                                 <option value="" disabled selected>Choose...</option>
                                 <?php 
                                     foreach(terraces() ?? [] as $terrace): 
@@ -199,7 +198,7 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Basment</label>
-                            <select name="property_details[basment_id]" id="" class="form-control" >
+                            <select name="property_details[basment_id]" id="" class="form-control"  data-selected_id="<?= $basment_id ?? '' ?>">
                                 <option value="" disabled selected>Choose...</option>
                                 <?php 
                                     foreach(basments() ?? [] as $basment): 
@@ -216,7 +215,7 @@
                       <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Parking</label>
-                            <input type="text" placeholder="Enter parking" name="property_details[parking_count]" class="form-control" value="<?= $parking_count ?? '' ?>">
+                            <input type="text" placeholder="Enter parking" name="property_details[parking_count]" class="form-control" value="<?= $parking_count ?? '' ?>"  data-selected_id="<?= $parking_count ?? '' ?>">
                         </div>
                     </div>
                     <!-- End Parking -->
@@ -225,7 +224,7 @@
                      <div class="col-md-12">
                         <div class="form-group">
                             <label for="">Remark</label>
-                            <textarea type="text" placeholder="Enter remark" name="property_details[remark]" class="form-control"><?= $remark ?? '' ?></textarea>
+                            <textarea type="text" placeholder="Enter remark" name="property_details[remark]" class="form-control"  data-selected_id="<?= $remark ?? '' ?>"><?= $remark ?? '' ?></textarea>
                         </div>
                     </div>
                     <!-- End Remark -->

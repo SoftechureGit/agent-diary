@@ -109,7 +109,7 @@
                }
 
                if ($('#lead-unit-form [name="property_type_id"]').val() != '') {
-                
+
                  setTimeout(function() {
 
                    $('#lead-unit-form [name="property_type_id"]').trigger('change')
@@ -281,8 +281,10 @@
                //  
                if (form_request_for == 'inventory') {
                  if (res.property_layout) {
-                   $('.old_property_layout').val(res.property_layout)
+                   console.log(res.property_layout)
+                   $('.old_property_layout').val(res.property_layout).attr('data-saved-value', res.property_layout)
                    $('.property-layout-anchor').attr('href', res.property_layout_url).removeClass('d-none')
+                   $('.property-layout-anchor').attr('href', res.property_layout_url).attr('data-saved-value', res.property_layout_url).removeClass('d-none')
                  } else {
                    $('.old_property_layout').val('')
                    $('.property-layout-anchor').attr('href', '#').addClass('d-none')
@@ -427,11 +429,11 @@
                  $('#lead-unit-form [name="property_details[unit_code]"] + .select2').removeClass('d-none')
                  $('#lead-unit-form [name="property_details[unit_code_name]"]').prop('required', false).addClass('d-none')
 
-                   /** Lead Unit Property List : Trigger  */
-                   if ($('#lead-unit-form [name="project_id"]').data('selected_id') != '') {
-                    $('#lead-unit-form [name="project_id"]').trigger('change')
-                  }
-                  /** End Lead Unit Property List : Trigger  */
+                 /** Lead Unit Property List : Trigger  */
+                 if ($('#lead-unit-form [name="project_id"]').data('selected_id') != '') {
+                   $('#lead-unit-form [name="project_id"]').trigger('change')
+                 }
+                 /** End Lead Unit Property List : Trigger  */
                } else {
                  $('#lead-unit-form .project_name_wrapper').removeClass('d-none')
                  $('#lead-unit-form .project_list_wrapper').addClass('d-none')
@@ -453,27 +455,27 @@
        /*  End Projects */
 
        /* Project Properties */
-        $(document).on('change', '#lead-unit-form [name="project_id"]', function() {
-          var project_id = $(this).val();
-        
-          selected_id = $('[name="property_details[unit_code]"]').data('selected_id');
-        
-          $.ajax({
-            method: 'GET',
-            url: "<?= base_url('helper/project_properties'); ?>",
-            data: {
-              project_id: project_id,
-              selected_id: selected_id,
-              view: true
-            },
-            dataType: 'json',
-            success: (res) => {
-              if (res.status) {
-                $('#lead-unit-form [name="property_details[unit_code]"]').html(res.view)
-              }
-            }
-          })
-        })
+       $(document).on('change', '#lead-unit-form [name="project_id"]', function() {
+         var project_id = $(this).val();
+
+         selected_id = $('[name="property_details[unit_code]"]').data('selected_id');
+
+         $.ajax({
+           method: 'GET',
+           url: "<?= base_url('helper/project_properties'); ?>",
+           data: {
+             project_id: project_id,
+             selected_id: selected_id,
+             view: true
+           },
+           dataType: 'json',
+           success: (res) => {
+             if (res.status) {
+               $('#lead-unit-form [name="property_details[unit_code]"]').html(res.view)
+             }
+           }
+         })
+       })
        /*  End Project Properties */
 
        /* Project Property Details */
@@ -839,7 +841,51 @@
        //  
 
        $(document).on('change', '[name="property_details[unit_code]"]', function() {
-    
+
+
+         /**
+          *  Edit Saved Data Fetched and set
+          */
+         current_value = this.value;
+         saved_value = $(this).data('selected_id');
+
+         if (current_value == saved_value) {
+           fields = $(this).closest('form').find(':input')
+           $.each(fields, (key, field) => {
+
+             saved_value = $(field).data('saved-value');
+             if (saved_value) {
+
+               if ($(field).is('select')) {
+                 $(field).val(saved_value).trigger('change');
+               } else {
+                 console.log("Input Tag => " + saved_value);
+                 $(field).val(saved_value);
+               }
+
+               /** Property Layout */
+               if (field.name == 'old_property_layout') {
+                 $('.property-layout-anchor').removeClass('d-none')
+
+                 property_layout_url = $('.property-layout-anchor').data('saved-value')
+
+                 $('.property-layout-anchor').attr('href', property_layout_url)
+               }
+               /** End Property Layout */
+
+             }
+             // console.log(field.name + ": " + $(field).val());
+           })
+
+           // $.each()
+           return false;
+         }
+
+         /**
+          *  End Edit Saved Data Fetched and set
+          */
+
+
          /** Commercial */
          var property_type_name = $(this).find('option:checked').data('property-type-name')
 
@@ -865,9 +911,6 @@
          }
          /** End Commercial */
 
-        //  if ($('#modal-inventory-form [name="property_details[id]"]').val() != '') {
-        //    return false;
-        //  }
 
          var accomodation_id = $(this).find('option:checked').data('accomodation-id')
          var accomodation_name = $(this).find('option:checked').data('accomodation-name')

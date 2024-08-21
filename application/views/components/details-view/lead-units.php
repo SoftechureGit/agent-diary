@@ -13,12 +13,23 @@
 
           <?php
 
-           foreach (lead_units($lead_id ?? 0 , $user_detail ) as $lead_unit) : ?>
+           foreach (lead_units($lead_id ?? 0 , $user_detail ) as $key => $lead_unit) : ?>
             <!-- Unit Card -->
             <div class="col-md-12">
               <div class="card unit-card">
                 <div class="card-body">
                   <div class="row">
+                    <!-- S. No. -->
+                    <div class="col-md-3">
+                      <label for="">S. No.</label>
+                    </div>
+                    <div class="col-md-9">
+                      <span class="label-value">
+                        : &nbsp;&nbsp; <?= ++$key ?>
+                      </span>
+                    </div>
+                    <!-- End S. No. -->
+
                     <!-- Project Type -->
                     <div class="col-md-3">
                       <label for="">Project Type</label>

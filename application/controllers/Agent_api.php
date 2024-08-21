@@ -1577,6 +1577,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 'lead_title'                                 => $this->input->post('lead_title'),
                 'lead_first_name'                            => $this->input->post('lead_first_name'),
                 'lead_last_name'                             => $this->input->post('lead_last_name'),
+                'lead_email'                                 => $this->input->post('lead_email'),
                 'lead_date'                                  => $this->input->post('lead_date'),
                 'lead_time'                                  => $this->input->post('lead_time'),
                 'lead_mobile_no_2'                           => $this->input->post('lead_mobile_no_2'),

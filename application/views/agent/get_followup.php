@@ -283,10 +283,10 @@ endif;
               <!-- End Name -->
 
               <!-- Email -->
-              <?php if ($record->email): ?>
+              <?php if ($record->lead_email): ?>
                 <tr>
                   <th>Email</th>
-                  <td><?= $record->email ?></td>
+                  <td><?= $record->lead_email ?></td>
                 </tr>
               <?php endif; ?>
               <!-- End Email -->
