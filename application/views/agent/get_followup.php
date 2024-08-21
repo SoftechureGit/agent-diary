@@ -1,9 +1,9 @@
 <?php
-  $is_followup      = false;
-  
-  if($record->added_to_followup == '1' ):
-    $is_followup      = true;
-  endif;
+$is_followup      = false;
+
+if ($record->added_to_followup == '1'):
+  $is_followup      = true;
+endif;
 ?>
 <style>
   .card.unit-card {
@@ -119,9 +119,9 @@
     margin-bottom: 0;
   }
 
-#lead-profile-table{
-  font-size: 13px !important;
-}
+  #lead-profile-table {
+    font-size: 13px !important;
+  }
 </style>
 
 
@@ -134,7 +134,7 @@
     <div class="col-md-10">
 
       <div class="row">
-      
+
         <div class="col-md-6" align="right">
           <!--<h6 class="card-text text-muted"><?= ucwords($record->user_title . ' ' . $record->first_name . ' ' . $record->last_name) ?></h6>-->
         </div>
@@ -149,7 +149,7 @@
           <h6 class="card-text text-muted ft-sm text-right"><i class="fa fa-calendar"></i> <?= $record->lead_date ?></h6>
         </div>
         <div class="col-md-6 d-none">
-          </div>
+        </div>
         <div class="col-md-6 d-none" align="right">
           <h6 class="card-text text-muted ft-sm">Matching Property</h6>
         </div>
@@ -158,30 +158,30 @@
       <div class="row" style="margin-top: 2px;">
         <div class="col-md-6">
           <!-- Primary Mobile Number -->
-          <?php if($record->lead_mobile_no): ?>
-          <h6 class="card-text text-muted  ft-sm" style="margin-top: 4px;margin-bottom: 0px;padding-bottom: 0px;">
-            <i class="fa fa-mobile ft-14"></i> <span><?= ( $record->primary_mobile_number_country_data ?? 0 ) ? '+'.json_decode($record->primary_mobile_number_country_data)->dialCode : '+91' ?>  <?= $record->lead_mobile_no ?></span>
-          </h6>
+          <?php if ($record->lead_mobile_no): ?>
+            <h6 class="card-text text-muted  ft-sm" style="margin-top: 4px;margin-bottom: 0px;padding-bottom: 0px;">
+              <i class="fa fa-mobile ft-14"></i> <span><?= ($record->primary_mobile_number_country_data ?? 0) ? '+' . json_decode($record->primary_mobile_number_country_data)->dialCode : '+91' ?> <?= $record->lead_mobile_no ?></span>
+            </h6>
           <?php endif; ?>
           <!-- End Primary Mobile Number -->
 
           <!-- Secondary Mobile Number -->
-          <?php if($record->lead_mobile_no_2): ?>
-          <h6 class="card-text text-muted  ft-sm" style="margin-top: 4px;padding-top: 0px;">
-            <i class="fa fa-phone ft-14"></i> <span><?= ( $record->secondary_mobile_number_country_data ?? 0 ) ? '+'.json_decode($record->secondary_mobile_number_country_data)->dialCode : '+91' ?> <?= $record->lead_mobile_no_2 ?></span>
-          </h6>
+          <?php if ($record->lead_mobile_no_2): ?>
+            <h6 class="card-text text-muted  ft-sm" style="margin-top: 4px;padding-top: 0px;">
+              <i class="fa fa-phone ft-14"></i> <span><?= ($record->secondary_mobile_number_country_data ?? 0) ? '+' . json_decode($record->secondary_mobile_number_country_data)->dialCode : '+91' ?> <?= $record->lead_mobile_no_2 ?></span>
+            </h6>
           <?php endif; ?>
           <!-- End Secondary Mobile Number -->
 
           <!-- Email -->
-          <?php if($record->lead_email): ?>
-              <h6 class="card-text text-muted ft-14"><i class="fa fa-envelope"></i> <?= $record->lead_email ?></h6>
+          <?php if ($record->lead_email): ?>
+            <h6 class="card-text text-muted ft-14"><i class="fa fa-envelope"></i> <?= $record->lead_email ?></h6>
           <?php endif; ?>
           <!-- End Email -->
 
         </div>
 
-        
+
         <div class="col-md-6" align="right">
           <div class="card-text text-muted pt-1 ft-sm"><span><?php if ($record->lead_type_id == 1) {
                                                                 echo "<span style='padding:2px 10px;background:#4d7cff;color:white;border-radius:10px;'>" . $record->lead_type_name . "</span>";
@@ -215,57 +215,57 @@
         <button class="btn btn-dark btn-sm btn-rounded" style="margin-right: 8px;" onclick="transfer_lead(<?= $record->lead_id ?>)"><i class="fa fa-exchange" style="color: #fff;"></i></button>
 
         <?php if (!$record->added_to_followup) : ?>
-            <button type="button" class="btn-add-followup w-120 mt-1 ft-sm bg-transparent border-0" style="color: white; width:fit-content; cursor:pointer; outline:none;" onclick="add_to_followup_new(<?= $record->lead_id ?>)" width="50px">
-              <img src="<?= base_url('public/assets/images/icons/follow-up.png') ?>" alt="" width="25px">
-            </button>
-          <?php endif; ?>
+          <button type="button" class="btn-add-followup w-120 mt-1 ft-sm bg-transparent border-0" style="color: white; width:fit-content; cursor:pointer; outline:none;" onclick="add_to_followup_new(<?= $record->lead_id ?>)" width="50px">
+            <img src="<?= base_url('public/assets/images/icons/follow-up.png') ?>" alt="" width="25px">
+          </button>
+        <?php endif; ?>
       </div>
 
     </div>
   </div>
 
   <div style="margin-top: 10px;">
-      <!-- Tabs List -->
-      <ul class="nav nav-tabs mb-3">
-        <!-- Profile -->
-        <li class="nav-item">
-          <a href="#navtabs-profile" class="nav-link active" data-toggle="tab" aria-expanded="false">Profile</a>
-        </li>
-        <!-- End Profile -->
-        
-        <!-- Requirement -->
-        <li class="nav-item <?= $is_followup ? '' : 'd-none'; ?>" onclick="getRequirementList(<?= $record->lead_id ?>);">
-          <a href="#navtabs-requirement" class="nav-link" data-toggle="tab" aria-expanded="false">Requirement</a>
-        </li>
-        <!-- Requirement -->
+    <!-- Tabs List -->
+    <ul class="nav nav-tabs mb-3">
+      <!-- Profile -->
+      <li class="nav-item">
+        <a href="#navtabs-profile" class="nav-link active" data-toggle="tab" aria-expanded="false">Profile</a>
+      </li>
+      <!-- End Profile -->
 
-        <!-- Follow Up -->
-        <li class="nav-item <?= $is_followup ? '' : 'd-none'; ?>" onclick="getFollowupList(<?= $record->lead_id ?>);">
-          <a href="#navtabs-followup" class="nav-link" data-toggle="tab" aria-expanded="true">Followup</a>
-        </li>
-        <!-- Follow Up -->
+      <!-- Requirement -->
+      <li class="nav-item <?= $is_followup ? '' : 'd-none'; ?>" onclick="getRequirementList(<?= $record->lead_id ?>);">
+        <a href="#navtabs-requirement" class="nav-link" data-toggle="tab" aria-expanded="false">Requirement</a>
+      </li>
+      <!-- Requirement -->
 
-        <!-- Lead History -->
-        <?php if ($this->Action_model->check_perm('followup_history', 'rr_view')) { ?>
-          <li class="nav-item <?= $is_followup ? '' : 'd-none'; ?>" onclick="getLeadHistoryList(<?= $record->lead_id ?>);">
-            <a href="#navtabs-history" class="nav-link" data-toggle="tab" aria-expanded="true">History</a>
-          </li>
-        <?php } ?>
-        <!-- Lead History -->
+      <!-- Follow Up -->
+      <li class="nav-item <?= $is_followup ? '' : 'd-none'; ?>" onclick="getFollowupList(<?= $record->lead_id ?>);">
+        <a href="#navtabs-followup" class="nav-link" data-toggle="tab" aria-expanded="true">Followup</a>
+      </li>
+      <!-- Follow Up -->
 
-        <!-- Feedback List / Product -->
-        <li class="nav-item <?= $is_followup ? '' : 'd-none'; ?>" onclick="getFeedbackList(<?= $record->lead_id ?>);">
-          <a href="#navtabs-product" class="nav-link" data-toggle="tab" aria-expanded="true">Product</a>
+      <!-- Lead History -->
+      <?php if ($this->Action_model->check_perm('followup_history', 'rr_view')) { ?>
+        <li class="nav-item <?= $is_followup ? '' : 'd-none'; ?>" onclick="getLeadHistoryList(<?= $record->lead_id ?>);">
+          <a href="#navtabs-history" class="nav-link" data-toggle="tab" aria-expanded="true">History</a>
         </li>
-        <!-- Feedback List / Product -->
+      <?php } ?>
+      <!-- Lead History -->
 
-        <!-- Unit -->
-        <li class="nav-item <?= $is_followup ? '' : 'd-none'; ?>">
-          <a href="#navtabs-units" class="nav-link" data-toggle="tab" onclick="lead_units(<?= $record->lead_id ?>)">Unit</a>
-        </li>
-        <!-- End Unit -->
-      </ul>
-      <!-- End Tabs List -->
+      <!-- Feedback List / Product -->
+      <li class="nav-item <?= $is_followup ? '' : 'd-none'; ?>" onclick="getFeedbackList(<?= $record->lead_id ?>);">
+        <a href="#navtabs-product" class="nav-link" data-toggle="tab" aria-expanded="true">Product</a>
+      </li>
+      <!-- Feedback List / Product -->
+
+      <!-- Unit -->
+      <li class="nav-item <?= $is_followup ? '' : 'd-none'; ?>">
+        <a href="#navtabs-units" class="nav-link" data-toggle="tab" onclick="lead_units(<?= $record->lead_id ?>)">Unit</a>
+      </li>
+      <!-- End Unit -->
+    </ul>
+    <!-- End Tabs List -->
 
     <div class="tab-content br-n pn" style="height: 50vh;overflow-y: auto;overflow-x: hidden;padding-right: 6px;">
       <div id="navtabs-profile" class="tab-pane active">
@@ -274,178 +274,187 @@
 
           <div class="col-md-12">
             <!-- Table -->
-             <table class="table table-bordered" id="lead-profile-table">
-                <!-- Name -->
-                <tr>
-                  <th>Name</th>
-                  <td><?= ucwords($record->lead_title . ' ' . $record->lead_first_name . ' ' . $record->lead_last_name) ?></td>
-                </tr>
-                <!-- End Name -->
+            <table class="table table-bordered" id="lead-profile-table">
+              <!-- Name -->
+              <tr>
+                <th>Name</th>
+                <td><?= ucwords($record->lead_title . ' ' . $record->lead_first_name . ' ' . $record->lead_last_name) ?></td>
+              </tr>
+              <!-- End Name -->
 
-                <!-- Email -->
-                <?php if($record->email): ?>
+              <!-- Email -->
+              <?php if ($record->email): ?>
                 <tr>
                   <th>Email</th>
                   <td><?= $record->email ?></td>
                 </tr>
-                <?php endif; ?>
-                <!-- End Email -->
+              <?php endif; ?>
+              <!-- End Email -->
 
-                <!-- Mobile -->
-                <?php if($record->lead_mobile_no): ?>
+              <!-- Mobile -->
+              <?php if ($record->lead_mobile_no): ?>
                 <tr>
                   <th>Mobile</th>
                   <td>
-                  <?= $record->secondary_mobile_number_country_data ? ( '+'.json_decode($record->primary_mobile_number_country_data)->dialCode ?? '' ) :'' ?>
-                    
+                    <?= $record->secondary_mobile_number_country_data ? ('+' . json_decode($record->primary_mobile_number_country_data)->dialCode ?? '') : '' ?>
+
                     <?= $record->lead_mobile_no ?></td>
                 </tr>
-                <?php endif; ?>
-                <!-- Mobile -->
+              <?php endif; ?>
+              <!-- Mobile -->
 
-                <!-- Secondary Mobile -->
-                <?php if($record->lead_mobile_no_2): ?>
+              <!-- Secondary Mobile -->
+              <?php if ($record->lead_mobile_no_2): ?>
                 <tr>
                   <th>Secondary Mobile</th>
                   <td>
-                    <?= $record->secondary_mobile_number_country_data ? ( '+'.json_decode($record->secondary_mobile_number_country_data)->dialCode ?? '' ) :'' ?>
-                    
+                    <?= $record->secondary_mobile_number_country_data ? ('+' . json_decode($record->secondary_mobile_number_country_data)->dialCode ?? '') : '' ?>
+
                     <?= $record->lead_mobile_no_2 ?></td>
                 </tr>
-                <?php endif; ?>
-                <!-- Secondary Mobile -->
+              <?php endif; ?>
+              <!-- Secondary Mobile -->
 
-                <!-- Gender -->
-                <?php if($record->lead_gender): ?>
+              <!-- Gender -->
+              <?php if ($record->lead_gender): ?>
                 <tr>
                   <th>Gender</th>
                   <td><?= $record->lead_gender ?></td>
                 </tr>
-                <?php endif; ?>
-                <!-- End Gender -->
+              <?php endif; ?>
+              <!-- End Gender -->
 
-                <!-- Occupation -->
-                <?php if($record->occupation_name): ?>
+              <!-- Occupation -->
+              <?php if ($record->occupation_name): ?>
                 <tr>
                   <th>Occupation</th>
                   <td><?= $record->occupation_name ?></td>
                 </tr>
-                <?php endif; ?>
-                <!-- End Occupation -->
+              <?php endif; ?>
+              <!-- End Occupation -->
 
-                <!-- Address -->
-                <?php if($record->lead_address): ?>
+              <!-- Address -->
+              <?php if ($record->lead_address): ?>
                 <tr>
                   <th>Address</th>
                   <td><?= $record->lead_address ?></td>
                 </tr>
-                <?php endif; ?>
-                <!-- End Address -->
+              <?php endif; ?>
+              <!-- End Address -->
 
-                <!-- City -->
-                <?php if($record->city_name): ?>
+              <!-- City -->
+              <?php if ($record->city_name): ?>
                 <tr>
                   <th>City</th>
                   <td><?= $record->city_name ?></td>
                 </tr>
-                <?php endif; ?>
-                <!-- End City -->
+              <?php endif; ?>
+              <!-- End City -->
 
-                <!-- State -->
-                <?php if($record->state_name): ?>
+              <!-- State -->
+              <?php if ($record->state_name): ?>
                 <tr>
                   <th>State</th>
                   <td><?= $record->state_name ?></td>
                 </tr>
-                <?php endif; ?>
-                <!-- End State -->
+              <?php endif; ?>
+              <!-- End State -->
 
-                <!-- Marital Status -->
-                <?php if($record->lead_marital_status): ?>
+              <!-- Marital Status -->
+              <?php if ($record->lead_marital_status): ?>
                 <tr>
                   <th>Marital Status</th>
                   <td><?= $record->lead_marital_status ?></td>
                 </tr>
-                <?php endif; ?>
-                <!-- End Marital Status -->
+              <?php endif; ?>
+              <!-- End Marital Status -->
 
-                <!-- Designation -->
-                <?php if($record->designation_name): ?>
+              <!-- Designation -->
+              <?php if ($record->designation_name): ?>
                 <tr>
                   <th>Designation</th>
                   <td><?= $record->designation_name ?></td>
                 </tr>
-                <?php endif; ?>
-                <!-- End Designation -->
+              <?php endif; ?>
+              <!-- End Designation -->
 
-                <!-- Company -->
-                <?php if($record->lead_company): ?>
+              <!-- Company -->
+              <?php if ($record->lead_company): ?>
                 <tr>
                   <th>Company</th>
                   <td><?= $record->lead_company ?></td>
                 </tr>
-                <?php endif; ?>
-                <!-- End Company -->
+              <?php endif; ?>
+              <!-- End Company -->
 
-                <!-- Annual Income -->
-                <?php if($record->lead_annual_income): ?>
+              <!-- Annual Income -->
+              <?php if ($record->lead_annual_income): ?>
                 <tr>
                   <th>Annual Income</th>
                   <td><?= $record->lead_annual_income ?></td>
                 </tr>
-                <?php endif; ?>
-                <!-- End Annual Income -->
+              <?php endif; ?>
+              <!-- End Annual Income -->
 
-                <!-- Pan Card Number -->
-                <?php if($record->lead_pan_no): ?>
+              <!-- Pan Card Number -->
+              <?php if ($record->lead_pan_no): ?>
                 <tr>
                   <th>Pan Card Number</th>
                   <td><?= $record->lead_pan_no ?></td>
                 </tr>
-                <?php endif; ?>
-                <!-- End Pan Card Number -->
+              <?php endif; ?>
+              <!-- End Pan Card Number -->
 
-                <!-- Aadhaar Card Number -->
-                <?php if($record->lead_adhar_no): ?>
+              <!-- Aadhaar Card Number -->
+              <?php if ($record->lead_adhar_no): ?>
                 <tr>
                   <th>Aadhaar Card Number</th>
                   <td><?= $record->lead_adhar_no ?></td>
                 </tr>
-                <?php endif; ?>
-                <!-- End Aadhaar Card Number -->
+              <?php endif; ?>
+              <!-- End Aadhaar Card Number -->
 
-                <!-- Voter Id Number -->
-                <?php if($record->lead_voter_id): ?>
+              <!-- Voter Id Number -->
+              <?php if ($record->lead_voter_id): ?>
                 <tr>
                   <th>Voter Id</th>
                   <td><?= $record->lead_voter_id ?></td>
                 </tr>
-                <?php endif; ?>
-                <!-- End Voter Id -->
+              <?php endif; ?>
+              <!-- End Voter Id -->
 
-                <!-- Passport Number -->
-                <?php if($record->lead_passport_no): ?>
+              <!-- Passport Number -->
+              <?php if ($record->lead_passport_no): ?>
                 <tr>
                   <th>Passport Number</th>
                   <td><?= $record->lead_passport_no ?></td>
                 </tr>
-                <?php endif; ?>
-                <!-- End Passport Number -->
+              <?php endif; ?>
+              <!-- End Passport Number -->
 
-                <!-- Added By -->
-                <?php if($record->lead_passport_no): ?>
+              <!-- Added By -->
+              <?php if ($record->lead_passport_no): ?>
                 <tr>
                   <th>Added By</th>
-                  <td>><?= ($record->added_by) ? $this->Action_model->get_name($record->added_by) : '' ?></td>
+                  <td><?= ($record->added_by) ? $this->Action_model->get_name($record->added_by) : '' ?></td>
                 </tr>
-                <?php endif; ?>
-                <!-- End Added By -->
-             </table>
+              <?php endif; ?>
+              <!-- End Added By -->
+
+              <!-- Action -->
+              <tr>
+                <th>Action</th>
+                <td>
+                  <button class="btn btn-sm btn-info edit-lead-btn">Edit</button>
+                </td>
+              </tr>
+              <!-- End Action -->
+            </table>
             <!-- End Table -->
           </div>
         </div>
 
-        <div class="modal fade" id="profileEditModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal fade" id="profileEditModal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
           <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
               <div class="modal-header">
@@ -708,6 +717,10 @@
   <!-- End Unit Details -->
 
   <script>
+    $(document).on('click', '.edit-lead-btn', function() {
+      $('#profileEditModal').modal('show')
+    })
+
     function transfer_lead(id) {
 
       $("#transferModal").modal({
@@ -753,7 +766,7 @@
                   $(".error-msg-right").html(alertMessage('success', obj.message));
                   $(".btn-add-followup").css("visibility", "hidden");
                   $(".transfer_btn").css("visibility", "hidden");
-                
+
 
                 } else {
                   $(".transfer-error-msg").html(alertMessage('error', obj.message));

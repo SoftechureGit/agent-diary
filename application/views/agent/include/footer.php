@@ -839,7 +839,7 @@
        //  
 
        $(document).on('change', '[name="property_details[unit_code]"]', function() {
-
+    
          /** Commercial */
          var property_type_name = $(this).find('option:checked').data('property-type-name')
 
@@ -865,9 +865,9 @@
          }
          /** End Commercial */
 
-         if ($('#modal-inventory-form [name="property_details[id]"]').val() != '') {
-           return false;
-         }
+        //  if ($('#modal-inventory-form [name="property_details[id]"]').val() != '') {
+        //    return false;
+        //  }
 
          var accomodation_id = $(this).find('option:checked').data('accomodation-id')
          var accomodation_name = $(this).find('option:checked').data('accomodation-name')
@@ -891,6 +891,8 @@
            },
            dataType: 'json',
            success: (res) => {
+
+            console.log(res)
              if (res.status) {
 
                /** Parking */
@@ -908,24 +910,24 @@
                  parkings[1] = 'basement';
                }
 
-               $(`#modal-inventory-form select[name="property_details[parking][]"]`).val('').trigger('change');
-               $(`#modal-inventory-form select[name="property_details[applicable_plc][]"]`).val('').trigger('change');
+               $(`select[name="property_details[parking][]"]`).val('').trigger('change');
+               $(`select[name="property_details[applicable_plc][]"]`).val('').trigger('change');
 
                /** End Parking */
 
                $.each(res.data, function(key, value) {
                  /** Size Unit */
                  if ((key == 'size_unit' || key == 'plot_unit') && (value != '' && value)) {
-                   $(`#modal-inventory-form select[name="property_details[size_unit]"]`).val(value).trigger('change.select2');
-                   $(`#modal-inventory-form select[name="property_details[sa_size_unit]"]`).val(value).trigger('change.select2');
-                   $(`#modal-inventory-form select[name="property_details[ba_size_unit]"]`).val(value).trigger('change.select2');
-                   $(`#modal-inventory-form select[name="property_details[ca_size_unit]"]`).val(value).trigger('change.select2');
+                   $(`select[name="property_details[size_unit]"]`).val(value).trigger('change.select2');
+                   $(`select[name="property_details[sa_size_unit]"]`).val(value).trigger('change.select2');
+                   $(`select[name="property_details[ba_size_unit]"]`).val(value).trigger('change.select2');
+                   $(`select[name="property_details[ca_size_unit]"]`).val(value).trigger('change.select2');
 
                  } else if (key == 'facing') {
-                   $(`#modal-inventory-form select[name="property_details[facing_id]"]`).val(value).trigger('change.select2');
+                   $(`select[name="property_details[facing_id]"]`).val(value).trigger('change.select2');
                  } else {
                    if (key != 'id') {
-                     $(`#modal-inventory-form input[name="property_details[${key}]"]`).val(value);
+                     $(`input[name="property_details[${key}]"]`).val(value);
                    }
                  }
                  /** End Size Unit */
