@@ -35,7 +35,7 @@
                                 </select>
                             <?php endif; ?>
                             
-                                <input type="hidden" value="<?= $data->property_type_name ?? '' ?>" name="property_details[property_type_name]" id="property_type_name">
+                                <input type="hidden" value="<?= $property_type_name ?? '' ?>" name="property_details[property_type_name]" id="property_type_name">
                                 <!-- <label id="property_details[unit_code]-error" class="error" for="property_details[unit_code]"></label> -->
 
                                 <!-- Unit Code Name -->
