@@ -20,7 +20,7 @@
                     <!-- Unit Code -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Unit Code<span class="text-danger">*</span></label>
+                            <label for="">Unit Code <span class="text-danger">*</span></label>
                              <!--  -->
                              <?php
                                 if(( $unit_code_name ?? '' ) == ''):

@@ -296,21 +296,31 @@ endif;
                 <tr>
                   <th>Mobile</th>
                   <td>
+                    <?php if($record->primary_mobile_number_country_data ?? 0): ?>
+                    <img src="https://ipdata.co/flags/<?= json_decode($record->primary_mobile_number_country_data)->iso2 ?>.png" alt="Flag" class="pr-2" title="<?= json_decode($record->primary_mobile_number_country_data)->name ?? '' ?>">
+                    <?php endif; ?>
+
                     <?= $record->secondary_mobile_number_country_data ? ('+' . json_decode($record->primary_mobile_number_country_data)->dialCode ?? '') : '' ?>
+                    
+                    <?= $record->lead_mobile_no ?>
+                  </td>
+                  </tr>
+                  <?php endif; ?>
+                  <!-- Mobile -->
+                  
+                  <!-- Secondary Mobile -->
+                  <?php if ($record->lead_mobile_no_2): ?>
+                    <tr>
+                      <th>Secondary Mobile</th>
+                      <td>
+                        <?php if($record->secondary_mobile_number_country_data ?? 0): ?>
+                        <img src="https://ipdata.co/flags/<?= json_decode($record->secondary_mobile_number_country_data)->iso2 ?>.png" alt="Flag" class="pr-2" title="<?= json_decode($record->secondary_mobile_number_country_data)->name ?? '' ?>">
+                        <?php endif; ?>
 
-                    <?= $record->lead_mobile_no ?></td>
-                </tr>
-              <?php endif; ?>
-              <!-- Mobile -->
-
-              <!-- Secondary Mobile -->
-              <?php if ($record->lead_mobile_no_2): ?>
-                <tr>
-                  <th>Secondary Mobile</th>
-                  <td>
-                    <?= $record->secondary_mobile_number_country_data ? ('+' . json_decode($record->secondary_mobile_number_country_data)->dialCode ?? '') : '' ?>
-
-                    <?= $record->lead_mobile_no_2 ?></td>
+                        <?= $record->secondary_mobile_number_country_data ? ('+' . json_decode($record->secondary_mobile_number_country_data)->dialCode ?? '') : '' ?>
+                        
+                        <?= $record->lead_mobile_no_2 ?>
+                      </td>
                 </tr>
               <?php endif; ?>
               <!-- Secondary Mobile -->
