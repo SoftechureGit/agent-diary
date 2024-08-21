@@ -185,7 +185,7 @@
           <div class="set_property_form w-100"></div>
           <!-- Form View -->
 
-          <div class="row">
+          <div class="row property_footer_form">
             <div class="container">
               <!-- Layout Upload -->
               <div class="col-md-4">

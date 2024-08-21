@@ -432,7 +432,7 @@ if (!function_exists('getAccountId')) {
 
             return CI()->load->view("components/property-forms/$form", [ 'data' => $data ], true);
         else :
-            return "<div class='text-center my-3'><h4>Form not available.</h4></div>";
+            return "<div class='text-center my-3 form-not-found'><h4>Form not available.</h4></div>";
         endif;
     }
 

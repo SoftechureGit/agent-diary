@@ -276,12 +276,16 @@
            success: (res) => {
              if (res.status) {
                $('.set_property_form').html(res.form_view)
+
+               setTimeout(function(){
+                $('.set_property_form').parents('form').find('.property_footer_form').addClass('d-none')
+               }, 100);
+
                convertToSelect2()
 
                //  
                if (form_request_for == 'inventory') {
                  if (res.property_layout) {
-                   console.log(res.property_layout)
                    $('.old_property_layout').val(res.property_layout).attr('data-saved-value', res.property_layout)
                    $('.property-layout-anchor').attr('href', res.property_layout_url).removeClass('d-none')
                    $('.property-layout-anchor').attr('href', res.property_layout_url).attr('data-saved-value', res.property_layout_url).removeClass('d-none')
