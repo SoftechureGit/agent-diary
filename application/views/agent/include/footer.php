@@ -119,7 +119,11 @@
                }
                if ($('#lead-unit-form [name="city_id"]').data('selected_id') != '') {
                  $('#lead-unit-form [name="state_id"]').trigger('change')
-               }
+                }
+                
+                if ($('#lead-unit-form [name="location_id"]').data('selected_id') != '') {
+                $('#lead-unit-form [name="location_id"]').trigger('change')
+                }
 
 
 
