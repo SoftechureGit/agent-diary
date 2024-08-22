@@ -7,6 +7,7 @@ class Agent_api extends CI_Controller
     {
         parent::__construct();
         $this->load->model('Action_model');
+        $this->load->library('form_validation');
     }
 
     public function index()
@@ -11304,7 +11305,43 @@ WHERE lead_id='" . $lead_id . "'
             $old_property_layout                        =   $this->input->post('old_property_layout');
             $property_details                           =   $this->input->post('property_details');
             $unit_code                                  =   $property_details['unit_code'];
+            $plot_number                                =   $property_details['plot_number'] ?? 0;
+            $unit_number                                =   $property_details['unit_no'] ?? 0;
+
             # End Init
+
+
+            # Validation : Plot Number or Unit Number Unique
+            if($plot_number || $unit_number):
+                # Plot Number
+                if($plot_number):
+                    $is_plot_number_dublicate                       =   dublicate_entry_in_inventory($id, $product_id, 'plot_number', $plot_number);
+                  
+                    if($is_plot_number_dublicate):
+                        echo json_encode(['status' => false, 'message' => 'Plot Number already exists']);
+                        exit;
+                    endif;
+                    # End Plot Number
+                endif;
+                # End Plot Number
+
+                # Unit Number
+                if($unit_number):
+                    $is_unit_number_dublicate                       =   dublicate_entry_in_inventory($id, $product_id, 'unit_no', $unit_number);
+
+                    # Unit Number
+                    if($is_unit_number_dublicate):
+                        echo json_encode(['status' => false, 'message' => 'Unit Number already exists']);
+                        exit;
+                    endif;
+                    # End Unit Number
+
+                endif;
+                # End Unit Number
+
+            endif;
+            # End Validation : Plot Number or Unit Number Unique
+        
 
             # File Upload
             $upload_response            =   upload_file('property_layout', './uploads/images/property/unit', $old_property_layout, false);

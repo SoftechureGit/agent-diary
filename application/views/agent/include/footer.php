@@ -160,6 +160,7 @@
                      },
                      success: function(res) {
                        if (res.status) {
+                        
                          // $('.ajax-msg').html(`<div class="alert alert-success">${res.message}</div>`)
 
                          showToast('success', res.message)

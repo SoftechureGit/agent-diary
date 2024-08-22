@@ -140,14 +140,14 @@ class Helper extends CI_Controller
         if ($property_id ?? 0) :
             if ($property_details) :
                 $property_details->product_id                     =   $property_id;
-                $property_details->product_details                =   property($property_id);
+                $property_details->property_details                =   property($property_id);
 
-                if ($property_details->product_details ?? 0) :
-                    $project_type_id                                    =   $property_details->product_details->project_type_id;
-                    $property_type_id                                   =   $property_details->product_details->property_type_id;
-                    $property_id                                        =   $property_id;
+                if ($property_details->property_details ?? 0) :
+                    $project_type_id                                    =   $property_details->property_details->project_type_id;
+                    $property_type_id                                   =   $property_details->property_details->property_type_id;
                     $property_details->unit_code_with_accomodations     =   getPropertyAccomodations($project_type_id, $property_type_id, $property_id);
                 endif;
+
             else :
                 $property_details['product_id']                         =   $property_id;
                 $property_details['property_details']                   =   property($property_id);
@@ -162,10 +162,6 @@ class Helper extends CI_Controller
             endif;
         endif;
         # Additional
-
-        // echo "<pre>";
-        // print_r($property_details);
-        // die;
 
         $form_view                      =   property_form($property_type_id, $property_details ?? null);
 

@@ -126,14 +126,22 @@
                     </div>
                     <!-- End Floor -->
 
-                    <!-- Block -->
+                    <!-- Block Or Floor -->
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Block</label>
-                            <input type="text" placeholder="Enter Block" name="property_details[block]" value="<?= $block ?? '' ?>" class="form-control"  data-selected_id="<?= $block ?? '' ?>">
+                            <select name="property_details[block_or_tower_id]" id="" class="form-control" data-saved-value="<?= $block_or_tower_id ?? '' ?>">
+                                <option value="" disabled selected>Choose...</option>
+                                <?php
+                                foreach (getBlocksOrTowers(0, $property_details->project_type_id, $property_details->property_type_id, $property_details->id) ?? [] as $block_or_tower) :
+                                    $selected         = (($block_or_tower_id ?? 0) == $block_or_tower->id) ? 'selected' : '';
+                                ?>
+                                    <option value="<?= $block_or_tower->id ?>" <?= $selected ?>><?= $block_or_tower->name ?? '' ?></option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                     </div>
-                    <!-- End Block -->
+                    <!-- End Block Or Floor -->
 
                     <!-- Applicable PLC -->
                     <div class="col-md-4">

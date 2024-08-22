@@ -27,9 +27,20 @@ if (!function_exists('db_instance')) {
 if (!function_exists('user')) {
     function user()
     {
-        $user_id    =    CI()->session->userdata('user_id');
+        $user_id            =    CI()->session->userdata('user_id');
+        $access_token       =    CI()->session->userdata('agent_hash');
+
+        if (!$user_id && !$access_token) return null;
+
+        $where              =   '1 = 1 ';
         
-        if (!$user_id) return null;
+        if($user_id):
+            $where              .=   " and user.user_id = '$user_id'";
+        endif;
+
+        if($access_token):
+            $where              .=   " and user.user_hash = '$access_token'";
+        endif;
 
         return  db_instance()
             ->select(
@@ -48,7 +59,7 @@ if (!function_exists('user')) {
                             parent_id"
             )
             ->join('tbl_roles as role', 'role.role_id = user.role_id', 'left')
-            ->where("user.user_id = $user_id")
+            ->where($where)
             ->get('tbl_users as user')->row();
     }
 }

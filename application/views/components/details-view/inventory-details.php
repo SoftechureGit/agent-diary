@@ -118,7 +118,7 @@ $property_layout_url        =   $property_layout ? base_url("uploads/images/prop
                 <!-- Tower -->
                 <?php if ($block_or_tower_id ?? 0) : ?>
                 <tr>
-                    <th>Tower</th>
+                    <th>Block / Tower</th>
                     <td><?= getBlocksOrTowers($block_or_tower_id)->name ?? '' ?></td>
                 </tr>
                 <?php endif; ?>

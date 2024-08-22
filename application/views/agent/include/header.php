@@ -67,13 +67,15 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id, $use
 
 
         /* Toast */
+ 
         #toast-container {
             position: fixed;
             top: 5%;
-            right: 5%;
-            width: 250px;
-            z-index: 1000;
+            right: 0;
+            left: 0;
+            width: fit-content;
             z-index: 9999;
+            margin: auto;
         }
 
         .toast {

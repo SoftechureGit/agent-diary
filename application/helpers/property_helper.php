@@ -253,12 +253,25 @@ if (!function_exists('getFloors')) {
 
 # Get Blocks or Towers
 if (!function_exists('getBlocksOrTowers')) {
-    function getBlocksOrTowers($id = null)
+    function getBlocksOrTowers($id = 0, $project_type_id = 0, $property_type_id = 0, $property_id = 0)
     {
+        
         $where  = "1 = 1";
 
         if ($id) :
-            $where  .= " and block_id = $id";
+            $where  .= " and block_id = '$id'";
+        endif;
+
+        if ($project_type_id) :
+            $where  .= " and project_type = '$project_type_id'";
+        endif;
+
+        if ($property_type_id) :
+            $where  .= " and property_type = '$property_type_id'";
+        endif;
+
+        if ($property_id) :
+            $where  .= " and product_id = '$property_id'";
         endif;
 
         $result  = db_instance()
@@ -605,6 +618,38 @@ if (!function_exists('accomodations')) {
         }
     endif;
     # End Unit Size List
+
+    # Is Plot Number Exists In Inventory
+    if(!function_exists('data_exists_in_inventory')):
+        function dublicate_entry_in_inventory($id,$property_id, $key_name, $key_value){
+
+            # Conditions
+            $where              =   "1 = 1 and product.property_type != '7' ";
+
+            if($id):
+                $where          .=   " and inventory.inventory_id != '$id'";
+            endif;
+            
+            if($property_id):
+                $where          .=   " and inventory.product_id = '$property_id'";
+            endif;
+            
+            if($key_name && $key_value):
+                $where          .=   " and JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.$key_name')) = '$key_value'";
+            endif;
+            # End Conditions
+
+            db_instance()->select("*");
+            db_instance()->where($where);
+            db_instance()->join('tbl_products as product', "product.product_id = inventory.product_id", "left");
+            db_instance()->from('tbl_inventory as inventory');
+        
+            $records = db_instance()->get()->num_rows();
+     
+            return $records;
+        }
+    endif;
+    # End Is Plot Number Exists In Inventory
 
 /*******************************************
  *  Inventory Filters

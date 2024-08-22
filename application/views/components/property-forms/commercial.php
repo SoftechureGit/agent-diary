@@ -86,7 +86,7 @@
                             <select name="property_details[block_or_tower_id]" id="" class="form-control" data-saved-value="<?= $block_or_tower_id ?? '' ?>">
                                 <option value="" disabled selected>Choose...</option>
                                 <?php
-                                foreach (getBlocksOrTowers() ?? [] as $block_or_tower) :
+                                foreach (getBlocksOrTowers(0, $property_details->project_type_id, $property_details->property_type_id, $property_details->id) ?? [] as $block_or_tower) :
                                     $selected         = (($block_or_tower_id ?? 0) == $block_or_tower->id) ? 'selected' : '';
                                 ?>
                                     <option value="<?= $block_or_tower->id ?>" <?= $selected ?>><?= $block_or_tower->name ?? '' ?></option>
