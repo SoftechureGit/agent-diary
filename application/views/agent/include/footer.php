@@ -86,18 +86,30 @@
        // $('.select2').select2();
        /* Add or Edit Lead Unit */
        $(document).on('click', '.add-edit-new-unit-btn', function() {
+
          id = $(this).data('id')
          lead_id = $(this).data('lead_id')
 
          $.ajax({
            method: 'GET',
+          //  async: false,
            url: "<?= base_url('agent/lead_unit_form_view'); ?>",
            data: {
              id: id,
              lead_id: lead_id
            },
            dataType: 'json',
-           success: (res) => {
+           beforeSend: function(data) {
+              /** Site Custom Loader */
+              $('.site-custom-loader').removeClass('d-none')
+              /** End Site Custom Loader */
+            },
+            success: (res) => {
+              /** Site Custom Loader */
+              $('.site-custom-loader').addClass('d-none')
+              /** End Site Custom Loader */
+
+
              if (res.status) {
                $('.lead-unit-form-view').html(res.view)
 
@@ -114,18 +126,12 @@
 
                    $('#lead-unit-form [name="property_type_id"]').trigger('change')
 
-                   if ($('#lead-unit-form [name="location_id"]').data('selected_id') != '') {
-                   $('#lead-unit-form [name="location_id"]').trigger('change')
-                   }
                  }, 500)
 
                }
                if ($('#lead-unit-form [name="city_id"]').data('selected_id') != '') {
                  $('#lead-unit-form [name="state_id"]').trigger('change')
-                }
-                
-
-
+               }
 
                // 
                /*  Lead Unit Form */
@@ -205,6 +211,7 @@
        function get_and_set_unit_details(id) {
          $.ajax({
            method: 'GET',
+          //  async: false,
            url: "<?= base_url('agent/lead_unit_details'); ?>",
            data: {
              id: id,
@@ -232,6 +239,7 @@
        function get_and_set_property_types(project_type_id, selected_id) {
          $.ajax({
            method: 'GET',
+          //  async: false,
            url: "<?= base_url('helper/get_property_types'); ?>",
            data: {
              project_type_id: project_type_id,
@@ -242,6 +250,8 @@
              if (res.status) {
                $('.set_property_types').html(res.options_view)
                if (selected_id) {
+                
+                  $('[name="property_type_id"]').trigger('change')
                  //  $('#lead-unit-form .get_property_form').trigger('change')
                }
              }
@@ -282,8 +292,8 @@
                $('.set_property_form').html(res.form_view)
 
                $('.property_footer_form').removeClass('d-none')
-               setTimeout(function(){
-                $('.form-not-found').parents('form').find('.property_footer_form').addClass('d-none')
+               setTimeout(function() {
+                 $('.form-not-found').parents('form').find('.property_footer_form').addClass('d-none')
                }, 100);
 
                convertToSelect2()
@@ -319,13 +329,22 @@
        function get_and_set_cities(state_id, selected_id) {
          $.ajax({
            method: 'GET',
+          //  async: false,
            url: "<?= base_url('helper/get_cities'); ?>",
            data: {
              state_id: state_id,
              selected_id: selected_id
            },
            dataType: 'json',
-           success: (res) => {
+           beforeSend: function(data) {
+              /** Site Custom Loader */
+              $('.site-custom-loader').removeClass('d-none')
+              /** End Site Custom Loader */
+            },
+            success: (res) => {
+             /** Site Custom Loader */
+             $('.site-custom-loader').addClass('d-none')
+             /** End Site Custom Loader */
              if (res.status) {
                $('.set_cities').html(res.options_view)
                $('#lead-unit-form [name="city_id"]').trigger('change')
@@ -348,6 +367,7 @@
        function get_and_set_locations(city_id, selected_id) {
          $.ajax({
            method: 'GET',
+          //  async: false,
            url: "<?= base_url('helper/get_locations'); ?>",
            data: {
              city_id: city_id,
@@ -357,6 +377,7 @@
            success: (res) => {
              if (res.status) {
                $('.set_locations').html(res.view)
+               $('[name="location_id"]').trigger('change')
              }
            }
          })
@@ -413,6 +434,7 @@
        function projects(project_type_id = 0, property_type_id = 0, state_id = 0, city_id = 0, location_id = 0, selected_id = 0) {
          $.ajax({
            method: 'GET',
+          //  async: false,
            url: "<?= base_url('helper/projects'); ?>",
            data: {
              project_type_id: project_type_id,
@@ -471,6 +493,7 @@
 
          $.ajax({
            method: 'GET',
+          //  async: false,
            url: "<?= base_url('helper/project_properties'); ?>",
            data: {
              project_id: project_id,
@@ -494,6 +517,7 @@
 
          $.ajax({
            method: 'GET',
+          //  async: false,
            url: "<?= base_url('helper/project_property_details'); ?>",
            data: {
              property_type_id: property_type_id,
@@ -937,6 +961,7 @@
        }) {
          $.ajax({
            post: 'GET',
+          //  async: false,
            url: "<?= base_url('helper/get_property_unit_details'); ?>",
            data: {
              id: id

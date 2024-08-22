@@ -286,6 +286,22 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id, $use
         } */
 
         /*  */
+
+        /*  */
+        .site-custom-loader img {
+            transform: translate(30%, 90%);
+        }
+
+        .site-custom-loader {
+            text-align: center;
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            z-index: 9;
+            background: #d3d3d391;
+        }
+
+        /*  */
     </style>
 
 </head>
@@ -302,6 +318,12 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id, $use
         <!-- Toast -->
         <div id="toast-container"></div>
         <!-- End Toast -->
+
+        <!-- Loader -->
+        <div class='site-custom-loader d-none'>
+            <img src='<?= base_url('public/front/ajax-loader.gif') ?>'>
+        </div>
+        <!-- End Loader -->
 
         <!--**********************************
             Nav header start
