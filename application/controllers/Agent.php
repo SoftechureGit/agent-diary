@@ -1022,7 +1022,7 @@ class Agent extends CI_Controller
             $query = $this->db->get();
 
             $builder_data = $query->result();
-            
+
             if ($builder_data) {
                 $builder_list  = $builder_data;
             }
@@ -2516,31 +2516,30 @@ class Agent extends CI_Controller
         $user_detail    =       user();
 
         // print_r($user_detail); die;
-       
+
         $account_id     = $user_detail->user_id;
 
         $user_id        = user()->user_id;
-      
+
         $where            = ' 1 = 1 ';
-        if(user()->role_id == 2){
+        if (user()->role_id == 2) {
             $where            .= " and account_id = $user_id";
-        }
-        else{
+        } else {
             $where            .= " and  added_by = $user_id";
         }
-        
+
         $all_file_type = $this->db->distinct()->select('file_name')->where($where)->get('tbl_data')->result();
-        
-        
-        
+
+
+
         // print_r($all_file_type) ; die;
 
         $all_status  =  $this->db->distinct()->select('lead_stage_id,lead_stage_name')->where(['lead_stage_status' => 1])->get('tbl_lead_stages')->result();
 
         # Reasons
         $reason_where           =   ' 1 = 1';
-        
-        if(user()->role_id == 2 ):
+
+        if (user()->role_id == 2):
             $reason_where           .=   " and account_id = $user_id ";
         else:
             $reason_where           .=   " and assign_user_id = $user_id or user_id =  $user_id";
@@ -2595,7 +2594,7 @@ class Agent extends CI_Controller
 
 
         // print_r($user_ids); die;
-       
+
 
         // if (count($user_ids)) {
 
@@ -2604,14 +2603,13 @@ class Agent extends CI_Controller
 
         // $where .= $where_ids;
 
-        
+
         // echo $where;  die;
-        
-        if($user_detail->parent_id == 0){
-        //    echo 'adf'; die;
+
+        if ($user_detail->parent_id == 0) {
+            //    echo 'adf'; die;
             $where  = "user_id=$user_detail->user_id OR parent_id=$user_detail->user_id";
-        }
-        else{
+        } else {
             // echo $user_detail->parent_id; die;
             $where = " user_id=$user_detail->user_id OR report_to=$user_detail->user_id";
         }
@@ -2766,13 +2764,14 @@ class Agent extends CI_Controller
         $agent_id                                   =   $this->session->userdata('user_id');
         $costing_price                              =   $this->input->post('costing_price');
         $youtube_data                               =   $this->input->post('youtube_data');
+        $inventory_id                               =   $this->input->post('inventory_id');
 
         foreach ($youtube_data ?? [] as $youtube_item) :
             if ($youtube_item['title'] != '' && $youtube_item['link'] != '') :
                 $youtube_data_arr[]               =   [
-                                                            'title' => $youtube_item['title'],
-                                                            'link'  => $youtube_item['link']
-                                                        ];
+                    'title' => $youtube_item['title'],
+                    'link'  => $youtube_item['link']
+                ];
             endif;
         endforeach;
         # End Init
@@ -2802,8 +2801,8 @@ class Agent extends CI_Controller
             'state_id'          => $state_id,
             'city_id'           => $city_id,
             'location_id'       => $location_id,
-            'property_details'  => ( $property_details ?? 0 ) ? json_encode($property_details) : NULL,
-            'youtube_data'      => ( $youtube_data_arr ?? 0 ) ? json_encode($youtube_data_arr) : NULL,
+            'property_details'  => ($property_details ?? 0) ? json_encode($property_details) : NULL,
+            'youtube_data'      => ($youtube_data_arr ?? 0) ? json_encode($youtube_data_arr) : NULL,
             'property_layout'   => $property_layout,
             'costing_price'     => $costing_price,
             'created_at'        => date('Y-m-d h:i:m:s'),
@@ -2838,6 +2837,30 @@ class Agent extends CI_Controller
         endif;
 
         # End Gallery Images Functionality
+
+
+        # Update Inventory Status
+        if ($inventory_id):
+            $inventory_status = 0;
+            switch ($looking_for):
+                case 'sale':
+                    $inventory_status = 1;
+                    break;
+
+                case 'rent':
+                    $inventory_status = 5;
+                    break;
+
+                case 'no_action':
+                    $inventory_status = 4;
+                    break;
+            endswitch;
+
+            if($inventory_status):
+                $this->db->where("inventory_id = '$inventory_id'")->update('tbl_inventory', ['inventory_status' => $inventory_status]);
+            endif;
+        endif;
+        # End Update Inventory Status
 
         # Init
 
@@ -2944,7 +2967,7 @@ class Agent extends CI_Controller
         $user_detail    = $this->Action_model->select_single('tbl_users', $where);
 
         $total_data_count    = 0;
-        $total_uploaded_data_count = 0;  
+        $total_uploaded_data_count = 0;
 
         if ($user_detail) {
             $user_id    =   $user_detail->user_id;
@@ -2959,22 +2982,22 @@ class Agent extends CI_Controller
 
         $data_excel = array();
 
-        
+
         if ($account_id) {
 
-                $upload_path = FCPATH . './uploads/raw-data/';
-                # Create Folder if Folder Not Exits
-                if (!file_exists($upload_path)) {
-                    mkdir($upload_path, 0777, true);
-                }
-                # End Create Folder if Folder Not Exits
-        
-                $config['upload_path']             = $upload_path;
-        
-                $config['allowed_types']          =    'xlsx';  
-                $this->load->library('upload', $config);
-                if ($this->upload->do_upload('file')) {
-                    $data = $this->upload->data();
+            $upload_path = FCPATH . './uploads/raw-data/';
+            # Create Folder if Folder Not Exits
+            if (!file_exists($upload_path)) {
+                mkdir($upload_path, 0777, true);
+            }
+            # End Create Folder if Folder Not Exits
+
+            $config['upload_path']             = $upload_path;
+
+            $config['allowed_types']          =    'xlsx';
+            $this->load->library('upload', $config);
+            if ($this->upload->do_upload('file')) {
+                $data = $this->upload->data();
 
                 if ($data['file_ext'] == '.xlsx') {
 
@@ -2985,12 +3008,12 @@ class Agent extends CI_Controller
                     $Reader = new SpreadsheetReader($data['full_path']);
                     $Sheets = $Reader->Sheets();
 
-                    
+
                     foreach ($Sheets as $Index => $Name) {
                         if ($Index == 0) {
                             $Reader->ChangeSheet($Index);
                             foreach ($Reader as $Key => $Row) {
-                              
+
                                 if ($Key  > 0) {
                                     $total_data_count++;
                                     $data_array = array(
@@ -3008,7 +3031,7 @@ class Agent extends CI_Controller
 
                                         $this->Action_model->update_data($data_array, 'tbl_data', $where);
                                     } else {
-                                        if( $Row[4] && $Row[2]){
+                                        if ($Row[4] && $Row[2]) {
                                             $total_uploaded_data_count++;
                                             $data_array2 = array(
                                                 'added_by'          =>  $user_id,
@@ -3016,7 +3039,7 @@ class Agent extends CI_Controller
                                                 'data_status'       =>  1,
                                                 'file_name'         =>  $this->input->post('lead_data_type'),
                                             );
-    
+
                                             $data_array     =   array_merge($data_array, $data_array2);
                                             $lead_id        =   $this->Action_model->insert_data($data_array, 'tbl_data');
                                         }
