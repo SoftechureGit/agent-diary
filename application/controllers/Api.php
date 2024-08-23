@@ -11600,12 +11600,13 @@ WHERE lead_id='" . $lead_id . "'";
         
       
         if ($searchValue) {
-            $where = "((user_title LIKE '%" . $searchValue . "%') OR 
+            $where = "(
+                        CONCAT(user_title, ' ',first_name, ' ', last_name) LIKE '%" . $searchValue . "%' OR
+                       (user_title LIKE '%" . $searchValue . "%') OR 
                        (first_name LIKE '%" . $searchValue . "%') OR 
                        (last_name LIKE '%"  . $searchValue . "%') OR 
                        (username LIKE '%"   . $searchValue . "%') OR 
-                       (mobile LIKE '%"     . $searchValue . "%') OR 
-                       (email LIKE '%"      . $searchValue . "%')) 
+                       (mobile LIKE '%"     . $searchValue . "%')) 
                        AND user.parent_id = '" . $parent_id . "'";
         } else {
             $where = "user.parent_id = '" . $parent_id . "'";
