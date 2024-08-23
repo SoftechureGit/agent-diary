@@ -169,6 +169,8 @@ class Helper extends CI_Controller
         if(!isset($property_details)):
             $property_details  = ( object ) [];
             $property_details->form_request_for    = $form_request_for;
+        else:
+            $property_details->form_request_for    = $form_request_for;
         endif;
 
         $form_view                      =   property_form($property_type_id, $property_details ?? null);
@@ -460,7 +462,7 @@ class Helper extends CI_Controller
         $view                       =    $this->input->get('view');
         $options                    =    "";
 
-        $records                 = inventory_plot_numbers((object) [ 'property_id' => $property_id,  'unit_code' => $unit_code ]);
+        $records                 = inventory_plot_or_unit_numbers((object) [ 'property_id' => $property_id,  'unit_code' => $unit_code ]);
 
         if($view):
             $options                =   "<option value='' disabled selected>Choose...</option>";
@@ -468,12 +470,12 @@ class Helper extends CI_Controller
             foreach ($records ?? [] as $record) :
                 if($record->plot_number):
                     $selected            =  $selected_id == $record->plot_number ? 'selected' : '';
-                    $options            .=  "<option value='$record->plot_number' $selected>$record->plot_number</option>";
+                    $options            .=  "<option value='$record->plot_number' $selected data-inventory-id='$record->inventory_id'>$record->plot_number</option>";
                 endif;
 
                 if($record->unit_number):
                     $selected            =  $selected_id == $record->unit_number ? 'selected' : '';
-                    $options            .=  "<option value='$record->unit_number' $selected>$record->unit_number</option>";
+                    $options            .=  "<option value='$record->unit_number' $selected data-inventory-id='$record->inventory_id'>$record->unit_number</option>";
                 endif;
             endforeach;
         endif;

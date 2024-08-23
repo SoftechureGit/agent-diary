@@ -63,9 +63,8 @@
                             <label for="">Plot Number</label>
                             <?php 
                             if (($form_request_for ?? '') == 'unit-inventory'): ?>
-                                <select class="form-control" id="" name="property_details[plot_number]" data-saved-value="<?= $plot_number ?? '' ?>">
+                                <select class="form-control" id="" name="property_details[plot_number]" data-selected_id="<?= $plot_number ?? 0 ?>" data-saved-value="<?= $plot_number ?? '' ?>">
                                     <option value="">Choose...</option>
-                        
                                 </select>
                             <?php else: ?>
                                 <input type="text" placeholder="Enter Plot Number" name="property_details[plot_number]" value="<?= $plot_number ?? '' ?>" class="form-control" data-saved-value="<?= $plot_number ?? '' ?>">

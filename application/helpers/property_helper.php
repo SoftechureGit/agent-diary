@@ -632,8 +632,8 @@ if (!function_exists('accomodations')) {
     # End Unit Size List
 
     # Inventory Plot Number 
-    if(!function_exists('inventory_plot_numbers')):
-        function inventory_plot_numbers($data = null){
+    if(!function_exists('inventory_plot_or_unit_numbers')):
+        function inventory_plot_or_unit_numbers($data = null){
 
            # Data 
            $property_id    = $data->property_id ?? 0;
@@ -652,7 +652,7 @@ if (!function_exists('accomodations')) {
             endif;
            # End Conditions
 
-           db_instance()->select("JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.plot_number')) as plot_number, 
+           db_instance()->select("inventory_id, JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.plot_number')) as plot_number, 
            JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.unit_no')) as unit_number");
            db_instance()->where($where);
           db_instance()->from('tbl_inventory as inventory');

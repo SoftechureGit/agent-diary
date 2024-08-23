@@ -143,8 +143,11 @@
                  },
                  messages: {},
                  submitHandler: function(form) {
+          
                    var myform = document.getElementById("lead-unit-form");
                    var fd = new FormData(myform);
+                    
+                  fd.append('inventory_id', $('[name="property_details[plot_number]"] option:selected').data('inventory-id'))
 
                    $.ajax({
                      type: "POST",
@@ -262,7 +265,8 @@
        /* End Get Property Types */
 
        /* End Get Property Form */
-       $(document).on('change', '#lead-unit-form [name="project_type_id"], #lead-unit-form [name="property_type_id"],#lead-unit-form [name="property_id"]', function() {
+       $(document).on('change', '#lead-unit-form [name="project_type_id"], #lead-unit-form [name="property_type_id"], #lead-unit-form [name="property_id"]', function() {
+      //  $(document).on('change', '#lead-unit-form [name="project_id"]', function() {
          var property_type_id = $('#lead-unit-form .get_property_form').val();
          var project_id = $('#lead-unit-form [name="project_id"]').val();
          var property_id = project_id ? $('#lead-unit-form [name="property_id"]').val() : 0;
@@ -272,7 +276,7 @@
 
          if (property_type_id) {
            id = $('#lead-unit-form [name="id"]').val();
-           getPropertyForm(id, property_type_id, property_id, selected_property_id, selected_id);
+           getPropertyForm(id, property_type_id, project_id, selected_property_id, selected_id);
          }
        })
 
@@ -507,6 +511,7 @@
            dataType: 'json',
            success: (res) => {
              if (res.status) {
+               $('#lead-unit-form [name="property_details[unit_code]"]').trigger('change')
                $('#lead-unit-form [name="property_details[unit_code]"]').html(res.view)
              }
            }
@@ -1051,6 +1056,7 @@
        /** get_set_inventory_plot_numbers */
        function get_set_inventory_plot_numbers({ property_id = 0 , unit_code = 0 }){
 
+        selected_id = $('[name="property_details[plot_number]"]').data('selected_id')
         return new Promise((resolve, reject) => {
 
            /** Ajax - Fetch Plot Or Unit Numbers From Inventory */
@@ -1061,6 +1067,7 @@
              data: {
                property_id: property_id,
                unit_code: unit_code,
+               selected_id: selected_id,
                view: true,
              },
              success: (res) => {
@@ -1092,6 +1099,11 @@
          id = 0,
          plot_or_unit_number = null
        }) {
+
+        // if(!id || !plot_or_unit_number){
+        //   return false
+        // }
+
          $.ajax({
            post: 'GET',
            url: "<?= base_url('helper/get_inventory_details'); ?>",
