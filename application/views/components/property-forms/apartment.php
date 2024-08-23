@@ -67,7 +67,14 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Unit No</label>
-                            <input type="text" placeholder="Enter Unit No" name="property_details[unit_no]" value="<?= $unit_no ?? '' ?>" class="form-control" data-saved-value="<?= $unit_no ?? '' ?>">
+                            <?php 
+                            if (($form_request_for ?? '') == 'unit-inventory'): ?>
+                                <select class="form-control" id="" name="property_details[unit_no]" data-saved-value="<?= $plot_number ?? '' ?>">
+                                    <option value="">Choose...</option>
+                                </select>
+                            <?php else: ?>
+                                <input type="text" placeholder="Enter Unit No" name="property_details[unit_no]" value="<?= $unit_no ?? '' ?>" class="form-control" data-saved-value="<?= $unit_no ?? '' ?>">
+                            <?php endif; ?>
                         </div>
                     </div>
                     <!-- End Unit No -->

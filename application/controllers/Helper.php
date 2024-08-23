@@ -83,7 +83,9 @@ class Helper extends CI_Controller
     public function get_inventory_details(){
         $arr                        =   [];
         $id                         =   $this->input->get('id');
-        $inventory                  =  getInventory($id);
+        $plot_or_unit_number                         =   $this->input->get('plot_or_unit_number');
+
+        $inventory                  =  getInventory($id, $plot_or_unit_number);
         $property_layout            =  $inventory->property_layout ?? null;
         $property_layout_url        =  ($inventory->property_layout ?? 0) ? base_url("/uploads/images/property/unit/$inventory->property_layout") : null;;
         $property_details           =  ($inventory->property_details ?? 0) ? json_decode($inventory->property_details ?? []) : $inventory;
@@ -163,10 +165,10 @@ class Helper extends CI_Controller
         endif;
         # Additional
 
-        if($property_details ?? 0):
-            if(isset($property_details->form_request_for)):
-                $property_details->form_request_for = $form_request_for ?? '';
-            endif;
+
+        if(!isset($property_details)):
+            $property_details  = ( object ) [];
+            $property_details->form_request_for    = $form_request_for;
         endif;
 
         $form_view                      =   property_form($property_type_id, $property_details ?? null);
@@ -450,4 +452,33 @@ class Helper extends CI_Controller
     # end  get invetory file sample 
 
 
+    # Inventory Plot Or Unit Numbers
+    public function inventory_plot_or_unit_numbers(){
+        $property_id                =    $this->input->get('property_id');
+        $unit_code                  =    $this->input->get('unit_code');
+        $selected_id                =    $this->input->get('selected_id');
+        $view                       =    $this->input->get('view');
+        $options                    =    "";
+
+        $records                 = inventory_plot_numbers((object) [ 'property_id' => $property_id,  'unit_code' => $unit_code ]);
+
+        if($view):
+            $options                =   "<option value='' disabled selected>Choose...</option>";
+            
+            foreach ($records ?? [] as $record) :
+                if($record->plot_number):
+                    $selected            =  $selected_id == $record->plot_number ? 'selected' : '';
+                    $options            .=  "<option value='$record->plot_number' $selected>$record->plot_number</option>";
+                endif;
+
+                if($record->unit_number):
+                    $selected            =  $selected_id == $record->unit_number ? 'selected' : '';
+                    $options            .=  "<option value='$record->unit_number' $selected>$record->unit_number</option>";
+                endif;
+            endforeach;
+        endif;
+
+        echo json_encode(['status' => true, 'message' => 'Successfully data fetched', 'data' => $records, 'options_view' => $options]);
+    }
+    # End Inventory Plot Or Unit Numbers
 }

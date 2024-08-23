@@ -92,7 +92,7 @@
 
          $.ajax({
            method: 'GET',
-          //  async: false,
+           //  async: false,
            url: "<?= base_url('agent/lead_unit_form_view'); ?>",
            data: {
              id: id,
@@ -100,14 +100,14 @@
            },
            dataType: 'json',
            beforeSend: function(data) {
-              /** Site Custom Loader */
-              $('.site-custom-loader').removeClass('d-none')
-              /** End Site Custom Loader */
-            },
-            success: (res) => {
-              /** Site Custom Loader */
-              $('.site-custom-loader').addClass('d-none')
-              /** End Site Custom Loader */
+             /** Site Custom Loader */
+             $('.site-custom-loader').removeClass('d-none')
+             /** End Site Custom Loader */
+           },
+           success: (res) => {
+             /** Site Custom Loader */
+             $('.site-custom-loader').addClass('d-none')
+             /** End Site Custom Loader */
 
 
              if (res.status) {
@@ -160,7 +160,7 @@
                      },
                      success: function(res) {
                        if (res.status) {
-                        
+
                          // $('.ajax-msg').html(`<div class="alert alert-success">${res.message}</div>`)
 
                          showToast('success', res.message)
@@ -212,7 +212,7 @@
        function get_and_set_unit_details(id) {
          $.ajax({
            method: 'GET',
-          //  async: false,
+           //  async: false,
            url: "<?= base_url('agent/lead_unit_details'); ?>",
            data: {
              id: id,
@@ -240,7 +240,7 @@
        function get_and_set_property_types(project_type_id, selected_id) {
          $.ajax({
            method: 'GET',
-          //  async: false,
+           //  async: false,
            url: "<?= base_url('helper/get_property_types'); ?>",
            data: {
              project_type_id: project_type_id,
@@ -251,8 +251,8 @@
              if (res.status) {
                $('.set_property_types').html(res.options_view)
                if (selected_id) {
-                
-                  $('[name="property_type_id"]').trigger('change')
+
+                 $('[name="property_type_id"]').trigger('change')
                  //  $('#lead-unit-form .get_property_form').trigger('change')
                }
              }
@@ -272,11 +272,14 @@
 
          if (property_type_id) {
            id = $('#lead-unit-form [name="id"]').val();
-           getPropertyForm(id, property_type_id, property_id, selected_property_id, selected_id, "unit-inventory");
+           getPropertyForm(id, property_type_id, property_id, selected_property_id, selected_id);
          }
        })
 
-       function getPropertyForm(id, property_type_id, property_id, selected_property_id, selected_id, form_request_for = '') {
+       function getPropertyForm(id, property_type_id, property_id, selected_property_id, selected_id) {
+
+         form_request_for = $('[name="form_request_for"]').val();
+
          $.ajax({
            method: 'GET',
            url: "<?= base_url('helper/get_property_form'); ?>",
@@ -330,7 +333,7 @@
        function get_and_set_cities(state_id, selected_id) {
          $.ajax({
            method: 'GET',
-          //  async: false,
+           //  async: false,
            url: "<?= base_url('helper/get_cities'); ?>",
            data: {
              state_id: state_id,
@@ -338,11 +341,11 @@
            },
            dataType: 'json',
            beforeSend: function(data) {
-              /** Site Custom Loader */
-              $('.site-custom-loader').removeClass('d-none')
-              /** End Site Custom Loader */
-            },
-            success: (res) => {
+             /** Site Custom Loader */
+             $('.site-custom-loader').removeClass('d-none')
+             /** End Site Custom Loader */
+           },
+           success: (res) => {
              /** Site Custom Loader */
              $('.site-custom-loader').addClass('d-none')
              /** End Site Custom Loader */
@@ -368,7 +371,7 @@
        function get_and_set_locations(city_id, selected_id) {
          $.ajax({
            method: 'GET',
-          //  async: false,
+           //  async: false,
            url: "<?= base_url('helper/get_locations'); ?>",
            data: {
              city_id: city_id,
@@ -406,15 +409,15 @@
        /*  End Lead Units */
 
        /** Costing Validation */
-       $(document).on('change', '#lead-unit-form [name="looking_for"]', function() {
-         if (this.value == 'no_action') {
-           $('#lead-unit-form .costing-price-wrapper').find('span.text-danger').html('')
-           $('#lead-unit-form .costing-price-wrapper').find('[name="costing_price"]').prop('required', false)
-         } else {
-           $('#lead-unit-form .costing-price-wrapper').find('span.text-danger').html('*')
-           $('#lead-unit-form .costing-price-wrapper').find('[name="costing_price"]').prop('required', true)
-         }
-       });
+      //  $(document).on('change', '#lead-unit-form [name="looking_for"]', function() {
+      //    if (this.value == 'no_action') {
+      //      $('#lead-unit-form .costing-price-wrapper').find('span.text-danger').html('')
+      //      $('#lead-unit-form .costing-price-wrapper').find('[name="costing_price"]').prop('required', false)
+      //    } else {
+      //      $('#lead-unit-form .costing-price-wrapper').find('span.text-danger').html('*')
+      //      $('#lead-unit-form .costing-price-wrapper').find('[name="costing_price"]').prop('required', true)
+      //    }
+      //  });
        /** Costing Validation */
 
        /*  Projects */
@@ -435,7 +438,7 @@
        function projects(project_type_id = 0, property_type_id = 0, state_id = 0, city_id = 0, location_id = 0, selected_id = 0) {
          $.ajax({
            method: 'GET',
-          //  async: false,
+           //  async: false,
            url: "<?= base_url('helper/projects'); ?>",
            data: {
              project_type_id: project_type_id,
@@ -494,7 +497,7 @@
 
          $.ajax({
            method: 'GET',
-          //  async: false,
+           //  async: false,
            url: "<?= base_url('helper/project_properties'); ?>",
            data: {
              project_id: project_id,
@@ -518,7 +521,7 @@
 
          $.ajax({
            method: 'GET',
-          //  async: false,
+           //  async: false,
            url: "<?= base_url('helper/project_property_details'); ?>",
            data: {
              property_type_id: property_type_id,
@@ -876,6 +879,10 @@
 
        $(document).on('change', '[name="property_details[unit_code]"]', function() {
 
+         /** */
+         property_id = $('[name="project_id"]').val();
+         unit_code = $('[name="property_details[unit_code]"]').val();
+         /** */
 
          /**
           *  Edit Saved Data Fetched and set
@@ -906,9 +913,7 @@
                  $('.property-layout-anchor').attr('href', property_layout_url)
                }
                /** End Property Layout */
-
              }
-             // console.log(field.name + ": " + $(field).val());
            })
 
            // $.each()
@@ -952,9 +957,24 @@
          $('#modal-inventory-form [name="property_details[accomodation_id]"]').val(accomodation_id)
          $('#modal-inventory-form input[name="property_details[unit_type]"]').val(accomodation_name)
 
+         /** Get Inventory Details From Manage Inventory */
+         var form_request_for = $('[name="form_request_for"]').val()
+
+         if (form_request_for == 'unit-inventory') {
+        
+          result = get_set_inventory_plot_numbers({ 'property_id' : property_id, 'unit_code' : unit_code })
+          if(result){
+            return false;
+          } 
+          
+         }
+         /** End Get Inventory Details From Manage Inventory */
+
+         /**  Get Default Inventory Details  */
          getPropertyUnitDetails({
            'id': this.value
          })
+         /**  End Get Default Inventory Details  */
        })
 
        function getPropertyUnitDetails({
@@ -962,7 +982,7 @@
        }) {
          $.ajax({
            post: 'GET',
-          //  async: false,
+           //  async: false,
            url: "<?= base_url('helper/get_property_unit_details'); ?>",
            data: {
              id: id
@@ -1028,14 +1048,56 @@
          })
        }
 
+       /** get_set_inventory_plot_numbers */
+       function get_set_inventory_plot_numbers({ property_id = 0 , unit_code = 0 }){
+
+        return new Promise((resolve, reject) => {
+
+           /** Ajax - Fetch Plot Or Unit Numbers From Inventory */
+           $.ajax({
+             url: "<?= base_url('helper/inventory-plot-or-unit-numbers') ?>",
+             method: 'GET',
+             dataType: 'json',
+             data: {
+               property_id: property_id,
+               unit_code: unit_code,
+               view: true,
+             },
+             success: (res) => {
+               if (res.status) {
+                
+                $('[name="property_details[plot_number]"]').html(res.options_view)
+                $('[name="property_details[unit_no]"]').html(res.options_view)
+                // showToast('success', res.message)
+                resolve(true);
+
+               } else {
+                 showToast('danger', res.message)
+                 resolve(false);
+
+               }
+             },
+             error: (res) => {
+               showToast('danger', 'Some error occured')
+               reject(false);
+
+             }
+           })
+           /** End Ajax - Fetch Plot Or Unit Numbers From Inventory */
+          });
+       }
+       /** End get_set_inventory_plot_numbers */
+
        function getInventory({
-         id = 0
+         id = 0,
+         plot_or_unit_number = null
        }) {
          $.ajax({
            post: 'GET',
            url: "<?= base_url('helper/get_inventory_details'); ?>",
            data: {
-             id: id
+             id: id,
+             plot_or_unit_number: plot_or_unit_number,
            },
            dataType: 'json',
            success: (res) => {
@@ -1043,30 +1105,33 @@
              if (res.status) {
 
                /** End Parking */
-
-
                $.each(res.data, function(key, value) {
-                 $(`#modal-inventory-form input[name="property_details[${key}]"]`).val('');
+                
+                if(key == 'remark' && value != ''){
+                  $(`textarea[name="property_details[remark]"]`).text(value);
+                }
+
+                 $(`input[name="property_details[${key}]"]`).val('');
 
                  if (key == 'applicable_plc' && value != '') {
-                   $(`#modal-inventory-form select[name="property_details[applicable_plc][]"]`).val(value).trigger('change');
+                   $(`select[name="property_details[applicable_plc][]"]`).val(value).trigger('change');
                  }
 
                  if (key == 'parking' && value != '') {
-                   $(`#modal-inventory-form select[name="property_details[parking][]"]`).val(value).trigger('change');
+                   $(`select[name="property_details[parking][]"]`).val(value).trigger('change');
                  }
 
                  /** Size Unit */
                  if ((key == 'size_unit' || key == 'plot_unit') && value != '') {
-                   $(`#modal-inventory-form select[name="property_details[size_unit]"]`).val(value).trigger('change');
-                   $(`#modal-inventory-form select[name="property_details[sa_size_unit]"]`).val(value).trigger('change');
-                   $(`#modal-inventory-form select[name="property_details[ba_size_unit]"]`).val(value).trigger('change');
-                   $(`#modal-inventory-form select[name="property_details[ca_size_unit]"]`).val(value).trigger('change');
-                 } else if (key == 'facing') {
-                   $(`#modal-inventory-form select[name="property_details[facing_id]"]`).val(value).trigger('change');
+                   $(`select[name="property_details[size_unit]"]`).val(value).trigger('change');
+                   $(`select[name="property_details[sa_size_unit]"]`).val(value).trigger('change');
+                   $(`select[name="property_details[ba_size_unit]"]`).val(value).trigger('change');
+                   $(`select[name="property_details[ca_size_unit]"]`).val(value).trigger('change');
+                 } else if (key == 'facing_id' && value != '') {
+                   $(`select[name="property_details[facing_id]"]`).val(value).trigger('change');
                  } else {
                    if (key != 'id') {
-                     $(`#modal-inventory-form input[name="property_details[${key}]"]`).val(value);
+                     $(`input[name="property_details[${key}]"]`).val(value);
                    }
                  }
                  /** End Size Unit */
@@ -1090,6 +1155,14 @@
          })
        }
        //  
+
+      /** Fetch Inventory Data Via Plot Number */
+      $(document).on('change', '[name="property_details[plot_number]"], [name="property_details[unit_no]"]', function(){
+        plot_or_unit_number = this.value;
+
+        getInventory({plot_or_unit_number:plot_or_unit_number})
+      })
+      /** End Fetch Inventory Data Via Plot Number */
      </script>
      <!--  -->
 
