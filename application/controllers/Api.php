@@ -1330,53 +1330,7 @@ class Api extends CI_Controller
     /* role end */
 
     /* team start */
-    public function team_list()
-    {
-
-
-        $where = "user_hash='" . $this->input->post('user_hash') . "'";
-
-        $user_detail = $this->Action_model->select_single('tbl_users', $where);
-
-        $uid = $user_detail->user_id;
-        if ($user_detail->parent_id != 0) {
-            $uid = $user_detail->parent_id;
-        }
-
-        $select = 'tbl_users.user_id,date_register,mobile,user_title,first_name,last_name,user_status,role_name,username';
-
-
-        $searchValue = $this->input->post("search");
-        $searchQuery = "";
-        if ($searchValue != '') {
-            $searchQuery = " (first_name like '%" . $searchValue . "%' ) AND tbl_roles.is_agent_member='1' AND tbl_users.parent_id='" . $uid . "'";
-        } else {
-            $searchQuery = "tbl_roles.is_agent_member='1' AND tbl_users.parent_id='" . $uid . "'";
-        }
-
-
-        $this->db->select($select);
-        $this->db->from('tbl_users');
-        $this->db->join('tbl_roles', 'tbl_roles.role_id = tbl_users.role_id');
-        $this->db->where($searchQuery);
-        $query = $this->db->get();
-        $data = $query->result();
-
-        $response = array();
-
-        if (count($data)):
-
-            $response =  array("status" => true, "msg" => "Data successfully found", "team_list" => $data);
-
-        else:
-
-            $response =  array("status" => false, "msg" => "Data not found", "team_list" => $data);
-
-        endif;
-
-        echo json_encode($response);
-    }
-
+  
     public function get_team()
     {
         $array = array();
@@ -11638,16 +11592,38 @@ WHERE lead_id='" . $lead_id . "'";
 
         $parent_id              =   $user->parent_id ? $user->parent_id : $user->user_id;
 
-        $where = "user.parent_id='" . $parent_id . "'";
+        // $where = "user.parent_id='" . $parent_id . "'";
+
+
+        $searchValue = $this->input->post("search");
+
+        
+      
+        if ($searchValue) {
+            $where = "(
+                        CONCAT(user_title, ' ',first_name, ' ', last_name) LIKE '%" . $searchValue . "%' OR
+                       (user_title LIKE '%" . $searchValue . "%') OR 
+                       (first_name LIKE '%" . $searchValue . "%') OR 
+                       (last_name LIKE '%"  . $searchValue . "%') OR 
+                       (username LIKE '%"   . $searchValue . "%') OR 
+                       (mobile LIKE '%"     . $searchValue . "%')) 
+                       AND user.parent_id = '" . $parent_id . "'";
+        } else {
+            $where = "user.parent_id = '" . $parent_id . "'";
+        }
+
 
         # Teams
-        $this->db->select("CONCAT(
-                                    COALESCE(user.user_title, ''),
-                                    ' ',
-                                    COALESCE(user.first_name, ''),
-                                    ' ',
-                                    COALESCE(user.last_name, '')
-                                ) as full_name,
+        $page   = $this->input->post('page') ?? 1;
+        $limit  = 10;
+        $join   = array('tbl_roles as role', 'role.role_id = user.role_id');
+        $select = "CONCAT(
+                            COALESCE(user.user_title, ''),
+                            ' ',
+                            COALESCE(user.first_name, ''),
+                            ' ',
+                            COALESCE(user.last_name, '')
+                        ) as full_name,
                             user.user_id as id,
                             user.username,
                             user.email,
@@ -11660,36 +11636,51 @@ WHERE lead_id='" . $lead_id . "'";
                                 ELSE 'N/A'
                             END AS status_label
 
-                        ");
-        $this->db->where($where);
-        $this->db->order_by('user.user_id', 'desc');
-        $this->db->from('tbl_users as user');
-        $this->db->join('tbl_roles as role', 'role.role_id = user.role_id', 'left');
-        $teams          =   $this->db->get();
+                        ";
 
-        $teams          =   $teams->num_rows();
-        $teams          =   $teams->result();
+        $teams = $this->Action_model->apiPagination($select, $page, $limit, $join, $where, 'tbl_users as user');
 
 
-        # Pagination
-            $pagination             =   (object) [
-                                                    'current_page'      => 1,
-                                                    'total_pages'       => 1,
-                                                    'total_records'     => 1,
-                                                    'per_page'          => 1,
-                                                ];
-        # End Pagination
-
-        if($teams):
-            $arr            =   [ 'status' => true, 'message' => 'Successfully data fetched', 'data' => $teams, 'pagination' => $pagination ];
+        if(count($teams['data']) > 0 ):
+            $arr            =   [ 'status' => true, 'message' => 'Successfully data fetched', 'data' => $teams['data'], 'pagination' => $teams['pagination'] ];
         else:
-            $arr            =   [ 'status' => false, 'message' => 'No data available', 'pagination' => $pagination];
+            $arr            =   [ 'status' => false, 'message' => 'No data available', 'pagination' => $teams['pagination']];
         endif;
         # End Parent Id
 
-
         echo json_encode($arr);
     }
+
+
+    # Team Data Store
+
+    public  function team_data_store(){
+
+        print_r('store'); 
+
+    }
+
+    # End Team Data Store
+
+
+    # Team Add or Edit View Data
+
+    public function team_add_or_edit_view_data(){
+
+            $res = array();
+
+            # Role Level
+                    $where = "is_agent_member='1'";
+                    $role_list = $this->Action_model->detail_result('tbl_roles', $where);             
+            # End Role Level
+
+
+
+        
+    
+    }
+
+    # End Team Add or Edit and View Data
 
     /*****************************
      *  End Teams Functionality
