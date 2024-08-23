@@ -11641,13 +11641,16 @@ WHERE lead_id='" . $lead_id . "'";
         $where = "user.parent_id='" . $parent_id . "'";
 
         # Teams
-        $this->db->select("CONCAT(
-                                    COALESCE(user.user_title, ''),
-                                    ' ',
-                                    COALESCE(user.first_name, ''),
-                                    ' ',
-                                    COALESCE(user.last_name, '')
-                                ) as full_name,
+        $page   = $this->input->post('page') ?? 1;
+        $limit  = 10;
+        $join   = array('tbl_roles as role', 'role.role_id = user.role_id');
+        $select = "CONCAT(
+                            COALESCE(user.user_title, ''),
+                            ' ',
+                            COALESCE(user.first_name, ''),
+                            ' ',
+                            COALESCE(user.last_name, '')
+                        ) as full_name,
                             user.user_id as id,
                             user.username,
                             user.email,
@@ -11660,36 +11663,42 @@ WHERE lead_id='" . $lead_id . "'";
                                 ELSE 'N/A'
                             END AS status_label
 
-                        ");
-        $this->db->where($where);
-        $this->db->order_by('user.user_id', 'desc');
-        $this->db->from('tbl_users as user');
-        $this->db->join('tbl_roles as role', 'role.role_id = user.role_id', 'left');
-        $teams          =   $this->db->get();
+                        ";
 
-        $teams          =   $teams->num_rows();
-        $teams          =   $teams->result();
+        $teams = $this->Action_model->apiPagination($select, $page, $limit, $join, $where, 'tbl_users as user');
 
 
-        # Pagination
-            $pagination             =   (object) [
-                                                    'current_page'      => 1,
-                                                    'total_pages'       => 1,
-                                                    'total_records'     => 1,
-                                                    'per_page'          => 1,
-                                                ];
-        # End Pagination
-
-        if($teams):
-            $arr            =   [ 'status' => true, 'message' => 'Successfully data fetched', 'data' => $teams, 'pagination' => $pagination ];
+        if(count($teams['data']) > 0 ):
+            $arr            =   [ 'status' => true, 'message' => 'Successfully data fetched', 'data' => $teams['data'], 'pagination' => $teams['pagination'] ];
         else:
-            $arr            =   [ 'status' => false, 'message' => 'No data available', 'pagination' => $pagination];
+            $arr            =   [ 'status' => false, 'message' => 'No data available', 'pagination' => $teams['pagination']];
         endif;
         # End Parent Id
 
-
         echo json_encode($arr);
     }
+
+
+    # Team Data Store
+
+    public  function team_data_store(){
+
+        print_r('store'); 
+
+    }
+
+    # End Team Data Store
+
+
+    # Team Add or Edit View Data
+
+    public function team_add_or_edit_view_data(){
+
+        print_r('view data');
+    
+    }
+
+    # End Team Add or Edit and View Data
 
     /*****************************
      *  End Teams Functionality
