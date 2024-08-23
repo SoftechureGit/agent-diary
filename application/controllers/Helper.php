@@ -163,6 +163,13 @@ class Helper extends CI_Controller
         endif;
         # Additional
 
+        if($property_details ?? 0):
+            if(!isset($property_details->form_request_for)):
+                $property_details           = (object) [];
+            endif;
+            $property_details->form_request_for = $form_request_for ?? '';
+        endif;
+
         $form_view                      =   property_form($property_type_id, $property_details ?? null);
 
         echo json_encode(['status' => true, 'message' => 'Successfully data fetched', 'form_view' => $form_view, 'property_layout_url' => $property_layout_url, 'property_layout' => $property_layout]);

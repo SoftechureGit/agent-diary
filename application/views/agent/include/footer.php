@@ -272,7 +272,7 @@
 
          if (property_type_id) {
            id = $('#lead-unit-form [name="id"]').val();
-           getPropertyForm(id, property_type_id, property_id, selected_property_id, selected_id);
+           getPropertyForm(id, property_type_id, property_id, selected_property_id, selected_id, "unit-inventory");
          }
        })
 
