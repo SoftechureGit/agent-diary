@@ -1330,53 +1330,7 @@ class Api extends CI_Controller
     /* role end */
 
     /* team start */
-    public function team_list()
-    {
-
-
-        $where = "user_hash='" . $this->input->post('user_hash') . "'";
-
-        $user_detail = $this->Action_model->select_single('tbl_users', $where);
-
-        $uid = $user_detail->user_id;
-        if ($user_detail->parent_id != 0) {
-            $uid = $user_detail->parent_id;
-        }
-
-        $select = 'tbl_users.user_id,date_register,mobile,user_title,first_name,last_name,user_status,role_name,username';
-
-
-        $searchValue = $this->input->post("search");
-        $searchQuery = "";
-        if ($searchValue != '') {
-            $searchQuery = " (first_name like '%" . $searchValue . "%' ) AND tbl_roles.is_agent_member='1' AND tbl_users.parent_id='" . $uid . "'";
-        } else {
-            $searchQuery = "tbl_roles.is_agent_member='1' AND tbl_users.parent_id='" . $uid . "'";
-        }
-
-
-        $this->db->select($select);
-        $this->db->from('tbl_users');
-        $this->db->join('tbl_roles', 'tbl_roles.role_id = tbl_users.role_id');
-        $this->db->where($searchQuery);
-        $query = $this->db->get();
-        $data = $query->result();
-
-        $response = array();
-
-        if (count($data)):
-
-            $response =  array("status" => true, "msg" => "Data successfully found", "team_list" => $data);
-
-        else:
-
-            $response =  array("status" => false, "msg" => "Data not found", "team_list" => $data);
-
-        endif;
-
-        echo json_encode($response);
-    }
-
+  
     public function get_team()
     {
         $array = array();
@@ -11638,7 +11592,19 @@ WHERE lead_id='" . $lead_id . "'";
 
         $parent_id              =   $user->parent_id ? $user->parent_id : $user->user_id;
 
-        $where = "user.parent_id='" . $parent_id . "'";
+        // $where = "user.parent_id='" . $parent_id . "'";
+
+
+        $searchValue = $this->input->post("search");
+
+        
+      
+        if ($searchValue) {
+            $where = " (first_name like '%" . $searchValue . "%' ) AND user.parent_id='" . $parent_id . "'";
+        } else {
+            $where = "user.parent_id='" . $parent_id . "'";
+        }
+
 
         # Teams
         $page   = $this->input->post('page') ?? 1;
