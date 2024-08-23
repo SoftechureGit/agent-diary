@@ -11600,9 +11600,15 @@ WHERE lead_id='" . $lead_id . "'";
         
       
         if ($searchValue) {
-            $where = " (user_title like '%" . $searchValue . "%' ) OR (first_name like '%" . $searchValue . "%' ) OR (last_name like '%" . $searchValue . "%' ) OR (username like '%" . $searchValue . "%' ) OR (mobile like '%" . $searchValue . "%' ) OR (email like '%" . $searchValue . "%' ) AND user.parent_id='" . $parent_id . "'";
+            $where = "((user_title LIKE '%" . $searchValue . "%') OR 
+                       (first_name LIKE '%" . $searchValue . "%') OR 
+                       (last_name LIKE '%"  . $searchValue . "%') OR 
+                       (username LIKE '%"   . $searchValue . "%') OR 
+                       (mobile LIKE '%"     . $searchValue . "%') OR 
+                       (email LIKE '%"      . $searchValue . "%')) 
+                       AND user.parent_id = '" . $parent_id . "'";
         } else {
-            $where = "user.parent_id='" . $parent_id . "'";
+            $where = "user.parent_id = '" . $parent_id . "'";
         }
 
 
@@ -11660,7 +11666,16 @@ WHERE lead_id='" . $lead_id . "'";
 
     public function team_add_or_edit_view_data(){
 
-        print_r('view data');
+            $res = array();
+
+            # Role Level
+                    $where = "is_agent_member='1'";
+                    $role_list = $this->Action_model->detail_result('tbl_roles', $where);             
+            # End Role Level
+
+
+
+        
     
     }
 
