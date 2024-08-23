@@ -10,6 +10,7 @@
     <!-- End Form Name -->
 
     <!-- User Id  -->
+    <input type="hidden" name="form_request_for" value="unit-inventory">
     <input type="hidden" name="id" value="<?= $record->id  ?? 0 ?>">
     <input type="hidden" name="lead_id" value="<?= $record->lead_id ?? $lead_id ?? 0 ?>">
     <!-- End User Id -->

@@ -149,11 +149,23 @@ function parkings($id)
 # End Get Property Parkings Details
 
 # Get Inventory Details
-function getInventory($id)
+function getInventory($id, $plot_or_unit_number = null)
 {
+    $where = " 1 = 1 ";
+
+    if($id):
+        $where .= " and inventory_id = $id";
+    endif;
+
+    if($plot_or_unit_number):
+        $where          .=  " and JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.plot_number')) = '$plot_or_unit_number'
+                               or JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.unit_no')) = '$plot_or_unit_number'
+                            ";
+    endif;
+
     return db_instance()
         ->select('*')
-        ->where("inventory_id = $id")
+        ->where($where)
         ->get('tbl_inventory')
         ->row();
 }
@@ -611,6 +623,39 @@ if (!function_exists('accomodations')) {
            db_instance()->where($where);
            db_instance()->join('tbl_units as size_unit', "size_unit.unit_id = JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.unit_size_unit'))", "left");
            db_instance()->from('tbl_inventory as inventory');
+       
+           $records = db_instance()->get()->result();
+    
+           return $records;
+        }
+    endif;
+    # End Unit Size List
+
+    # Inventory Plot Number 
+    if(!function_exists('inventory_plot_numbers')):
+        function inventory_plot_numbers($data = null){
+
+           # Data 
+           $property_id    = $data->property_id ?? 0;
+           $unit_code      = $data->unit_code ?? 0;
+           # End Data 
+
+           # Conditions
+           $where          =   '1 = 1';
+
+           if($property_id):
+               $where          .=   " and inventory.product_id = $property_id";
+           endif;
+           
+            if($unit_code):
+                $where          .=   " and JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.unit_code')) = '$unit_code'";
+            endif;
+           # End Conditions
+
+           db_instance()->select("JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.plot_number')) as plot_number, 
+           JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.unit_no')) as unit_number");
+           db_instance()->where($where);
+          db_instance()->from('tbl_inventory as inventory');
        
            $records = db_instance()->get()->result();
     

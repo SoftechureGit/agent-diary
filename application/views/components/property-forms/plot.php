@@ -1,6 +1,6 @@
 <?php extract($data->property_details ?? []); ?>
 <!-- Plot Details -->
-<section id="plot-property-form" class="theme-form">
+<section id="plot-property-form" class="theme-form <?= ($form_request_for ?? '') ?>">
     <input type="hidden" name="property_details[id]" value="<?= $lead_or_inventory_id ?? '' ?>" class="id">
     <input type="hidden" name="property_details[product_id]" value="<?= $product_id ?? 0 ?>" class="product_id">
 
@@ -61,17 +61,14 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Plot Number</label>
-                            <?php if (($form_request_for ?? '') == 'unit-inventoryd'): ?>
+                            <?php 
+                            if (($form_request_for ?? '') == 'unit-inventory'): ?>
                                 <select class="form-control" id="" name="property_details[plot_number]" data-saved-value="<?= $plot_number ?? '' ?>">
                                     <option value="">Choose...</option>
-                                    <?php foreach ( []  as $item) :
-                                        $selected         = (isset($plot_number) &&  $item->plot_number == ($plot_number ?? '')) ? 'selected' : '';
-                                    ?>
-                                        <option value="<?= $item->plot_number ?>" <?= $selected ?>><?= $item->plot_number ?></option>
-                                    <?php endforeach; ?>
+                        
                                 </select>
                             <?php else: ?>
-                            <input type="text" placeholder="Enter Plot Number" name="property_details[plot_number]" value="<?= $plot_number ?? '' ?>" class="form-control" data-saved-value="<?= $plot_number ?? '' ?>">
+                                <input type="text" placeholder="Enter Plot Number" name="property_details[plot_number]" value="<?= $plot_number ?? '' ?>" class="form-control" data-saved-value="<?= $plot_number ?? '' ?>">
                             <?php endif; ?>
                         </div>
                     </div>
@@ -81,7 +78,7 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Plot Size </label>
-                                <input type="text" placeholder="Enter Plot Size " name="property_details[plot_size]" value="<?= $plot_size ?? '' ?>" class="form-control" data-saved-value="<?= $plot_size ?? '' ?>">
+                            <input type="text" placeholder="Enter Plot Size " name="property_details[plot_size]" value="<?= $plot_size ?? '' ?>" class="form-control" data-saved-value="<?= $plot_size ?? '' ?>">
                         </div>
                     </div>
 
