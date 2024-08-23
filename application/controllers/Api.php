@@ -11667,18 +11667,93 @@ WHERE lead_id='" . $lead_id . "'";
 
     public function team_add_or_edit_view_data(){
 
-            $res = array();
+            $arr = array(); 
+
+            # Team List 
+
+                $id = $this->input->post('id');
+                if($id):
+                    $where          =   "user_id='$id'";
+                    $select         =   "user_id , role_id , username,user_title,first_name,last_name,mobile,whatsapp_no,email,user_status,date_register,report_to";
+                    $team_details   =   $this->Action_model->select_single('tbl_users', $where , $select );
+                else:
+                    $team_details   =  null ;
+                endif; 
+
+            # End Team List 
 
             # Role Level
-                    $where = "is_agent_member='1'";
-                    $role_list = $this->Action_model->detail_result('tbl_roles', $where);             
-            # End Role Level
+                $where = "is_agent_member='1'";
+                $role_list = $this->Action_model->detail_result('tbl_roles', $where);                      
+            # End Role Level    
 
+            if($team_details && count($role_list) > 0 ){  
+                $arr = ['status' => 'true' , 'messages' => 'Team details found' , 'team_details' => $team_details  , 'role_list' => $role_list ];
+            }
+            elseif(count($role_list) > 0){
+                $arr = ['status' => 'true' , 'messages' => 'Team details not found' ,'team_details' => $team_details  , 'role_list' => $role_list ] ;
+            }
+            else{
+                $arr = ['status' => 'false' , 'messages' => 'No data found' ,'team_details' => $team_details  , 'role_list' => $role_list ] ;
+            }
 
+            echo   json_encode($arr);
 
-        
-    
     }
+
+    # Get report to list
+
+        public function get_report_to_list(){
+
+             # agnet information 
+                $account_id      = getAccountId();
+                $agent           = $this->getAgent();
+                $user_id         = $agent->user_id ?? 0;
+                $where           = "user_hash='" . $this->input->request_headers()['Access-Token'] . "'";
+                $user_detail     = $this->Action_model->select_single('tbl_users', $where);
+                $account_id      = $user_detail->user_id;
+             # end agent infromation  
+             
+            $array      = array();
+            $user_list  = array();
+    
+            if ($this->input->post()) {
+                $user_role_id = $this->input->post('id');
+                // $account_id = getAccountId();
+    
+                $where = "";
+                if ($user_role_id == 5) {
+                    $where = "user_id='" . $account_id . "'";
+                } else if ($user_role_id == 4) {
+                    $where = "(role_id='5' AND parent_id='" . $account_id . "') OR user_id='" . $account_id . "'";
+                } else if ($user_role_id == 3) {
+                    $where = "((role_id='4' OR role_id='5') AND parent_id='" . $account_id . "') OR user_id='" . $account_id . "'";
+                }
+    
+                if ($where) {
+                    $user_data = $this->Action_model->detail_result('tbl_users', $where);
+                    if ($user_data) {
+                        foreach ($user_data as $item) {
+                            if ($item->parent_id == 0) {
+                                $name = ($item->is_individual) ? (ucwords($item->user_title . ' ' . $item->first_name . ' ' . $item->last_name)) : $item->firm_name;
+                            } else {
+                                $name = ucwords($item->user_title . ' ' . $item->first_name . ' ' . $item->last_name);
+                            }
+    
+                            $user_list[] = array('name' => $name, 'id' => $item->user_id);
+                        }
+                    }
+                }
+                $array = array('status' => 'true', 'message' => 'Data Found', 'user_list' => $user_list);
+            } else {
+                $array = array('status' => 'false', 'message' => 'Some error occurred, please try again.');
+            }
+    
+            echo json_encode($array);
+
+        }
+
+    # End get report to list 
 
     # End Team Add or Edit and View Data
 
