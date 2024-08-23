@@ -11656,7 +11656,70 @@ WHERE lead_id='" . $lead_id . "'";
 
     public  function team_data_store(){
 
-        print_r('store'); 
+        $array = array();
+
+        if ($this->input->post()) {
+
+            $where           = "user_hash='" . $this->input->request_headers()['Access-Token'] . "'";
+            $user_detail     = $this->Action_model->select_single('tbl_users', $where);
+
+            $uid = $user_detail->user_id;
+            if ($user_detail->parent_id != 0) {
+                $uid = $user_detail->parent_id;
+            }
+
+            $id = $this->input->post('id');
+            $record = $this->Action_model->select_single('tbl_users', "user_id='" . $id . "'");
+
+            $record_array = array(
+                'user_title' => $this->input->post('user_title'),
+                'first_name' => $this->input->post('user_first_name'),
+                'last_name' => $this->input->post('user_last_name'),
+                'email' => $this->input->post('user_email'),
+                'username' => $this->input->post('user_user_id'),
+                'mobile' => $this->input->post('user_mobile'),
+                'whatsapp_no' => $this->input->post('user_whatsapp_no'),
+                'role_id' => $this->input->post('user_role_id'),
+                'work_time_from' => $this->input->post('work_time_from'),
+                'work_time_to' => $this->input->post('work_time_to'),
+                'date_register' => $this->input->post('date_register'),
+                'user_status' => $this->input->post('user_status'),
+                'report_to' => $this->input->post('report_to'),
+                'user_hash' => md5(time()) . time() . rand(1000, 9999)
+            );
+
+            if ($record) {
+                $record_array['updated_at'] = time();
+
+                if ($this->input->post('user_password')) {
+                    $record_array['password'] = md5($this->input->post('user_password'));
+                }
+
+                $this->Action_model->update_data($record_array, 'tbl_users', "user_id='" . $id . "'");
+                $array = array('status' => 'added', 'message' => 'Team Updated Successfully!!');
+            } else {
+
+
+                $record_array['created_at'] = time();
+                $record_array['updated_at'] = time();
+                $record_array['parent_id'] = $uid;
+                $record_array['email_verify'] = 1;
+                $record_array['password'] = md5($this->input->post('user_password'));
+
+                if ($this->Action_model->select_single('tbl_users', "username='" . $this->input->post('user_user_id') . "'")) {
+                    $array = array('status' => 'error', 'message' => 'This Username is already exist.');
+                } else if ($this->Action_model->select_single('tbl_users', "email='" . $this->input->post('user_email') . "'")) {
+                    $array = array('status' => 'error', 'message' => 'This email address is already exist.');
+                } else {
+                    $this->Action_model->insert_data($record_array, 'tbl_users');
+                    $array = array('status' => 'added', 'message' => 'Team Added Successfully!!');
+                }
+            }
+        } else {
+            $array = array('status' => 'error', 'message' => 'Some error occurred, please try again.');
+        }
+
+        echo json_encode($array);
 
     }
 
@@ -11750,6 +11813,36 @@ WHERE lead_id='" . $lead_id . "'";
             }
     
             echo json_encode($array);
+
+        }
+
+        public function get_user_list(){
+
+            $where           = "user_hash='" . $this->input->request_headers()['Access-Token'] . "'";
+            $user_detail     = $this->Action_model->select_single('tbl_users', $where);
+
+            $account_id      = $user_detail->user_id ; 
+
+            $where = "user_status='1' AND ((parent_id='" . $account_id . "') OR (user_id='" . $account_id . "' AND role_id='2'))";
+            $where_ids = "";
+            $user_ids = $this->get_level_user_ids($this->input->request_headers()['Access-Token']);
+
+            if (count($user_ids)) {
+                $where_ids .= " AND (tbl_users.user_id='" . implode("' OR tbl_users.user_id='", $user_ids) . "')";
+            }
+
+            $where .= $where_ids;
+
+            $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,user_title,first_name,last_name,parent_id,is_individual,firm_name');
+
+             if($user_list):
+                $arr = array('status' => 'true' , 'message' => 'User list found' , 'user_list' =>$user_list);   
+             else:
+                $arr = array('status' => 'false' , 'message' => 'User list not found' , 'user_list' =>$user_list); 
+             endif; 
+
+             echo  json_encode($arr);
+
 
         }
 
