@@ -3493,7 +3493,14 @@ class Api extends CI_Controller
         $data['unit_list'] = $unit_list;
         # end unit size list
 
-        $arr = array('status' => true , 'message' => 'Related Data Found' , 'data' => $data );
+        $arr = array(
+            'status'  => true ,
+            'message' => 'Related Data Found' ,
+            'data' => $data ,
+
+        );
+
+        echo json_encode($arr);
 
     }
     # end get edit or add view details
@@ -9473,7 +9480,8 @@ class Api extends CI_Controller
             $requirement_data = $query->result();
 
 
-            if ($requirement_data) {
+            if (count($requirement_data) > 0 ) {
+                echo 'dfasdf'; die;
                 //$requirement_list = $requirement_data;
                 foreach ($requirement_data as $item) {
                     $location = "";
@@ -9538,8 +9546,11 @@ class Api extends CI_Controller
                         "added_by" => (($item->au_parent_id == 0) ? (($item->au_is_individual) ? ucwords($item->au_user_title . ' ' . $item->au_first_name . ' ' . $item->au_last_name) : $item->au_firm_name) : ucwords($item->au_user_title . ' ' . $item->au_first_name . ' ' . $item->au_last_name))
                     );
                 }
+                $array['data'] = array('status' => 'true', 'msg' => 'Data Found', 'requirement_list' => $requirement_list);
             }
-            $array['data'] = array('status' => 'true', 'msg' => 'Data Found', 'requirement_list' => $requirement_list);
+            else{
+                $array['data'] = array('status' => 'false', 'msg' => 'Data not found');
+            }
         } else {
             $array['data'] = array('status' => 'false', 'msg' => 'Some error occurred, please try again.');
         }
