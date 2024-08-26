@@ -11310,6 +11310,12 @@ WHERE lead_id='" . $lead_id . "'
 
             # End Init
 
+            # Validation
+            if(!$plot_number ||  !$unit_number):
+                echo json_encode(['status' => false, 'message' => 'Plot or Unit Number requried']);
+                exit;
+            endif;
+            # End Validation
 
             # Validation : Plot Number or Unit Number Unique
             if($plot_number || $unit_number):

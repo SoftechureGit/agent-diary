@@ -161,7 +161,7 @@ class Helper extends CI_Controller
         endif;
 
         if ($property_id ?? 0) :
-            if ($property_details) :
+            if ($property_details ?? 0) :
                 $property_details->product_id                     =   $property_id;
                 $property_details->property_details                =   property($property_id);
 
