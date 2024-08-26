@@ -3463,9 +3463,11 @@ class Api extends CI_Controller
         $all_unit_type_list = $this->Action_model->detail_result('tbl_unit_types', "unit_type_status='1'", 'unit_type_id,unit_type_name,requirement_accomodation');
         $data['all_unit_type_list'] = $all_unit_type_list;
 
+        # get state list
         $where = "country_id='1' AND state_status=1";
         $state_list = $this->Action_model->detail_result('tbl_states', $where = "country_id='1'", 'state_id,state_name');
         $data['state_list'] = $state_list;
+        # end get state list
 
         # product list
         $where = "product_type_status='1'";
@@ -3473,121 +3475,25 @@ class Api extends CI_Controller
         $data['project_type_list'] = $project_type_list;
         # end product list
 
-
-        $where = "accomodation_status='1'";
-        $accomodation_list = $this->Action_model->detail_result('tbl_accomodations', $where, 'accomodation_id,accomodation_name');
-        $data['accomodation_list'] = $accomodation_list;
-
         # lead option
         $where = "lead_option_status='1' and lead_option_id != 1";
         $lead_option_list = $this->Action_model->detail_result('tbl_lead_options', $where, 'lead_option_id,lead_option_name');
         $data['lead_option_list'] = $lead_option_list;
         # end lead option
 
-        $where = "lead_source_status='1'";
-        $lead_source_list = $this->Action_model->detail_result('tbl_lead_sources', $where);
-        $data['lead_source_list'] = $lead_source_list;
-
+        # get  budget list
         $where = "budget_status='1'";
         $budget_list = $this->Action_model->detail_result('tbl_budgets', $where, 'budget_id,budget_name');
-        $data['budget_list'] = $budget_list;
+        $data['budget_list'] = $budget_list;      
+        # end get budget list
 
+        # unit size list 
         $where = "unit_status='1'";
         $unit_list = $this->Action_model->detail_result('tbl_units', $where, 'unit_id,unit_name');
         $data['unit_list'] = $unit_list;
+        # end unit size list
 
-        $where = "lead_stage_status='1'";
-        $lead_stage_list = $this->Action_model->detail_result('tbl_lead_stages', $where, 'lead_stage_id,lead_stage_name');
-        $data['lead_stage_list'] = $lead_stage_list;
-
-        $where = "lead_type_status='1'";
-        $lead_type_list = $this->Action_model->detail_result('tbl_lead_types', $where, 'lead_type_id,lead_type_name');
-        $data['lead_type_list'] = $lead_type_list;
-
-        $where = "lead_action_status='1'";
-        $lead_action_list = $this->Action_model->detail_result('tbl_lead_actions', $where, 'lead_action_id,lead_action_name');
-        $data['lead_action_list'] = $lead_action_list;
-
-        $total_followup = 0;
-        $today_followup = 0;
-        $missed_followup = 0;
-
-        $account_id = getAccountId();
-
-        $where = "account_id='" . $account_id . "'";
-        $tb_data = $this->Action_model->select_single('tbl_leads', $where, "COUNT(CASE WHEN added_to_followup = 1 THEN lead_id END) as total_followup,COUNT(CASE WHEN followup_date = '" . date('d-m-Y') . "' THEN lead_id END) as today_followup,COUNT(CASE WHEN added_to_followup = 0 THEN lead_id END) as missed_followup");
-
-        $today_date                 = date('Y-m-d');
-        # Total New Leads
-        $total_new_leads            = $this->db->where("account_id = $account_id and DATE(STR_TO_DATE(`lead_date`, '%d-%m-%Y')) = '$today_date'")->get('tbl_leads')->num_rows();
-        # End Total New Leads
-
-        # Today Followup 
-        $today_followups            = $this->db->where("account_id = $account_id and DATE(STR_TO_DATE(`followup_date`, '%d-%m-%Y')) = '$today_date'")->get('tbl_leads')->num_rows();
-        # Today Followup 
-
-        # Total Followup 
-        $total_followups            = $this->db->where("account_id = $account_id and followup_date IS NOT NULL ")->get('tbl_leads')->num_rows();
-        # Total Followup 
-
-        # Missed Followup 
-        $missed_followups            =  $this->db->where("account_id = $account_id and DATE(STR_TO_DATE(`followup_date`, '%d-%m-%Y')) < '$today_date'")->get('tbl_leads')->num_rows();
-        # Missed Followup 
-
-
-        $data['total_new_leads'] = $total_new_leads;
-        $data['total_followup'] = $total_followups;
-        $data['today_followup'] = $today_followups;
-        $data['missed_followup'] = $missed_followups;
-
-        $where = "account_id='" . $account_id . "'";
-        $chart_data = $this->Action_model->select_single('tbl_leads', $where, 'COUNT(CASE WHEN lead_stage_id = 3 THEN lead_id END) as total_enquiry,COUNT(CASE WHEN lead_stage_id = 1 THEN lead_id END) as total_initial,COUNT(CASE WHEN lead_stage_id = 4 THEN lead_id END) as total_site_visit,COUNT(CASE WHEN added_to_followup = 1 THEN lead_id END) as total_followup');
-
-        $pie_chart_values = array();
-        $pie_chart_values[] = array('label' => 'Enquiry', 'color' => '#ff9f5f', 'value' => $chart_data->total_enquiry);
-        $pie_chart_values[] = array('label' => 'Initial', 'color' => '#7571F9', 'value' => $chart_data->total_initial);
-        $pie_chart_values[] = array('label' => 'Site Visit', 'color' => '#31b925', 'value' => $chart_data->total_site_visit);
-        $pie_chart_values[] = array('label' => 'Followup', 'color' => '#e62739', 'value' => $chart_data->total_followup);
-
-        $where = "user_status='1' AND ((parent_id='" . $account_id . "') OR (user_id='" . $account_id . "' AND role_id='2'))";
-        $where_ids = "";
-        $user_ids = $this->get_level_user_ids();
-
-        if (count($user_ids)) {
-
-            $where_ids .= " AND (tbl_users.user_id='" . implode("' OR tbl_users.user_id='", $user_ids) . "')";
-        }
-        $where .= $where_ids;
-
-        $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,user_title,first_name,last_name,parent_id,is_individual,firm_name');
-        $data['user_list'] = $user_list;
-
-        $where = "agent_id='" . $account_id . "' OR share_account_id='" . $account_id . "'";
-        $this->db->select("product_id,project_name");
-        $this->db->from('tbl_products');
-        $this->db->join('tbl_project_share', "tbl_project_share.project_id = tbl_products.product_id AND share_account_id='" . $account_id . "'", 'left');
-        $this->db->where($where);
-        $query = $this->db->get();
-        $product_list = $query->result();
-        $data['product_list'] = $product_list;
-
-        $data['pie_chart_values'] = $pie_chart_values;
-
-        $account_id = getAccountId();
-        $where = "(tbl_users.user_id='" . $account_id . "' OR tbl_users.parent_id='" . $account_id . "')";
-
-        $this->db->select('*');
-        $this->db->from('tbl_users');
-        $this->db->where($where);
-        $query = $this->db->get();
-        $filter_user_list = $query->result();
-        $data['filter_user_list'] = $filter_user_list;
-
-        if ($this->input->get('page') == 'old') :
-            $this->load->view(AGENT_URL . 'leads-old', $data);
-        else :
-            $this->load->view(AGENT_URL . 'leads', $data);
-        endif;
+        $arr = array('status' => true , 'message' => 'Related Data Found' , 'data' => $data );
 
     }
     # end get edit or add view details
@@ -11992,9 +11898,9 @@ WHERE lead_id='" . $lead_id . "'";
 
             $account_id      = $user_detail->user_id ; 
 
-            $where = "user_status='1' AND ((parent_id='" . $account_id . "') OR (user_id='" . $account_id . "' AND role_id='2'))";
-            $where_ids = "";
-            $user_ids = $this->get_level_user_ids($this->input->request_headers()['Access-Token']);
+            $where      = "user_status='1' AND ((parent_id='" . $account_id . "') OR (user_id='" . $account_id . "' AND role_id='2'))";
+            $where_ids  = "";
+            $user_ids   = $this->get_level_user_ids($this->input->request_headers()['Access-Token']);
 
             if (count($user_ids)) {
                 $where_ids .= " AND (tbl_users.user_id='" . implode("' OR tbl_users.user_id='", $user_ids) . "')";
