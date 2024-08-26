@@ -418,6 +418,7 @@
              if (res.status) {
                $('#lead-unit-form [name="project_id"]').html(res.view)
 
+               console.log($('#lead-unit-form [name="project_id"] > option').length)
                if ($('#lead-unit-form [name="project_id"] > option').length > 1) {
                  $('#lead-unit-form .project_name_wrapper').addClass('d-none')
                  $('#lead-unit-form .project_list_wrapper').removeClass('d-none')

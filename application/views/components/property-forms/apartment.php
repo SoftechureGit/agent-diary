@@ -46,8 +46,8 @@
                             <input type="hidden" name="property_details[accomodation_id]" value="<?= $accomodation_id ?? 0; ?>">
                             <!-- <label id="property_details[unit_code]-error" class="error" for="property_details[unit_code]"></label> -->
 
-                            <!-- Unit Code Name -->
-                            <input type="hidden" class="form-control<?= ($unit_code_name ?? '') != '' ? '' : 'd-none' ?>" name="property_details[unit_code_name]" value="<?= $unit_code_name ?? '' ?>" placeholder="Enter unit code" id="unit_code_name">
+                             <!-- Unit Code Name -->
+                             <input type="text" class="form-control <?= ($unit_code_name ?? '') != '' ? '' : 'd-none' ?>" name="property_details[unit_code_name]" value="<?= $unit_code_name ?? '' ?>" placeholder="Enter unit code" id="unit_code_name">
                             <!-- End Unit Code Name -->
                         </div>
                     </div>
@@ -102,7 +102,7 @@
                             <select name="property_details[block_or_tower_id]" id="" class="form-control" data-saved-value="<?= $block_or_tower_id ?? 0 ?? '' ?>">
                                 <option value="" disabled selected>Choose...</option>
                                 <?php
-                                foreach (getBlocksOrTowers(0, $property_details->project_type_id, $property_details->property_type_id, $property_details->id) ?? [] as $block_or_tower) :
+                                foreach (getBlocksOrTowers(0, ( $property_details->project_type_id ?? 0), ( $property_details->property_type_id ?? 0 ), ( $property_details->id ?? 0 )) ?? [] as $block_or_tower) :
                                     $selected         = (($block_or_tower_id ?? 0) == $block_or_tower->id) ? 'selected' : '';
                                 ?>
                                     <option value="<?= $block_or_tower->id ?>" <?= $selected ?>><?= $block_or_tower->name ?? '' ?></option>
