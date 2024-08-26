@@ -11550,9 +11550,22 @@ WHERE lead_id='" . $lead_id . "'";
         $lead_type_list = $this->Action_model->detail_result('tbl_lead_types', $where, 'lead_type_id,lead_type_name');
         $data['lead_type_list'] = $lead_type_list;
 
-        // $where = "product_type_status='1'";
-        // $project_type_list = $this->Action_model->detail_result('tbl_product_types', $where, 'product_type_id,product_type_name');
-        // $data['project_type_list'] = $project_type_list;
+
+        # Get Product List
+
+        $where                  = "agent_id='" . $account_id . "' OR share_account_id='" . $account_id . "'";
+
+        $this->db->select("product_id,project_name");
+        $this->db->from('tbl_products');
+        $this->db->join('tbl_project_share', "tbl_project_share.project_id = tbl_products.product_id AND share_account_id='" . $account_id . "'", 'left');
+        $this->db->where($where);
+
+        $query                  = $this->db->get();
+        $product_list           = $query->result();
+        $data['product_list']   = $product_list;
+
+        # End Get  Product list 
+
 
         $where = "user_status='1' AND ((parent_id='" . $account_id . "') OR (user_id='" . $account_id . "' AND role_id='2'))";
         $where_ids = "";
@@ -11567,11 +11580,6 @@ WHERE lead_id='" . $lead_id . "'";
 
         $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,CONCAT(user_title," ",first_name," ",last_name) as user_full_name');
         $data['user_list'] = $user_list;
-
-        // $where .= $where_ids;
-
-        // $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,user_title,first_name,last_name,parent_id,is_individual,firm_name');
-        // $data['user_list'] = $user_list;
 
         echo json_encode($data);
     }
@@ -11696,10 +11704,8 @@ WHERE lead_id='" . $lead_id . "'";
                 }
 
                 $this->Action_model->update_data($record_array, 'tbl_users', "user_id='" . $id . "'");
-                $array = array('status' => 'added', 'message' => 'Team Updated Successfully!!');
+                $array = array('status' => 'true', 'message' => 'Team Updated Successfully!!');
             } else {
-
-
                 $record_array['created_at'] = time();
                 $record_array['updated_at'] = time();
                 $record_array['parent_id'] = $uid;
@@ -11707,16 +11713,16 @@ WHERE lead_id='" . $lead_id . "'";
                 $record_array['password'] = md5($this->input->post('user_password'));
 
                 if ($this->Action_model->select_single('tbl_users', "username='" . $this->input->post('user_user_id') . "'")) {
-                    $array = array('status' => 'error', 'message' => 'This Username is already exist.');
+                    $array = array('status' => 'false', 'message' => 'This Username is already exist.');
                 } else if ($this->Action_model->select_single('tbl_users', "email='" . $this->input->post('user_email') . "'")) {
-                    $array = array('status' => 'error', 'message' => 'This email address is already exist.');
+                    $array = array('status' => 'false', 'message' => 'This email address is already exist.');
                 } else {
                     $this->Action_model->insert_data($record_array, 'tbl_users');
-                    $array = array('status' => 'added', 'message' => 'Team Added Successfully!!');
+                    $array = array('status' => 'true', 'message' => 'Team Added Successfully!!');
                 }
             }
         } else {
-            $array = array('status' => 'error', 'message' => 'Some error occurred, please try again.');
+            $array = array('status' => 'false', 'message' => 'Some error occurred, please try again.');
         }
 
         echo json_encode($array);
