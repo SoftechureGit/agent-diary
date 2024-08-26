@@ -20,35 +20,34 @@
                     <!-- Unit Code -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Unit Code  <span class="text-danger">*</span></label>
+                            <label for="">Unit Code <span class="text-danger">*</span></label>
                             <!--  -->
                             <?php
-                                if(( $unit_code_name ?? '' ) == ''):
+                            if (($unit_code_name ?? '') == ''):
                             ?>
-                            <!--  -->
-                            <select name="property_details[unit_code]" id="property-unit-code" class="form-control" data-selected_id="<?= $unit_code ?? 0 ?>" required>
-                                <option value="" disabled selected>Choose...</option>
-                                <?php
-                                foreach ($unit_code_with_accomodations ?? [] as $unit_code_with_accomodation) :
-                                     $selected         = (($unit_code ?? 0) == $unit_code_with_accomodation->id) ? 'selected' : '';
-                                ?>
-                                    <option 
-                                        value                       =   "<?= $unit_code_with_accomodation->id ?>" 
-                                        data-accomodation-id        =   "<?= $unit_code_with_accomodation->accomodation_id ?? 0 ;?>"
-                                        data-accomodation-name      =   "<?= $unit_code_with_accomodation->accomodation_name ?? '' ;?>"
-                                        <?= $selected ?> 
-                                        >
-                                    <?= $unit_code_with_accomodation->unit_code_with_accomodation_name ?? $unit_code_with_accomodation->inventory_unit_code ?? '' ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <!--  -->
+                                <!--  -->
+                                <select name="property_details[unit_code]" id="property-unit-code" class="form-control" data-selected_id="<?= $unit_code ?? 0 ?>" data-saved-value="<?= $unit_code ?? '' ?>" required>
+                                    <option value="" disabled selected>Choose...</option>
+                                    <?php
+                                    foreach ($unit_code_with_accomodations ?? [] as $unit_code_with_accomodation) :
+                                        $selected         = (($unit_code ?? 0) == $unit_code_with_accomodation->id) ? 'selected' : '';
+                                    ?>
+                                        <option
+                                            value="<?= $unit_code_with_accomodation->id ?>"
+                                            data-accomodation-id="<?= $unit_code_with_accomodation->accomodation_id ?? 0; ?>"
+                                            data-accomodation-name="<?= $unit_code_with_accomodation->accomodation_name ?? ''; ?>"
+                                            <?= $selected ?>>
+                                            <?= $unit_code_with_accomodation->unit_code_with_accomodation_name ?? $unit_code_with_accomodation->inventory_unit_code ?? '' ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <!--  -->
                             <?php endif; ?>
                             <!--  -->
-                            <input type="hidden" name="property_details[accomodation_id]" value="<?= $accomodation_id ?? 0 ;?>">
+                            <input type="hidden" name="property_details[accomodation_id]" value="<?= $accomodation_id ?? 0; ?>">
                             <!-- <label id="property_details[unit_code]-error" class="error" for="property_details[unit_code]"></label> -->
 
                             <!-- Unit Code Name -->
-                            <input type="hidden" class="form-control<?= ( $unit_code_name ?? '' ) != '' ? '' : 'd-none' ?>" name="property_details[unit_code_name]" value="<?= $unit_code_name ?? '' ?>" placeholder="Enter unit code" id="unit_code_name">
+                            <input type="hidden" class="form-control<?= ($unit_code_name ?? '') != '' ? '' : 'd-none' ?>" name="property_details[unit_code_name]" value="<?= $unit_code_name ?? '' ?>" placeholder="Enter unit code" id="unit_code_name">
                             <!-- End Unit Code Name -->
                         </div>
                     </div>
@@ -67,7 +66,7 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Unit No</label>
-                            <?php 
+                            <?php
                             if (($form_request_for ?? '') == 'unit-inventory'): ?>
                                 <select class="form-control" id="" name="property_details[unit_no]" data-saved-value="<?= $unit_no ?? '' ?>">
                                     <option value="">Choose...</option>
@@ -217,13 +216,13 @@
                             <label for="">Facing</label>
                             <select name="property_details[facing_id]" id="" class="form-control" data-saved-value="<?= $facing_id ?? '' ?>">
                                 <option value="" disabled selected>Choose...</option>
-                                <?php 
-                                    foreach(facings() ?? [] as $facing_item): 
-                                    $selected         = $facing_item->facing_id == ( $facing_id ?? 0 ) ? 'selected' : '';
+                                <?php
+                                foreach (facings() ?? [] as $facing_item):
+                                    $selected         = $facing_item->facing_id == ($facing_id ?? 0) ? 'selected' : '';
                                 ?>
-                                    <option value="<?= $facing_item->facing_id ?>"  <?= $selected ?>><?= $facing_item->title ?></option>   
-                                    <?php endforeach; ?>
-                                </select>
+                                    <option value="<?= $facing_item->facing_id ?>" <?= $selected ?>><?= $facing_item->title ?></option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                     </div>
                     <!-- End Facing -->
@@ -232,10 +231,13 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="">Parking</label>
-                            <select name="property_details[parking][]" id="" class="form-select" multiple data-saved-value="[<?= implode(',',  $parking ?? []) ?>]">
+                            <?php
+                            $formatted_parking = "['" . implode("', '", $parking) . "']";
+                            ?>
+                            <select name="property_details[parking][]" id="" class="form-select" multiple data-saved-value="<?= $formatted_parking ?>">
 
-                                <?php 
-                                foreach(parkings($product_id ?? 0) as $parking_item): ?>
+                                <?php
+                                foreach (parkings($product_id ?? 0) as $parking_item): ?>
                                     <option value="<?= $parking_item->value ?>" <?= in_array($parking_item->value, $parking ?? []) ? 'selected' : '' ?>><?= $parking_item->label ?></option>
                                 <?php endforeach; ?>
 
