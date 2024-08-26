@@ -2484,13 +2484,10 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
 
     public function get_followup()
     {
-
-        $account_id = getAccountId();
-
-        $where          = "user_hash='" . $this->session->userdata('agent_hash') . "'";
-        $user_detail    = $this->Action_model->select_single('tbl_users', $where);
-
-        $account_id  =  $user_detail->user_id;
+        $account_id     =   getAccountId();
+        $where          =   "user_hash='" . $this->session->userdata('agent_hash') . "'";
+        $user_detail    =   $this->Action_model->select_single('tbl_users', $where);
+        $account_id     =   $user_detail->user_id;
 
         if ($account_id && $this->input->post()) {
 
