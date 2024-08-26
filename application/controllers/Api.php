@@ -9530,7 +9530,7 @@ class Api extends CI_Controller
                         "lead_history_id" => $item->lead_history_id,
                         "title" => $item->title,
                         "description" => $item->description,
-                        "created_at" => date("d-m-Y", $item->created_at) . '<br>' . date("h:i a", $item->created_at)
+                        "created_at" => date("d-m-Y", $item->created_at) . ' ' . date("h:i a", $item->created_at)
                     );
                 }
             }
@@ -10747,24 +10747,24 @@ WHERE lead_id='" . $lead_id . "'";
 
 
 
-    // custom sms
+    # SEND CUSTOM SMS AND MESSAGE 
     public function get_sms_form()
     {
         $array = array();
 
         if ($this->input->post()) {
-            $type = $this->input->post('type');
 
-            $account_id = getAccountIdHash($this->input->post("user_hash"));
-            $where = "template_status='1' AND user_id='" . $account_id . "' AND template_type='" . $type . "'";
-            $template_data = $this->Action_model->detail_result('tbl_templates', $where);
-            $template_list = array();
+            $type           = $this->input->post('type');
+            $account_id     = getAccountIdHash($this->input->request_headers()['Access-Token']);
+            $where          = "template_status='1' AND user_id='" . $account_id . "' AND template_type='" . $type . "'";
+            $template_data  = $this->Action_model->detail_result('tbl_templates', $where);
+            $template_list  = array();
+
             if ($template_data) {
                 $template_list = $template_data;
             }
-
-
             $array = array('status' => true, 'message' => 'Data found', 'template_list' => $template_list);
+
         } else {
             $array = array('status' => false, 'message' => 'Some error occurred, please try again.');
         }
@@ -10775,28 +10775,31 @@ WHERE lead_id='" . $lead_id . "'";
 
     public function send_sms_whatsapp_email()
     {
-        $array = array();
-        $type = $this->input->post('type');
-        $user_id = getAccountIdHash($this->input->post("user_hash"));
-        $send_to = $this->input->post('send_to');
-        $message = $this->input->post('message');
-        $subject = $this->input->post('subject');
-        $send_type = $this->input->post('send_type');
+        # Request data
+        $array      = array();
+        $type       = $this->input->post('type');
+        $user_id    = getAccountIdHash($this->input->request_headers()['Access-Token']);
+        $send_to    = $this->input->post('send_to');
+        $message    = $this->input->post('message');
+        $subject    = $this->input->post('subject');
+        $send_type  = $this->input->post('send_type');
+        # End request data
 
         if ($send_type == "lead") {
 
-            $where = "lead_id='" . $user_id . "'";
-            $user_detail = $this->Action_model->select_single('tbl_leads', $where, "*,CONCAT(lead_first_name, ' ', lead_last_name) AS lead_name");
+            $where          = "lead_id='" . $user_id . "'";
+            $user_detail    = $this->Action_model->select_single('tbl_leads', $where, "*,CONCAT(lead_first_name, ' ', lead_last_name) AS lead_name");
 
             if ($user_detail) {
                 $message = str_replace("[customer_name]", $user_detail->lead_name, $message);
                 $message = str_replace("[customer_email]", $user_detail->lead_email, $message);
                 $message = str_replace("[customer_mobile]", $user_detail->lead_mobile_no, $message);
             }
-        } else if ($send_type == "agent") {
+        } 
+        else if ($send_type == "agent") {
 
-            $where = "user_id='" . $user_id . "'";
-            $user_detail = $this->Action_model->select_single('tbl_users', $where);
+            $where          = "user_id='" . $user_id . "'";
+            $user_detail    = $this->Action_model->select_single('tbl_users', $where);
 
             if ($user_detail) {
                 $message = str_replace("[name]", $this->Action_model->get_name($user_detail->user_id), $message);
@@ -10804,10 +10807,12 @@ WHERE lead_id='" . $lead_id . "'";
                 $message = str_replace("[mobile]", $user_detail->mobile, $message);
                 $message = str_replace("[expire_date]", $user_detail->next_due_date, $message);
             }
-        } else {
 
-            $where = "user_id='" . $user_id . "'";
-            $user_detail = $this->Action_model->select_single('tbl_users', $where);
+        } 
+        else {
+
+            $where          = "user_id='" . $user_id . "'";
+            $user_detail    = $this->Action_model->select_single('tbl_users', $where);
 
             if ($user_detail) {
                 $message = str_replace("[name]", $this->Action_model->get_name($user_detail->user_id), $message);
@@ -10817,75 +10822,77 @@ WHERE lead_id='" . $lead_id . "'";
             }
         }
 
-        //echo $message;exit;
+        # SMS 
 
         if ($this->input->post()) {
             $msg = "";
             if ($type == "1") {
-                $msg = "SMS Sent Successfully";
 
-                $account_id = getAccountIdHash($this->input->post("user_hash"));
-                $where = "tbl_user_details.user_id='" . $account_id . "'";
+                $msg        = "SMS Sent Successfully";
+                $account_id = getAccountIdHash($this->input->request_headers()['Access-Token']);
+                $where      = "tbl_user_details.user_id='" . $account_id . "'";
 
                 $this->db->select('*');
                 $this->db->from('tbl_user_details');
                 $this->db->join('tbl_users', 'tbl_users.user_id = tbl_user_details.user_id');
                 $this->db->where($where);
-                $query = $this->db->get();
-                $agent_detail = $query->row();
+
+                $query          = $this->db->get();
+                $agent_detail   = $query->row();
+
                 if ($agent_detail && $agent_detail->no_of_sms > 0) {
-
-
-                    $s_account_id = $account_id;
+                    $s_account_id   = $account_id;
                     $s_team_user_id = "";
-                    $s_customer_id = "";
-                    $s_mobile = $send_to;
-                    $s_message  = $message;
-
-                    $sms_response = $this->Action_model->sendMobileSMS($s_mobile, $s_message, true);
+                    $s_customer_id  = "";
+                    $s_mobile       = $send_to;
+                    $s_message      = $message;
+                    $sms_response   = $this->Action_model->sendMobileSMS($s_mobile, $s_message, true);
 
                     if ($sms_response) {
+    
                         $sms_response_array = json_decode($sms_response);
+
                         if ($sms_response_array && isset($sms_response_array->status) && $sms_response_array->status == "success") {
 
-                            $sms_before = $agent_detail->no_of_sms;
-                            $net_no_of_sms = $sms_before - 1;
-                            $sms_after = $net_no_of_sms;
+                            $sms_before     = $agent_detail->no_of_sms;
+                            $net_no_of_sms  = $sms_before - 1;
+                            $sms_after      = $net_no_of_sms;
 
                             $user_data = array(
                                 'no_of_sms' => $net_no_of_sms
                             );
+
                             $where = "user_id='" . $account_id . "'";
                             $this->Action_model->update_data($user_data, 'tbl_users', $where);
 
                             $sms_credit_array = array(
-                                'account_id' => $s_account_id,
-                                'team_user_id' => $s_team_user_id,
-                                'customer_id' => $s_customer_id,
-                                'sms_before' => $sms_before,
-                                'sms_after' => $sms_after,
-                                'mobile' => $s_mobile,
-                                'message' => $s_message,
-                                'create_at' => date("d-m-Y H:i:s A")
+                                'account_id'    => $s_account_id,
+                                'team_user_id'  => $s_team_user_id,
+                                'customer_id'   => $s_customer_id,
+                                'sms_before'    => $sms_before,
+                                'sms_after'     => $sms_after,
+                                'mobile'        => $s_mobile,
+                                'message'       => $s_message,
+                                'create_at'     => date("d-m-Y H:i:s A")
                             );
 
                             $this->Action_model->insert_data($sms_credit_array, 'tbl_sms_history');
-
 
                             $array = array('status' => true, 'msg' => $msg);
                         } else {
                             $array = array('status' => false, 'msg' => "SMS API Error, Please Try Again");
                         }
                     } else {
-                        $array = array('status' => false, 'msg' => "SMS API Error, Please Try Again");
+                        $array  = array('status' => false, 'msg' => "SMS API Error, Please Try Again");
                     }
                 } else {
                     $array = array('status' => false, 'msg' => "Please purchase sms and try again.");
                 }
-            } else if ($type == "2") {
-                $msg = "Email Sent Successfully";
-                $result_status = $this->Action_model->sendEmailFromAgent($send_to, $subject, $message, $user_id);
-
+            } 
+        # Email    
+        else if ($type == "2") {
+                $msg            = "Email Sent Successfully";
+                $result_status  = $this->Action_model->sendEmailFromAgent($send_to, $subject, $message, $user_id);
 
                 if ($result_status == 1) {
                     $array = array('status' => true, 'msg' => $msg);
@@ -10894,9 +10901,11 @@ WHERE lead_id='" . $lead_id . "'";
                 } else {
                     $array = array('status' => false, 'msg' => "Error in sending email, Please Try Again");
                 }
-            } else if ($type == "3") {
-                $msg = "Whatsapp Message Sent Successfully";
-                $result_status = $this->Action_model->sendWhatsappMessageFromAgent($send_to, $message, $user_id);
+            } 
+        # Whatsapp    
+        else if ($type == "3") {
+                $msg            = "Whatsapp Message Sent Successfully";
+                $result_status  = $this->Action_model->sendWhatsappMessageFromAgent($send_to, $message, $user_id);
                 if ($result_status == 1) {
                     $array = array('status' => true, 'msg' => $msg);
                 } else if ($result_status == 2) {
@@ -10911,6 +10920,7 @@ WHERE lead_id='" . $lead_id . "'";
 
         echo json_encode($array);
     }
+    # END SEND CUSTOM SMS ADN MESSAGE
 
     public function transfer_lead()
     {
@@ -11550,9 +11560,22 @@ WHERE lead_id='" . $lead_id . "'";
         $lead_type_list = $this->Action_model->detail_result('tbl_lead_types', $where, 'lead_type_id,lead_type_name');
         $data['lead_type_list'] = $lead_type_list;
 
-        // $where = "product_type_status='1'";
-        // $project_type_list = $this->Action_model->detail_result('tbl_product_types', $where, 'product_type_id,product_type_name');
-        // $data['project_type_list'] = $project_type_list;
+
+        # Get Product List
+
+        $where                  = "agent_id='" . $account_id . "' OR share_account_id='" . $account_id . "'";
+
+        $this->db->select("product_id as project_id ,project_name");
+        $this->db->from('tbl_products');
+        $this->db->join('tbl_project_share', "tbl_project_share.project_id = tbl_products.product_id AND share_account_id='" . $account_id . "'", 'left');
+        $this->db->where($where);
+
+        $query                  = $this->db->get();
+        $product_list           = $query->result();
+        $data['product_list']   = $product_list;
+
+        # End Get  Product list 
+
 
         $where = "user_status='1' AND ((parent_id='" . $account_id . "') OR (user_id='" . $account_id . "' AND role_id='2'))";
         $where_ids = "";
@@ -11567,11 +11590,6 @@ WHERE lead_id='" . $lead_id . "'";
 
         $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,CONCAT(user_title," ",first_name," ",last_name) as user_full_name');
         $data['user_list'] = $user_list;
-
-        // $where .= $where_ids;
-
-        // $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,user_title,first_name,last_name,parent_id,is_individual,firm_name');
-        // $data['user_list'] = $user_list;
 
         echo json_encode($data);
     }
@@ -11696,10 +11714,8 @@ WHERE lead_id='" . $lead_id . "'";
                 }
 
                 $this->Action_model->update_data($record_array, 'tbl_users', "user_id='" . $id . "'");
-                $array = array('status' => 'added', 'message' => 'Team Updated Successfully!!');
+                $array = array('status' => 'true', 'message' => 'Team Updated Successfully!!');
             } else {
-
-
                 $record_array['created_at'] = time();
                 $record_array['updated_at'] = time();
                 $record_array['parent_id'] = $uid;
@@ -11707,16 +11723,16 @@ WHERE lead_id='" . $lead_id . "'";
                 $record_array['password'] = md5($this->input->post('user_password'));
 
                 if ($this->Action_model->select_single('tbl_users', "username='" . $this->input->post('user_user_id') . "'")) {
-                    $array = array('status' => 'error', 'message' => 'This Username is already exist.');
+                    $array = array('status' => 'false', 'message' => 'This Username is already exist.');
                 } else if ($this->Action_model->select_single('tbl_users', "email='" . $this->input->post('user_email') . "'")) {
-                    $array = array('status' => 'error', 'message' => 'This email address is already exist.');
+                    $array = array('status' => 'false', 'message' => 'This email address is already exist.');
                 } else {
                     $this->Action_model->insert_data($record_array, 'tbl_users');
-                    $array = array('status' => 'added', 'message' => 'Team Added Successfully!!');
+                    $array = array('status' => 'true', 'message' => 'Team Added Successfully!!');
                 }
             }
         } else {
-            $array = array('status' => 'error', 'message' => 'Some error occurred, please try again.');
+            $array = array('status' => 'false', 'message' => 'Some error occurred, please try again.');
         }
 
         echo json_encode($array);
