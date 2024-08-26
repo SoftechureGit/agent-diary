@@ -9530,7 +9530,8 @@ class Api extends CI_Controller
                         "lead_history_id" => $item->lead_history_id,
                         "title" => $item->title,
                         "description" => $item->description,
-                        "created_at" => date("d-m-Y", $item->created_at) . ' ' . date("h:i a", $item->created_at)
+                        "created_date" => date("d-m-Y", $item->created_at),
+                        "created_time" => date("h:i a", $item->created_at),
                     );
                 }
             }
