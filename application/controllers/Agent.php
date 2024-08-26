@@ -2777,10 +2777,10 @@ class Agent extends CI_Controller
         # End Unit Code Validation
         
         # Validation
-        if(!isset($property_details['plot_number']) ||  !isset($property_details['unit_no'])):
-            echo json_encode(['status' => false, 'message' => 'Plot or Unit Number requried']);
-            exit;
-        endif;
+        // if(!isset($property_details['plot_number']) ||  !isset($property_details['unit_no'])):
+        //     echo json_encode(['status' => false, 'message' => 'Plot or Unit Number requried']);
+        //     exit;
+        // endif;
         # End Validation
         
         # Plot Number Validation
