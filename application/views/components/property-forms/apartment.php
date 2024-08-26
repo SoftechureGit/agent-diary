@@ -69,7 +69,7 @@
                             <label for="">Unit No</label>
                             <?php 
                             if (($form_request_for ?? '') == 'unit-inventory'): ?>
-                                <select class="form-control" id="" name="property_details[unit_no]" data-saved-value="<?= $plot_number ?? '' ?>">
+                                <select class="form-control" id="" name="property_details[unit_no]" data-saved-value="<?= $unit_no ?? '' ?>">
                                     <option value="">Choose...</option>
                                 </select>
                             <?php else: ?>

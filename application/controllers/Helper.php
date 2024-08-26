@@ -118,10 +118,23 @@ class Helper extends CI_Controller
         switch ($form_request_for):
             case 'inventory':
                 $inventory               =  getInventory($lead_or_inventory_id);
-
+                
                 $property_layout            =  $inventory->property_layout ?? null;
                 $property_layout_url     =  ($inventory->property_layout ?? 0) ? base_url("/uploads/images/property/unit/$inventory->property_layout") : null;;
                 $property_details        =  ($inventory->property_details ?? 0) ? json_decode($inventory->property_details ?? []) : $inventory;
+                
+                break;
+                
+                case 'unit-inventory':
+                    $inventory               =  lead_unit_details($lead_or_inventory_id);
+
+                    if(!$inventory):
+                        $inventory               =  getInventory($lead_or_inventory_id);
+                    endif;
+
+                    $property_layout         =  $inventory->property_layout ?? null;
+                    $property_layout_url     =  ($inventory->property_layout ?? 0) ? base_url("/uploads/images/property/unit/$inventory->property_layout") : null;;
+                    $property_details        =  ($inventory->property_details ?? 0) ? $inventory->property_details : $inventory;
 
                 break;
 
@@ -178,6 +191,10 @@ class Helper extends CI_Controller
             endif;
         endif;
 
+        // echo "<pre>";
+        // print_r($property_details);
+        // die;
+        
         $form_view                      =   property_form($property_type_id, $property_details ?? null);
 
         echo json_encode(['status' => true, 'message' => 'Successfully data fetched', 'form_view' => $form_view, 'property_layout_url' => $property_layout_url, 'property_layout' => $property_layout]);

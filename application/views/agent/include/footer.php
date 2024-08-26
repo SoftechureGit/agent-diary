@@ -83,121 +83,71 @@
        }
 
        convertToSelect2()
-       // $('.select2').select2();
-       /* Add or Edit Lead Unit */
-       $(document).on('click', '.add-edit-new-unit-btn', function() {
+      
+      /***********************************************************************
+      * Add or Edit Lead Unit 
+      ************************************************************************/
 
-         id = $(this).data('id')
-         lead_id = $(this).data('lead_id')
+      $(document).on('click', '.add-edit-new-unit-btn', function() {
 
-         $.ajax({
-           method: 'GET',
-           //  async: false,
-           url: "<?= base_url('agent/lead_unit_form_view'); ?>",
-           data: {
-             id: id,
-             lead_id: lead_id
-           },
-           dataType: 'json',
-           beforeSend: function(data) {
-             /** Site Custom Loader */
-             $('.site-custom-loader').removeClass('d-none')
-             /** End Site Custom Loader */
-           },
-           success: (res) => {
-             /** Site Custom Loader */
-             $('.site-custom-loader').addClass('d-none')
-             /** End Site Custom Loader */
+        id        =   $(this).data('id')
+        lead_id   =   $(this).data('lead_id')
 
+        $.ajax({
+          method        : 'GET',
+          //  async       : false,
+          url           : "<?= base_url('agent/lead_unit_form_view'); ?>",
+          data          :   {
+                              id          : id,
+                              lead_id     : lead_id
+                            },
+          dataType     : 'json',
 
-             if (res.status) {
-               $('.lead-unit-form-view').html(res.view)
+          beforeSend   : function(data)  {
+                                            /** Site Custom Loader */
+                                            $('.site-custom-loader').removeClass('d-none')
+                                            /** End Site Custom Loader */
+                                          },
+          success      : (res) =>  {
+                                      /** Site Custom Loader */
+                                      $('.site-custom-loader').addClass('d-none')
+                                      /** End Site Custom Loader */
 
-               convertToSelect2()
-               $('#unitModal').modal('show')
+                                      /** # **/
+                                      if (res.status) {
+                                        /** Form View */
+                                        $('.lead-unit-form-view').html(res.view)
+                                        /** End Form View */
+                                        
+                                        /** Convert To Select2 */
+                                        convertToSelect2()
+                                        /** End Convert To Select2 */
+                                        
+                                        /** Modal */
+                                        $('#unitModal').modal('show')
+                                        /** End Modal */
 
-               if ($('#lead-unit-form [name="property_type_id"]').data('selected_id') != '') {
-                 $('#lead-unit-form [name="project_type_id"]').trigger('change')
-               }
+                                        /** Trigger : Project Type Id */
+                                        if ($('#lead-unit-form [name="property_type_id"]').data('selected_id') != '') {
+                                          $('#lead-unit-form [name="project_type_id"]').trigger('change')
+                                        }
+                                        /** End Trigger : Project Type Id */
 
-              //  if ($('#lead-unit-form [name="property_type_id"]').val() != '') {
+                                        /** Trigger : State Id */
+                                        $('#lead-unit-form [name="state_id"]').trigger('change')
+                                        /** End Trigger : State Id */
 
-              //    setTimeout(function() {
-
-              //      $('#lead-unit-form [name="property_type_id"]').trigger('change')
-
-              //    }, 500)
-
-              //  }
-              //  if ($('#lead-unit-form [name="city_id"]').data('selected_id') != '') {
-                 $('#lead-unit-form [name="state_id"]').trigger('change')
-              //  }
-
-               // 
-               /*  Lead Unit Form */
-               $('#lead-unit-form').validate({
-                 rules: {
-                   looking_for: {
-                     required: true
-                   }
-                 },
-                 messages: {},
-                 submitHandler: function(form) {
-
-                   var myform = document.getElementById("lead-unit-form");
-                   var fd = new FormData(myform);
-
-                   fd.append('inventory_id', $('[name="property_details[plot_number]"] option:selected').data('inventory-id'))
-
-                   $.ajax({
-                     type: "POST",
-                     url: "<?= base_url('agent/store_lead_unit') ?>",
-                     data: fd,
-                     dataType: 'json',
-                     cache: false,
-                     processData: false,
-                     contentType: false,
-                     beforeSend: function(data) {
-                       $(".error-msg").html('');
-                       $(".submit-btn").html("Please wait...").prop('disabled', true);
-                     },
-                     success: function(res) {
-                       if (res.status) {
-
-                         // $('.ajax-msg').html(`<div class="alert alert-success">${res.message}</div>`)
-
-                         showToast('success', res.message)
-
-                         setTimeout(function() {
-                           $('#unitModal').modal('hide')
-                           $('#lead-unit-form')[0].reset()
-                           $('.ajax-msg').html('')
-                           $('.set_property_form').html('')
-
-                           /* Refresh Lead Units */
-                           lead_units($('[name="lead_id"]').val());
-                           /* End Refresh Lead Units */
-
-                         }, 1000)
-                       } else {
-                         // $('.ajax-msg').html(`<div class="alert alert-danger">${res.message}</div>`)
-                         showToast('danger', res.message)
-                       }
-                       $(".submit-btn").html("Submit").prop('disabled', false);
-                     },
-                     error: function() {
-
-                     }
-
-                   });
-
-                 }
-               });
-               /*  End Lead Unit Form */
-               // 
-             }
-           }
-         })
+                                        /***********************************************************************
+                                        * Lead Unit Form Validate
+                                        ************************************************************************/
+                                        lead_unit_form_validate()
+                                        /***********************************************************************
+                                        * End Lead Unit Form Validate
+                                        ************************************************************************/
+                                      }
+                                      /** # **/
+                                    }
+        })
        })
        /* Add or Edit Lead Unit */
 
@@ -264,138 +214,143 @@
        }
        /* End Get Property Types */
 
-       /* End Get Property Form */
-       //  $(document).on('change', '#lead-unit-form [name="project_type_id"], #lead-unit-form [name="property_type_id"], #lead-unit-form [name="property_id"]', function() {
-       $(document).on('change', '#lead-unit-form [name="property_type_id"], #lead-unit-form [name="project_id"]', function() {
-         //  $(document).on('change', '#lead-unit-form [name="project_id"]', function() {
-         var property_type_id = $('#lead-unit-form .get_property_form').val();
-         var project_id = $('#lead-unit-form [name="project_id"]').val();
-         var property_id = project_id ? $('#lead-unit-form [name="property_id"]').val() : 0;
+       
+      /************************************************************************************
+      * Get Property Form
+      ************************************************************************************/
+        $(document).on('change', '#lead-unit-form [name="property_type_id"], #lead-unit-form [name="project_id"]', function() {
+          var property_type_id            =   $('#lead-unit-form .get_property_form').val();
+          var project_id                  =   $('#lead-unit-form [name="project_id"]').val();
+          var property_id                 =   project_id ? $('#lead-unit-form [name="property_id"]').val() : 0;
+          var selected_id                 =   $('#lead-unit-form .get_property_form').data('selected_id');
+          var selected_property_id        =   $('#lead-unit-form [name="property_id"]').data('selected_id');
 
-         var selected_id = $('#lead-unit-form .get_property_form').data('selected_id');
-         var selected_property_id = $('#lead-unit-form [name="property_id"]').data('selected_id');
+          if (property_type_id) {
+            id = $('#lead-unit-form [name="id"]').val();
+            getPropertyForm(id, property_type_id, project_id, selected_property_id, selected_id);
+          }
+        })
 
-         if (property_type_id) {
-           id = $('#lead-unit-form [name="id"]').val();
-           getPropertyForm(id, property_type_id, project_id, selected_property_id, selected_id);
-         }
-       })
+      /************************************************************************************
+      * End Get Property Form
+      ************************************************************************************/
+     
+      /************************************************************************************
+      * Ajax : Get Property Form
+      ************************************************************************************/
+      function getPropertyForm(id, property_type_id, property_id, selected_property_id, selected_id) {
 
-       function getPropertyForm(id, property_type_id, property_id, selected_property_id, selected_id) {
+          form_request_for = $('[name="form_request_for"]').val();
 
-         form_request_for = $('[name="form_request_for"]').val();
+          $.ajax({
+            method: 'GET',
+            url: "<?= base_url('helper/get_property_form'); ?>",
+            dataType: 'json',
+            data: {
+              id: id,
+              property_type_id: property_type_id,
+              property_id: property_id,
+              selected_property_id: selected_property_id,
+              form_request_for: form_request_for,
+            },
+            success: (res) => {
+              if (res.status) {
+                $('.set_property_form').html(res.form_view)
 
-         $.ajax({
-           method: 'GET',
-           url: "<?= base_url('helper/get_property_form'); ?>",
-           data: {
-             id: id,
-             property_type_id: property_type_id,
-             property_id: property_id,
-             selected_property_id: selected_property_id,
-             form_request_for: form_request_for,
-           },
-           dataType: 'json',
-           success: (res) => {
-             if (res.status) {
-               $('.set_property_form').html(res.form_view)
+                $('.property_footer_form').removeClass('d-none')
+                setTimeout(function() {
+                  $('.form-not-found').parents('form').find('.property_footer_form').addClass('d-none')
+                }, 100);
 
-               $('.property_footer_form').removeClass('d-none')
-               setTimeout(function() {
-                 $('.form-not-found').parents('form').find('.property_footer_form').addClass('d-none')
-               }, 100);
-
-               convertToSelect2()
+                convertToSelect2()
 
                //  
-               if (form_request_for == 'inventory') {
-                 if (res.property_layout) {
-                   $('.old_property_layout').val(res.property_layout).attr('data-saved-value', res.property_layout)
-                   $('.property-layout-anchor').attr('href', res.property_layout_url).removeClass('d-none')
-                   $('.property-layout-anchor').attr('href', res.property_layout_url).attr('data-saved-value', res.property_layout_url).removeClass('d-none')
-                 } else {
-                   $('.old_property_layout').val('')
-                   $('.property-layout-anchor').attr('href', '#').addClass('d-none')
-                 }
-               }
+                if (form_request_for == 'inventory') {
+                  if (res.property_layout) {
+                    $('.old_property_layout').val(res.property_layout).attr('data-saved-value', res.property_layout)
+                    $('.property-layout-anchor').attr('href', res.property_layout_url).removeClass('d-none')
+                    $('.property-layout-anchor').attr('href', res.property_layout_url).attr('data-saved-value', res.property_layout_url).removeClass('d-none')
+                  } else {
+                    $('.old_property_layout').val('')
+                    $('.property-layout-anchor').attr('href', '#').addClass('d-none')
+                  }
+                }
                //  
-             }
-           }
-         })
-       }
-       /* End Get Property Form */
+              }  
+            }
+          })
+        }
+      /************************************************************************************
+      * End Ajax : Get Property Form
+      ************************************************************************************/
 
-       /*  Get Cities */
-       $(document).on('change', '.get_cities', function() {
-         var state_id = $(this).val();
+        /*  Get Cities */
+        $(document).on('change', '.get_cities', function() {
+          var state_id          = $(this).val();
+          var selected_id       = $('#lead-unit-form [name="city_id"]').data('selected_id');
+          get_and_set_cities(state_id, selected_id);
+        })
 
-         var selected_id = $('#lead-unit-form [name="city_id"]').data('selected_id');
+        /*  Ajax : Get Cities */
+        function get_and_set_cities(state_id, selected_id) {
+          $.ajax({
+            method: 'GET',
+            //  async: false,
+            url: "<?= base_url('helper/get_cities'); ?>",
+            data: {
+                    state_id: state_id,
+                    selected_id: selected_id
+            },
+            dataType: 'json',
+            beforeSend: function(data) {
+              /** Site Custom Loader */
+              $('.site-custom-loader').removeClass('d-none')
+              /** End Site Custom Loader */
+            },
+            success: (res) => {
+              /** Site Custom Loader */
+              $('.site-custom-loader').addClass('d-none')
+              /** End Site Custom Loader */
+              if (res.status) {
+                $('.set_cities').html(res.options_view)
+                $('#lead-unit-form [name="city_id"]').trigger('change')
+              }
+            }
+          })
+        }
+        /* End Ajax : Get Cities */
+        /*  End Get Cities */
 
-         get_and_set_cities(state_id, selected_id);
+        /*  Get Locations */
+        $(document).on('change', '.get_locations', function() {
+          var city_id       = $(this).val();
+          var selected_id   = $('.set_locations').data('selected_id');
+          get_and_set_locations(city_id, selected_id);
+        })
 
-       })
+        /*  Ajax : Get Locations */
+        function get_and_set_locations(city_id, selected_id) {
 
-       function get_and_set_cities(state_id, selected_id) {
-         $.ajax({
-           method: 'GET',
-           //  async: false,
-           url: "<?= base_url('helper/get_cities'); ?>",
-           data: {
-             state_id: state_id,
-             selected_id: selected_id
-           },
-           dataType: 'json',
-           beforeSend: function(data) {
-             /** Site Custom Loader */
-             $('.site-custom-loader').removeClass('d-none')
-             /** End Site Custom Loader */
-           },
-           success: (res) => {
-             /** Site Custom Loader */
-             $('.site-custom-loader').addClass('d-none')
-             /** End Site Custom Loader */
-             if (res.status) {
-               $('.set_cities').html(res.options_view)
-               $('#lead-unit-form [name="city_id"]').trigger('change')
-             }
-           }
-         })
-       }
-       /*  End Get Cities */
+          if (!city_id) return;
 
-       /*  Get Locations */
-       $(document).on('change', '.get_locations', function() {
-         var city_id = $(this).val();
-
-         var selected_id = $('.set_locations').data('selected_id');
-
-         get_and_set_locations(city_id, selected_id);
-
-       })
-
-       function get_and_set_locations(city_id, selected_id) {
-
-         if (!city_id) return;
-
-         $.ajax({
-           method: 'GET',
-           //  async: false,
-           url: "<?= base_url('helper/get_locations'); ?>",
-           data: {
-             city_id: city_id,
-             selected_id: selected_id
-           },
-           dataType: 'json',
-           success: (res) => {
-             if (res.status) {
-               $('.set_locations').html(res.view)
-               $('[name="location_id"]').trigger('change')
-             }
-           }
-         })
-       }
-       /*  End Get Locations */
-
+          $.ajax({
+            method: 'GET',
+            //  async: false,
+            url: "<?= base_url('helper/get_locations'); ?>",
+            data: {
+              city_id: city_id,
+              selected_id: selected_id
+            },
+            dataType: 'json',
+            success: (res) => {
+              if (res.status) {
+                $('.set_locations').html(res.view)
+                $('[name="location_id"]').trigger('change')
+              }
+            }
+          })
+        }
+       /*  End Ajax : Get Locations */
 
 
        /*  Lead Units */
@@ -782,6 +737,8 @@
 
        /** Get Inventory Details */
        function get_inventory_details(id) {
+        if(!id) return
+
          // Fetch Data
          $.ajax({
            type: "GET",
@@ -894,52 +851,35 @@
          unit_code = $('[name="property_details[unit_code]"]').val();
          /** */
 
-         /**
-          *  Edit Saved Data Fetched and set
-          */
-         current_value = this.value;
-         saved_value = $(this).data('selected_id');
+         /** Get Inventory Details From Manage Inventory */
+         var form_request_for = $('[name="form_request_for"]').val()
 
-         if (current_value == saved_value) {
-           fields = $(this).closest('form').find(':input')
-           $.each(fields, (key, field) => {
+         if (form_request_for == 'unit-inventory') {
 
-             saved_value = $(field).data('saved-value');
-             if (saved_value) {
-
-               if ($(field).is('select')) {
-                 $(field).val(saved_value).trigger('change');
-               } else {
-                 console.log("Input Tag => " + saved_value);
-                 $(field).val(saved_value);
-               }
-
-               /** Property Layout */
-               if (field.name == 'old_property_layout') {
-                 $('.property-layout-anchor').removeClass('d-none')
-
-                 property_layout_url = $('.property-layout-anchor').data('saved-value')
-
-                 $('.property-layout-anchor').attr('href', property_layout_url)
-               }
-               /** End Property Layout */
-             }
+           result = get_set_inventory_plot_numbers({
+             'property_id': property_id,
+             'unit_code': unit_code
            })
+           if (result) {
+             return false;
+           }
 
-           // $.each()
-           return false;
          }
+         /** End Get Inventory Details From Manage Inventory */
 
-         /**
-          *  End Edit Saved Data Fetched and set
-          */
+        /************************************************************
+        *  Saved Data set in fields
+        *************************************************************/
+          // if(!set_saved_data_in_form_fields(this)) return false
+        /************************************************************
+        * End Saved Data set in fields
+        *************************************************************/
+        
+        /** Commercial */
+        var property_type_name = $(this).find('option:checked').data('property-type-name')
 
-
-         /** Commercial */
-         var property_type_name = $(this).find('option:checked').data('property-type-name')
-
-         if (property_type_name) {
-           $('#property_type_name').val(property_type_name)
+        if (property_type_name) {
+          $('#property_type_name').val(property_type_name)
            $('.commercial-property-type').text(property_type_name)
 
            /** Property Type Name */
@@ -967,21 +907,7 @@
          $('#modal-inventory-form [name="property_details[accomodation_id]"]').val(accomodation_id)
          $('#modal-inventory-form input[name="property_details[unit_type]"]').val(accomodation_name)
 
-         /** Get Inventory Details From Manage Inventory */
-         var form_request_for = $('[name="form_request_for"]').val()
-
-         if (form_request_for == 'unit-inventory') {
-
-           result = get_set_inventory_plot_numbers({
-             'property_id': property_id,
-             'unit_code': unit_code
-           })
-           if (result) {
-             return false;
-           }
-
-         }
-         /** End Get Inventory Details From Manage Inventory */
+         
 
          /**  Get Default Inventory Details  */
          getPropertyUnitDetails({
@@ -1090,7 +1016,6 @@
 
                  $('[name="property_details[plot_number]"]').html(res.options_view)
                  $('[name="property_details[unit_no]"]').html(res.options_view)
-                 // showToast('success', res.message)
                  resolve(true);
 
                } else {
@@ -1115,9 +1040,9 @@
          plot_or_unit_number = null
        }) {
 
-         // if(!id || !plot_or_unit_number){
-         //   return false
-         // }
+         if(!plot_or_unit_number){
+           return false
+         }
 
          $.ajax({
            post: 'GET',
@@ -1187,11 +1112,138 @@
        $(document).on('change', '[name="property_details[plot_number]"], [name="property_details[unit_no]"]', function() {
          plot_or_unit_number = this.value;
 
+         /************************************************************
+        *  Saved Data set in fields
+        *************************************************************/
+        // if(!set_saved_data_in_form_fields(this)) return false
+        /************************************************************
+        * End Saved Data set in fields
+        ************************************************************/
+        
+
          getInventory({
            plot_or_unit_number: plot_or_unit_number
          })
        })
        /** End Fetch Inventory Data Via Plot Number */
+
+      /***********************************************************************
+      * Lead Unit Form Validate
+      ************************************************************************/
+
+      function lead_unit_form_validate(){
+        $('#lead-unit-form').validate({
+                 rules: {
+                   looking_for: {
+                     required: true
+                   }
+                 },
+                 messages: {},
+                 submitHandler: function(form) {
+
+                   var myform = document.getElementById("lead-unit-form");
+                   var fd = new FormData(myform);
+
+                   fd.append('inventory_id', $('[name="property_details[plot_number]"] option:selected').data('inventory-id'))
+
+                   $.ajax({
+                     type: "POST",
+                     url: "<?= base_url('agent/store_lead_unit') ?>",
+                     data: fd,
+                     dataType: 'json',
+                     cache: false,
+                     processData: false,
+                     contentType: false,
+                     beforeSend: function(data) {
+                       $(".error-msg").html('');
+                       $(".submit-btn").html("Please wait...").prop('disabled', true);
+                     },
+                     success: function(res) {
+                       if (res.status) {
+
+                         // $('.ajax-msg').html(`<div class="alert alert-success">${res.message}</div>`)
+
+                         showToast('success', res.message)
+
+                         setTimeout(function() {
+                           $('#unitModal').modal('hide')
+                           $('#lead-unit-form')[0].reset()
+                           $('.ajax-msg').html('')
+                           $('.set_property_form').html('')
+
+                           /* Refresh Lead Units */
+                           lead_units($('[name="lead_id"]').val());
+                           /* End Refresh Lead Units */
+
+                         }, 1000)
+                       } else {
+                         // $('.ajax-msg').html(`<div class="alert alert-danger">${res.message}</div>`)
+                         showToast('danger', res.message)
+                       }
+                       $(".submit-btn").html("Submit").prop('disabled', false);
+                     },
+                     error: function() {
+
+                     }
+
+                   });
+
+                 }
+              });
+      }
+
+      /***********************************************************************
+      * End Lead Unit Form Validate
+      ************************************************************************/
+
+      /***********************************************************************
+      * Set Saved Data In Form Fields
+      ************************************************************************/
+      function set_saved_data_in_form_fields(e){
+        current_value         =   e.value;
+          saved_value         =   $(e).data('selected_id');
+
+          console.log(current_value)
+          console.log(saved_value)
+        
+          if (current_value == saved_value) {
+          
+            fields            =   $(e).closest('form').find(':input')
+            
+            /*********************** Form Fields Loop  ***********************/
+            $.each(fields, (key, field) => {
+
+              saved_value     =  $(field).data('saved-value');
+
+              if (saved_value) {
+
+                if ($(field).is('select')) 
+                { $(field).val(saved_value).trigger('change'); } 
+                else 
+                { $(field).val(saved_value); }
+
+                /** Property Layout */
+                if (field.name == 'old_property_layout') {
+                  $('.property-layout-anchor').removeClass('d-none')
+
+                  property_layout_url = $('.property-layout-anchor').data('saved-value')
+
+                  $('.property-layout-anchor').attr('href', property_layout_url)
+                }
+                /** End Property Layout */
+              }
+            })
+            /*********************** Form Fields Loop  ***********************/
+
+           // $.each()
+            return false;
+          }
+        return true;
+      }
+      /***********************************************************************
+      * End Set Saved Data In Form Fields
+      ************************************************************************/
+
      </script>
      <!--  -->
 
