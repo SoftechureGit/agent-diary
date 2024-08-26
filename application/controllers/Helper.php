@@ -170,7 +170,12 @@ class Helper extends CI_Controller
             $property_details  = ( object ) [];
             $property_details->form_request_for    = $form_request_for;
         else:
-            $property_details->form_request_for    = $form_request_for;
+            if(is_array($property_details)):
+                $property_details['form_request_for']    = $form_request_for;
+            endif;
+            if(is_object($property_details)):
+                $property_details->form_request_for    = $form_request_for;
+            endif;
         endif;
 
         $form_view                      =   property_form($property_type_id, $property_details ?? null);

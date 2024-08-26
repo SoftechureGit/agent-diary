@@ -120,18 +120,18 @@
                  $('#lead-unit-form [name="project_type_id"]').trigger('change')
                }
 
-               if ($('#lead-unit-form [name="property_type_id"]').val() != '') {
+              //  if ($('#lead-unit-form [name="property_type_id"]').val() != '') {
 
-                 setTimeout(function() {
+              //    setTimeout(function() {
 
-                   $('#lead-unit-form [name="property_type_id"]').trigger('change')
+              //      $('#lead-unit-form [name="property_type_id"]').trigger('change')
 
-                 }, 500)
+              //    }, 500)
 
-               }
-               if ($('#lead-unit-form [name="city_id"]').data('selected_id') != '') {
+              //  }
+              //  if ($('#lead-unit-form [name="city_id"]').data('selected_id') != '') {
                  $('#lead-unit-form [name="state_id"]').trigger('change')
-               }
+              //  }
 
                // 
                /*  Lead Unit Form */
@@ -143,11 +143,11 @@
                  },
                  messages: {},
                  submitHandler: function(form) {
-          
+
                    var myform = document.getElementById("lead-unit-form");
                    var fd = new FormData(myform);
-                    
-                  fd.append('inventory_id', $('[name="property_details[plot_number]"] option:selected').data('inventory-id'))
+
+                   fd.append('inventory_id', $('[name="property_details[plot_number]"] option:selected').data('inventory-id'))
 
                    $.ajax({
                      type: "POST",
@@ -265,8 +265,9 @@
        /* End Get Property Types */
 
        /* End Get Property Form */
-       $(document).on('change', '#lead-unit-form [name="project_type_id"], #lead-unit-form [name="property_type_id"], #lead-unit-form [name="property_id"]', function() {
-      //  $(document).on('change', '#lead-unit-form [name="project_id"]', function() {
+       //  $(document).on('change', '#lead-unit-form [name="project_type_id"], #lead-unit-form [name="property_type_id"], #lead-unit-form [name="property_id"]', function() {
+       $(document).on('change', '#lead-unit-form [name="property_type_id"], #lead-unit-form [name="project_id"]', function() {
+         //  $(document).on('change', '#lead-unit-form [name="project_id"]', function() {
          var property_type_id = $('#lead-unit-form .get_property_form').val();
          var project_id = $('#lead-unit-form [name="project_id"]').val();
          var property_id = project_id ? $('#lead-unit-form [name="property_id"]').val() : 0;
@@ -373,6 +374,9 @@
        })
 
        function get_and_set_locations(city_id, selected_id) {
+
+         if (!city_id) return;
+
          $.ajax({
            method: 'GET',
            //  async: false,
@@ -413,15 +417,15 @@
        /*  End Lead Units */
 
        /** Costing Validation */
-      //  $(document).on('change', '#lead-unit-form [name="looking_for"]', function() {
-      //    if (this.value == 'no_action') {
-      //      $('#lead-unit-form .costing-price-wrapper').find('span.text-danger').html('')
-      //      $('#lead-unit-form .costing-price-wrapper').find('[name="costing_price"]').prop('required', false)
-      //    } else {
-      //      $('#lead-unit-form .costing-price-wrapper').find('span.text-danger').html('*')
-      //      $('#lead-unit-form .costing-price-wrapper').find('[name="costing_price"]').prop('required', true)
-      //    }
-      //  });
+       //  $(document).on('change', '#lead-unit-form [name="looking_for"]', function() {
+       //    if (this.value == 'no_action') {
+       //      $('#lead-unit-form .costing-price-wrapper').find('span.text-danger').html('')
+       //      $('#lead-unit-form .costing-price-wrapper').find('[name="costing_price"]').prop('required', false)
+       //    } else {
+       //      $('#lead-unit-form .costing-price-wrapper').find('span.text-danger').html('*')
+       //      $('#lead-unit-form .costing-price-wrapper').find('[name="costing_price"]').prop('required', true)
+       //    }
+       //  });
        /** Costing Validation */
 
        /*  Projects */
@@ -511,8 +515,9 @@
            dataType: 'json',
            success: (res) => {
              if (res.status) {
-               $('#lead-unit-form [name="property_details[unit_code]"]').trigger('change')
                $('#lead-unit-form [name="property_details[unit_code]"]').html(res.view)
+
+                 $('#lead-unit-form [name="property_details[unit_code]"]').trigger('change')
              }
            }
          })
@@ -966,12 +971,15 @@
          var form_request_for = $('[name="form_request_for"]').val()
 
          if (form_request_for == 'unit-inventory') {
-        
-          result = get_set_inventory_plot_numbers({ 'property_id' : property_id, 'unit_code' : unit_code })
-          if(result){
-            return false;
-          } 
-          
+
+           result = get_set_inventory_plot_numbers({
+             'property_id': property_id,
+             'unit_code': unit_code
+           })
+           if (result) {
+             return false;
+           }
+
          }
          /** End Get Inventory Details From Manage Inventory */
 
@@ -1054,10 +1062,17 @@
        }
 
        /** get_set_inventory_plot_numbers */
-       function get_set_inventory_plot_numbers({ property_id = 0 , unit_code = 0 }){
+       function get_set_inventory_plot_numbers({
+         property_id = 0,
+         unit_code = 0
+       }) {
 
-        selected_id = $('[name="property_details[plot_number]"]').data('selected_id')
-        return new Promise((resolve, reject) => {
+        if(!unit_code || !property_id){
+          return false
+        }
+
+         selected_id = $('[name="property_details[plot_number]"]').data('selected_id')
+         return new Promise((resolve, reject) => {
 
            /** Ajax - Fetch Plot Or Unit Numbers From Inventory */
            $.ajax({
@@ -1072,11 +1087,11 @@
              },
              success: (res) => {
                if (res.status) {
-                
-                $('[name="property_details[plot_number]"]').html(res.options_view)
-                $('[name="property_details[unit_no]"]').html(res.options_view)
-                // showToast('success', res.message)
-                resolve(true);
+
+                 $('[name="property_details[plot_number]"]').html(res.options_view)
+                 $('[name="property_details[unit_no]"]').html(res.options_view)
+                 // showToast('success', res.message)
+                 resolve(true);
 
                } else {
                  showToast('danger', res.message)
@@ -1091,7 +1106,7 @@
              }
            })
            /** End Ajax - Fetch Plot Or Unit Numbers From Inventory */
-          });
+         });
        }
        /** End get_set_inventory_plot_numbers */
 
@@ -1100,9 +1115,9 @@
          plot_or_unit_number = null
        }) {
 
-        // if(!id || !plot_or_unit_number){
-        //   return false
-        // }
+         // if(!id || !plot_or_unit_number){
+         //   return false
+         // }
 
          $.ajax({
            post: 'GET',
@@ -1118,10 +1133,10 @@
 
                /** End Parking */
                $.each(res.data, function(key, value) {
-                
-                if(key == 'remark' && value != ''){
-                  $(`textarea[name="property_details[remark]"]`).text(value);
-                }
+
+                 if (key == 'remark' && value != '') {
+                   $(`textarea[name="property_details[remark]"]`).text(value);
+                 }
 
                  $(`input[name="property_details[${key}]"]`).val('');
 
@@ -1168,13 +1183,15 @@
        }
        //  
 
-      /** Fetch Inventory Data Via Plot Number */
-      $(document).on('change', '[name="property_details[plot_number]"], [name="property_details[unit_no]"]', function(){
-        plot_or_unit_number = this.value;
+       /** Fetch Inventory Data Via Plot Number */
+       $(document).on('change', '[name="property_details[plot_number]"], [name="property_details[unit_no]"]', function() {
+         plot_or_unit_number = this.value;
 
-        getInventory({plot_or_unit_number:plot_or_unit_number})
-      })
-      /** End Fetch Inventory Data Via Plot Number */
+         getInventory({
+           plot_or_unit_number: plot_or_unit_number
+         })
+       })
+       /** End Fetch Inventory Data Via Plot Number */
      </script>
      <!--  -->
 
