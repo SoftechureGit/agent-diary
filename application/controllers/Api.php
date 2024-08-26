@@ -11555,7 +11555,7 @@ WHERE lead_id='" . $lead_id . "'";
 
         $where                  = "agent_id='" . $account_id . "' OR share_account_id='" . $account_id . "'";
 
-        $this->db->select("product_id,project_name");
+        $this->db->select("product_id as project_id ,project_name");
         $this->db->from('tbl_products');
         $this->db->join('tbl_project_share', "tbl_project_share.project_id = tbl_products.product_id AND share_account_id='" . $account_id . "'", 'left');
         $this->db->where($where);
