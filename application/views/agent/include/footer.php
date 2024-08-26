@@ -105,12 +105,12 @@
 
           beforeSend   : function(data)  {
                                             /** Site Custom Loader */
-                                            $('.site-custom-loader').removeClass('d-none')
+                                            // $('.site-custom-loader').removeClass('d-none')
                                             /** End Site Custom Loader */
                                           },
           success      : (res) =>  {
                                       /** Site Custom Loader */
-                                      $('.site-custom-loader').addClass('d-none')
+                                      // $('.site-custom-loader').addClass('d-none')
                                       /** End Site Custom Loader */
 
                                       /** # **/
@@ -304,12 +304,12 @@
             dataType: 'json',
             beforeSend: function(data) {
               /** Site Custom Loader */
-              $('.site-custom-loader').removeClass('d-none')
+              // $('.site-custom-loader').removeClass('d-none')
               /** End Site Custom Loader */
             },
             success: (res) => {
               /** Site Custom Loader */
-              $('.site-custom-loader').addClass('d-none')
+              // $('.site-custom-loader').addClass('d-none')
               /** End Site Custom Loader */
               if (res.status) {
                 $('.set_cities').html(res.options_view)

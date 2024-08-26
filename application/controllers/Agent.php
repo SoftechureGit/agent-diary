@@ -2765,6 +2765,41 @@ class Agent extends CI_Controller
         $costing_price                              =   $this->input->post('costing_price');
         $youtube_data                               =   $this->input->post('youtube_data');
         $inventory_id                               =   $this->input->post('inventory_id');
+        
+        # Validation
+        # Unit Code Validation
+        if(isset($property_details['unit_code']) ):
+            if($property_details['unit_code'] == '' ):
+                echo json_encode(['status' => false, 'message' => 'Unit code requried']);
+                exit;
+            endif;
+        endif;
+        # End Unit Code Validation
+        
+        # Validation
+        if(!isset($property_details['plot_number']) ||  !isset($property_details['unit_no'])):
+            echo json_encode(['status' => false, 'message' => 'Plot or Unit Number requried']);
+            exit;
+        endif;
+        # End Validation
+        
+        # Plot Number Validation
+        // if(isset($property_details['plot_number']) ):
+        //     if($property_details['plot_number'] == '' ||  ):
+        //         echo json_encode(['status' => false, 'message' => 'Plot Number requried']);
+        //         exit;
+        //     endif;
+        // endif;
+        # End Plot Number Validation
+
+        # Unit Number Validation
+        // if(isset($property_details['unit_no']) ):
+        //     if($property_details['unit_no'] == '' ):
+        //         echo json_encode(['status' => false, 'message' => 'Unit Number requried']);
+        //         exit;
+        //     endif;
+        // endif;
+        # End Unit Number Validation
 
         foreach ($youtube_data ?? [] as $youtube_item) :
             if ($youtube_item['title'] != '' && $youtube_item['link'] != '') :

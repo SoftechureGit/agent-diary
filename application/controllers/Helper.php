@@ -126,34 +126,42 @@ class Helper extends CI_Controller
                 break;
                 
                 case 'unit-inventory':
-                    $inventory               =  lead_unit_details($lead_or_inventory_id);
+                    
+                    if($lead_or_inventory_id):
 
-                    if(!$inventory):
-                        $inventory               =  getInventory($lead_or_inventory_id);
+                        
+                        $inventory               =  lead_unit_details($lead_or_inventory_id);
+
+                        if(!$inventory):
+                            $inventory               =  getInventory($lead_or_inventory_id);
+                            
+                            $inventory->property_details = ($inventory->property_details ?? 0) ? json_decode($inventory->property_details ?? 0 ) : $inventory;
+                        endif;
+                        
+                        $property_layout         =  $inventory->property_layout ?? null;
+                        $property_layout_url     =  ($inventory->property_layout ?? 0) ? base_url("/uploads/images/property/unit/$inventory->property_layout") : null;;
+                        $property_details        =  ($inventory->property_details ?? 0) ? $inventory->property_details : $inventory;
+                        
                     endif;
-
-                    $property_layout         =  $inventory->property_layout ?? null;
-                    $property_layout_url     =  ($inventory->property_layout ?? 0) ? base_url("/uploads/images/property/unit/$inventory->property_layout") : null;;
-                    $property_details        =  ($inventory->property_details ?? 0) ? $inventory->property_details : $inventory;
-
                 break;
 
-            default:
-                if ($property_id && $selected_property_id != $property_id) :
-                    $property_details               =   project_property_details($property_type_id, $property_id);
-                elseif ($lead_or_inventory_id) :
-                    $lead_unit_details               = lead_unit_details($lead_or_inventory_id);
-                    $property_details                = $lead_unit_details->property_details ?? null;
-                endif;
-                break;
+            // default:
+            //     if ($property_id && $selected_property_id != $property_id) :
+            //         $property_details               =   project_property_details($property_type_id, $property_id);
+            //     elseif ($lead_or_inventory_id) :
+            //         $lead_unit_details               = lead_unit_details($lead_or_inventory_id);
+            //         $property_details                = $lead_unit_details->property_details ?? null;
+            //     endif;
+            //     break;
         endswitch;
 
         # Additional
         if ($lead_or_inventory_id ?? 0) :
             $property_details->lead_or_inventory_id                           =   $lead_or_inventory_id;
         endif;
+
         if ($property_id ?? 0) :
-            if ($property_details) :
+            if ($property_details ?? 0) :
                 $property_details->product_id                     =   $property_id;
                 $property_details->property_details                =   property($property_id);
 
@@ -190,10 +198,6 @@ class Helper extends CI_Controller
                 $property_details->form_request_for    = $form_request_for;
             endif;
         endif;
-
-        // echo "<pre>";
-        // print_r($property_details);
-        // die;
         
         $form_view                      =   property_form($property_type_id, $property_details ?? null);
 
