@@ -10759,11 +10759,27 @@ WHERE lead_id='" . $lead_id . "'";
             $account_id     = getAccountIdHash($this->input->request_headers()['Access-Token']);
             $where          = "template_status='1' AND user_id='" . $account_id . "' AND template_type='" . $type . "'";
             $template_data  = $this->Action_model->detail_result('tbl_templates', $where);
-            $template_list  = array();
 
-            if ($template_data) {
+            $template_one = array( 
+                "template_id" => "0",
+                "template_name" => "Custom Message",
+                "template_message" => "",
+                "template_subject" => "",
+                "template_type" => "",
+                "template_status" => "",
+                "created_at" => "",
+                "updated_at" => "",
+                "disable_delete" => "0",
+                "user_id" => $account_id
+            );
+            
+            if (is_array($template_data)) {
+                array_unshift($template_data, $template_one);
                 $template_list = $template_data;
+            } else {
+                $template_list = array($template_one);
             }
+            
             $array = array('status' => true, 'message' => 'Data found', 'template_list' => $template_list);
 
         } else {
