@@ -27,7 +27,7 @@
                                 if(( $unit_code_name ?? '' ) == ''):
                             ?>
                             <!--  -->
-                            <select name="property_details[unit_code]" id="" class="form-control" data-selected_id="<?= $unit_code ?? 0 ?>" required>
+                            <select name="property_details[unit_code]" id="" class="form-control" data-selected_id="<?= $unit_code ?? 0 ?>" data-saved-value="<?= $unit_code ?? '' ?>" required>
                                 <option value="" disabled selected>Choose...</option>
                                 <?php 
                                     foreach($unit_code_with_accomodations ?? [] as $unit_code_with_accomodation): 
