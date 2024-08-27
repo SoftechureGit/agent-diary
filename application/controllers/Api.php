@@ -2528,9 +2528,8 @@ class Api extends CI_Controller
     # new lead data 
     public function get_lead_list()
     {
-
         $array = array();
-
+        
         if ($this->input->post()) {
             # Is Details View
             $is_detail_view                 =   $this->input->post('is_detail_view');

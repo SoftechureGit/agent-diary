@@ -260,7 +260,7 @@
                          <div class="col-md-6">
                           <div class="form-group">
 
-                            <label for="">From</label>
+                            <label for="">To</label>
                             <input type="date" id="followup_to" name="followup_to" class="form-control">
                           </div>
                          </div>
@@ -268,6 +268,7 @@
 
                           <div class="col-md-6">
                             <div class="form-group">
+                            <label for="">State</label>
                             <select class="form-control" id="search_state_id" name="search_state_id" onchange="getCitySearch(this.value)" style="height: 38px;border-radius: 6px;margin-top: 10px;">
                               <option value="">Select State</option>
                               <?php foreach ($state_list as $state) { ?>
@@ -279,6 +280,7 @@
 
                           <div class="col-md-6">
                             <div class="form-group">
+                            <label for="">City</label>
                             <select class="form-control" id="search_city_id" name="search_city_id" style="height: 38px;border-radius: 6px;margin-top: 10px;" onchange="getLocationSearch(this.value)">
                               <option value="">Select City</option>
                             </select>
@@ -287,6 +289,7 @@
 
                           <div class="col-md-6">
                             <div class="form-group">
+                            <label for="">Location</label>
                             <select class="form-control" id="search_location_id" name="search_location_id" style="height: 38px;border-radius: 6px;margin-top: 10px;">
                               <option value="">Select Location</option>
                             </select>
@@ -295,6 +298,7 @@
 
                           <div class="col-md-6">
                             <div class="form-group">
+                            <label for="">Agent</label>
                             <select class="form-control" id="search_agent_id" name="search_agent_id" style="height: 38px;border-radius: 6px;margin-top: 10px;">
                               <option value="">Select Agent</option>
                               <?php foreach ($filter_user_list as $item) { ?>
@@ -306,6 +310,7 @@
 
 
                           <div class="col-md-4">
+                          <label for="">Source</label>
                             <select class="form-control" id="search_source_id" name="search_source_id" style="height: 38px;border-radius: 6px;margin-top: 10px;">
                               <option value="">Select Source</option>
                               <?php foreach ($lead_source_list as $lead_source) { ?>
@@ -315,6 +320,7 @@
                           </div>
 
                           <div class="col-md-4">
+                          <label for="">Stage</label>
                             <select class="form-control" id="search_stage_id" name="search_stage_id" style="height: 38px;border-radius: 6px;margin-top: 10px;">
                               <option value="">Select Stage</option>
                               <?php foreach ($lead_stage_list as $lead_stage) { ?>
@@ -325,6 +331,7 @@
                             
                           <?php if(user()->role_id == 1 || user()->role_id == 5 || true): ?>
                           <div class="col-md-4">
+                          <label for="">Status</label>
                             <select class="form-control" id="search_status" name="search_status" style="height: 38px;border-radius: 6px;margin-top: 10px;">
                               <option value="">Select Status</option>
                               <?php foreach ($lead_type_list as $item) { ?>
