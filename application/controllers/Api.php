@@ -2821,7 +2821,7 @@ class Api extends CI_Controller
 
                         # Secondary Mobile Number Country Code
                         $secondary_country_code                           =   ($item->secondary_mobile_number_country_data ?? null) ? (json_decode($item->secondary_mobile_number_country_data)->dialCode ?? '') : '';
-                        $secondary_mobile_number_with_country_code             =  ($item->lead_mobile_no ?? null) ? '+' . $secondary_country_code . ' ' . $item->lead_mobile_no : null;
+                        $secondary_mobile_number_with_country_code             =  ($item->lead_mobile_no_2 ?? null) ? '+' . $secondary_country_code . ' ' . $item->lead_mobile_no_2 : null;
                         # End Secondary Mobile Number Country Code
                         #
 

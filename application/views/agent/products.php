@@ -93,9 +93,11 @@
                     <h4 class="card-title">Inventory ( <span class="total_records">0</span> )</h4>
                   </div>
                   <div class="col-md-6" align="right">
-                    <select class="form-control" style="height: 30px !important;min-height: 30px;padding: 0px 10px;width: 145px;" id="filter_by" onchange="filterData()">
+                    <!-- <select class="form-control" style="height: 30px !important;min-height: 30px;padding: 0px 10px;width: 145px;" id="filter_by" onchange="filterData()">
                       <option value="">SORT BY</option>
-                    </select>
+                    </select> -->
+
+                    <input type="search" class="form-control" placeholder="Serach" onchange="filterData()" id="serach">
                   </div>
                   <div class="col-md-12" style="height: 450px;overflow-y: auto;">
 
@@ -624,6 +626,9 @@
                 html += "<div class='customer' style='border-bottom: 1px solid rgba(0, 0, 0, 0.125);' onclick='showCustomer(" + record.product_unit_detail_id + ",0)'>" +
                   "    <div style='padding-top: 8px;margin-bottom: 8px;'>" +
                   "    <div class='row'>" +
+                  "    <div class='col-md-12'>" +
+                  "          <small class='text-muted'><i>" + record.project_name + "</i></small>" +
+                  "   </div>" +
                   "    <div class='col-md-12'>" +
                   "          <div class='card-text text-muted'><strong>" + action + "</strong></div>" +
                   "    </div>" +

@@ -423,9 +423,9 @@
                  $('#lead-unit-form .project_list_wrapper').removeClass('d-none')
                  $('#lead-unit-form .project_properties').removeClass('d-none')
 
-                 $('#lead-unit-form [name="property_details[unit_code]"]').prop('required', false).removeClass('d-none')
-                 $('#lead-unit-form [name="property_details[unit_code]"] + .select2').removeClass('d-none')
-                 $('#lead-unit-form [name="property_details[unit_code_name]"]').prop('required', false).addClass('d-none')
+                //  $('#lead-unit-form [name="property_details[unit_code]"]').prop('required', false).removeClass('d-none')
+                //  $('#lead-unit-form [name="property_details[unit_code]"] + .select2').removeClass('d-none')
+                //  $('#lead-unit-form [name="property_details[unit_code_name]"]').prop('required', false).addClass('d-none')
 
                  /** Lead Unit Property List : Trigger  */
                  if ($('#lead-unit-form [name="project_id"]').data('selected_id') != '') {
@@ -438,10 +438,10 @@
                  $('#lead-unit-form .project_properties').addClass('d-none')
                  $('#lead-unit-form .project_properties').addClass('d-none')
 
-                 $('#lead-unit-form [name="property_details[unit_code]"]').html('')
-                 $('#lead-unit-form [name="property_details[unit_code]"]').prop('required', true).addClass('d-none')
-                 $('#lead-unit-form [name="property_details[unit_code]"] + .select2').addClass('d-none')
-                 $('#lead-unit-form [name="property_details[unit_code_name]"]').prop('required', true).removeClass('d-none')
+                //  $('#lead-unit-form [name="property_details[unit_code]"]').html('')
+                //  $('#lead-unit-form [name="property_details[unit_code]"]').prop('required', true).addClass('d-none')
+                //  $('#lead-unit-form [name="property_details[unit_code]"] + .select2').addClass('d-none')
+                //  $('#lead-unit-form [name="property_details[unit_code_name]"]').prop('required', true).removeClass('d-none')
 
                }
                //  $('#lead-unit-form [name="project_id"]').trigger('change')

@@ -6997,6 +6997,7 @@ WHERE lead_id='" . $lead_id . "'
 
                 $where .= " limit " . $start . "," . $limit;
                 $this->db->select("
+                                    p.project_name,
                                     pud.product_unit_detail_id,
                                     pud.created_at,
                                     tbl_product_types.product_type_name,
@@ -7194,171 +7195,10 @@ WHERE lead_id='" . $lead_id . "'
                             }
                         }
 
-                        /*$this->db->select('*');
-                        $this->db->from('tbl_inventory');
-                        $this->db->join('tbl_basic_cost', 'tbl_basic_cost.inventory_id = tbl_inventory.inventory_id','left');
-                        $this->db->where("unit_code='".$item->product_unit_detail_id."'");
-                        $query = $this->db->get();
-                        $item_inv_data = $query->result();
-                        $o=0;
-                        $current_rate = 0;
-                        foreach ($item_inv_data as $itemInv) {
-                            if ($itemInv->basic_cost_id) {
-                                if ($itemInv->current_rate) {
-                                    //$current_rate += $itemInv->current_rate;
-
-                                    if($item->project_type==2){
-                            
-                                        if(($item->property_type==1 || $item->property_type==7)){
-                                            //$size = $item->sa;
-                                            //if ($item->sa_unit_name) {
-                                            //    $size .= ' '.$item->sa_unit_name;
-                                            //}
-
-                                            if ($b_cost_unit=='2') {
-                                                $current_rate += $item->sa*$itemInv->current_rate;
-                                            }
-                                            else if ($b_cost_unit=='5') {
-                                                $current_rate += $item->basic_cost;
-                                            }
-                                        }
-                                        else if(($item->property_type==2 || $item->property_type==3)){
-                                            //$size = $item->plot_size;
-                                            //if ($item->plot_unit_name) {
-                                            //    $size .= ' '.$item->plot_unit_name;
-                                            //}
-                                            if ($b_cost_unit=='1') {
-                                                $current_rate += $item->plot_size*$itemInv->current_rate;
-                                            }
-                                            else if ($b_cost_unit=='2') {
-                                                $current_rate += $item->construction_area*$itemInv->current_rate;
-                                            } 
-                                            else if ($b_cost_unit=='5') {
-                                                $current_rate += $itemInv->current_rate;
-                                            }
-                                        }
-                                    }
-                                    else if($item->project_type==3){
-                                            //$size = $item->sa;
-                                            //if ($item->sa_unit_name) {
-                                            //    $size .= ' '.$item->sa_unit_name;
-                                            //}
-
-                                        if ($b_cost_unit=='2') {
-                                            $current_rate += $item->sa*$itemInv->current_rate;
-                                        }
-                                        else if ($b_cost_unit=='5') {
-                                            $current_rate += $itemInv->current_rate;
-                                        }
-                                    }
-                                }
-                            }
-                            else {
-                                if ($item->basic_cost) {
-
-                                    if($item->project_type==2){
-                            
-                                        if(($item->property_type==1 || $item->property_type==7)){
-                                            //$size = $item->sa;
-                                            //if ($item->sa_unit_name) {
-                                            //    $size .= ' '.$item->sa_unit_name;
-                                            //}
-
-                                            if ($b_cost_unit=='2') {
-                                                $current_rate += $item->sa*$item->basic_cost;
-                                            }
-                                            else if ($b_cost_unit=='5') {
-                                                $current_rate += $item->basic_cost;
-                                            }
-                                        }
-                                        else if(($item->property_type==2 || $item->property_type==3)){
-                                            //$size = $item->plot_size;
-                                            //if ($item->plot_unit_name) {
-                                            //    $size .= ' '.$item->plot_unit_name;
-                                            //}
-                                            if ($b_cost_unit=='1') {
-                                                $current_rate += $item->plot_size*$item->basic_cost;
-                                            }
-                                            else if ($b_cost_unit=='2') {
-                                                $current_rate += $item->construction_area*$item->basic_cost;
-                                            } 
-                                            else if ($b_cost_unit=='5') {
-                                                $current_rate += $item->basic_cost;
-                                            }
-                                        }
-                                    }
-                                    else if($item->project_type==3){
-                                            //$size = $item->sa;
-                                            //if ($item->sa_unit_name) {
-                                            //    $size .= ' '.$item->sa_unit_name;
-                                            //}
-
-                                        if ($b_cost_unit=='2') {
-                                            $current_rate += $item->sa*$item->basic_cost;
-                                        }
-                                        else if ($b_cost_unit=='5') {
-                                            $current_rate += $item->basic_cost;
-                                        }
-                                    }
-                                }
-                            }
-                        }*/
-
-
-                        /*$current_rate = 0;
-
-                        if ($item->basic_cost) {
-
-                            if($item->project_type==2){
-                    
-                                if(($item->property_type==1 || $item->property_type==7)){
-                                    //$size = $item->sa;
-                                    //if ($item->sa_unit_name) {
-                                    //    $size .= ' '.$item->sa_unit_name;
-                                    //}
-
-                                    if ($b_cost_unit=='2' && $item->sa) {
-                                        $current_rate = $item->sa*$item->basic_cost;
-                                    }
-                                    else if ($b_cost_unit=='5') {
-                                        $current_rate = $item->basic_cost;
-                                    }
-                                }
-                                else if(($item->property_type==2 || $item->property_type==3)){
-                                    //$size = $item->plot_size;
-                                    //if ($item->plot_unit_name) {
-                                    //    $size .= ' '.$item->plot_unit_name;
-                                    //}
-                                    if ($b_cost_unit=='1' && $item->plot_size) {
-                                        $current_rate = $item->plot_size*$item->basic_cost;
-                                    }
-                                    else if ($b_cost_unit=='2' && $item->construction_area) {
-                                        $current_rate = $item->construction_area*$item->basic_cost;
-                                    } 
-                                    else if ($b_cost_unit=='5') {
-                                        $current_rate = $item->basic_cost;
-                                    }
-                                }
-                            }
-                            else if($item->project_type==3){
-                                    //$size = $item->sa;
-                                    //if ($item->sa_unit_name) {
-                                    //    $size .= ' '.$item->sa_unit_name;
-                                    //}
-
-                                if ($b_cost_unit=='2' && $item->sa) {
-                                    $current_rate = $item->sa*$item->basic_cost;
-                                }
-                                else if ($b_cost_unit=='5') {
-                                    $current_rate = $item->basic_cost;
-                                }
-                            }
-                        }
-                        $budget = $current_rate;*/
-
                         $bottom_label = $size . (($size) ? ', ' : ' ') . $budget;
 
                         $records[] = array(
+                            'project_name'              => $item->project_name,
                             'created_at'                => date('d F, Y', $item->created_at),
                             'product_unit_detail_id' => $item->product_unit_detail_id,
                             "accomodation_name" => (!$item->accomodation_name) ? '' : $item->accomodation_name,
@@ -11308,10 +11148,10 @@ WHERE lead_id='" . $lead_id . "'
             # End Init
 
             # Validation
-            // if(!$plot_number ||  !$unit_number):
-            //     echo json_encode(['status' => false, 'message' => 'Plot or Unit Number requried']);
-            //     exit;
-            // endif;
+            if(!$plot_number &&  !$unit_number):
+                echo json_encode(['status' => false, 'message' => 'Either Plot Number or Unit Number is required']);
+                exit;
+            endif;
             # End Validation
 
             # Validation : Plot Number or Unit Number Unique
