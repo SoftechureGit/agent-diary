@@ -11992,8 +11992,7 @@ class Api extends CI_Controller
             endif;
     
             $record             =    lead_unit_details($id);
-    
-         
+        
             if ($record) :
                 echo json_encode(['status' => true, 'message' => 'Record successfully fetched', 'data' => $record]);
             else :
