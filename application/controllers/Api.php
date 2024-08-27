@@ -2529,7 +2529,7 @@ class Api extends CI_Controller
     public function get_lead_list()
     {
         $array = array();
-        
+
         if ($this->input->post()) {
             # Is Details View
             $is_detail_view                 =   $this->input->post('is_detail_view');
@@ -3292,7 +3292,13 @@ class Api extends CI_Controller
                 $location_list = $location_data;
             }
 
-            $array = array('status' => 'true', 'msg' => 'Data Found', 'location_list' => $location_list);
+            if(count($location_list) > 0 ) {
+                $array = array('status' => 'true', 'msg' => 'Data Found', 'location_list' => $location_list);
+            }
+            else{
+                $array = array('status' => 'false', 'msg' => 'Data Not  Found', 'location_list' => $location_list);
+            }
+
         } else {
             $array = array('status' => 'false', 'msg' => 'Some error occurred, please try again.');
         }
@@ -3309,10 +3315,18 @@ class Api extends CI_Controller
             $product_type_id = $this->input->post('product_type_id');
             $where = "product_type_id='" . $product_type_id . "' AND unit_type_status='1'";
             $unit_type_data = $this->Action_model->detail_result('tbl_unit_types', $where, 'unit_type_id,unit_type_name');
+           
             if ($unit_type_data) {
                 $unit_type_list = $unit_type_data;
             }
-            $array = array('status' => 'true', 'msg' => 'Data Found', 'unit_type_list' => $unit_type_list);
+
+            if(count($unit_type_list) > 0 ){
+                $array = array('status' => 'true', 'msg' => 'Data Found', 'unit_type_list' => $unit_type_list);
+            }
+            else{
+                $array = array('status' => 'false', 'msg' => 'Data Not  Found', 'unit_type_list' => $unit_type_list);
+            }
+
         } else {
             $array = array('status' => 'false', 'msg' => 'Some error occurred, please try again.');
         }
@@ -3323,26 +3337,23 @@ class Api extends CI_Controller
 
     public function add_requirement()
     {
-        $array = array();
-
+        $array      = array();
         $account_id = 0;
-        $user_id = 0;
+        $user_id    = 0;
 
         if (isset($_POST['user_hash'])):
-
             $where = "user_hash='" . $this->input->post('user_hash') . "'";
         else:
-
             $where = "user_hash='" . $this->session->userdata('agent_hash') . "'";
-
         endif;
 
         $user_detail = $this->Action_model->select_single('tbl_users', $where);
 
         if ($user_detail) {
 
-            $user_id = $user_detail->user_id;
+            $user_id    = $user_detail->user_id;
             $account_id = $user_detail->user_id;
+
             if ($user_detail->role_id != 2) {
                 $account_id = $user_detail->parent_id;
             }
@@ -3350,29 +3361,29 @@ class Api extends CI_Controller
 
         if ($user_detail && $this->input->post()) {
 
-            $id = $this->input->post('id');
-            $record = $this->Action_model->select_single('tbl_requirements', "requirement_id='" . $id . "' AND account_id='" . $account_id . "'");
-
-            $location = $this->input->post('location');
+            $id         = $this->input->post('id');
+            $record     = $this->Action_model->select_single('tbl_requirements', "requirement_id='" . $id . "' AND account_id='" . $account_id . "'");
+            $location   = $this->input->post('location');
+           
             if ($location) {
                 $location = implode(",", $location);
             }
 
             $record_array = array(
-                'look_for' => $this->input->post('look_for'),
-                'product_type_id' => $this->input->post('product_type_id'),
-                'unit_type_id' => $this->input->post('unit_type_id'),
-                'accomodation_id' => $this->input->post('accomodation_id'),
-                'state_id' => $this->input->post('state_id'),
-                'city_id' => $this->input->post('city_id'),
-                'location' => $location,
-                'budget_min' => $this->input->post('budget_min'),
-                'budget_max' => $this->input->post('budget_max'),
-                'size_min' => $this->input->post('size_min'),
-                'size_max' => $this->input->post('size_max'),
-                'size_unit' => $this->input->post('size_unit'),
-                'remark' => $this->input->post('remark'),
-                'requirement_status' => $this->input->post('requirement_status')
+                'look_for'              => $this->input->post('look_for'),
+                'product_type_id'       => $this->input->post('product_type_id'),
+                'unit_type_id'          => $this->input->post('unit_type_id'),
+                'accomodation_id'       => $this->input->post('accomodation_id'),
+                'state_id'              => $this->input->post('state_id'),
+                'city_id'               => $this->input->post('city_id'),
+                'location'              => $location,
+                'budget_min'            => $this->input->post('budget_min'),
+                'budget_max'            => $this->input->post('budget_max'),
+                'size_min'              => $this->input->post('size_min'),
+                'size_max'              => $this->input->post('size_max'),
+                'size_unit'             => $this->input->post('size_unit'),
+                'remark'                => $this->input->post('remark'),
+                'requirement_status'    => $this->input->post('requirement_status')
             );
 
             if ($record) {
@@ -3382,23 +3393,25 @@ class Api extends CI_Controller
 
                 $array = array('status' => 'true', 'msg' => 'Requirement Updated Successfully!!');
             } else {
-                $record_array['dor'] = date("d-m-Y");
-                $record_array['created_at'] = time();
-                $record_array['updated_at'] = time();
-                $record_array['user_id'] = $user_id;
-                $record_array['account_id'] = $account_id;
-                $record_array['lead_id'] = $this->input->post('lead_id');
-
-                $id = $this->Action_model->insert_data($record_array, 'tbl_requirements');
+                $record_array['dor']            = date("d-m-Y");
+                $record_array['created_at']     = time();
+                $record_array['updated_at']     = time();
+                $record_array['user_id']        = $user_id;
+                $record_array['account_id']     = $account_id;
+                $record_array['lead_id']        = $this->input->post('lead_id');
+                $id                             = $this->Action_model->insert_data($record_array, 'tbl_requirements');
 
                 $lead_history_array = array(
-                    'title' => 'New Requirement',
-                    'description' => 'Requirement created by ' . $this->Action_model->get_name($user_id),
-                    'lead_id' => $this->input->post('lead_id'),
-                    'created_at' => time(),
-                    "account_id" => $account_id,
-                    "user_id" => $user_id
+
+                    'title'         => 'New Requirement',
+                    'description'   => 'Requirement created by ' . $this->Action_model->get_name($user_id),
+                    'lead_id'       => $this->input->post('lead_id'),
+                    'created_at'    => time(),
+                    "account_id"    => $account_id,
+                    "user_id"       => $user_id
+
                 );
+
                 $this->Action_model->insert_data($lead_history_array, 'tbl_lead_history');
 
                 $array = array('status' => 'true', 'msg' => 'Requirement Added Successfully!!');
@@ -3456,6 +3469,18 @@ class Api extends CI_Controller
     # get edit or add view details
     public function requirement_add_or_edit_view_data(){
         $arr = array();
+
+        $account_id = getAccountIdHash($this->input->request_headers()['Access-Token'] );
+  
+        $id = $this->input->post('id');
+        $record = $this->Action_model->select_single('tbl_requirements', "requirement_id='" . $id . "' AND account_id='" . $account_id . "'");
+        
+    
+        if($record):
+            $data['requirement'] = $record;
+        else:
+            $data['requirement'] = null;
+        endif;        
 
         $all_unit_type_list = $this->Action_model->detail_result('tbl_unit_types', "unit_type_status='1'", 'unit_type_id,unit_type_name,requirement_accomodation');
         $data['all_unit_type_list'] = $all_unit_type_list;
@@ -9163,8 +9188,14 @@ class Api extends CI_Controller
                 $city_list = $this->Action_model->detail_result('tbl_city', $where);
             }
 
+            if(count($city_list) > 0 ){
+                $array['data'] = array('status' => 'true', 'msg' => 'City Found', 'city_list' => $city_list);
+            }
+            else{
+                $array['data'] = array('status' => 'false', 'msg' => 'City Not  Found', 'city_list' => $city_list);
+            }
 
-            $array['data'] = array('status' => 'true', 'msg' => 'City Found', 'city_list' => $city_list);
+
         } else {
             $array['data'] = array('status' => 'false', 'msg' => 'Some error occurred, please try again.');
         }
@@ -9446,17 +9477,16 @@ class Api extends CI_Controller
         $array = array();
         $requirement_list = array();
 
-        $account_id = getAccountIdHash($this->input->post('user_hash'));
+        $account_id = getAccountIdHash($this->input->request_headers()['Access-Token'] );
+
 
         if ($account_id && $this->input->post()) {
 
-            $lead_id = $this->input->post('lead_id');
-            $where = "lead_id='" . $lead_id . "' AND tbl_requirements.account_id='" . $account_id . "'";
-            $where_ids = "";
-            $user_ids = $this->get_level_user_ids($this->input->post('user_hash'));
-            //if (count($user_ids)) {
-            //    $where_ids .= " AND (tbl_requirements.user_id='".implode("' OR tbl_requirements.user_id='", $user_ids)."')";
-            //}
+            $lead_id        = $this->input->post('lead_id');
+            $where          = "lead_id='" . $lead_id . "' AND tbl_requirements.account_id='" . $account_id . "'";
+            $where_ids      = "";
+            $user_ids       = $this->get_level_user_ids($this->input->request_headers()['Access-Token'] );
+
             $where .= $where_ids;
             $where .= " ORDER BY requirement_id DESC";
 
@@ -9478,8 +9508,6 @@ class Api extends CI_Controller
 
 
             if (count($requirement_data) > 0 ) {
-                echo 'dfasdf'; die;
-                //$requirement_list = $requirement_data;
                 foreach ($requirement_data as $item) {
                     $location = "";
                     if ($item->location) {
@@ -9523,24 +9551,24 @@ class Api extends CI_Controller
                     }
 
                     $requirement_list[] = array(
-                        "requirement_id" => $item->requirement_id,
-                        "lead_id" => $item->lead_id,
-                        "look_for" => $item->look_for,
-                        "budget_min" => ($item->budget_minimum) ? $item->budget_minimum : '',
-                        "budget_max" => ($item->budget_maximum) ? $item->budget_maximum : '',
-                        "size_min" => $item->size_min,
-                        "size_max" => $item->size_max,
-                        "size_unit" => $item->size_unit_name,
-                        "remark" => $item->remark,
-                        "dor" => $item->dor,
-                        "state_id" => $item->state_id,
-                        "city_id" => $item->city_id,
-                        "product_type_id" => $item->product_type_id,
-                        "product_unit_id" => $item->unit_type_id,
-                        "lead_option_id" => $item->lead_option_id,
-                        "location" => $location,
-                        "requirement_status" => $item->requirement_status,
-                        "added_by" => (($item->au_parent_id == 0) ? (($item->au_is_individual) ? ucwords($item->au_user_title . ' ' . $item->au_first_name . ' ' . $item->au_last_name) : $item->au_firm_name) : ucwords($item->au_user_title . ' ' . $item->au_first_name . ' ' . $item->au_last_name))
+                        "requirement_id"        => $item->requirement_id,
+                        "lead_id"               => $item->lead_id,
+                        "look_for"              => $item->look_for,
+                        "budget_min"            => ($item->budget_minimum) ? $item->budget_minimum : '',
+                        "budget_max"            => ($item->budget_maximum) ? $item->budget_maximum : '',
+                        "size_min"              => $item->size_min,
+                        "size_max"              => $item->size_max,
+                        "size_unit"             => $item->size_unit_name,
+                        "remark"                => $item->remark,
+                        "dor"                   => $item->dor,
+                        "state_id"              => $item->state_id,
+                        "city_id"               => $item->city_id,
+                        "product_type_id"       => $item->product_type_id,
+                        "product_unit_id"       => $item->unit_type_id,
+                        "lead_option_id"        => $item->lead_option_id,
+                        "location"              => $location,
+                        "requirement_status"    => $item->requirement_status,
+                        "added_by"              => (($item->au_parent_id == 0) ? (($item->au_is_individual) ? ucwords($item->au_user_title . ' ' . $item->au_first_name . ' ' . $item->au_last_name) : $item->au_firm_name) : ucwords($item->au_user_title . ' ' . $item->au_first_name . ' ' . $item->au_last_name))
                     );
                 }
                 $array['data'] = array('status' => 'true', 'msg' => 'Data Found', 'requirement_list' => $requirement_list);
@@ -9577,11 +9605,11 @@ class Api extends CI_Controller
                 foreach ($lead_history_data as $item) {
 
                     $lead_history_list[] = array(
-                        "lead_history_id" => $item->lead_history_id,
-                        "title" => $item->title,
-                        "description" => $item->description,
-                        "created_date" => date("d-m-Y", $item->created_at),
-                        "created_time" => date("h:i a", $item->created_at),
+                        "lead_history_id"   => $item->lead_history_id,
+                        "title"             => $item->title,
+                        "description"       => $item->description,
+                        "created_date"      => date("d-m-Y", $item->created_at),
+                        "created_time"      => date("h:i a", $item->created_at),
                     );
                 }
             }
@@ -9605,28 +9633,28 @@ class Api extends CI_Controller
             $lead_id = $this->input->post('lead_id');
 
             $sql = "
-SELECT req.requirement_id,pty.property_id,COALESCE('simple_property') as  type,bgt_min.budget_amount as req_budget_min,bgt_max.budget_amount as req_budget_max,state_name,city_name,location_name,product_type_name,unit_type_name,COALESCE('') as  project_name, pty.property_id as pid FROM tbl_requirements as req 
-JOIN tbl_property as pty ON pty.product_type_id = req.product_type_id AND pty.unit_type_id = req.unit_type_id AND pty.state_id = req.state_id AND pty.city_id = req.city_id 
-LEFT JOIN tbl_budgets as bgt_min ON bgt_min.budget_id = req.budget_min 
-LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max 
-LEFT JOIN tbl_states ON tbl_states.state_id = pty.state_id 
-LEFT JOIN tbl_city ON tbl_city.city_id = pty.city_id 
-LEFT JOIN tbl_locations ON tbl_locations.location_id = pty.location_id  
-LEFT JOIN tbl_product_types ON tbl_product_types.product_type_id = req.product_type_id 
-LEFT JOIN tbl_unit_types ON tbl_unit_types.unit_type_id = req.unit_type_id  
-WHERE lead_id='" . $lead_id . "'
-UNION ALL
-SELECT req.requirement_id,pty.product_unit_detail_id,COALESCE('project_property') as  type,bgt_min.budget_amount as req_budget_min,bgt_max.budget_amount as req_budget_max,state_name,city_name,location_name,product_type_name,unit_type_name,COALESCE(pdt.project_name) as  project_name,pdt.product_id as pid FROM tbl_requirements as req
-JOIN tbl_product_unit_details as pty ON pty.project_type = req.product_type_id AND ((pty.project_type != '3' AND pty.property_type = req.unit_type_id) OR (pty.project_type = '3' AND pty.sub_category = req.unit_type_id))  
-JOIN tbl_products as pdt ON pdt.product_id = pty.product_id  AND pdt.state_id = req.state_id AND pdt.city_id = req.city_id
-LEFT JOIN tbl_budgets as bgt_min ON bgt_min.budget_id = req.budget_min 
-LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max 
-LEFT JOIN tbl_states ON tbl_states.state_id = pdt.state_id 
-LEFT JOIN tbl_city ON tbl_city.city_id = pdt.city_id 
-LEFT JOIN tbl_locations ON tbl_locations.location_id = pdt.location 
-LEFT JOIN tbl_product_types ON tbl_product_types.product_type_id = req.product_type_id 
-LEFT JOIN tbl_unit_types ON tbl_unit_types.unit_type_id = req.unit_type_id  
-WHERE lead_id='" . $lead_id . "'";
+                SELECT req.requirement_id,pty.property_id,COALESCE('simple_property') as  type,bgt_min.budget_amount as req_budget_min,bgt_max.budget_amount as req_budget_max,state_name,city_name,location_name,product_type_name,unit_type_name,COALESCE('') as  project_name, pty.property_id as pid FROM tbl_requirements as req 
+                JOIN tbl_property as pty ON pty.product_type_id = req.product_type_id AND pty.unit_type_id = req.unit_type_id AND pty.state_id = req.state_id AND pty.city_id = req.city_id 
+                LEFT JOIN tbl_budgets as bgt_min ON bgt_min.budget_id = req.budget_min 
+                LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max 
+                LEFT JOIN tbl_states ON tbl_states.state_id = pty.state_id 
+                LEFT JOIN tbl_city ON tbl_city.city_id = pty.city_id 
+                LEFT JOIN tbl_locations ON tbl_locations.location_id = pty.location_id  
+                LEFT JOIN tbl_product_types ON tbl_product_types.product_type_id = req.product_type_id 
+                LEFT JOIN tbl_unit_types ON tbl_unit_types.unit_type_id = req.unit_type_id  
+                WHERE lead_id='" . $lead_id . "'
+                UNION ALL
+                SELECT req.requirement_id,pty.product_unit_detail_id,COALESCE('project_property') as  type,bgt_min.budget_amount as req_budget_min,bgt_max.budget_amount as req_budget_max,state_name,city_name,location_name,product_type_name,unit_type_name,COALESCE(pdt.project_name) as  project_name,pdt.product_id as pid FROM tbl_requirements as req
+                JOIN tbl_product_unit_details as pty ON pty.project_type = req.product_type_id AND ((pty.project_type != '3' AND pty.property_type = req.unit_type_id) OR (pty.project_type = '3' AND pty.sub_category = req.unit_type_id))  
+                JOIN tbl_products as pdt ON pdt.product_id = pty.product_id  AND pdt.state_id = req.state_id AND pdt.city_id = req.city_id
+                LEFT JOIN tbl_budgets as bgt_min ON bgt_min.budget_id = req.budget_min 
+                LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max 
+                LEFT JOIN tbl_states ON tbl_states.state_id = pdt.state_id 
+                LEFT JOIN tbl_city ON tbl_city.city_id = pdt.city_id 
+                LEFT JOIN tbl_locations ON tbl_locations.location_id = pdt.location 
+                LEFT JOIN tbl_product_types ON tbl_product_types.product_type_id = req.product_type_id 
+                LEFT JOIN tbl_unit_types ON tbl_unit_types.unit_type_id = req.unit_type_id  
+                WHERE lead_id='" . $lead_id . "'";
 
 
             $query = $this->db->query($sql);
