@@ -11967,38 +11967,35 @@ class Api extends CI_Controller
      # lead unit 
         # list
         public function unit_list(){
-            print_r('thids'); die;
+            $lead_id            = $this->input->post('lead_id');
+
+            if (!$lead_id) :
+                echo json_encode(['status' => false, 'message' => 'Please select lead']);
+                exit;
+            endif;
+    
+            $where          = "user_hash='" . $this->input->request_headers()['Access-Token'] . "'";
+            $user_detail    = $this->db->where($where)->get('tbl_users')->row();
+    
+            echo json_encode(['status' => true, 'message' => 'Successfully data fetched' , 'unit_list' =>  lead_units($lead_id ?? 0 , $user_detail )  ]);
         }
 
         # details
         public function lead_unit_details()
         {
 
-            $id                 =    $this->input->get('id');
+            $id                 =  $this->input->post('id');
             $is_view            =    $this->input->get('view') == 'true' ? true : false;
-
+    
             if (!$id) :
                 echo json_encode(['status' => false, 'message' => 'Invalid Record']);
             endif;
-
+    
             $record             =    lead_unit_details($id);
-
+    
+         
             if ($record) :
-                if ($is_view) :
-
-                    # Property Documents
-                    $property_document_full_url                   =   base_url('public/other/property-documents/');
-                    $property_documents             =   $this->db->select("id, title, document, CONCAT('$property_document_full_url', document) as document_full_url")->where("lead_unit_id = $id")->get('tbl_property_documents')->result();
-                    # End Property Documents
-
-                    # Gallery Images
-                    $full_url                   =   base_url('public/other/gallery-images/lead-units/');
-                    $gallery_images             =   $this->db->select("id, name, CONCAT('$full_url', name) as full_url")->where("type = 'lead_unit' and parent_id = $id")->get('tbl_gallery_images')->result();
-                    # End Gallery Images
-
-                    $details_view     = $this->load->view('components/details-view/lead-unit-details', ['record' => $record, 'gallery_images' => $gallery_images ?? [], 'property_documents' => $property_documents ?? []], true);
-                endif;
-                echo json_encode(['status' => true, 'message' => 'Record successfully fetched', 'data' => $record, 'details_view' => $details_view ?? null]);
+                echo json_encode(['status' => true, 'message' => 'Record successfully fetched', 'data' => $record]);
             else :
                 echo json_encode(['status' => false, 'message' => 'Invalid Record']);
             endif;

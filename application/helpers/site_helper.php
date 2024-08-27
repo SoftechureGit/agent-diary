@@ -387,9 +387,13 @@ if (!function_exists('getAccountId')) {
             ->get('tbl_lead_units as lead_unit')
             ->row();
 
+        if($record) :
+            $record->property_details           =   ($record->property_details ?? 0) ? json_decode($record->property_details) : null;
+            $record->property_layout_url        =   $record->property_layout ? base_url("public/other/lead-unit-layouts/$record->property_layout") : null;          
+        else:
+            return  null; 
+        endif;    
 
-        $record->property_details           =   ($record->property_details ?? 0) ? json_decode($record->property_details) : null;
-        $record->property_layout_url        =   $record->property_layout ? base_url("public/other/lead-unit-layouts/$record->property_layout") : null;
 
         return $record ?? null;
     }
