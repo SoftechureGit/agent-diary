@@ -2532,7 +2532,6 @@ class Api extends CI_Controller
         $array = array();
 
         if ($this->input->post()) {
-
             # Is Details View
             $is_detail_view                 =   $this->input->post('is_detail_view');
             # End Is Details View
@@ -2576,7 +2575,6 @@ class Api extends CI_Controller
                 $search_size_max     = $this->input->post('search_size_max');
                 $search_size_unit    = $this->input->post('search_size_unit');
                 $search_agent_id     = $this->input->post('search_agent_id');
-
                 # end  filters and shorting  
 
                 # pagination 
