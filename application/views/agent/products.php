@@ -574,7 +574,6 @@
   
     $.ajax({
       type: "POST",
-      async: false,
       url: "<?php echo base_url(AGENT_URL . 'api/get_product_list'); ?>",
       data: {
         page: page,
