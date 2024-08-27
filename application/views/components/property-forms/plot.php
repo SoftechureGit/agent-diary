@@ -48,15 +48,7 @@
                     </div>
                     <!-- End Unit Code -->
 
-                    <!-- Referance No -->
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="">Referance Number</label>
-                            <input type="text" placeholder="Enter Referance Number" name="property_details[referance_number]" value="<?= $referance_number ?? '' ?>" class="form-control" data-saved-value="<?= $referance_number ?? '' ?>">
-                        </div>
-                    </div>
-                    <!-- End Referance No -->
-
+                    
                     <!-- Plot No -->
                     <div class="col-md-4">
                         <div class="form-group">
@@ -72,6 +64,16 @@
                         </div>
                     </div>
                     <!-- End Plot No -->
+                     
+                    <!-- Referance No -->
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="">Referance Number</label>
+                            <input type="text" placeholder="Enter Referance Number" name="property_details[referance_number]" value="<?= $referance_number ?? '' ?>" class="form-control" data-saved-value="<?= $referance_number ?? '' ?>">
+                        </div>
+                    </div>
+                    <!-- End Referance No -->
+
 
                     <!-- Plot Size  -->
                     <div class="col-md-4">

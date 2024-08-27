@@ -11636,12 +11636,10 @@ class Api extends CI_Controller
 
     public function get_followup_related_data()
     {
-
         $where          = "user_hash='" . $this->input->post('user_hash') . "'";
         $user_detail    = $this->Action_model->select_single('tbl_users', $where);
 
         $account_id     = $user_detail->user_id;
-
 
         $where = "lead_stage_status='1'";
         $lead_stage_list = $this->Action_model->detail_result('tbl_lead_stages', $where, 'lead_stage_id,lead_stage_name');
@@ -11964,4 +11962,101 @@ class Api extends CI_Controller
     /*****************************
      *  End Teams Functionality
      ******************************/
+
+
+     # lead unit 
+        # list
+        public function unit_list(){
+            print_r('thids'); die;
+        }
+
+        # details
+        public function lead_unit_details()
+        {
+
+            $id                 =    $this->input->get('id');
+            $is_view            =    $this->input->get('view') == 'true' ? true : false;
+
+            if (!$id) :
+                echo json_encode(['status' => false, 'message' => 'Invalid Record']);
+            endif;
+
+            $record             =    lead_unit_details($id);
+
+            if ($record) :
+                if ($is_view) :
+
+                    # Property Documents
+                    $property_document_full_url                   =   base_url('public/other/property-documents/');
+                    $property_documents             =   $this->db->select("id, title, document, CONCAT('$property_document_full_url', document) as document_full_url")->where("lead_unit_id = $id")->get('tbl_property_documents')->result();
+                    # End Property Documents
+
+                    # Gallery Images
+                    $full_url                   =   base_url('public/other/gallery-images/lead-units/');
+                    $gallery_images             =   $this->db->select("id, name, CONCAT('$full_url', name) as full_url")->where("type = 'lead_unit' and parent_id = $id")->get('tbl_gallery_images')->result();
+                    # End Gallery Images
+
+                    $details_view     = $this->load->view('components/details-view/lead-unit-details', ['record' => $record, 'gallery_images' => $gallery_images ?? [], 'property_documents' => $property_documents ?? []], true);
+                endif;
+                echo json_encode(['status' => true, 'message' => 'Record successfully fetched', 'data' => $record, 'details_view' => $details_view ?? null]);
+            else :
+                echo json_encode(['status' => false, 'message' => 'Invalid Record']);
+            endif;
+        }
+        
+     # end leadd unit
+
+
+     public function lead_search_view_data(){
+
+        $array = array();
+
+        $where          = "user_hash='" . $this->input->request_headers()['Access-Token'] . "'";
+        $user_detail    = $this->Action_model->select_single('tbl_users', $where);
+        $account_id     = $user_detail->user_id;
+
+      
+        $where = "country_id='1' AND state_status=1";
+        $state_list = $this->Action_model->detail_result('tbl_states', $where = "country_id='1'", 'state_id,state_name');
+        $data['state_list'] = $state_list;
+
+    
+        $where = "lead_source_status='1'";
+        $lead_source_list = $this->Action_model->detail_result('tbl_lead_sources', $where);
+        $data['lead_source_list'] = $lead_source_list;
+
+        $where = "lead_stage_status='1'";
+        $lead_stage_list = $this->Action_model->detail_result('tbl_lead_stages', $where, 'lead_stage_id,lead_stage_name');
+        $data['lead_stage_list'] = $lead_stage_list;
+
+        $where = "lead_type_status='1'";
+        $lead_type_list = $this->Action_model->detail_result('tbl_lead_types', $where, 'lead_type_id,lead_type_name');
+
+        $where = "user_status='1' AND ((parent_id='" . $account_id . "') OR (user_id='" . $account_id . "' AND role_id='2'))";
+        $where_ids = "";
+
+        if ($user_detail->parent_id == 0) {
+
+            $where  = "user_id=$user_detail->user_id OR parent_id=$user_detail->user_id";
+        } else {
+
+            $where = " user_id=$user_detail->user_id OR report_to=$user_detail->user_id";
+        }
+
+        $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,CONCAT(user_title," ",first_name," ",last_name) as user_full_name');
+     
+ 
+            $array['data'] = array(
+                'status' => 'true',
+                'msg' => 'Found',
+                'state_list' => $state_list,
+                'lead_source_list' => $lead_source_list,
+                'lead_stage_list' => $lead_stage_list,
+                'user_list' => $user_list ?? [],  
+                'lead_type_list' => $lead_type_list  
+            );
+     
+        echo json_encode($array);
+     }
+
 }
