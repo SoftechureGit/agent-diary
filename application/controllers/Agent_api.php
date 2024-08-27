@@ -6961,7 +6961,7 @@ WHERE lead_id='" . $lead_id . "'
 
                 $page = $this->input->post('page');
 
-                $limit = 10;
+                $limit = 5;
                 $total_pages = 0;
                 $start = 0;
                 $next_page = 0;

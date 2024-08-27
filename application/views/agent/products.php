@@ -571,10 +571,10 @@
   function get_product_list() {
     var filter_by = $("#filter_by").val();
     var search_text = $("#serachInput").val();
-    console.log(search_text)
-
+  
     $.ajax({
       type: "POST",
+      async: true,
       url: "<?php echo base_url(AGENT_URL . 'api/get_product_list'); ?>",
       data: {
         page: page,
@@ -648,7 +648,7 @@
                   "</div>";
               }
 
-              $(".lead-list").html(html);
+              $(".lead-list").append(html);
 
               if (obj.total_records == 0) {
                 $(".lead-list").html("<div class='text-center text-muted pt-2'>--- No Products ---</div>");
@@ -839,7 +839,6 @@
   });
 
   function filterData() {
-    console.log('df')
 
     $(".search-btn").hide();
     page = 1;
@@ -1061,7 +1060,6 @@
       },
       beforeSend: function(data) {},
       success: function(response) {
-        console.log(response);
         var obj;
         try {
           obj = JSON.parse(response);
@@ -1098,7 +1096,6 @@
       },
       beforeSend: function(data) {},
       success: function(response) {
-        console.log(response);
         var obj;
         try {
           obj = JSON.parse(response);
