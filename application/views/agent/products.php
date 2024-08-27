@@ -97,7 +97,7 @@
                       <option value="">SORT BY</option>
                     </select> -->
 
-                    <input type="search" class="form-control" placeholder="Serach" onchange="filterData()" id="serach">
+                    <input type="text" class="form-control" placeholder="Serach" onkeyup="filterData()" id="serachInput">
                   </div>
                   <div class="col-md-12" style="height: 450px;overflow-y: auto;">
 
@@ -570,7 +570,9 @@
 
   function get_product_list() {
     var filter_by = $("#filter_by").val();
-    var search_text = $("#search_text").val();
+    var search_text = $("#serachInput").val();
+    console.log(search_text)
+
     $.ajax({
       type: "POST",
       url: "<?php echo base_url(AGENT_URL . 'api/get_product_list'); ?>",
@@ -646,7 +648,7 @@
                   "</div>";
               }
 
-              $(".lead-list").append(html);
+              $(".lead-list").html(html);
 
               if (obj.total_records == 0) {
                 $(".lead-list").html("<div class='text-center text-muted pt-2'>--- No Products ---</div>");
@@ -837,6 +839,8 @@
   });
 
   function filterData() {
+    console.log('df')
+
     $(".search-btn").hide();
     page = 1;
     $(".lead-list").html("");

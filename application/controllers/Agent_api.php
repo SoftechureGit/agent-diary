@@ -6956,7 +6956,9 @@ WHERE lead_id='" . $lead_id . "'
             $account_id = getAccountId();
 
             if ($account_id) {
-                $filter_by = $this->input->post('filter_by');
+                $filter_by      = $this->input->post('filter_by');
+                $search         = $this->input->post('search_text');
+
                 $page = $this->input->post('page');
 
                 $limit = 10;
@@ -6965,7 +6967,12 @@ WHERE lead_id='" . $lead_id . "'
                 $next_page = 0;
                 $start = ($page - 1) * $limit;
 
-                $where = "p.agent_id='" . $account_id . "' OR share_account_id='" . $account_id . "'";
+                $where = "( p.agent_id='" . $account_id . "' OR share_account_id='" . $account_id . "' )";
+                
+                if($search):
+                    $where .= " and p.project_name like '%$search%'";
+                endif;
+
                 $this->db->select("count(tbl_product_unit_details.product_unit_detail_id) as total_records");
                 $this->db->from('tbl_product_unit_details');
                 $this->db->join('tbl_products as p', 'p.product_id = tbl_product_unit_details.product_id', 'left');
@@ -6981,7 +6988,13 @@ WHERE lead_id='" . $lead_id . "'
                 }
 
 
-                $where = "p.agent_id='" . $account_id . "' OR share_account_id='" . $account_id . "'";
+                $where = "( p.agent_id='" . $account_id . "' OR share_account_id='" . $account_id . "' )";
+
+                if($search):
+                    $where .= " and p.project_name like '%$search%'";
+                endif;
+
+
                 if ($filter_by == 1) {
                     //$where.=" ORDER BY lead_name";
                 } else if ($filter_by == 2) {
@@ -6996,6 +7009,8 @@ WHERE lead_id='" . $lead_id . "'
                 }
 
                 $where .= " limit " . $start . "," . $limit;
+               
+
                 $this->db->select("
                                     p.project_name,
                                     pud.product_unit_detail_id,
