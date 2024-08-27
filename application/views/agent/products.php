@@ -135,7 +135,7 @@
 
                     <div class="error-msg-left"></div>
                     <div class="wrapper-bottom" align="center">
-                      <div class="load-more" onclick="get_product_list()">Load More</div>
+                      <div class="load-more" onclick="get_product_list(this)">Load More</div>
 
                       <div class="bottom-loader">
                         <img src="<?= base_url('public/front/ajax-loader.gif'); ?>">
@@ -568,13 +568,13 @@
   var page = 1;
   get_product_list();
 
-  function get_product_list() {
+  function get_product_list(e = null) {
     var filter_by = $("#filter_by").val();
     var search_text = $("#serachInput").val();
   
     $.ajax({
       type: "POST",
-      async: true,
+      async: false,
       url: "<?php echo base_url(AGENT_URL . 'api/get_product_list'); ?>",
       data: {
         page: page,
@@ -587,7 +587,7 @@
         $(".bottom-loader").show();
         $(".search_btn").attr("disabled", true);
       },
-      success: function(response) {
+      success: (response) => {
         setTimeout(function() {
           $(".search_btn").attr("disabled", false);
           var obj;
@@ -647,8 +647,12 @@
                   "   </div>" +
                   "</div>";
               }
-
-              $(".lead-list").append(html);
+              
+              if($(e).hasClass('load-more')){
+                $(".lead-list").append(html);
+              }else{
+                $(".lead-list").html(html);
+              }
 
               if (obj.total_records == 0) {
                 $(".lead-list").html("<div class='text-center text-muted pt-2'>--- No Products ---</div>");
