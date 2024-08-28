@@ -4262,7 +4262,7 @@ WHERE lead_id='" . $lead_id . "'
             $this->db->select("lead_stage_id,lead_status");
             $this->db->from('tbl_leads');
             $this->db->where($where);
-            $query = $this->db->get();
+            $query  = $this->db->get();
             $record = $query->row();
 
             if ($record) {

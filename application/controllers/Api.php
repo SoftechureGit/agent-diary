@@ -9452,6 +9452,7 @@ class Api extends CI_Controller
 
                     $followup_list[] = array(
                         "lead_id" => $item->lead_id,
+                        "followup_id" => $item->followup_id ,
                         'label' => $item->lead_action_name . '@ '.$next_action. 'By '.(($item->cu_parent_id == 0) ? (($item->cu_is_individual) ? ucwords($item->cu_user_title . ' ' . $item->cu_first_name . ' ' . $item->cu_last_name) : $item->cu_firm_name) : ucwords($item->cu_user_title . ' ' . $item->cu_first_name . ' ' . $item->cu_last_name)) ,
                         'remark'  => $item->task_desc,
                         'comment' => $item->comment.' @ '.date("d-m-Y & h:i A", $item->created_at).' '.(($item->au_parent_id == 0) ? (($item->au_is_individual) ? ucwords($item->au_user_title . ' ' . $item->au_first_name . ' ' . $item->au_last_name) : $item->au_firm_name) : ucwords($item->au_user_title . ' ' . $item->au_first_name . ' ' . $item->au_last_name)),
@@ -10058,7 +10059,6 @@ class Api extends CI_Controller
 
 
 
-
                         $i1 = array(
                             'requirement_id' => $itemRow->requirement_id,
                             'property_id' => $itemRow->property_id,
@@ -10213,21 +10213,24 @@ class Api extends CI_Controller
 
         $account_id = getAccountIdHash($this->input->request_headers()['Access-Token']);
 
-        if ($account_id && $this->input->post()) {
-            $id = $this->input->post('lead_id');
+        // print_r($this->input->post()); die;
 
-            $where = "lead_id='" . $id . "' AND account_id='" . $account_id . "'";
+        if ($account_id && $this->input->post()) {
+
+            $id = $this->input->post('id');
+
+            $where = "lead_id=$id";
 
             $this->db->select("lead_stage_id,lead_status");
             $this->db->from('tbl_leads');
             $this->db->where($where);
-            $query = $this->db->get();
+            $query  = $this->db->get();
             $record = $query->row();
 
             if ($record) {
                 $array['data'] = array('status' => 'true', 'msg' => 'Record Found', 'record' => $record);
             } else {
-                $array['data'] = array('status' => 'false', 'msg' => 'Some error occurred, please try again.');
+                $array['data'] = array('status' => 'false', 'msg' => 'Record Not Found');
             }
         } else {
             $array = array('status' => 'false', 'msg' => 'Some error occurred, please try again.');
