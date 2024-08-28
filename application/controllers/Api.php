@@ -9451,12 +9451,13 @@ class Api extends CI_Controller
 
 
                     $followup_list[] = array(
-                        'label_1' => $item->lead_action_name . '@ '.$next_action. 'By '.(($item->cu_parent_id == 0) ? (($item->cu_is_individual) ? ucwords($item->cu_user_title . ' ' . $item->cu_first_name . ' ' . $item->cu_last_name) : $item->cu_firm_name) : ucwords($item->cu_user_title . ' ' . $item->cu_first_name . ' ' . $item->cu_last_name)) ,
+                        "lead_id" => $item->lead_id,
+                        'label' => $item->lead_action_name . '@ '.$next_action. 'By '.(($item->cu_parent_id == 0) ? (($item->cu_is_individual) ? ucwords($item->cu_user_title . ' ' . $item->cu_first_name . ' ' . $item->cu_last_name) : $item->cu_firm_name) : ucwords($item->cu_user_title . ' ' . $item->cu_first_name . ' ' . $item->cu_last_name)) ,
                         'remark'  => $item->task_desc,
                         'comment' => $item->comment.' @ '.date("d-m-Y & h:i A", $item->created_at).' '.(($item->au_parent_id == 0) ? (($item->au_is_individual) ? ucwords($item->au_user_title . ' ' . $item->au_first_name . ' ' . $item->au_last_name) : $item->au_firm_name) : ucwords($item->au_user_title . ' ' . $item->au_first_name . ' ' . $item->au_last_name)),
                         "followup_status" => ($item->followup_status == 1) ? 'Pending' : ( ($item->followup_status == 2) ? 'Complete' : 'Cancel'),
                         "followup_status_id" =>  $item->followup_status ,
-                        // "lead_id" => $item->lead_id,
+                       
                         // // "followup_status" => $item->followup_status,
                         // "comment" => $item->comment,
                         // "task_desc" => $item->task_desc,
