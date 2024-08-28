@@ -3481,7 +3481,7 @@ class Api extends CI_Controller
         if($record):
             $requirement = $record;
         else:
-            $requirement = null;
+            $requirement = [];
         endif;        
 
         $all_unit_type_list = $this->Action_model->detail_result('tbl_unit_types', "unit_type_status='1'", 'unit_type_id,unit_type_name,requirement_accomodation');
@@ -9471,11 +9471,26 @@ class Api extends CI_Controller
                     );
                 }
             }
+
+            $status_option = array(
+                array(
+                    'id'   => 1 ,
+                    'name' => 'Pending' 
+                ),
+                array(
+                    'id'   => 2 ,
+                    'name' => 'Complete' 
+                ),
+                array(
+                    'id'   => 3 ,
+                    'name' => 'Cancel' 
+                )
+                );
             
             if(count($followup_list) > 0 ):
-                $array['data'] = array('status' => 'true', 'msg' => 'Data Found', 'followup_list' => $followup_list);
+                $array['data'] = array('status' => 'true', 'msg' => 'Data Found', 'followup_list' => $followup_list , 'followup_status_list' => $status_option);
             else:
-                $array['data'] = array('status' => 'false', 'msg' => 'Data Not  Found', 'followup_list' => $followup_list);
+                $array['data'] = array('status' => 'false', 'msg' => 'Data Not  Found', 'followup_list' => $followup_list , 'followup_status_list' => $status_option);
             endif;       
 
         } else {
