@@ -2532,17 +2532,16 @@ class Api extends CI_Controller
 
         if ($this->input->post()) {
             # Is Details View
-            $is_detail_view                 =   $this->input->post('is_detail_view');
+                $is_detail_view                 =   $this->input->post('is_detail_view');
             # End Is Details View
 
             # agnet information 
-            $account_id      = getAccountId();
-            $agent           = $this->getAgent();
-            $user_id         = $agent->user_id ?? 0;
-            $where           = "user_hash='" . $this->input->post('user_hash') . "'";
-            $user_detail     = $this->Action_model->select_single('tbl_users', $where);
-            $account_id      = $user_detail->user_id;
-            
+                $account_id      = getAccountId();
+                $agent           = $this->getAgent();
+                $user_id         = $agent->user_id ?? 0;
+                $where           = "user_hash='" . $this->input->post('user_hash') . "'";
+                $user_detail     = $this->Action_model->select_single('tbl_users', $where);
+                $account_id      = $user_detail->user_id;  
             # end agent infromation   
 
             if ($account_id) {
@@ -9452,22 +9451,26 @@ class Api extends CI_Controller
 
 
                     $followup_list[] = array(
-                        "followup_id" => $item->followup_id,
-                        "lead_id" => $item->lead_id,
-                        "followup_status" => $item->followup_status,
-                        "comment" => $item->comment,
-                        "task_desc" => $item->task_desc,
-                        "created" => date("d-m-Y & h:i A", $item->created_at),
-                        "cu_name" => (($item->cu_parent_id == 0) ? (($item->cu_is_individual) ? ucwords($item->cu_user_title . ' ' . $item->cu_first_name . ' ' . $item->cu_last_name) : $item->cu_firm_name) : ucwords($item->cu_user_title . ' ' . $item->cu_first_name . ' ' . $item->cu_last_name)),
-                        "au_name" => (($item->au_parent_id == 0) ? (($item->au_is_individual) ? ucwords($item->au_user_title . ' ' . $item->au_first_name . ' ' . $item->au_last_name) : $item->au_firm_name) : ucwords($item->au_user_title . ' ' . $item->au_first_name . ' ' . $item->au_last_name)),
-                        "next_action" => $next_action,
-                        "lead_stage_id" => $item->lead_stage_id,
-                        "lead_status_id" => $item->lead_status_id,
-                        "next_followup_date" => $item->next_followup_date,
-                        "next_followup_time" => $item->next_followup_time,
-                        "project_id" => $item->project_id,
-                        "agent_id" => $item->user_id,
-                        "lead_action_name" => $item->lead_action_name
+                        'label_1' => $item->lead_action_name . '@ '.$next_action. 'By '.(($item->cu_parent_id == 0) ? (($item->cu_is_individual) ? ucwords($item->cu_user_title . ' ' . $item->cu_first_name . ' ' . $item->cu_last_name) : $item->cu_firm_name) : ucwords($item->cu_user_title . ' ' . $item->cu_first_name . ' ' . $item->cu_last_name)) ,
+                        'remark'  => $item->task_desc,
+                        'comment' => $item->comment.' @ '.date("d-m-Y & h:i A", $item->created_at).' '.(($item->au_parent_id == 0) ? (($item->au_is_individual) ? ucwords($item->au_user_title . ' ' . $item->au_first_name . ' ' . $item->au_last_name) : $item->au_firm_name) : ucwords($item->au_user_title . ' ' . $item->au_first_name . ' ' . $item->au_last_name)),
+                        "followup_status" => ($item->followup_status == 1) ? 'Pending' : ( ($item->followup_status == 2) ? 'Complete' : 'Cancel'),
+                        "followup_status_id" =>  $item->followup_status ,
+                        // "lead_id" => $item->lead_id,
+                        // // "followup_status" => $item->followup_status,
+                        // "comment" => $item->comment,
+                        // "task_desc" => $item->task_desc,
+                        // "created" => date("d-m-Y & h:i A", $item->created_at),
+                        // "cu_name" => (($item->cu_parent_id == 0) ? (($item->cu_is_individual) ? ucwords($item->cu_user_title . ' ' . $item->cu_first_name . ' ' . $item->cu_last_name) : $item->cu_firm_name) : ucwords($item->cu_user_title . ' ' . $item->cu_first_name . ' ' . $item->cu_last_name)),
+                        // "au_name" => (($item->au_parent_id == 0) ? (($item->au_is_individual) ? ucwords($item->au_user_title . ' ' . $item->au_first_name . ' ' . $item->au_last_name) : $item->au_firm_name) : ucwords($item->au_user_title . ' ' . $item->au_first_name . ' ' . $item->au_last_name)),
+                        // "next_action" => $next_action,
+                        // "lead_stage_id" => $item->lead_stage_id,
+                        // "lead_status_id" => $item->lead_status_id,
+                        // "next_followup_date" => $item->next_followup_date,
+                        // "next_followup_time" => $item->next_followup_time,
+                        // "project_id" => $item->project_id,
+                        // "agent_id" => $item->user_id,
+                        // "lead_action_name" => $item->lead_action_name
                     );
                 }
             }
