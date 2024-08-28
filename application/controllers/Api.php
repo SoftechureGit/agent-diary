@@ -2542,9 +2542,11 @@ class Api extends CI_Controller
             $where           = "user_hash='" . $this->input->post('user_hash') . "'";
             $user_detail     = $this->Action_model->select_single('tbl_users', $where);
             $account_id      = $user_detail->user_id;
+            
             # end agent infromation   
 
             if ($account_id) {
+
                 # filters and shorting  
                 $filter_by           = $this->input->post('filter_by');
                 $page                = $this->input->post('page');
@@ -3477,48 +3479,53 @@ class Api extends CI_Controller
         
     
         if($record):
-            $data['requirement'] = $record;
+            $requirement = $record;
         else:
-            $data['requirement'] = null;
+            $requirement = null;
         endif;        
 
         $all_unit_type_list = $this->Action_model->detail_result('tbl_unit_types', "unit_type_status='1'", 'unit_type_id,unit_type_name,requirement_accomodation');
-        $data['all_unit_type_list'] = $all_unit_type_list;
+   
 
         # get state list
         $where = "country_id='1' AND state_status=1";
         $state_list = $this->Action_model->detail_result('tbl_states', $where = "country_id='1'", 'state_id,state_name');
-        $data['state_list'] = $state_list;
+
         # end get state list
 
         # product list
         $where = "product_type_status='1'";
         $project_type_list = $this->Action_model->detail_result('tbl_product_types', $where, 'product_type_id,product_type_name');
-        $data['project_type_list'] = $project_type_list;
+       
         # end product list
 
         # lead option
         $where = "lead_option_status='1' and lead_option_id != 1";
         $lead_option_list = $this->Action_model->detail_result('tbl_lead_options', $where, 'lead_option_id,lead_option_name');
-        $data['lead_option_list'] = $lead_option_list;
+     
         # end lead option
 
         # get  budget list
         $where = "budget_status='1'";
         $budget_list = $this->Action_model->detail_result('tbl_budgets', $where, 'budget_id,budget_name');
-        $data['budget_list'] = $budget_list;      
+  
         # end get budget list
 
         # unit size list 
         $where = "unit_status='1'";
         $unit_list = $this->Action_model->detail_result('tbl_units', $where, 'unit_id,unit_name');
-        $data['unit_list'] = $unit_list;
+     
         # end unit size list
 
         $arr = array(
-            'status'  => true ,
-            'message' => 'Related Data Found' ,
-            'data' => $data ,
+            'status'            => true ,
+            'message'           => 'Related Data Found' ,
+            'requirement'       => $requirement,
+            'state_list'        => $state_list,
+            'project_type_list' => $project_type_list,
+            'lead_option_list'  => $lead_option_list,
+            'budget_list'       => $budget_list,
+            'unit_list'         => $unit_list,
 
         );
 
@@ -9397,12 +9404,12 @@ class Api extends CI_Controller
         echo json_encode($array);
     }
 
-    public function load_followup_list()
+    public function lead_followup_list()
     {
         $array = array();
         $followup_list = array();
 
-        $account_id = getAccountIdHash($this->input->post('user_hash'));
+        $account_id = getAccountIdHash($this->input->request_headers()['Access-Token']);
 
         if ($account_id && $this->input->post()) {
 
@@ -9464,7 +9471,13 @@ class Api extends CI_Controller
                     );
                 }
             }
-            $array['data'] = array('status' => 'true', 'msg' => 'Data Found', 'followup_list' => $followup_list);
+            
+            if(count($followup_list) > 0 ):
+                $array['data'] = array('status' => 'true', 'msg' => 'Data Found', 'followup_list' => $followup_list);
+            else:
+                $array['data'] = array('status' => 'false', 'msg' => 'Data Not  Found', 'followup_list' => $followup_list);
+            endif;       
+
         } else {
             $array['data'] = array('status' => 'false', 'msg' => 'Some error occurred, please try again.');
         }
@@ -10179,7 +10192,7 @@ class Api extends CI_Controller
     {
         $array = array();
 
-        $account_id = getAccountIdHash($this->input->post('user_hash'));
+        $account_id = getAccountIdHash($this->input->request_headers()['Access-Token']);
 
         if ($account_id && $this->input->post()) {
             $id = $this->input->post('lead_id');
