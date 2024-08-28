@@ -9456,7 +9456,7 @@ class Api extends CI_Controller
                         'label' => $item->lead_action_name . '@ '.$next_action. 'By '.(($item->cu_parent_id == 0) ? (($item->cu_is_individual) ? ucwords($item->cu_user_title . ' ' . $item->cu_first_name . ' ' . $item->cu_last_name) : $item->cu_firm_name) : ucwords($item->cu_user_title . ' ' . $item->cu_first_name . ' ' . $item->cu_last_name)) ,
                         'remark'  => $item->task_desc,
                         'comment' => $item->comment.' @ '.date("d-m-Y & h:i A", $item->created_at).' '.(($item->au_parent_id == 0) ? (($item->au_is_individual) ? ucwords($item->au_user_title . ' ' . $item->au_first_name . ' ' . $item->au_last_name) : $item->au_firm_name) : ucwords($item->au_user_title . ' ' . $item->au_first_name . ' ' . $item->au_last_name)),
-                        "followup_status" => ($item->followup_status == 1) ? 'Pending' : ( ($item->followup_status == 2) ? 'Complete' : 'Cancel'),
+                        "followup_status" => ($item->followup_status == 1) ? '<span class="" style="padding: 3px 10px;color:#fff;background-color: #f29d56;border-radius: 10rem;line-height: 15px;font-weight: 600;font-size: 85%;">Pending</span>' : ( ($item->followup_status == 2) ? '<span class="" style="padding: 3px 10px;color:#fff;background-color: #6fd96f;border-radius: 10rem;line-height: 15px;font-weight: 600;font-size: 85%;">Complete</span>' : '<span class="" style="padding: 3px 10px;color:#fff;background-color: #ff5e5e;border-radius: 10rem;line-height: 15px;font-weight: 600;font-size: 85%;">Cancel</span>'),
                         "followup_status_id" =>  $item->followup_status ,
                        
                         // // "followup_status" => $item->followup_status,
