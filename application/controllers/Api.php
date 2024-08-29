@@ -2920,6 +2920,8 @@ class Api extends CI_Controller
             }
         }
 
+        // print_r($user_detail); die;
+
         if ($user_detail && $this->input->post()) {
             $followup_lead_id = $this->input->post('followup_lead_id');
             $record = $this->Action_model->select_single('tbl_leads', "lead_id='" . $followup_lead_id . "' AND account_id='" . $account_id . "'");
@@ -3697,6 +3699,8 @@ class Api extends CI_Controller
             }
 
             $record = $this->Action_model->select_single('tbl_followup', "followup_id='" . $followup_id . "' AND account_id='" . $account_id . "'");
+
+
 
             if ($record) {
                 $followup_next_status = 0;
