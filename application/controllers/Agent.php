@@ -132,7 +132,7 @@ class Agent extends CI_Controller
         # End Trial Plan
 
         # Leads & Followup Query
-            
+            $user_id                            = $this->user()->user_id;
             # End Leads
             $lead_select_query                  =   "
                                                         count(*) as total_count,
@@ -140,6 +140,7 @@ class Agent extends CI_Controller
                                                     ";
 
             $this->db->select($lead_select_query);
+            $this->db->where("user_id = '$user_id'");
             $this->db->from('tbl_leads as lead');
             $leads                          =   $this->db->get()->row();
             # End Leads
@@ -159,6 +160,7 @@ class Agent extends CI_Controller
                                                     ";
 
             $this->db->select($followup_select_query);
+            $this->db->where("user_id = '$user_id'");
             $this->db->from('tbl_followup as followup');
             $followups                          =   $this->db->get()->row();
             # End Followup
