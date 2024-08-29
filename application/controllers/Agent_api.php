@@ -2163,6 +2163,327 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
     public function get_followup_list()
     {
 
+        $array = array();
+
+        if ($this->input->post()) {
+
+            $account_id   = getAccountId();
+            $agent = $this->getAgent();
+            $user_id = $agent->user_id ?? 0;
+
+            $where          = "user_hash='" . $this->session->userdata('agent_hash') . "'";
+            $user_detail    = $this->Action_model->select_single('tbl_users', $where);
+
+            // echo '<pre>';
+            // print_r($user_detail); die;
+
+            $account_id = $user_detail->user_id;
+
+            if ($account_id) {
+                $filter_by = $this->input->post('filter_by');
+                $page = $this->input->post('page');
+
+                $search_text = $this->input->post('search_text');
+
+                $search_date_from = $this->input->post('search_date_from');
+                $search_date_to = $this->input->post('search_date_to');
+
+                # Lead Filter
+                $lead_from = $this->input->post('lead_from');
+                $lead_to = $this->input->post('lead_to');
+                # End Lead Filter
+
+                # Followup Filter
+                $followup_from = $this->input->post('followup_from');
+                $followup_to = $this->input->post('followup_to');
+                # End Followup Filter
+
+                $search_state_id = $this->input->post('search_state_id');
+                $search_city_id = $this->input->post('search_city_id');
+                $search_source_id = $this->input->post('search_source_id');
+                $search_stage_id = $this->input->post('search_stage_id');
+                $search_status = $this->input->post('search_status');
+                $search_location_id = $this->input->post('search_location_id');
+                $search_budget_min = $this->input->post('search_budget_min');
+                $search_budget_max = $this->input->post('search_budget_max');
+                $search_size_min = $this->input->post('search_size_min');
+                $search_size_max = $this->input->post('search_size_max');
+                $search_size_unit = $this->input->post('search_size_unit');
+                $search_agent_id = $this->input->post('search_agent_id');
+
+
+                $limit = 10;
+                $total_pages = 0;
+                $start = 0;
+                $next_page = 0;
+                $start = ($page - 1) * $limit;
+
+                // echo '<pre>';
+                // print_r($user_detail); die;
+
+                // $where = "tbl_leads.account_id='".$account_id."' AND added_to_followup='1' AND tbl_leads.lead_status='1' AND is_customer='0'";
+
+                if ($user_detail->role_id < 3 || $user_detail->role_id == 5) {
+
+                    if ($user_detail->parent_id == 0) {
+                        $where = "tbl_leads.lead_status='1' AND is_customer ='0' AND tbl_leads.account_id='" . $account_id . "'";
+                    } else {
+                        $where = "tbl_leads.lead_status='1' AND is_customer ='0' AND tbl_leads.user_id='" . $account_id . "'";
+                    }
+                } else {
+
+                    $where = "tbl_leads.user_id='" . $account_id . "' AND tbl_leads.lead_status='1' AND is_customer='0'";
+                }
+
+                // echo $account_id; die;
+
+                $where_ids = "";
+                $user_ids = $this->get_level_user_ids();
+
+
+                // if (count($user_ids)) {
+                //     $where_ids .= " AND ((tbl_followup.user_id='" . implode("' OR tbl_followup.user_id='", $user_ids) . "')  OR (tbl_followup.assign_user_id='" . implode("' OR tbl_followup.assign_user_id='", $user_ids) . "'))";
+
+                // }
+
+                if ($search_agent_id) {
+                    $where_ids .= " AND (tbl_followup.user_id='" . $search_agent_id . "')";
+                }
+
+                $where .= $where_ids;
+                $where_ext = "";
+                if ($search_text) {
+                    $where_ext .= " AND (lead_mobile_no LIKE '%" . $search_text . "%' OR lead_email LIKE '%" . $search_text . "%' OR CONCAT(lead_title, ' ', lead_first_name, ' ', lead_last_name) LIKE '%" . $search_text . "%')";
+                }
+
+                if ($lead_from && !$lead_to) {
+                    $where_ext .= " AND DATE(STR_TO_DATE(tbl_leads.lead_date, '%d-%m-%Y')) >= '$lead_from'";
+                }
+
+                if ($lead_from && $lead_to) {
+                    $where_ext .= " AND DATE(STR_TO_DATE(tbl_leads.lead_date, '%d-%m-%Y')) BETWEEN '$lead_from' AND '$lead_to'";
+                }
+
+                if ($followup_from && !$followup_to) {
+                    $where_ext .= " AND DATE(STR_TO_DATE(tbl_leads.followup_date, '%d-%m-%Y')) >= '$followup_from'";
+                }
+
+                if ($followup_from && $followup_to) {
+
+                    $where_ext .= " AND DATE(STR_TO_DATE(tbl_leads.followup_date, '%d-%m-%Y')) BETWEEN '$followup_from' AND '$followup_to'";
+                }
+
+                if ($search_state_id) {
+                    $where_ext .= " AND lead_state_id='" . $search_state_id . "'";
+                }
+
+                if ($search_city_id) {
+                    $where_ext .= " AND lead_city_id='" . $search_city_id . "'";
+                }
+
+                if ($search_source_id) {
+                    $where_ext .= " AND tbl_leads.lead_source_id='" . $search_source_id . "'";
+                }
+
+                if ($search_stage_id) {
+                    $where_ext .= " AND tbl_leads.lead_stage_id='" . $search_stage_id . "'";
+                }
+                if ($search_status) {
+                    $where_ext .= " AND tbl_leads.lead_status='" . $search_status . "'";
+                }
+
+                if ($search_location_id) {
+                    $where_ext .= " AND tbl_leads.location_id='" . $search_location_id . "'";
+                    // $where_ext .= " AND FIND_IN_SET(" . $search_location_id . ",location)";
+                }
+
+                if ($search_budget_min && !$search_budget_max) {
+                    $where_ext .= " AND budget_min>='" . $search_budget_min . "'";
+                }
+                if ($search_budget_min && $search_budget_max) {
+                    $where_ext .= " AND (budget_min>='" . $search_budget_min . "' AND budget_max<='" . $search_budget_max . "')";
+                }
+
+                if ($search_size_min && !$search_size_max) {
+                    $where_ext .= " AND size_min<='" . $search_size_min . "'";
+                }
+                if ($search_size_min && $search_size_max) {
+                    $where_ext .= " AND (size_min<='" . $search_size_min . "' AND size_max>='" . $search_size_max . "')";
+                }
+
+                if ($search_size_unit) {
+                    $where_ext .= " AND size_unit='" . $search_size_unit . "'";
+                }
+
+                $where .= $where_ext;
+
+                // $where .= " GROUP BY tbl_followup.lead_id";
+                // $where .= " GROUP BY tbl_leads.lead_id";
+
+                # Sorting
+                switch ($filter_by):
+                    case 'due_followup':
+                        $where .= " and tbl_leads.added_to_followup = 1";
+                        $where .= " GROUP BY tbl_leads.lead_id";
+                        $where .= " ORDER BY DATE(STR_TO_DATE(`followup_date`, '%d-%m-%Y')) DESC , next_followup_time DESC";
+                        break;
+
+                    case 'new_leads':
+                        $where .= " and tbl_leads.added_to_followup = 0";
+                        $where .= " GROUP BY tbl_leads.lead_id";
+                        $where .= " ORDER BY DATE(STR_TO_DATE(`lead_date`, '%d-%m-%Y')) DESC, STR_TO_DATE(`lead_time`, '%h:%i:%s %p') DESC";
+                        break;
+                    default:
+                        $where .= " GROUP BY tbl_leads.lead_id";
+                        break;
+                endswitch;
+                # End Sorting
+
+                $this->db->select("count(tbl_leads.lead_id) as total_records");
+                // $this->db->select("count(tbl_followup.lead_id) as total_records");
+                // $this->db->from('tbl_followup');
+                // $this->db->join('tbl_leads', 'tbl_leads.lead_id = tbl_followup.lead_id');
+                // $this->db->join('tbl_requirements', 'tbl_requirements.lead_id = tbl_leads.lead_id','left');
+                // $this->db->where($where);
+                // $query = $this->db->get();
+                // $this->db->join("tbl_lead_transfer","tbl_lead_transfer.transfer_to=tbl_leads.user_id");
+                $this->db->join('tbl_followup', 'tbl_followup.followup_id = tbl_leads.user_id', 'left');
+                $this->db->where($where);
+                $query = $this->db->get('tbl_leads');
+                $record_all = $query->result();
+
+                // print_r($this->db->last_query());
+                // die;
+                // echo $where.'<br>';
+
+                // echo count($record_all); die;
+
+                $total_records = 0;
+                if ($record_all) {
+                    $total_records = count($record_all); // $record_all->total_records;
+                    $total_pages = ceil($total_records / $limit);
+                }
+
+
+                // $where = "tbl_leads.lead_status='1' AND is_customer='0'";
+
+                if ($user_detail->role_id < 3 || $user_detail->role_id == 5) {
+
+                    if ($user_detail->parent_id == 0) {
+                        $where = "tbl_leads.lead_status='1' AND is_customer ='0' AND tbl_leads.account_id='" . $account_id . "'";
+                    } else {
+                        $where = "tbl_leads.lead_status='1' AND is_customer ='0' AND tbl_leads.user_id='" . $account_id . "'";
+                    }
+                } else {
+                    $where = "tbl_leads.user_id='" . $account_id . "' AND tbl_leads.lead_status='1' AND is_customer='0'";
+                }
+                $where_ids = "";
+                $user_ids = $this->get_level_user_ids();
+
+                $where .= $where_ids;
+
+                $where .= $where_ext;
+
+                # Sorting
+                switch ($filter_by):
+                    case 'due_followup':
+                        $where .= " and tbl_leads.added_to_followup = '1'";
+                        $where .= " GROUP BY tbl_leads.lead_id";
+                        // $where .= " ORDER BY DATE(STR_TO_DATE(tbl_followup.next_followup_date, '%d-%m-%Y')) desc , tbl_followup.next_followup_time DESC";
+                        $where .= " ORDER BY DATE(STR_TO_DATE(tbl_followup.next_followup_date, '%d-%m-%Y')) desc , tbl_followup.next_followup_time DESC";
+                        break;
+
+                    case 'new_leads':
+                        $where .= " and tbl_leads.added_to_followup = 0";
+                        $where .= " GROUP BY tbl_leads.lead_id";
+                        // $where .= " ORDER BY DATE(STR_TO_DATE(`lead_date`, '%d-%m-%Y')) DESC, lead_time DESC";
+                        $where .= " ORDER BY DATE(STR_TO_DATE(`lead_date`, '%d-%m-%Y')) DESC, STR_TO_DATE(`lead_time`, '%h:%i:%s %p') DESC";
+                        break;
+                    default:
+                        $where .= " GROUP BY tbl_leads.lead_id";
+                        break;
+                endswitch;
+                # End Sorting
+
+
+                $where .= " limit " . $start . "," . $limit;
+
+                $profile_base_url           =   base_url('public/other/profile/');
+
+                $this->db->select(
+                    "tbl_leads.*, 
+                                    CONCAT(user.user_title, user.first_name, user.last_name) as assgin_user_full_name, 
+                                    stages.lead_stage_name as stage_name, 
+                                    lead_source.lead_source_name,
+                                    concat(tbl_leads.profile) as full_profile_url,
+                                    tbl_followup.next_followup_date,
+                                    tbl_followup.next_followup_time"
+                );
+
+                //  echo $where; die;               
+
+                $this->db->where($where);
+                $this->db->join('tbl_lead_sources as lead_source', 'lead_source.lead_source_id = tbl_leads.lead_source_id', 'left');
+                $this->db->join('tbl_lead_stages as stages', 'stages.lead_stage_id = tbl_leads.lead_stage_id', 'left');
+                $this->db->join('tbl_users as user', 'user.user_id = tbl_leads.user_id', 'left');
+                // $this->db->join('tbl_followup', 'tbl_followup.lead_id = tbl_leads.lead_id', 'left');
+                $this->db->join('(SELECT * FROM tbl_followup WHERE followup_id IN (SELECT MAX(followup_id) FROM tbl_followup GROUP BY lead_id)) as tbl_followup', 'tbl_followup.lead_id = tbl_leads.lead_id', 'left');
+
+                $query = $this->db->get('tbl_leads');
+
+                $record_data = $query->result();
+
+                // print_r($this->db->last_query());
+                // die;
+                // print_r($record_data);
+
+                $records = array();
+                if ($record_data) {
+                    foreach ($record_data as $item) {
+
+                        $lead_or_next_followp_date                  =   $item->next_followup_date ? date('d-m-Y', strtotime($item->next_followup_date)) : ($item->lead_date ? date('d-m-Y', strtotime($item->lead_date)) : 'N/A');
+
+                        $lead_or_next_followp_time                  =   $item->next_followup_time ? $item->next_followup_time : ($item->lead_time ? date('H:i', strtotime($item->lead_time)) : 'N/A');
+
+                        $records[] = array(
+                            'lead_id'                               => $item->lead_id,
+                            'lead_title'                            => $item->lead_title,
+                            'lead_first_name'                       => $item->lead_first_name,
+                            'lead_last_name'                        => $item->lead_last_name,
+                            'lead_mobile_no'                        => $item->lead_mobile_no,
+                            'lead_stage_name'                       => $item->lead_stage_name ?? '',
+                            'lead_source_name'                      => $item->lead_source_name ?? 'N/A',
+                            'lead_email'                            => $item->lead_email,
+                            'is_followup'                           => $item->added_to_followup,
+                            'assgin_user_full_name'                 => $item->assgin_user_full_name,
+                            'stage_name'                            => $item->stage_name ?? 'N/A',
+                            'full_profile_url'                      => $item->full_profile_url ? ($profile_base_url . $item->full_profile_url) : base_url('public/front/user.png'),
+                            'lead_or_next_followp_date'             => $lead_or_next_followp_date,
+                            'lead_or_next_followp_time'             => $lead_or_next_followp_time,
+                            'lead_or_next_followp_date_and_time'    => $lead_or_next_followp_date . ' ( ' . $lead_or_next_followp_time . ' )'
+                        );
+                    }
+                }
+
+                if ($total_pages != $page) {
+                    $next_page = $page + 1;
+                }
+
+                $array = array('status' => 'success', 'message' => 'Lead Found', 'records' => $records, 'total_records' => $total_records, 'total_pages' => $total_pages, 'next_page' => $next_page, 'records' => $records);
+            } else {
+                $array = array('status' => 'error', 'message' => 'No Leads');
+            }
+        } else {
+            $array = array('status' => 'error', 'message' => 'Some error occurred, please try again.');
+        }
+
+        echo json_encode($array);
+    }
+    
+    # old followup list
+    public function get_followup_list_old()
+    {
+
         //  echo $menu_item_array['leads']['rr_view']; die;
 
         $array = array();
@@ -3941,7 +4262,7 @@ WHERE lead_id='" . $lead_id . "'
             $this->db->select("lead_stage_id,lead_status");
             $this->db->from('tbl_leads');
             $this->db->where($where);
-            $query = $this->db->get();
+            $query  = $this->db->get();
             $record = $query->row();
 
             if ($record) {
