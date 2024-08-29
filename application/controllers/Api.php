@@ -9455,7 +9455,7 @@ class Api extends CI_Controller
                         "followup_id" => $item->followup_id ,
                         'label' => $item->lead_action_name . '@ '.$next_action. 'By '.(($item->cu_parent_id == 0) ? (($item->cu_is_individual) ? ucwords($item->cu_user_title . ' ' . $item->cu_first_name . ' ' . $item->cu_last_name) : $item->cu_firm_name) : ucwords($item->cu_user_title . ' ' . $item->cu_first_name . ' ' . $item->cu_last_name)) ,
                         'remark'  => $item->task_desc,
-                        'comment' => $item->comment.' @ '.date("d-m-Y & h:i A", $item->created_at).' '.(($item->au_parent_id == 0) ? (($item->au_is_individual) ? ucwords($item->au_user_title . ' ' . $item->au_first_name . ' ' . $item->au_last_name) : $item->au_firm_name) : ucwords($item->au_user_title . ' ' . $item->au_first_name . ' ' . $item->au_last_name)),
+                        'comment' => $item->comment ? ( $item->comment.' @ '.date("d-m-Y & h:i A", $item->created_at).' '.(($item->au_parent_id == 0) ? (($item->au_is_individual) ? ucwords($item->au_user_title . ' ' . $item->au_first_name . ' ' . $item->au_last_name) : $item->au_firm_name) : ucwords($item->au_user_title . ' ' . $item->au_first_name . ' ' . $item->au_last_name))) : '',
                         "followup_status" => ($item->followup_status == 1) ? 'Pending' : ( ($item->followup_status == 2) ? 'Complete' : 'Cancel'),
                         // "followup_status" => ($item->followup_status == 1) ? '<span class="" style="padding: 3px 10px;color:#fff;background-color: #f29d56;border-radius: 10rem;line-height: 15px;font-weight: 600;font-size: 85%;">Pending</span>' : ( ($item->followup_status == 2) ? '<span class="" style="padding: 3px 10px;color:#fff;background-color: #6fd96f;border-radius: 10rem;line-height: 15px;font-weight: 600;font-size: 85%;">Complete</span>' : '<span class="" style="padding: 3px 10px;color:#fff;background-color: #ff5e5e;border-radius: 10rem;line-height: 15px;font-weight: 600;font-size: 85%;">Cancel</span>'),
                         "followup_status_id" =>  $item->followup_status ,
@@ -9557,7 +9557,7 @@ class Api extends CI_Controller
                     }
 
                     if ($location) {
-                        $location .= "<br>";
+                        $location .= " ";
                     }
 
                     if ($item->state_name) {
@@ -9588,11 +9588,8 @@ class Api extends CI_Controller
                         "requirement_id"        => $item->requirement_id,
                         "lead_id"               => $item->lead_id,
                         "look_for"              => $item->look_for,
-                        "budget_min"            => ($item->budget_minimum) ? $item->budget_minimum : '',
-                        "budget_max"            => ($item->budget_maximum) ? $item->budget_maximum : '',
-                        "size_min"              => $item->size_min,
-                        "size_max"              => $item->size_max,
-                        "size_unit"             => $item->size_unit_name,
+                        "budget"                => (($item->budget_minimum) ? $item->budget_minimum : '' ).' - '.(($item->budget_maximum) ? $item->budget_maximum : ''),
+                        "size"              => $item->size_min.'-'.$item->size_max.' '.$item->size_unit_name,
                         "remark"                => $item->remark,
                         "dor"                   => $item->dor,
                         "state_id"              => $item->state_id,
