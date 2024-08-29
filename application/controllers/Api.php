@@ -3998,6 +3998,7 @@ class Api extends CI_Controller
 
     public function followup_save()
     {
+        $this->form_validation->set_rules('followup_id', 'Followup Id', 'required');
         $this->form_validation->set_rules('lead_stage_id', 'Stage', 'required');
         $this->form_validation->set_rules('lead_status_id', 'Status', 'required');
         $this->form_validation->set_rules('next_action', 'Next Action', 'required');
@@ -4024,6 +4025,7 @@ class Api extends CI_Controller
 
         $where = "user_hash='" . $this->input->post('user_hash') . "'";
         $user_detail = $this->Action_model->select_single('tbl_users', $where);
+        
         if ($user_detail) {
             $user_id = $user_detail->user_id;
             $account_id = $user_detail->user_id;
