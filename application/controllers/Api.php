@@ -4025,7 +4025,7 @@ class Api extends CI_Controller
 
         $where = "user_hash='" . $this->input->post('user_hash') . "'";
         $user_detail = $this->Action_model->select_single('tbl_users', $where);
-        
+
         if ($user_detail) {
             $user_id = $user_detail->user_id;
             $account_id = $user_detail->user_id;
@@ -4036,9 +4036,12 @@ class Api extends CI_Controller
 
         if ($user_detail && $this->input->post()) {
 
-            $followup_id = $this->input->post('followup_id');
+            $followup_id = (int) $this->input->post('followup_id');
+
+
             $followup_lead_id = $this->input->post('followup_lead_id');
-            $followup_status = $this->input->post('followup_status');
+            $followup_status  
+            = $this->input->post('followup_status');
 
             if ($this->input->post("lead_stage_id") == 6) {
                 $inv_data = $this->Action_model->select_single('tbl_inventory', "inventory_id='" . $this->input->post("bk_inventory_id") . "' AND inventory_status='1'");
@@ -4061,7 +4064,11 @@ class Api extends CI_Controller
                 $comment = $this->input->post('comment');
             }
 
+            //  echo $followup_id; die;
+
             $record = $this->Action_model->select_single('tbl_followup', "followup_id='" . $followup_id . "' AND account_id='" . $account_id . "'");
+
+            // print_r($record); die;
 
             if ($record) {
                 $followup_next_status = 0;
