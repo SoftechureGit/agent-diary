@@ -3336,7 +3336,7 @@ class Api extends CI_Controller
     }
 
 
-    public function add_requirement()
+    public function requirement_store()
     {
         $array      = array();
         $account_id = 0;

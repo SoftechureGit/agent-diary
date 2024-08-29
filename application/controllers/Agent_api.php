@@ -2924,7 +2924,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
     }
 
 
-    public function requirement_store()
+    public function add_requirement()
     {
         $array = array();
 
