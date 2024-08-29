@@ -3998,6 +3998,8 @@ class Api extends CI_Controller
 
     public function followup_save()
     {
+
+
         $this->form_validation->set_rules('followup_id', 'Followup Id', 'required');
         $this->form_validation->set_rules('lead_stage_id', 'Stage', 'required');
         $this->form_validation->set_rules('lead_status_id', 'Status', 'required');
@@ -4036,8 +4038,9 @@ class Api extends CI_Controller
 
         if ($user_detail && $this->input->post()) {
 
-            $followup_id = (int) $this->input->post('followup_id');
+            $followup_id = json_decode($this->input->post('followup_id'));
 
+            // print_r($followup_id); die;
 
             $followup_lead_id = $this->input->post('followup_lead_id');
             $followup_status  
@@ -11962,7 +11965,6 @@ class Api extends CI_Controller
         if (count($transfer_lead_ids) > 0) {
             foreach ($transfer_lead_ids as   $transfer_lead_id) {
                 $raw_data =     $this->db->select('*')->where('data_id', json_decode($transfer_lead_id))->get('tbl_data')->row();
-
 
                 if ($raw_data) {
 
