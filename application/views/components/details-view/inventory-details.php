@@ -192,7 +192,7 @@ $property_layout_url        =   $property_layout ? base_url("uploads/images/prop
                 <?php if ($facing_id ?? 0) : ?>
                 <tr>
                     <th>Facing</th>
-                    <td><?= facings($facing_id)->title; ?></td>
+                    <td><?= facings($facing_id)->title ?? ''; ?></td>
                 </tr>
                 <?php endif; ?>
                 <!-- End Facing -->
