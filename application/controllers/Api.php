@@ -3646,7 +3646,7 @@ class Api extends CI_Controller
         echo json_encode($array);
     }
 
-    public function followup_save()
+    public function followup_save_old()
     {
         $array = array();
 
@@ -3990,6 +3990,368 @@ class Api extends CI_Controller
             }
         } else {
             $array = array('status' => 'false', 'msg' => 'Some error occurred, please try again.');
+        }
+
+        echo json_encode($array);
+    }
+
+
+    public function followup_save()
+    {
+        $this->form_validation->set_rules('lead_stage_id', 'Stage', 'required');
+        $this->form_validation->set_rules('lead_status_id', 'Status', 'required');
+        $this->form_validation->set_rules('next_action', 'Next Action', 'required');
+        $this->form_validation->set_rules('next_followup_date', 'Date', 'required');
+        $this->form_validation->set_rules('next_followup_time', 'Time', 'required');
+        $this->form_validation->set_rules('fp_assign_to', 'Assign To ', 'required');
+
+
+        if ($this->form_validation->run() == FALSE):
+            // Validation failed
+            $response = array(
+                'status' => 'error',
+                'msg'   => validation_errors('<div style="color:red;">', '</div>')
+            );
+            echo json_encode($response);
+            exit;
+        endif;
+
+
+        $array = array();
+
+        $account_id = 0;
+        $user_id = 0;
+
+        $where = "user_hash='" . $this->input->post('user_hash') . "'";
+        $user_detail = $this->Action_model->select_single('tbl_users', $where);
+        if ($user_detail) {
+            $user_id = $user_detail->user_id;
+            $account_id = $user_detail->user_id;
+            if ($user_detail->role_id != 2) {
+                $account_id = $user_detail->parent_id;
+            }
+        }
+
+        if ($user_detail && $this->input->post()) {
+
+            $followup_id = $this->input->post('followup_id');
+            $followup_lead_id = $this->input->post('followup_lead_id');
+            $followup_status = $this->input->post('followup_status');
+
+            if ($this->input->post("lead_stage_id") == 6) {
+                $inv_data = $this->Action_model->select_single('tbl_inventory', "inventory_id='" . $this->input->post("bk_inventory_id") . "' AND inventory_status='1'");
+                if ($inv_data) {
+                    $check = $this->Action_model->select_single('tbl_bookings', "inventory_id='" . $this->input->post("bk_inventory_id") . "' AND (booking_status='0' || booking_status='1')");
+                    if ($check) {
+                        $array = array('status' => 'error', 'message' => 'Already Booked');
+                        echo json_encode($array);
+                        exit;
+                    }
+                } else {
+                    $array = array('status' => 'error', 'message' => 'Not available for booking.');
+                    echo json_encode($array);
+                    exit;
+                }
+            }
+
+            $comment = "";
+            if ($this->input->post('comment')) {
+                $comment = $this->input->post('comment');
+            }
+
+            $record = $this->Action_model->select_single('tbl_followup', "followup_id='" . $followup_id . "' AND account_id='" . $account_id . "'");
+
+            if ($record) {
+                $followup_next_status = 0;
+                if ($followup_status == 2) {
+                    $followup_next_status = 1;
+                    $this->Action_model->update_data(array('followup_status' => 2, "comment" => $comment), 'tbl_followup', "followup_id='" . $followup_id . "' AND account_id='" . $account_id . "'");
+                } else if ($followup_status == 3) {
+                    $followup_next_status = 1;
+                    $this->Action_model->update_data(array('followup_status' => 3, "comment" => $comment), 'tbl_followup', "followup_id='" . $followup_id . "' AND account_id='" . $account_id . "'");
+                }
+
+                $lead_status_id = "";
+                if ($this->input->post("lead_status_id")) {
+                    $lead_status_id = $this->input->post("lead_status_id");
+                }
+
+                if ($this->input->post("lead_stage_id") == 7) {
+                    $lead_status_id = 2;
+                }
+                if ($this->input->post("lead_stage_id") == 6) {
+                    $lead_status_id = 3;
+                }
+
+                $this->Action_model->update_data(array('lead_status' => $lead_status_id, 'lead_stage_id' => $this->input->post("lead_stage_id")), 'tbl_leads', "lead_id='" . $followup_lead_id . "' AND account_id='" . $account_id . "'");
+
+                $next_followup_date = "";
+                $next_followup_time = "";
+                $next_followup = "";
+                $project_id = "";
+                $next_action = "";
+                $task_desc = "";
+
+                if ($this->input->post("next_followup_date")) {
+                    $next_followup_date = $this->input->post("next_followup_date");
+                }
+                if ($this->input->post("next_followup_time")) {
+                    // $next_followup_time = $this->input->post("next_followup_time");
+                    $next_followup_time = str_replace(['am', 'pm'], ['', ''], $this->input->post('next_followup_time'));
+                }
+                if ($this->input->post("project_id")) {
+                    $project_id = $this->input->post("project_id");
+                }
+                if ($this->input->post("next_action")) {
+                    $next_action = $this->input->post("next_action");
+                }
+                if ($this->input->post("task_desc")) {
+                    $task_desc = $this->input->post("task_desc");
+                }
+
+                if ($this->input->post("lead_stage_id") != 6) {
+                    $followup_array = array(
+                        "lead_stage_id" => $this->input->post("lead_stage_id"),
+                        "lead_status_id" => $lead_status_id,
+                        "next_action" => $next_action,
+                        "next_followup_date" => $next_followup_date,
+                        "next_followup_time" => $next_followup_time,
+                        "project_id" => $project_id,
+                        "task_desc" => $task_desc,
+                        "comment" => '',
+                        "lead_id" => $followup_lead_id,
+                        "added_by" => $user_id,
+                        "user_id" => $user_id,
+                        "account_id" => $account_id,
+                        "assign_user_id" => $this->input->post("fp_assign_to"),
+                        "followup_status" => $followup_next_status,
+                        "created_at" => time(),
+                        "updated_at" => time()
+                    );
+
+                    $this->Action_model->insert_data($followup_array, 'tbl_followup');
+
+                    $where = "lead_id='" . $followup_lead_id . "' AND account_id='" . $account_id . "' ORDER BY followup_id DESC LIMIT 1";
+                    $this->db->select('au.first_name as au_first_name,au.last_name as au_last_name,next_followup_date,next_followup_time');
+                    $this->db->from('tbl_followup');
+                    $this->db->join('tbl_users as au', 'au.user_id = tbl_followup.assign_user_id', 'left');
+                    $this->db->where($where);
+                    $query = $this->db->get();
+                    $followup_detail = $query->row();
+                    if ($followup_detail && $followup_detail->next_followup_date) {
+                        $next_followup = "<i class='fa fa-clock-o'></i> " . $followup_detail->next_followup_date . " & " . $followup_detail->next_followup_time . " &nbsp; <i class='fa fa-bookmark'></i> " . $followup_detail->au_first_name . ' ' . $followup_detail->au_last_name;
+                        $next_followup_date = $followup_detail->next_followup_date . " " . $followup_detail->next_followup_time;
+                    }
+
+                    $lead_history_array = array(
+                        'title' => 'Followup',
+                        'description' => 'Followup assign to ' . $this->Action_model->get_name($this->input->post("fp_assign_to")) . ' by ' . $this->Action_model->get_name($user_id),
+                        'lead_id' => $followup_lead_id,
+                        'created_at' => time(),
+                        "account_id" => $account_id,
+                        "user_id" => $user_id
+                    );
+                    $this->Action_model->insert_data($lead_history_array, 'tbl_lead_history');
+                }
+
+                //site visit
+                if ($this->input->post("next_action") == 2 && $this->input->post("fp_project_id")) {
+                    $fp_project = $this->input->post("fp_project_id");
+
+                    $prject_names = array();
+                    foreach ($fp_project as $rowItem) {
+
+                        $recordProject = $this->Action_model->select_single('tbl_products', "product_id='" . $rowItem . "'", "project_name");
+                        if ($recordProject) {
+                            $prject_names[] = $recordProject->project_name;
+                        }
+
+                        $sv_array = array(
+                            "lead_id" => $followup_lead_id,
+                            "project_id " => $rowItem,
+                            "visit_date " => $this->input->post("next_followup_date"),
+                            "visit_time " => $this->input->post("next_followup_time"),
+                            "attend_by" => '',
+                            "site_visit_status" => 1,
+                            "interested " => 0,
+                            "comment" => '',
+                            "account_id" => $account_id,
+                            "added_by" => $user_id,
+                            "user_id" => $user_id,
+                            "assign_to" => $this->input->post("fp_assign_to"),
+                            "created_at" => time()
+                        );
+
+                        $this->Action_model->insert_data($sv_array, 'tbl_site_visit');
+
+                        $lead_history_array = array(
+                            'title' => 'Site Visit',
+                            'description' => 'Site Visit assign to ' . $this->Action_model->get_name($this->input->post("fp_assign_to")) . ' by ' . $this->Action_model->get_name($user_id),
+                            'lead_id' => $followup_lead_id,
+                            'created_at' => time(),
+                            "account_id" => $account_id,
+                            "user_id" => $user_id
+                        );
+                        $this->Action_model->insert_data($lead_history_array, 'tbl_lead_history');
+                    }
+
+
+                    if ($this->input->post("lead_stage_id") == 4) {
+
+
+                        $recordLead = $this->Action_model->select_single('tbl_leads', "lead_id='" . $followup_lead_id . "'", "lead_mobile_no,lead_id");
+
+                        if ($recordLead) {
+                            $account_id = 0;
+                            $user_id = 0;
+
+                            $where = "user_hash='" . $this->session->userdata('agent_hash') . "'";
+                            $user_detail = $this->Action_model->select_single('tbl_users', $where);
+                            if ($user_detail) {
+                                $user_id = $user_detail->user_id;
+                                $account_id = $user_detail->user_id;
+                                if ($user_detail->role_id != 2) {
+                                    $account_id = $user_detail->parent_id;
+                                }
+                            }
+
+                            $s_account_id = $account_id;
+                            $s_team_user_id = $user_id;
+                            $s_customer_id = $recordLead->lead_id;
+                            $s_mobile = $recordLead->lead_mobile_no;
+                            $project_name = ($prject_names) ? implode(", ", $prject_names) : "";
+
+                            $where_agent = "user_id='" . $s_account_id . "'";
+                            $agent_detail = $this->Action_model->select_single('tbl_users', $where_agent);
+
+                            if ($agent_detail->no_of_sms) {
+
+                                $s_message = "Hi! Thank you for confirming your appointment @ " . $this->input->post("next_followup_time") . " on " . $this->input->post("next_followup_date") . " to visit the " . $project_name . ". for any assistance call us @ " . $this->Action_model->get_name($this->input->post("fp_assign_to"));
+
+                                $sms_response = $this->Action_model->sendMobileSMS($s_mobile, $s_message, true);
+                                if ($sms_response) {
+                                    $sms_response_array = json_decode($sms_response);
+                                    if ($sms_response_array && isset($sms_response_array->status) && $sms_response_array->status == "success") {
+
+
+
+                                        $sms_before = $agent_detail->no_of_sms;
+                                        $net_no_of_sms = $sms_before - 1;
+                                        $sms_after = $net_no_of_sms;
+
+                                        $user_data = array(
+                                            'no_of_sms' => $net_no_of_sms
+                                        );
+
+                                        $this->Action_model->update_data($user_data, 'tbl_users', $where_agent);
+
+                                        $sms_credit_array = array(
+                                            'account_id' => $s_account_id,
+                                            'team_user_id' => $s_team_user_id,
+                                            'customer_id' => $s_customer_id,
+                                            'sms_before' => $sms_before,
+                                            'sms_after' => $sms_after,
+                                            'mobile' => $s_mobile,
+                                            'message' => $s_message,
+                                            'create_at' => date("d-m-Y H:i:s A")
+                                        );
+
+                                        $this->Action_model->insert_data($sms_credit_array, 'tbl_sms_history');
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                //site visit end
+
+
+                // booking
+                if ($this->input->post("lead_stage_id") == 6) {
+
+                    $this->Action_model->update_data(array('followup_status' => 2), 'tbl_followup', "followup_id='" . $followup_id . "' AND account_id='" . $account_id . "'");
+
+                    $where = "inventory_id='" . $this->input->post("bk_inventory_id") . "'";
+                    $inv_data = $this->Action_model->select_single('tbl_inventory', $where);
+
+                    if ($inv_data) {
+                        $data_array = array(
+                            'inventory_status' => '2', 'last_update' => time()
+                        );
+                        $this->Action_model->update_data($data_array, 'tbl_inventory', $where);
+
+                        $check = $this->Action_model->select_single('tbl_bookings', "inventory_id='" . $this->input->post("bk_inventory_id") . "'");
+                        if (!$check) {
+                            $bk_size = "";
+                            if ($this->input->post("bk_size")) {
+                                $bk_size = $this->input->post("bk_size");
+                                $bk_size = explode("##", $bk_size);
+                                $bk_size = $bk_size[0];
+                            }
+
+                            $bk_unit_no = "";
+                            if ($this->input->post("bk_unit_no")) {
+                                $bk_unit_no = $this->input->post("bk_unit_no");
+                                $bk_unit_no = explode("##", $bk_unit_no);
+                                $bk_unit_no = $bk_unit_no[0];
+                            }
+
+                            $bk_array = array(
+                                "customer_name" => $this->input->post("bk_customer_name"),
+                                "dob" => $this->input->post("bk_dob"),
+                                "sdw" => $this->input->post("bk_sdw"),
+                                "sdw_title" => $this->input->post("bk_sdw_title"),
+                                "unit_no" => $bk_unit_no,
+                                "unit_ref_no" => $this->input->post("bk_unit_ref_no"),
+                                "address" => $this->input->post("bk_address"),
+                                "state_id" => $this->input->post("bk_state_id"),
+                                "city_id" => $this->input->post("bk_city_id"),
+                                "project_id" => $this->input->post("bk_project_id"),
+                                "tower" => $this->input->post("bk_tower"),
+                                "floor" => $this->input->post("bk_floor"),
+                                "size" => $bk_size,
+                                "accommodation" => $this->input->post("bk_accommodation"),
+                                "product_unit_detail_id" => $this->input->post("bk_product_unit_detail_id"),
+                                "inventory_id" => $this->input->post("bk_inventory_id"),
+                                "deal_amount" => $this->input->post("bk_deal_amount"),
+                                "booking_amount" => $this->input->post("bk_booking_amount"),
+                                "payment_mode" => $this->input->post("bk_payment_mode"),
+                                "cheque_no" => $this->input->post("bk_cheque_no"),
+                                "drawn_on" => $this->input->post("bk_drawn_on"),
+                                "booking_date" => $this->input->post("bk_booking_date"),
+                                "remark" => $this->input->post("bk_remark")
+                            );
+
+                            $bk_array['account_id'] = $account_id;
+                            $bk_array['user_id'] = $user_id;
+                            $bk_array['lead_id'] = $followup_lead_id;
+                            $bk_array['created_at'] = time();
+
+                            $this->Action_model->insert_data($bk_array, 'tbl_bookings');
+
+                            $lead_history_array = array(
+                                'title' => 'Booking',
+                                'description' => 'New Booking by ' . $this->Action_model->get_name($user_id),
+                                'lead_id' => $followup_lead_id,
+                                'created_at' => time(),
+                                "account_id" => $account_id,
+                                "user_id" => $user_id
+                            );
+                            $this->Action_model->insert_data($lead_history_array, 'tbl_lead_history');
+                        }
+                    }
+                }
+                // booking end
+
+                $array = array('status' => 'true', 'message' => 'Updated Successfully!!');
+            } else {
+
+
+
+                $array = array('status' => 'false', 'message' => 'Record Not Found!!');
+            }
+        } else {
+            $array = array('status' => 'false', 'message' => 'Some error occurred, please try again.');
         }
 
         echo json_encode($array);
