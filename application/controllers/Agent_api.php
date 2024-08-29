@@ -1860,8 +1860,8 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
         $account_id = 0;
         $user_id = 0;
 
-        $where = "user_hash='" . $this->session->userdata('agent_hash') . "'";
-        $user_detail = $this->Action_model->select_single('tbl_users', $where);
+        $where          = "user_hash='" . $this->session->userdata('agent_hash') . "'";
+        $user_detail    = $this->Action_model->select_single('tbl_users', $where);
 
         if ($user_detail) {
             $user_id = $user_detail->user_id;
