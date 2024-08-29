@@ -108,7 +108,7 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id, $use
         }
 
         .nk-sidebar {
-            top: 117px !important;
+            top: 116px !important;
         }
 
         .s-hide {
@@ -303,6 +303,9 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id, $use
             background: #d3d3d391;
         }
 
+        .select2-selection__rendered { color: #9d9d9d; }
+        .logo-img{ height: 94px; padding: 0.5rem;}
+
         /*  */
     </style>
 
@@ -336,7 +339,7 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id, $use
                     <b class="logo-abbr"><img src="<?php echo base_url('public/admin/') ?>images/logo.png" alt=""> </b>
                     <span class="logo-compact"><img src="<?php echo base_url('public/front/images/logo.png') ?>" alt=""></span>
                     <span class="brand-title">
-                        <img class="h50" src="<?php echo base_url('public/front/images/logo.png') ?>" alt="">
+                        <img class="logo-img" src="<?php echo base_url('public/front/images/logo.png') ?>" alt="" title="Agent Diary - Lead Managment Solution">
                     </span>
                 </a>
             </div>

@@ -3,6 +3,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class Agent extends CI_Controller
 {
+   
     public function __construct()
     {
         parent::__construct();
@@ -75,59 +76,119 @@ class Agent extends CI_Controller
         }
     }
 
-    public function testmail()
-    {
-        $data = array();
+    # User
+    public function user(){
+        $user               =   null;
 
-        $data['name'] = ucfirst('g' . ' ' . ' r');
-        $data['email_confirm_code'] = 1;
-        $data['email'] = 1;
-        $data['username'] = 1;
+        $agent_hash         =   $this->session->userdata('agent_hash');
 
-        $from = MAINEMAIL;
-        $this->email->from($from, SITE_TITLE);
-        $this->email->to(MAINEMAIL);
-        $this->email->subject("Test Mail");
-        $message = $this->load->view('email/email_verification', $data, true);;
-        $this->email->message($message);
-        $this->email->set_mailtype("html");
-        $this->email->send();
+        if($agent_hash):
+            $where              =   "user_hash='" .$agent_hash. "'";
+            $user               =   $this->Action_model->select_single('tbl_users', $where);
+        endif;
 
-        /*$data['name'] = ucfirst('g'.' '.' r');
-        $data['email_confirm_code'] = 1;
+        if(!$user):
+            echo "Unauthorized";
+            die;
+        endif;
 
-        $from = MAINEMAIL;
-        $this->email->from($from, SITE_TITLE);
-        $this->email->to(MAINEMAIL);
-        $this->email->subject("Test Mail");
-        $message = $this->load->view('email/email_confirm',$data,true);;
-        $this->email->message($message);
-        $this->email->set_mailtype("html");
-        $this->email->send();*/
-
-
-
-        //$this->load->view('email/email_confirm',$data,true);//$this->load->view('email/email_confirm',$data,true);//"Testing Mail";
-
-        /*$data['name'] = ucfirst('g'.' '.' r');
-        $data['email_confirm_code'] = 1;
-
-        $from = MAINEMAIL;
-        $this->email->from($from, SITE_TITLE);
-        $this->email->to(MAINEMAIL);
-        $this->email->subject(SITE_TITLE." - Verify your Email Address");
-        $message = $this->load->view('email/email_confirm',$data,true);
-        $this->email->message($message);
-        $this->email->set_mailtype("html");
-        $this->email->send();*/
+        return $user;
     }
+    # End User
 
-    public function testphone()
-    {
-        //$this->Action_model->sendMobileSMS("8005756759","rkk");
+    # Panel Icons
+    public function icons(){
+        return $this->load->view('agent/include/icons');
     }
+    # End Panel Icons
 
     public function index()
+    {
+
+        $member                 =   $this->input->get('member');
+        $project                =   $this->input->get('project');
+
+        $user_detail            =   $this->user();
+
+        # Init
+
+        $total_leads_count                  =   0;
+        $today_leads_count                  =   0;
+        $today_followup_count               =   0;
+        $missed_followup_count              =   0;
+
+        $is_trial                           =   false;
+        $trial_expired                      =   false;
+        $trial_remaining_days               =   0;
+        $expire_today                       =   0;
+        # End Init
+        
+        # Trial Plan
+
+            # Magical Function
+            $this->trial_plan($is_trial, $trial_expired, $trial_remaining_days, $expire_today);
+            # End Magical Function
+        
+        # End Trial Plan
+
+        # Leads & Followup Query
+            
+            # End Leads
+            $lead_select_query                  =   "
+                                                        count(*) as total_count,
+                                                        SUM(CASE WHEN STR_TO_DATE(lead_date, '%d-%m-%Y')  = CURDATE() THEN 1 ELSE 0 END) as today_count
+                                                    ";
+
+            $this->db->select($lead_select_query);
+            $this->db->from('tbl_leads as lead');
+            $leads                          =   $this->db->get()->row();
+            # End Leads
+
+            # Followup
+            $followup_select_query                  =   "
+                                                        count(*) as total_count,
+                                                        SUM(CASE WHEN ( STR_TO_DATE(next_followup_date, '%d-%m-%Y')  = CURDATE() AND followup_status = '1' AND lead_status_id = 1 ) THEN 1 ELSE 0 END) as today_count,
+                                                        SUM(CASE WHEN ( STR_TO_DATE(next_followup_date, '%d-%m-%Y')  < CURDATE() AND followup_status = '1' AND lead_status_id = 1 ) THEN 1 ELSE 0 END) as missed_count,
+                                                        SUM(CASE WHEN lead_stage_id = '1' THEN 1 ELSE 0 END) as total_initial_count,
+                                                        SUM(CASE WHEN lead_stage_id = '2' THEN 1 ELSE 0 END) as total_followup_count,
+                                                        SUM(CASE WHEN lead_stage_id = '3' THEN 1 ELSE 0 END) as total_enquiry_count,
+                                                        SUM(CASE WHEN lead_stage_id = '4' THEN 1 ELSE 0 END) as total_site_visit_count,
+                                                        SUM(CASE WHEN lead_stage_id = '5' THEN 1 ELSE 0 END) as total_metting_count,
+                                                        SUM(CASE WHEN lead_stage_id = '6' THEN 1 ELSE 0 END) as total_success_count,
+                                                        SUM(CASE WHEN lead_stage_id = '7' THEN 1 ELSE 0 END) as total_dump_count
+                                                    ";
+
+            $this->db->select($followup_select_query);
+            $this->db->from('tbl_followup as followup');
+            $followups                          =   $this->db->get()->row();
+            # End Followup
+
+            // echo "<pre>";
+            // echo $this->db->last_query();
+            // print_r($followups);
+            // die;
+
+        # End Leads & Followup Query
+
+        # Data   
+        $data['is_trial']                   =   $is_trial;
+        $data['trial_expired']              =   $trial_expired;
+        $data['trial_remaining_days']       =   $trial_remaining_days;
+        $data['expire_today']               =   $expire_today;
+        
+        # Count
+        $data['leads']                      =   $leads;
+        $data['followups']                  =   $followups;
+        # End Count
+
+        $data['user_detail']                =   $user_detail;
+        # End Data   
+        
+        
+        $this->load->view(AGENT_URL . 'index', $data);
+    }
+    
+    public function index_old()
     {
 
         $member = ($this->input->get('member') && is_numeric($this->input->get('member'))) ? $this->input->get('member') : "";
@@ -427,48 +488,7 @@ class Agent extends CI_Controller
         $this->load->view(AGENT_URL . 'index', $data);
     }
 
-    /*public function plans()
-    {
-        $where = "user_hash='".$this->session->userdata('agent_hash')."'";
-        $user_detail = $this->Action_model->select_single('tbl_users',$where);
-        $data['user_detail'] = $user_detail;
-
-        $where = "plan_id='".$user_detail->plan_id."'";
-        $plan_detail = $this->Action_model->select_single('tbl_plan',$where);
-
-        $is_trial = false;
-        $trial_expired = false;
-        $trial_remaining_days = 0;
-        if ($plan_detail && $plan_detail->trial_days) {
-
-            $date_today = strtotime(date("d-m-Y")." 00:00:00");//strtotime(date("d-m-Y")." 00:00:00");  
-            $date_trial_start = strtotime("2020-08-25 00:00:00"); //date("d-m-Y",$user_detail->created_at).
-            $diff = abs($date_today - $date_trial_start); 
-            $years = floor($diff / (365*60*60*24));
-            $months = floor(($diff - $years * 365*60*60*24) 
-                                   / (30*60*60*24));  
-            $days = floor(($diff - $years * 365*60*60*24 -  
-            $months*30*60*60*24)/ (60*60*24));
-
-            $is_trial = true;
-
-            if ($days>$plan_detail->trial_days) {
-                $trial_expired = true;
-            }
-
-            $trial_remaining_days = $plan_detail->trial_days - $days;
-        }
-
-        $data['is_trial'] = $is_trial;
-        $data['trial_expired'] = $trial_expired;
-        $data['trial_remaining_days'] = $trial_remaining_days;
-        
-        $where = "plan_id!=''";
-        $plans = $this->Action_model->detail_result('tbl_plan',$where);
-        $data['plans'] = $plans;
-        $this->load->view(AGENT_URL.'plans',$data);
-    }*/
-
+    
     public function get_level_user_ids($value = '')
     {
         $account_id = getAccountId();
@@ -3094,4 +3114,55 @@ class Agent extends CI_Controller
             redirect(AGENT_URL . 'data');
         }
     }
+
+    /*************************************************************************************** 
+    * Helper Function
+    ****************************************************************************************/
+
+    # Trial Plan
+    public function trial_plan(&$is_trial, &$trial_expired, &$trial_remaining_days, &$expire_today){
+        $where = "plan_id='" .  $this->user()->plan_id . "'";
+        $plan_detail = $this->Action_model->select_single('tbl_plan', $where);
+
+        if ( $this->user()->plan_id == 1) {
+
+            $date1 = new DateTime(date("d-m-Y") . " 00:00:00");
+            $date2 = new DateTime( $this->user()->next_due_date . " 00:00:00");
+            $interval = $date1->diff($date2);
+            $days = $interval->days;
+
+            $is_trial = true;
+
+            if ( $this->user()->next_due_date == date("d-m-Y")) {
+                $expire_today = 1;
+            } else if (strtotime( $this->user()->next_due_date . " 00:00:00") < strtotime(date("d-m-Y") . " 00:00:00")) {
+                $trial_expired = true;
+                $trial_remaining_days = 0;
+            } else {
+                $trial_remaining_days = $days;
+            }
+        } else if ( $this->user()->plan_id == 2) {
+
+            $date1 = new DateTime(date("d-m-Y") . " 00:00:00");
+            $date2 = new DateTime( $this->user()->next_due_date . " 00:00:00");
+            $interval = $date1->diff($date2);
+            $days = $interval->days;
+
+            if ( $this->user()->next_due_date == date("d-m-Y")) {
+                $expire_today = 1;
+            } else if (strtotime( $this->user()->next_due_date . " 00:00:00") < strtotime(date("d-m-Y") . " 00:00:00")) {
+                $trial_remaining_days = 0;
+            } else {
+                $trial_remaining_days = $days;
+            }
+        }
+
+    }
+    # End Trial Plan
+    
+    /*************************************************************************************** 
+    *  Helper Function
+    *************************************************************************************** */
+
+    
 }
