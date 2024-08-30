@@ -3471,6 +3471,8 @@ class Api extends CI_Controller
 
     # get edit or add view details
     public function requirement_add_or_edit_view_data(){
+
+        
         $arr = array();
 
         $account_id = getAccountIdHash($this->input->request_headers()['Access-Token'] );
@@ -9976,7 +9978,7 @@ class Api extends CI_Controller
                         "product_unit_id"       => $item->unit_type_id,
                         "lead_option_id"        => $item->lead_option_id,
                         "location"              => $location,
-                        "requirement_status"    => $item->requirement_status,
+                        "requirement_status"    => $item->requirement_status == 1 ? 'Open' : 'Close' ,
                         "added_by"              => (($item->au_parent_id == 0) ? (($item->au_is_individual) ? ucwords($item->au_user_title . ' ' . $item->au_first_name . ' ' . $item->au_last_name) : $item->au_firm_name) : ucwords($item->au_user_title . ' ' . $item->au_first_name . ' ' . $item->au_last_name))
                     );
                 }
