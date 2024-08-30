@@ -3527,11 +3527,11 @@ class Api extends CI_Controller
 
        $status_list = array(
          array(
-            'id'   => 1,
+            'id'   => '1',
             'name' => 'Open'
          ),
          array(
-            'id' => 0 , 
+            'id' => '0' , 
             'name' => 'Close'
          )
          );
