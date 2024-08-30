@@ -3520,6 +3520,21 @@ class Api extends CI_Controller
      
         # end unit size list
 
+        # requirment status list
+
+       $status_list = array(
+         array(
+            'id'   => 1,
+            'name' => 'Open'
+         ),
+         array(
+            'id' => 0 , 
+            'name' => 'Close'
+         )
+         );
+
+        # end requirement status list
+
         $arr = array(
             'status'            => true ,
             'message'           => 'Related Data Found' ,
@@ -3529,6 +3544,7 @@ class Api extends CI_Controller
             'lead_option_list'  => $lead_option_list,
             'budget_list'       => $budget_list,
             'unit_list'         => $unit_list,
+            'status_list'       => $status_list,
 
         );
 
