@@ -3367,10 +3367,13 @@ class Api extends CI_Controller
             $id         = $this->input->post('id');
             $record     = $this->Action_model->select_single('tbl_requirements', "requirement_id='" . $id . "' AND account_id='" . $account_id . "'");
             $location   = $this->input->post('location');
-           
-            if ($location) {
-                $location = implode(",", $location);
-            }
+            
+            
+            
+            // if ($location) {
+            //     $location = explode(",",$location);
+            // }
+
 
             $record_array = array(
                 'look_for'              => $this->input->post('look_for'),
@@ -3379,7 +3382,7 @@ class Api extends CI_Controller
                 'accomodation_id'       => $this->input->post('accomodation_id'),
                 'state_id'              => $this->input->post('state_id'),
                 'city_id'               => $this->input->post('city_id'),
-                'location'              => $location,
+                'location'              => $location ?? '',
                 'budget_min'            => $this->input->post('budget_min'),
                 'budget_max'            => $this->input->post('budget_max'),
                 'size_min'              => $this->input->post('size_min'),
