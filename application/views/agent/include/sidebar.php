@@ -5,6 +5,15 @@
             <div class="nk-nav-scroll" style="overflow: scroll;">
                 <ul class="metismenu" id="menu">
 
+                    <!-- Dashboard -->
+                     <li>
+                        <a href="<?= base_url('agent') ?>">
+                            <i class="icon-grid menu-icon"></i> 
+                            <span class="nav-text">Dashboard</span>
+                        </a>
+                     </li>
+                    <!-- End Dashboard -->
+
                     <!--  Raw Data -->
                     <?php if(isset($menu_item_array['raw_data']) && $menu_item_array['raw_data']['rr_view']) { ?>  
                     <li>
