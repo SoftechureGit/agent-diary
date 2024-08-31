@@ -87,7 +87,7 @@
 
               $selected_member_ids_arr  = [];
 
-                $selected_member_ids_arr = explode(',', $selected_member_ids);
+              $selected_member_ids_arr = explode(',', $selected_member_ids);
               ?>
 
               <label for="team_member">Team Member</label>
@@ -321,8 +321,22 @@
       placeholder: 'Choose...',
       allowClear: true
     });
+
+
   });
 
+  $('.multi-team-members-select2').on('select2:select', function(e) {
+    var data = e.params.data;
+    console.log(data.id)
+    if(data.id == 0){
+      $('.multi-team-members-select2 option').prop('selected', false)
+      $('.default-option').prop('selected', true)
+      $('.multi-team-members-select2').trigger('change')
+    }else{
+      $('.default-option').prop('selected', false)
+      $('.multi-team-members-select2').trigger('change')
+    }
+  });
   /** */
 
   function filterDashboard() {

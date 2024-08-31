@@ -2139,6 +2139,31 @@ class Api extends CI_Controller
     # Store Lead
     public function store_lead()
     {
+        # Lead Id
+        $id                                             =   $this->input->post('lead_id');
+        $request_type                                   =   $this->input->post('request_type');
+        # End Lead Id
+
+        if(($request_type ?? '' ) == 'only_update_profile'):
+            # Profile
+            if (!empty($_FILES['profile']['name'])):
+                $profile                                =   upload_file('profile', 'profile', time());
+                $record_array['profile']                =   $profile->file_name ?? null;
+            endif;
+            # End Profile
+
+            # Update Lead
+            if(count($record_array ?? [])):
+                $this->Action_model->update_data($record_array, 'tbl_leads', "lead_id='$id'");
+                $array                  =  array('status' => 'true', 'msg' => 'Profile updated');
+            else:
+                $array                  =  array('status' => 'false', 'msg' => 'Profile not updated. Please try again.');
+            endif;
+            # End Update Lead
+
+            echo json_encode($array);
+            exit;
+        endif;
         
         $this->form_validation->set_rules('lead_date', 'Date', 'required');
         $this->form_validation->set_rules('lead_time', 'Time', 'required');
@@ -2182,10 +2207,6 @@ class Api extends CI_Controller
         }
 
         if ($user_detail && $this->input->post()) {
-
-            # Lead Id
-            $id                                     =   $this->input->post('lead_id');
-            # End Lead Id
 
             # Record Exists
             $record                                 =   $this->Action_model->select_single('tbl_leads', "lead_id='" . $id . "'");

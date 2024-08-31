@@ -137,6 +137,10 @@ class Agent extends CI_Controller
         $this->db->from('tbl_users');
         $this->db->where($where);
         $members                            =   $this->db->get()->result();
+
+        // echo "<pre>";
+        // print_r($members);
+        // die;
         # End Team Member
 
         # Member Ids
@@ -178,10 +182,8 @@ class Agent extends CI_Controller
         
         
         if(!$selected_member_ids):
-            // $where                          .=   " and ( user_id in ($members_ids) or assign_user_id in ($members_ids) )";
             $where                          .=   " and user_id in ($members_ids) ";
         else:
-            // $where                          .=   " and ( user_id in ($selected_member_ids) or assign_user_id in ($selected_member_ids) )";
             $where                          .=   " and user_id in ($selected_member_ids) ";
         endif;
 
