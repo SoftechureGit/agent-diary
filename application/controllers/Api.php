@@ -118,13 +118,65 @@ class Api extends CI_Controller
         if ($access_token):
             // $where          =   "user_hash = '$access_token' and role_id = '2'";
             $where          =   "user_hash = '$access_token'";
-            $this->user     =   $this->Action_model->select_single('tbl_users', $where, "tbl_users.*, CONCAT(first_name,' ',last_name) as name");
+            // $this->user     =   $this->Action_model->select_single('tbl_users', $where, "tbl_users.*, CONCAT(first_name,' ',last_name) as name");
+            $this->db->select('user.*,  role.role_name');
+            $this->db->where($where);
+            $this->db->from('tbl_users as user');
+            $this->db->join('tbl_roles  as role', 'user.role_id = role.role_id', 'left');
+            $user             =                   $this->db->get()->row();
+
+            # Permission Roles
+            $permission_roles                       =   [];
+            
+            # For Agent 
+            if($user->role_id == 2):
+                $permission_roles                       =   [3,4,5];
+            endif;
+            # End For Agent 
+
+            # Level 1
+            if($user->role_id == 3):
+                $permission_roles                       =   [0];
+            endif;
+            # End Level 1
+
+            # Level 2
+            if($user->role_id == 4):
+                $permission_roles                       =   [3];
+            endif;
+            # End Level 2
+
+            # Level 3
+            if($user->role_id == 5):
+                $permission_roles                       =   [3, 4];
+            endif;
+            # End Level 3
+
+            $user->permission_roles                 =   implode(',', $permission_roles);
+            # Permission Roles
+
+            # Acount Id
+            if ($user) {
+                $account_id = $user->user_id;
+                if ($user->role_id != 2) {
+                    $account_id = $user->parent_id;
+                }
+            }
+
+            $user->account_id             =   $account_id ?? 0;
+            # End Account Id 
+            $this->user = $user;
             return true;
         endif;
 
         return false;
     }
     # Check Is User Login
+
+
+    public function user(){
+        return $this->user;
+    }
 
     # Log
     public function dd($param)
@@ -145,357 +197,128 @@ class Api extends CI_Controller
 
     public function dashboard()
     {
-        $array                  =   array();
-
-        if ($this->input->get()) {
-
-
-            $member = ($this->input->get('member') && is_numeric($this->input->get('member'))) ? $this->input->get('member') : "";
-            $project = ($this->input->get('project') && is_numeric($this->input->get('project'))) ? $this->input->get('project') : "";
-
-            // $where = "user_hash='".$this->input->get('user_hash')."'";
-            // $user_detail = $this->Action_model->select_single('tbl_users',$where,"CONCAT(first_name,' ',last_name) as name, tbl_users.*");
-
-            $user_detail = $this->user;
-
-            $is_trial = false;
-            $trial_expired = false;
-            $trial_remaining_days = 0;
-            $expire_today = 0;
-
-            if ($user_detail) {
-                //$data['user_detail'] = $user_detail;
-
-                $where = "plan_id='" . $user_detail->plan_id . "'";
-                $plan_detail = $this->Action_model->select_single('tbl_plan', $where);
-
-
-                if ($user_detail->plan_id == 1) {
-
-                    $date1 = new DateTime(date("d-m-Y") . " 00:00:00");
-                    $date2 = new DateTime($user_detail->next_due_date . " 00:00:00");
-                    $interval = $date1->diff($date2);
-                    $days = $interval->days;
-
-                    $is_trial = true;
-
-                    if ($user_detail->next_due_date == date("d-m-Y")) {
-                        $expire_today = 1;
-                    } else if (strtotime($user_detail->next_due_date . " 00:00:00") < strtotime(date("d-m-Y") . " 00:00:00")) {
-                        $trial_expired = true;
-                        $trial_remaining_days = 0;
-                    } else {
-                        $trial_remaining_days = $days;
-                    }
-                } else if ($user_detail->plan_id == 2) {
-
-                    $date1 = new DateTime(date("d-m-Y") . " 00:00:00");
-                    $date2 = new DateTime($user_detail->next_due_date . " 00:00:00");
-                    $interval = $date1->diff($date2);
-                    $days = $interval->days;
-
-                    if ($user_detail->next_due_date == date("d-m-Y")) {
-                        $expire_today = 1;
-                    } else if (strtotime($user_detail->next_due_date . " 00:00:00") < strtotime(date("d-m-Y") . " 00:00:00")) {
-                        $trial_remaining_days = 0;
-                    } else {
-                        $trial_remaining_days = $days;
-                    }
-                }
-
-                $data['is_trial'] = $is_trial;
-                $data['trial_expired'] = $trial_expired;
-                $data['trial_remaining_days'] = $trial_remaining_days;
-                $data['expire_today'] = $expire_today;
-            }
-
-
-            $upcoming_followup = 0;
-            $today_followup = 0;
-            $missed_followup = 0;
-            $total_project = 0;
-            $total_property_rent = 0;
-            $total_property_sale = 0;
-            $total_lead_rent = 0;
-            $total_lead_sale = 0;
-            $total_lead_active_rent = 0;
-            $total_lead_conversion_rent = 0;
-            $total_lead_dead_rent = 0;
-            $total_lead_active_sale = 0;
-            $total_lead_conversion_sale = 0;
-            $total_lead_dead_sale = 0;
-
-            // $account_id = getAccountIdHash($this->input->get('user_hash'));
-            $account_id = $this->user->user_id;
-
-            $where = "account_id='" . $account_id . "'" . (($member) ? " AND tbl_leads.user_id='" . $member . "'" : "");
-            $tb_data = $this->Action_model->select_single('tbl_leads', $where, "COUNT(CASE WHEN added_to_followup = 1 THEN lead_id END) as upcoming_followup,COUNT(CASE WHEN followup_date = '" . date('d-m-Y') . "' THEN lead_id END) as today_followup,COUNT(CASE WHEN added_to_followup = 0 THEN lead_id END) as missed_followup");
-
-            $where = "account_id='" . $account_id . "' AND UNIX_TIMESTAMP(STR_TO_DATE(followup_date, '%d-%m- %Y')) >= " . strtotime(date("d-m-Y", strtotime('tomorrow')) . "00:00:00") . (($member) ? " AND tbl_leads.user_id='" . $member . "'" : "");
-            $dd = $this->Action_model->select_single('tbl_leads', $where, "count(lead_id) as total");
-            if ($dd) {
-                $upcoming_followup = $dd->total;
-            }
-
-            $data['upcoming_followup'] = (string)$upcoming_followup;
-            $data['today_followup'] = (string)$tb_data->today_followup;
-            $data['missed_followup'] = (string)$tb_data->missed_followup;
-
-            $data['total_lead_active_rent'] = (string)$total_lead_active_rent;
-            $data['total_lead_conversion_rent'] = (string)$total_lead_conversion_rent;
-            $data['total_lead_dead_rent'] = (string)$total_lead_dead_rent;
-            $data['total_lead_active_sale'] = (string)$total_lead_active_sale;
-            $data['total_lead_conversion_sale'] = (string)$total_lead_conversion_sale;
-            $data['total_lead_dead_sale'] = (string)$total_lead_dead_sale;
-
-            $where = "tbl_leads.account_id='" . $account_id . "' AND look_for='2'" . (($member) ? " AND tbl_leads.user_id='" . $member . "'" : "");
-            $this->db->select("count(tbl_requirements.lead_id) as total");
-            $this->db->from('tbl_requirements');
-            $this->db->join('tbl_leads', "tbl_leads.lead_id = tbl_requirements.lead_id");
-            $this->db->where($where);
-            $query = $this->db->get();
-            $dd = $query->row();
-            if ($dd) {
-                $total_lead_rent = $dd->total;
-            }
-
-            $where = "tbl_leads.account_id='" . $account_id . "' AND (look_for='1' OR look_for='3')" . (($member) ? " AND tbl_leads.user_id='" . $member . "'" : "");
-            $this->db->select("count(tbl_requirements.lead_id) as total");
-            $this->db->from('tbl_requirements');
-            $this->db->join('tbl_leads', "tbl_leads.lead_id = tbl_requirements.lead_id");
-            $this->db->where($where);
-            $query = $this->db->get();
-            $dd = $query->row();
-            if ($dd) {
-                $total_lead_sale = $dd->total;
-            }
-
-
-            $where = "tbl_leads.account_id='" . $account_id . "' AND lead_status='1' AND look_for='2'" . (($member) ? " AND tbl_leads.user_id='" . $member . "'" : "");
-            $this->db->select("count(tbl_requirements.lead_id) as total");
-            $this->db->from('tbl_requirements');
-            $this->db->join('tbl_leads', "tbl_leads.lead_id = tbl_requirements.lead_id");
-            $this->db->where($where);
-            $query = $this->db->get();
-            $dd = $query->row();
-            if ($dd) {
-                $total_lead_active_rent = $dd->total;
-            }
-
-            $where = "tbl_leads.account_id='" . $account_id . "' AND lead_status='1' AND (look_for='1' OR look_for='3')" . (($member) ? " AND tbl_leads.user_id='" . $member . "'" : "");
-            $this->db->select("count(tbl_requirements.lead_id) as total");
-            $this->db->from('tbl_requirements');
-            $this->db->join('tbl_leads', "tbl_leads.lead_id = tbl_requirements.lead_id");
-            $this->db->where($where);
-            $query = $this->db->get();
-            $dd = $query->row();
-            if ($dd) {
-                $total_lead_active_sale = $dd->total;
-            }
-
-
-            $where = "tbl_leads.account_id='" . $account_id . "' AND lead_status='2' AND look_for='2'" . (($member) ? " AND tbl_leads.user_id='" . $member . "'" : "");
-            $this->db->select("count(tbl_requirements.lead_id) as total");
-            $this->db->from('tbl_requirements');
-            $this->db->join('tbl_leads', "tbl_leads.lead_id = tbl_requirements.lead_id");
-            $this->db->where($where);
-            $query = $this->db->get();
-            $dd = $query->row();
-            if ($dd) {
-                $total_lead_dead_rent = $dd->total;
-            }
-
-            $where = "tbl_leads.account_id='" . $account_id . "' AND lead_status='2' AND (look_for='1' OR look_for='3')" . (($member) ? " AND tbl_leads.user_id='" . $member . "'" : "");
-            $this->db->select("count(tbl_requirements.lead_id) as total");
-            $this->db->from('tbl_requirements');
-            $this->db->join('tbl_leads', "tbl_leads.lead_id = tbl_requirements.lead_id");
-            $this->db->where($where);
-            $query = $this->db->get();
-            $dd = $query->row();
-            if ($dd) {
-                $total_lead_dead_sale = $dd->total;
-            }
-
-            $where = "tbl_leads.account_id='" . $account_id . "' AND lead_status='1' AND look_for='2'" . (($member) ? " AND tbl_leads.user_id='" . $member . "'" : "");
-            $this->db->select("count(tbl_requirements.lead_id) as total");
-            $this->db->from('tbl_requirements');
-            $this->db->join('tbl_leads', "tbl_leads.lead_id = tbl_requirements.lead_id");
-            $this->db->where($where);
-            $query = $this->db->get();
-            $dd = $query->row();
-            if ($dd) {
-                $total_lead_conversion_rent = $dd->total;
-            }
-
-            $where = "tbl_leads.account_id='" . $account_id . "' AND lead_status='3' AND (look_for='1' OR look_for='3')" . (($member) ? " AND tbl_leads.user_id='" . $member . "'" : "");
-            $this->db->select("count(tbl_requirements.lead_id) as total");
-            $this->db->from('tbl_requirements');
-            $this->db->join('tbl_leads', "tbl_leads.lead_id = tbl_requirements.lead_id");
-            $this->db->where($where);
-            $query = $this->db->get();
-            $dd = $query->row();
-            if ($dd) {
-                $total_lead_conversion_sale = $dd->total;
-            }
-
-            $where = "account_id='" . $account_id . "' AND property_status='3' AND listing_type='1'" . (($member) ? " AND account_id='" . $member . "'" : "");
-            $dd = $this->Action_model->select_single('tbl_property', $where, "count(property_id) as total");
-            if ($dd) {
-                $total_property_rent = $dd->total;
-            }
-
-            $where = "account_id='" . $account_id . "' AND property_status='1' AND listing_type='2'" . (($member) ? " AND account_id='" . $member . "'" : "");
-            $dd = $this->Action_model->select_single('tbl_property', $where, "count(property_id) as total");
-            if ($dd) {
-                $total_property_sale = $dd->total;
-            }
-
-            $where = "user_status='1' AND (user_id='" . $account_id . "' OR parent_id='" . $account_id . "') ORDER BY user_id ASC";
-
-            $this->db->select("*");
-            $this->db->from('tbl_users');
-            $this->db->join('tbl_city', "tbl_city.city_id = tbl_users.city_id", 'left');
-            $this->db->where($where);
-            $query = $this->db->get();
-            $member_list = $query->result();
-            //$data['member_list'] = $member_list; 
-
-            $where = "product_status='1' AND (tbl_products.agent_id='" . $account_id . "') ORDER BY tbl_products.product_id ASC";
-
-            $this->db->select("product_id,project_name");
-            $this->db->from('tbl_products');
-            $this->db->where($where);
-            $query = $this->db->get();
-            $project_list = $query->result();
-            // $data['project_list'] = $project_list;
-
-            $total_project = ($project_list) ? count($project_list) : 0;
-            $data['total_project'] = (string)$total_project;
-
-            $where = "user_status='1' AND (user_id='" . $account_id . "' OR parent_id='" . $account_id . "')" . (($member) ? " AND user_id='" . $member . "'" : "") . " ORDER BY user_id ASC";
-
-            $this->db->select("*");
-            $this->db->from('tbl_users');
-            $this->db->join('tbl_city', "tbl_city.city_id = tbl_users.city_id", 'left');
-            $this->db->where($where);
-            $query = $this->db->get();
-            $user_data = $query->result();
-            $user_list = array();
-            if ($user_data) {
-                foreach ($user_data as $row) {
-
-                    $where = "user_id='" . $row->user_id . "'";
-                    $this->db->select("count(tbl_leads.lead_id) as total");
-                    $this->db->from('tbl_leads');
-                    $this->db->where($where);
-                    $query = $this->db->get();
-                    $dd = $query->row();
-                    $total_lead = 0;
-                    if ($dd) {
-                        $total_lead = $dd->total;
-                    }
-                    $row->total_lead = $total_lead;
-
-                    $where = "user_id='" . $row->user_id . "' AND lead_status='3'";
-                    $this->db->select("count(tbl_leads.lead_id) as total");
-                    $this->db->from('tbl_leads');
-                    $this->db->where($where);
-                    $query = $this->db->get();
-                    $dd = $query->row();
-                    $percentage_conversion = 0;
-                    $total_conversion = 0;
-                    if ($dd) {
-                        $total_conversion = $dd->total;
-                    }
-
-                    $percentage_conversion = ($total_conversion == 0 && $total_lead == 0) ? 0 : ($total_conversion * 100) / $total_lead;
-
-
-                    // echo   ($percentage_conversion); die;
-
-                    $percentage_conversion = number_format((float)$percentage_conversion, 2, '.', '');
-                    $row->percentage_conversion = str_replace("0.00", "0", $percentage_conversion);
-
-                    $where = "tbl_site_visit.user_id='" . $row->user_id . "'";
-                    $this->db->select("count(tbl_leads.lead_id) as total");
-                    $this->db->from('tbl_leads');
-                    $this->db->join('tbl_site_visit', "tbl_site_visit.lead_id = tbl_leads.lead_id", 'left');
-                    $this->db->where($where);
-                    $query = $this->db->get();
-                    $dd = $query->row();
-                    $percentage_site_visit = 0;
-                    $total_site_visit = 0;
-
-                    if ($dd) {
-                        $total_site_visit = $dd->total;
-                    }
-
-
-
-
-                    if ($total_conversion == 0 &&  $total_site_visit == 0):
-
-                        $percentage_site_visit  =   0;
-
-                    else:
-
-                        $percentage_site_visit =    $total_site_visit ? ($total_conversion * 100) / ($total_site_visit) : 0;
-
-                    endif;
-
-
-                    $row->percentage_site_visit = str_replace("0.00", "0", $percentage_site_visit);
-
-                    $user_list[] = $row;
-
-
-                    //   echo   ($percentage_site_visit); die;
-                }
-            }
-            //$data['user_list'] = $user_list; 
-            $data['total_lead_sale'] = (string)$total_lead_sale;
-            $data['total_lead_rent'] = (string)$total_lead_rent;
-            $data['total_property_rent'] = (string)$total_property_rent;
-            $data['total_property_sale'] = (string)$total_property_sale;
-            $data['total_active_client'] = (string)0;
-            $data['total_deal_close'] = (string)0;
-            $team_list = array();
-            $team_list[] = array(
-                "user_id" => (string)1,
-                "name" => "Rakesh Kumar",
-                "total_lead" => (string)15,
-                "total_conversion" => (string)12,
-                "total_site_visit" => (string)122
-            );
-            $team_list[] = array(
-                "user_id" => (string)1,
-                "name" => "Pawan Kumar",
-                "total_lead" => (string)13,
-                "total_conversion" => (string)11,
-                "total_site_visit" => (string)172
-            );
-            $where1 = "country_id='1' AND state_status=1";
-            $state_list = $this->Action_model->detail_result('tbl_states', $where1);
-
-            $data['state_list'] = $state_list;
-            $where = "site_setting_id='1'";
-            $site_setting = $this->Action_model->select_single('tbl_site_setting', $where, "*");
-
-            $associate_complete = "0";
-            $role_id = (string)$this->user->role_id;
-            $is_agent = "0";
-            if ($this->user->role_id == '2' && $this->user->associate_complete == 1) {
-                $associate_complete = "1";
-            }
-            if ($this->user->role_id == '2') {
-                $is_agent = "1";
-            }
-
-            $array['data'] = array('status' => 'true', 'msg' => 'Found', 'data' => $data, 'user_detail' => $user_detail, 'project_list' => $project_list, 'site_setting' => $site_setting, 'team_list' => $team_list, 'state_list' => $state_list, 'associate_complete' => $associate_complete, 'role_id' => $role_id, "is_agent" => $is_agent);
-        } else {
-            $array['data'] = array('status' => 'false', 'msg' => 'Some error occurred, please try again.');
-        }
-        echo json_encode($array);
+
+        # Member Ids
+        $selected_member_ids_arr            =   [];
+        $selected_member_ids                =  $this->input->get('member');
+
+        # End Member Ids
+         $user_detail                        =   $this->user();
+
+
+        $account_id                         =   $user_detail->account_id;
+
+        $user_id                            =   $user_detail->user_id;
+
+        # Init
+        $is_trial                           =   false;
+        $trial_expired                      =   false;
+        $trial_remaining_days               =   0;
+        $expire_today                       =   0;
+        # End Init
+
+        # Trial Plan
+
+            # Magical Function
+            $this->trial_plan($is_trial, $trial_expired, $trial_remaining_days, $expire_today);
+            # End Magical Function
+
+        # End Trial Plan
+
+        # Teams Member
+        $where                              =   "(user.role_id in ($user_detail->permission_roles) or user.user_id = '$user_detail->user_id') and user.user_status='1' AND (user.user_id='$account_id' OR user.parent_id='$account_id') ORDER BY user.user_id ASC";
+        $this->db->select("user.user_id as id, concat(IFNULL(user.user_title, ''),' ', IFNULL(user.first_name, ''), ' ', IFNULL(user.last_name, '')) as full_name, role.role_name");
+        $this->db->from('tbl_users as user');
+        $this->db->join('tbl_roles  as role', 'user.role_id = role.role_id', 'left');
+        $this->db->where($where);
+        $members                            =   $this->db->get()->result();
+
+        # End Team Member
+
+        # Member Ids
+                // Extracting IDs
+                $members_ids_arr                    =  null;
+                if(!$selected_member_ids):
+                    $members_ids_arr                =   array_map(function($member) {
+                                                                        return $member->id;
+                                                                    }, $members);
+                    
+                    $members_ids                    =   implode(",", $members_ids_arr);
+                endif;
+        # End Member Ids
+        # Leads & Followup Query
+        
+
+        $where                              =   "(user.role_id in ($user_detail->permission_roles) or user.user_id = '$user_detail->user_id')";
+        
+        if(!$selected_member_ids):
+            $where                          .=   " and lead.user_id in ($members_ids) ";
+        else:
+            $where                          .=   " and lead.user_id in ($selected_member_ids) ";
+        endif;
+
+        $lead_select_query                  =   "
+                                                    count(*) as total_count,
+                                                    SUM(CASE WHEN STR_TO_DATE(lead_date, '%d-%m-%Y')  = CURDATE() THEN 1 ELSE 0 END) as today_count
+                                                ";
+                                               
+        $this->db->select($lead_select_query);
+        $this->db->where($where);
+        $this->db->from('tbl_leads as lead');
+        $this->db->join('tbl_users  as user', 'user.user_id = lead.user_id', 'left');
+        $leads                          =   $this->db->get()->row();
+       # End Leads
+
+
+        # Followup
+        $where                              =   "(user.role_id in ($user_detail->permission_roles) or user.user_id = '$user_detail->user_id') and followup.account_id='$account_id'";
+        
+        
+        if(!$selected_member_ids):
+            $where                          .=   " and followup.user_id in ($members_ids) ";
+        else:
+            $where                          .=   " and followup.user_id in ($selected_member_ids) ";
+        endif;
+
+        $followup_select_query                  =   "
+                                                        count(*) as total_count,
+                                                        SUM(CASE WHEN ( STR_TO_DATE(next_followup_date, '%d-%m-%Y')  = CURDATE() AND followup_status = '1' AND lead_status_id = 1 ) THEN 1 ELSE 0 END) as today_count,
+                                                        SUM(CASE WHEN ( STR_TO_DATE(next_followup_date, '%d-%m-%Y')  < CURDATE() AND followup_status = '1' AND lead_status_id = 1 ) THEN 1 ELSE 0 END) as missed_count,
+                                                        SUM(CASE WHEN lead_stage_id = '1' THEN 1 ELSE 0 END) as total_initial_count,
+                                                        SUM(CASE WHEN lead_stage_id = '2' THEN 1 ELSE 0 END) as total_followup_count,
+                                                        SUM(CASE WHEN lead_stage_id = '3' THEN 1 ELSE 0 END) as total_enquiry_count,
+                                                        SUM(CASE WHEN lead_stage_id = '4' THEN 1 ELSE 0 END) as total_site_visit_count,
+                                                        SUM(CASE WHEN lead_stage_id = '5' THEN 1 ELSE 0 END) as total_metting_count,
+                                                        SUM(CASE WHEN lead_stage_id = '6' THEN 1 ELSE 0 END) as total_success_count,
+                                                        SUM(CASE WHEN lead_stage_id = '7' THEN 1 ELSE 0 END) as total_dump_count
+                                                    ";
+
+        $this->db->select($followup_select_query);
+        $this->db->where($where);
+        $this->db->from('tbl_followup as followup');
+        $this->db->join('tbl_users  as user', 'user.user_id = followup.user_id', 'left');
+        $followups                          =   $this->db->get()->row();
+
+        # End Followup
+
+        # End Leads & Followup Query
+
+        # Data   
+        $data['is_trial']                   =   $is_trial;
+        $data['trial_expired']              =   $trial_expired;
+        $data['trial_remaining_days']       =   $trial_remaining_days;
+        $data['expire_today']               =   $expire_today;
+
+        # Count
+        $data['leads']                      =   $leads;
+        $data['followups']                  =   $followups;
+        # End Count
+        $data['members']                    =   $members;
+        $data['property_types']             =   $property_types ?? [];
+        $data['user_detail']                =   $user_detail;
+        # End Data   
+
+        echo json_encode(['status' => true, 'message' => 'Data fetched', 'data' => $data]);
     }
 
     public function agent_signin()
@@ -12506,5 +12329,54 @@ class Api extends CI_Controller
      
         echo json_encode($array);
      }
+
+     /*************************************************************************************** 
+     * Helper Function
+     ****************************************************************************************/
+
+    # Trial Plan
+    public function trial_plan(&$is_trial, &$trial_expired, &$trial_remaining_days, &$expire_today)
+    {
+        $where = "plan_id='" .  $this->user()->plan_id . "'";
+        $plan_detail = $this->Action_model->select_single('tbl_plan', $where);
+
+        if ($this->user()->plan_id == 1) {
+
+            $date1 = new DateTime(date("d-m-Y") . " 00:00:00");
+            $date2 = new DateTime($this->user()->next_due_date . " 00:00:00");
+            $interval = $date1->diff($date2);
+            $days = $interval->days;
+
+            $is_trial = true;
+
+            if ($this->user()->next_due_date == date("d-m-Y")) {
+                $expire_today = 1;
+            } else if (strtotime($this->user()->next_due_date . " 00:00:00") < strtotime(date("d-m-Y") . " 00:00:00")) {
+                $trial_expired = true;
+                $trial_remaining_days = 0;
+            } else {
+                $trial_remaining_days = $days;
+            }
+        } else if ($this->user()->plan_id == 2) {
+
+            $date1 = new DateTime(date("d-m-Y") . " 00:00:00");
+            $date2 = new DateTime($this->user()->next_due_date . " 00:00:00");
+            $interval = $date1->diff($date2);
+            $days = $interval->days;
+
+            if ($this->user()->next_due_date == date("d-m-Y")) {
+                $expire_today = 1;
+            } else if (strtotime($this->user()->next_due_date . " 00:00:00") < strtotime(date("d-m-Y") . " 00:00:00")) {
+                $trial_remaining_days = 0;
+            } else {
+                $trial_remaining_days = $days;
+            }
+        }
+    }
+    # End Trial Plan
+
+    /*************************************************************************************** 
+     *  Helper Function
+     *************************************************************************************** */
 
 }
