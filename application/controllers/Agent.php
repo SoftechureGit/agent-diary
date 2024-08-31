@@ -178,9 +178,11 @@ class Agent extends CI_Controller
         
         
         if(!$selected_member_ids):
+            // $where                          .=   " and ( user_id in ($members_ids) or assign_user_id in ($members_ids) )";
             $where                          .=   " and user_id in ($members_ids) ";
         else:
-            $where                          .=   " and ( user_id in ($selected_member_ids) or assign_user_id in ($selected_member_ids) )";
+            // $where                          .=   " and ( user_id in ($selected_member_ids) or assign_user_id in ($selected_member_ids) )";
+            $where                          .=   " and user_id in ($selected_member_ids) ";
         endif;
 
         $followup_select_query                  =   "
@@ -203,6 +205,8 @@ class Agent extends CI_Controller
 
         # End Followup
 
+        // echo $where;
+        // die;
         // echo "<pre>";
         // echo $this->db->last_query();
         // print_r($followups);

@@ -87,14 +87,12 @@
 
               $selected_member_ids_arr  = [];
 
-              if ($selected_member_ids):
                 $selected_member_ids_arr = explode(',', $selected_member_ids);
-              endif;
               ?>
 
               <label for="team_member">Team Member</label>
               <select class="form-control multi-team-members-select2" id="member" name="member" multiple>
-                <option value="0" class="default-option" selected>All</option>
+                <option value="0" class="default-option" <?= in_array(0, $selected_member_ids_arr) ? "selected" : "" ?>>All</option>
                 <?php foreach ($members as $member) { ?>
                   <option
                     value="<?= $member->id ?>"
