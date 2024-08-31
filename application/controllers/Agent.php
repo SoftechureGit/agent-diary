@@ -170,22 +170,17 @@ class Agent extends CI_Controller
         $this->db->where($where);
         $this->db->from('tbl_leads as lead');
         $leads                          =   $this->db->get()->row();
-        # End Leads
+       # End Leads
 
 
         # Followup
         $where                              =   "account_id='$account_id'";
         
-        if($selected_member_ids):
-            // $where                          .=   " and user_id='$member_id' or assign_user_id = '$member_id'";
-        else:
-            $where                          .=   " and user_id in ( $members_ids) ";
-        endif;
-
+        
         if(!$selected_member_ids):
             $where                          .=   " and user_id in ($members_ids) ";
         else:
-            $where                          .=   " and user_id in ($selected_member_ids) or assign_user_id in ($selected_member_ids)";
+            $where                          .=   " and ( user_id in ($selected_member_ids) or assign_user_id in ($selected_member_ids) )";
         endif;
 
         $followup_select_query                  =   "
@@ -205,6 +200,7 @@ class Agent extends CI_Controller
         $this->db->where($where);
         $this->db->from('tbl_followup as followup');
         $followups                          =   $this->db->get()->row();
+
         # End Followup
 
         // echo "<pre>";
