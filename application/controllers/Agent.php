@@ -182,6 +182,12 @@ class Agent extends CI_Controller
             $where                          .=   " and user_id in ( $members_ids) ";
         endif;
 
+        if(!$selected_member_ids):
+            $where                          .=   " and user_id in ($members_ids) ";
+        else:
+            $where                          .=   " and user_id in ($selected_member_ids) or assign_user_id in ($selected_member_ids)";
+        endif;
+
         $followup_select_query                  =   "
                                                         count(*) as total_count,
                                                         SUM(CASE WHEN ( STR_TO_DATE(next_followup_date, '%d-%m-%Y')  = CURDATE() AND followup_status = '1' AND lead_status_id = 1 ) THEN 1 ELSE 0 END) as today_count,
