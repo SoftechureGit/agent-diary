@@ -3526,13 +3526,13 @@ class Api extends CI_Controller
         # requirment status list
 
        $status_list = array(
+        array(
+            'id' => '0' , 
+            'name' => 'Close'
+        ),
          array(
             'id'   => '1',
             'name' => 'Open'
-         ),
-         array(
-            'id' => '0' , 
-            'name' => 'Close'
          )
          );
 
