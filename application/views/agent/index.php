@@ -1,5 +1,7 @@
 <?php include('include/header.php'); ?>
 <?php include('include/sidebar.php'); ?>
+
+
 <!--**********************************
   Content body start
   ***********************************-->
@@ -78,18 +80,27 @@
 
         <div class="row align-items-end">
           <!-- Team Member -->
-          <div class="col-md-3 mtm">
+          <div class="col-md-6 mtm">
             <div class="form-group  m-0">
+              <?php
+              $selected_member_ids      =  $this->input->get('member');
+
+              $selected_member_ids_arr  = [];
+
+              if ($selected_member_ids):
+                $selected_member_ids_arr = explode(',', $selected_member_ids);
+              endif;
+              ?>
+
               <label for="team_member">Team Member</label>
-              <select class="form-control" id="member" name="member">
-                <option value="all" selected>All</option>
+              <select class="form-control multi-team-members-select2" id="member" name="member" multiple>
+                <option value="0" class="default-option" selected>All</option>
                 <?php foreach ($members as $member) { ?>
-                  <option 
-                    value="<?= $member->id ?>" 
-                    <?= ($this->input->get('member') == $member->id) ? "selected" : "" ?>
-                  >
-                  <?= $member->full_name ?>
-                </option>
+                  <option
+                    value="<?= $member->id ?>"
+                    <?= in_array($member->id, $selected_member_ids_arr) ? "selected" : "" ?>>
+                    <?= $member->full_name ?>
+                  </option>
                 <?php } ?>
               </select>
             </div>
@@ -97,7 +108,7 @@
           <!-- End Team Member -->
 
           <!-- Property Type -->
-          <div class="col-md-3 mtm">
+          <div class="col-md-3 mtm d-none">
             <div class="form-group m-0">
               <label for="team_member">Property Type</label>
               <select class="form-control bdr10" id="project_id" name="project">
@@ -204,7 +215,7 @@
                         </tr>
                       </thead>
                       <tbody>
-                        
+
                         <tr>
                           <td>Initial</td>
                           <td class="text-center"><?= $followups->total_initial_count ?? 0 ?></td>
@@ -225,13 +236,13 @@
                           <td>Metting</td>
                           <td class="text-center"><?= $followups->total_metting_count ?? 0 ?></td>
                         </tr>
-                        <tr class="text-success">
-                          <td>Success</td>
-                          <td class="text-center"><?= $followups->total_success_count ?? 0 ?></td>
-                        </tr>
                         <tr class="text-danger">
                           <td>Dump</td>
                           <td class="text-center"><?= $followups->total_dump_count ?? 0 ?></td>
+                        </tr>
+                        <tr class="text-success">
+                          <td>Success</td>
+                          <td class="text-center"><?= $followups->total_success_count ?? 0 ?></td>
                         </tr>
 
                       </tbody>
@@ -305,15 +316,21 @@
 <!-- <script src="<?php echo base_url('public/admin/') ?>js/dashboard/dashboard-1.js"></script> -->
 
 <script>
-  function filterDashboard() {
-    var member = $("#member").val();
-    var project = $("#project_id").val();
+  /** */
+  $(document).ready(function() {
+    // Initialize Select2
+    $('.multi-team-members-select2').select2({
+      placeholder: 'Choose...',
+      allowClear: true
+    });
+  });
 
-    if(member == 'all' && project == 'all'){
-      window.location.href  = "<?= base_url('agent'); ?>";
-      return false
-    }
-    redirect_url        =  "?member=" + member + "&project=" + project;
-    window.location.href =  redirect_url
+  /** */
+
+  function filterDashboard() {
+    var members = $("#member").val();
+
+    redirect_url = "?member=" + members;
+    window.location.href = redirect_url
   }
 </script>

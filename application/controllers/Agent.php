@@ -107,13 +107,12 @@ class Agent extends CI_Controller
     public function index()
     {
 
-        $member_id                          =   $this->input->get('member');
-        $member_id                          =   $member_id == 'all' ? 0 : $member_id;
-        
-        $property_type_id                   =   $this->input->get('project');
-        $property_type_id                   =   $property_type_id == 'all' ? 0 : $property_type_id;
+        # Member Ids
+        $selected_member_ids_arr            =   [];
+        $selected_member_ids                =  $this->input->get('member');
 
-        $user_detail                        =   $this->user();
+        # End Member Ids
+         $user_detail                        =   $this->user();
         $account_id                         =   getAccountId();
         $user_id                            =   $user_detail->user_id;
 
@@ -140,19 +139,10 @@ class Agent extends CI_Controller
         $members                            =   $this->db->get()->result();
         # End Team Member
 
-        # Property List
-        $where                              =   "product_status='1' AND (tbl_products.agent_id='$account_id') ORDER BY tbl_products.product_id ASC";
-
-        $this->db->select("product_id as id, project_name as name");
-        $this->db->from('tbl_products');
-        $this->db->where($where);
-        $property_types                     =   $this->db->get()->result();
-        # End Property List
-
         # Member Ids
                 // Extracting IDs
                 $members_ids_arr                    =  null;
-                if(!$member_id):
+                if(!$selected_member_ids):
                     $members_ids_arr                =   array_map(function($member) {
                                                                         return $member->id;
                                                                     }, $members);
@@ -160,28 +150,15 @@ class Agent extends CI_Controller
                     $members_ids                    =   implode(",", $members_ids_arr);
                 endif;
         # End Member Ids
-
-        # Property Type Ids
-                // Extracting IDs
-                $property_type_ids_arr                    =  null;
-                if(!$property_type_id):
-                    $property_type_ids_arr                =   array_map(function($property_type) {
-                                                                        return $property_type->id;
-                                                                    }, $property_types);
-                    
-                    $property_type_ids                    =   implode(",", $property_type_ids_arr);
-                endif;
-        # End Property Type Ids
-
         # Leads & Followup Query
         
 
         $where                              =   "account_id='$account_id'";
         
-        if($member_id):
-            $where                          .=   " and user_id='$member_id'";
+        if(!$selected_member_ids):
+            $where                          .=   " and user_id in ($members_ids) ";
         else:
-            $where                          .=   " and user_id in ( $members_ids) ";
+            $where                          .=   " and user_id in ($selected_member_ids) ";
         endif;
 
         $lead_select_query                  =   "
@@ -195,17 +172,12 @@ class Agent extends CI_Controller
         $leads                          =   $this->db->get()->row();
         # End Leads
 
-        // echo "<pre>";
-        // print_r($leads);
-        // echo  $this->db->last_query();
-        // die;
-        # End Leads
 
         # Followup
         $where                              =   "account_id='$account_id'";
         
-        if($member_id):
-            $where                          .=   " and user_id='$member_id' or assign_user_id = '$member_id'";
+        if($selected_member_ids):
+            // $where                          .=   " and user_id='$member_id' or assign_user_id = '$member_id'";
         else:
             $where                          .=   " and user_id in ( $members_ids) ";
         endif;
@@ -247,7 +219,7 @@ class Agent extends CI_Controller
         $data['followups']                  =   $followups;
         # End Count
         $data['members']                    =   $members;
-        $data['property_types']             =   $property_types;
+        $data['property_types']             =   $property_types ?? [];
         $data['user_detail']                =   $user_detail;
         # End Data   
 
