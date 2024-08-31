@@ -3367,10 +3367,13 @@ class Api extends CI_Controller
             $id         = $this->input->post('id');
             $record     = $this->Action_model->select_single('tbl_requirements', "requirement_id='" . $id . "' AND account_id='" . $account_id . "'");
             $location   = $this->input->post('location');
-           
-            if ($location) {
-                $location = implode(",", $location);
-            }
+            
+            
+            
+            // if ($location) {
+            //     $location = explode(",",$location);
+            // }
+
 
             $record_array = array(
                 'look_for'              => $this->input->post('look_for'),
@@ -3379,7 +3382,7 @@ class Api extends CI_Controller
                 'accomodation_id'       => $this->input->post('accomodation_id'),
                 'state_id'              => $this->input->post('state_id'),
                 'city_id'               => $this->input->post('city_id'),
-                'location'              => $location,
+                'location'              => $location ?? '',
                 'budget_min'            => $this->input->post('budget_min'),
                 'budget_max'            => $this->input->post('budget_max'),
                 'size_min'              => $this->input->post('size_min'),
@@ -3471,6 +3474,8 @@ class Api extends CI_Controller
 
     # get edit or add view details
     public function requirement_add_or_edit_view_data(){
+
+        
         $arr = array();
 
         $account_id = getAccountIdHash($this->input->request_headers()['Access-Token'] );
@@ -3518,6 +3523,21 @@ class Api extends CI_Controller
      
         # end unit size list
 
+        # requirment status list
+
+       $status_list = array(
+        array(
+            'id' => '0' , 
+            'name' => 'Close'
+        ),
+         array(
+            'id'   => '1',
+            'name' => 'Open'
+         )
+         );
+
+        # end requirement status list
+
         $arr = array(
             'status'            => true ,
             'message'           => 'Related Data Found' ,
@@ -3527,6 +3547,7 @@ class Api extends CI_Controller
             'lead_option_list'  => $lead_option_list,
             'budget_list'       => $budget_list,
             'unit_list'         => $unit_list,
+            'status_list'       => $status_list,
 
         );
 
@@ -9976,7 +9997,7 @@ class Api extends CI_Controller
                         "product_unit_id"       => $item->unit_type_id,
                         "lead_option_id"        => $item->lead_option_id,
                         "location"              => $location,
-                        "requirement_status"    => $item->requirement_status,
+                        "requirement_status"    => $item->requirement_status == 1 ? 'Open' : 'Close' ,
                         "added_by"              => (($item->au_parent_id == 0) ? (($item->au_is_individual) ? ucwords($item->au_user_title . ' ' . $item->au_first_name . ' ' . $item->au_last_name) : $item->au_firm_name) : ucwords($item->au_user_title . ' ' . $item->au_first_name . ' ' . $item->au_last_name))
                     );
                 }
