@@ -97,7 +97,7 @@
                   <option
                     value="<?= $member->id ?>"
                     <?= in_array($member->id, $selected_member_ids_arr) ? "selected" : "" ?>>
-                    <?= $member->full_name ?>
+                    <?= $member->full_name ?> ( <?= $member->role_name ?> )
                   </option>
                 <?php } ?>
               </select>

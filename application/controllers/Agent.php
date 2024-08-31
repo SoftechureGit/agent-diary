@@ -85,13 +85,48 @@ class Agent extends CI_Controller
 
         if ($agent_hash):
             $where              =   "user_hash='" . $agent_hash . "'";
-            $user               =   $this->Action_model->select_single('tbl_users', $where);
+                                                    $this->db->select('user.*,  role.role_name');
+                                                    $this->db->where($where);
+                                                    $this->db->from('tbl_users as user');
+                                                    $this->db->join('tbl_roles  as role', 'user.role_id = role.role_id', 'left');
+            $user               =                   $this->db->get()->row();
+    
         endif;
 
         if (!$user):
             echo "Unauthorized";
             die;
         endif;
+
+        # Permission Roles
+            $permission_roles                       =   [];
+            
+            # For Agent 
+            if($user->role_id == 2):
+                $permission_roles                       =   [3,4,5];
+            endif;
+            # End For Agent 
+
+            # Level 1
+            if($user->role_id == 3):
+                $permission_roles                       =   [0];
+            endif;
+            # End Level 1
+
+            # Level 2
+            if($user->role_id == 4):
+                $permission_roles                       =   [3];
+            endif;
+            # End Level 2
+
+            # Level 3
+            if($user->role_id == 5):
+                $permission_roles                       =   [3, 4];
+            endif;
+            # End Level 3
+
+            $user->permission_roles                 =   implode(',', $permission_roles);
+        # Permission Roles
 
         return $user;
     }
@@ -113,6 +148,11 @@ class Agent extends CI_Controller
 
         # End Member Ids
          $user_detail                        =   $this->user();
+
+        //  echo "<pre>";
+        //  print_r($user_detail);
+        //  die;
+
         $account_id                         =   getAccountId();
         $user_id                            =   $user_detail->user_id;
 
@@ -132,15 +172,13 @@ class Agent extends CI_Controller
         # End Trial Plan
 
         # Teams Member
-        $where                              =   "user_status='1' AND (user_id='$account_id' OR parent_id='$account_id') ORDER BY user_id ASC";
-        $this->db->select("user_id as id, concat(IFNULL(user_title, ''),' ', IFNULL(first_name, ''), ' ', IFNULL(last_name, '')) as full_name");
-        $this->db->from('tbl_users');
+        $where                              =   "(user.role_id in ($user_detail->permission_roles) or user.user_id = '$user_detail->user_id') and user.user_status='1' AND (user.user_id='$account_id' OR user.parent_id='$account_id') ORDER BY user.user_id ASC";
+        $this->db->select("user.user_id as id, concat(IFNULL(user.user_title, ''),' ', IFNULL(user.first_name, ''), ' ', IFNULL(user.last_name, '')) as full_name, role.role_name");
+        $this->db->from('tbl_users as user');
+        $this->db->join('tbl_roles  as role', 'user.role_id = role.role_id', 'left');
         $this->db->where($where);
         $members                            =   $this->db->get()->result();
 
-        // echo "<pre>";
-        // print_r($members);
-        // die;
         # End Team Member
 
         # Member Ids
@@ -157,12 +195,12 @@ class Agent extends CI_Controller
         # Leads & Followup Query
         
 
-        $where                              =   "account_id='$account_id'";
+        $where                              =   "(user.role_id in ($user_detail->permission_roles) or user.user_id = '$user_detail->user_id')";
         
         if(!$selected_member_ids):
-            $where                          .=   " and user_id in ($members_ids) ";
+            $where                          .=   " and lead.user_id in ($members_ids) ";
         else:
-            $where                          .=   " and user_id in ($selected_member_ids) ";
+            $where                          .=   " and lead.user_id in ($selected_member_ids) ";
         endif;
 
         $lead_select_query                  =   "
@@ -173,18 +211,19 @@ class Agent extends CI_Controller
         $this->db->select($lead_select_query);
         $this->db->where($where);
         $this->db->from('tbl_leads as lead');
+        $this->db->join('tbl_users  as user', 'user.user_id = lead.user_id', 'left');
         $leads                          =   $this->db->get()->row();
        # End Leads
 
 
         # Followup
-        $where                              =   "account_id='$account_id'";
+        $where                              =   "(user.role_id in ($user_detail->permission_roles) or user.user_id = '$user_detail->user_id') and followup.account_id='$account_id'";
         
         
         if(!$selected_member_ids):
-            $where                          .=   " and user_id in ($members_ids) ";
+            $where                          .=   " and followup.user_id in ($members_ids) ";
         else:
-            $where                          .=   " and user_id in ($selected_member_ids) ";
+            $where                          .=   " and followup.user_id in ($selected_member_ids) ";
         endif;
 
         $followup_select_query                  =   "
@@ -203,6 +242,7 @@ class Agent extends CI_Controller
         $this->db->select($followup_select_query);
         $this->db->where($where);
         $this->db->from('tbl_followup as followup');
+        $this->db->join('tbl_users  as user', 'user.user_id = followup.user_id', 'left');
         $followups                          =   $this->db->get()->row();
 
         # End Followup
