@@ -1276,4 +1276,20 @@ if (!function_exists('getAccountId')) {
    
     # end  create excel with multiple sheet  
 
+    # Encrypt 
+    if(!function_exists('safeEncrypt')){
+        function safeEncrypt($value){
+            return base64_encode($value);
+        }
+    }
+    # End Encrypt 
+
+    # Decrypt 
+    if(!function_exists('safeDecrypt')){
+        function safeDecrypt($value){
+            return base64_decode($value);
+        }
+    }
+    # End Decrypt 
+
 }

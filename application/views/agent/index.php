@@ -83,8 +83,13 @@
               <label for="team_member">Team Member</label>
               <select class="form-control" id="member" name="member">
                 <option value="all" selected>All</option>
-                <?php foreach ($member_list as $row) { ?>
-                  <option value="<?= $row->user_id ?>" <?= ($this->input->get('member') == $row->user_id) ? "selected" : "" ?>><?= $this->Action_model->get_name($row->user_id) ?></option>
+                <?php foreach ($members as $member) { ?>
+                  <option 
+                    value="<?= $member->id ?>" 
+                    <?= ($this->input->get('member') == $member->id) ? "selected" : "" ?>
+                  >
+                  <?= $member->full_name ?>
+                </option>
                 <?php } ?>
               </select>
             </div>
@@ -97,8 +102,8 @@
               <label for="team_member">Property Type</label>
               <select class="form-control bdr10" id="project_id" name="project">
                 <option value="all" selected>All</option>
-                <?php foreach ($project_list as $row) { ?>
-                  <option value="<?= $row->product_id ?>" <?= ($this->input->get('project') == $row->product_id) ? "selected" : "" ?>><?= $row->project_name ?></option>
+                <?php foreach ($property_types as $property_type) { ?>
+                  <option value="<?= $property_type->id ?>" <?= ($this->input->get('project') == $property_type->id) ? "selected" : "" ?>><?= $property_type->name ?></option>
                 <?php } ?>
               </select>
             </div>
@@ -202,31 +207,31 @@
                         
                         <tr>
                           <td>Initial</td>
-                          <td class="text-center"><?= $followups->total_initial_count ?></td>
+                          <td class="text-center"><?= $followups->total_initial_count ?? 0 ?></td>
                         </tr>
-                        <tr>
+                        <tr class="text-primary">
                           <td>Followup</td>
-                          <td class="text-center"><?= $followups->total_followup_count ?></td>
+                          <td class="text-center"><?= $followups->total_followup_count ?? 0 ?></td>
                         </tr>
                         <tr>
                           <td>Enquiry</td>
-                          <td class="text-center"><?= $followups->total_enquiry_count ?></td>
+                          <td class="text-center"><?= $followups->total_enquiry_count ?? 0 ?></td>
                         </tr>
                         <tr>
                           <td>Site Visit</td>
-                          <td class="text-center"><?= $followups->total_site_visit_count ?></td>
+                          <td class="text-center"><?= $followups->total_site_visit_count ?? 0 ?></td>
                         </tr>
                         <tr>
                           <td>Metting</td>
-                          <td class="text-center"><?= $followups->total_metting_count ?></td>
+                          <td class="text-center"><?= $followups->total_metting_count ?? 0 ?></td>
                         </tr>
-                        <tr>
+                        <tr class="text-success">
                           <td>Success</td>
-                          <td class="text-center"><?= $followups->total_success_count ?></td>
+                          <td class="text-center"><?= $followups->total_success_count ?? 0 ?></td>
                         </tr>
-                        <tr>
+                        <tr class="text-danger">
                           <td>Dump</td>
-                          <td class="text-center"><?= $followups->total_dump_count ?></td>
+                          <td class="text-center"><?= $followups->total_dump_count ?? 0 ?></td>
                         </tr>
 
                       </tbody>
@@ -308,7 +313,7 @@
       window.location.href  = "<?= base_url('agent'); ?>";
       return false
     }
-
-    window.location.href = "?member=" + member + "&project=" + project;
+    redirect_url        =  "?member=" + member + "&project=" + project;
+    window.location.href =  redirect_url
   }
 </script>
