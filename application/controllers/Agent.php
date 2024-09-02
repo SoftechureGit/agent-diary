@@ -147,11 +147,7 @@ class Agent extends CI_Controller
         $selected_member_ids                =  $this->input->get('member');
 
         # End Member Ids
-         $user_detail                        =   $this->user();
-
-        //  echo "<pre>";
-        //  print_r($user_detail);
-        //  die;
+        $user_detail                        =   $this->user();
 
         $account_id                         =   getAccountId();
         $user_id                            =   $user_detail->user_id;
@@ -169,6 +165,34 @@ class Agent extends CI_Controller
             $this->trial_plan($is_trial, $trial_expired, $trial_remaining_days, $expire_today);
             # End Magical Function
 
+            #
+            $trial_alert_msg        = '';
+
+            if ($is_trial && $trial_expired):
+              $trial_alert_msg        = 'Your trial has ended.';
+    
+            elseif ($is_trial && $expire_today):
+              $trial_alert_msg        = 'Your trial expires today 11:59:00 PM';
+    
+            elseif ($is_trial && !$trial_expired):
+              $trial_alert_msg        = "Your trial expires in $trial_remaining_days days";
+    
+            elseif (!$is_trial && $expire_today):
+              $trial_alert_msg        = "Your plan expires today 11:59:00 PM";
+    
+            elseif (!$is_trial && $trial_remaining_days && $trial_remaining_days <= 10):
+              $trial_alert_msg        = "Your plan expires in $trial_remaining_days days";
+    
+            elseif (!$is_trial && $trial_remaining_days == 0):
+              $trial_alert_msg        = " Your plan has expired. Please update your payment details to reactive it.";
+            endif;
+            #
+
+            $tiral_data             =   (object) [
+                                                    'is_trial'      => $trial_alert_msg ? true : false,
+                                                    'message'       => $trial_alert_msg,
+                                                    'pay_url'       => base_url(AGENT_URL . 'pay')
+                                                ];
         # End Trial Plan
 
         # Teams Member
@@ -247,20 +271,11 @@ class Agent extends CI_Controller
 
         # End Followup
 
-        // echo $where;
-        // die;
-        // echo "<pre>";
-        // echo $this->db->last_query();
-        // print_r($followups);
-        // die;
 
         # End Leads & Followup Query
 
         # Data   
-        $data['is_trial']                   =   $is_trial;
-        $data['trial_expired']              =   $trial_expired;
-        $data['trial_remaining_days']       =   $trial_remaining_days;
-        $data['expire_today']               =   $expire_today;
+        $data['trial']                      =   $tiral_data;
 
         # Count
         $data['leads']                      =   $leads;

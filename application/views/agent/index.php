@@ -14,34 +14,12 @@
       <div class="col-md-12">
 
         <!-- Trial Alert -->
-        <?php
-        $trial_alert_msg        = '';
-
-        if ($is_trial && $trial_expired):
-          $trial_alert_msg        = 'Your trial has ended.';
-
-        elseif ($is_trial && $expire_today):
-          $trial_alert_msg        = 'Your trial expires today 11:59:00 PM';
-
-        elseif ($is_trial && !$trial_expired):
-          $trial_alert_msg        = "Your trial expires in $trial_remaining_days days";
-
-        elseif (!$is_trial && $expire_today):
-          $trial_alert_msg        = "Your plan expires today 11:59:00 PM";
-
-        elseif (!$is_trial && $trial_remaining_days && $trial_remaining_days <= 10):
-          $trial_alert_msg        = "Your plan expires in $trial_remaining_days days";
-
-        elseif (!$is_trial && $trial_remaining_days == 0):
-          $trial_alert_msg        = " Your plan has expired. Please update your payment details to reactive it.";
-        endif;
-        ?>
-
-        <?php if ($trial_alert_msg): ?>
+       
+        <?php if ($trial->is_trial): ?>
           <div class="alert alert-danger alert-dismissible fade show">
             <div class="row align-items-center">
               <div class="col-md-9">
-                <?= $trial_alert_msg; ?>
+                <?= $trial->message; ?>
               </div>
               <div class="col-md-3" align="right">
                 <a href="<?= base_url(AGENT_URL . 'pay') ?>" class="btn btn-dark btn-sm" title="Pay">Pay
