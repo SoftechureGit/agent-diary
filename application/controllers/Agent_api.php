@@ -2332,6 +2332,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
             if ($search_budget_min && !$search_budget_max) {
                 $where_ext .= " AND budget_min>='" . $search_budget_min . "'";
             }
+            
             if ($search_budget_min && $search_budget_max) {
                 $where_ext .= " AND (budget_min>='" . $search_budget_min . "' AND budget_max<='" . $search_budget_max . "')";
             }
