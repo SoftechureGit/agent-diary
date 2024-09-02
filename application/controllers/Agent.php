@@ -3,7 +3,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class Agent extends CI_Controller
 {
-   
+
     public function __construct()
     {
         parent::__construct();
@@ -77,27 +77,64 @@ class Agent extends CI_Controller
     }
 
     # User
-    public function user(){
+    public function user()
+    {
         $user               =   null;
 
         $agent_hash         =   $this->session->userdata('agent_hash');
 
-        if($agent_hash):
-            $where              =   "user_hash='" .$agent_hash. "'";
-            $user               =   $this->Action_model->select_single('tbl_users', $where);
+        if ($agent_hash):
+            $where              =   "user_hash='" . $agent_hash . "'";
+                                                    $this->db->select('user.*,  role.role_name');
+                                                    $this->db->where($where);
+                                                    $this->db->from('tbl_users as user');
+                                                    $this->db->join('tbl_roles  as role', 'user.role_id = role.role_id', 'left');
+            $user               =                   $this->db->get()->row();
+    
         endif;
 
-        if(!$user):
+        if (!$user):
             echo "Unauthorized";
             die;
         endif;
+
+        # Permission Roles
+            $permission_roles                       =   [];
+            
+            # For Agent 
+            if($user->role_id == 2):
+                $permission_roles                       =   [3,4,5];
+            endif;
+            # End For Agent 
+
+            # Level 1
+            if($user->role_id == 3):
+                $permission_roles                       =   [0];
+            endif;
+            # End Level 1
+
+            # Level 2
+            if($user->role_id == 4):
+                $permission_roles                       =   [3];
+            endif;
+            # End Level 2
+
+            # Level 3
+            if($user->role_id == 5):
+                $permission_roles                       =   [3, 4];
+            endif;
+            # End Level 3
+
+            $user->permission_roles                 =   implode(',', $permission_roles);
+        # Permission Roles
 
         return $user;
     }
     # End User
 
     # Panel Icons
-    public function icons(){
+    public function icons()
+    {
         return $this->load->view('agent/include/icons');
     }
     # End Panel Icons
@@ -105,48 +142,115 @@ class Agent extends CI_Controller
     public function index()
     {
 
-        $member                 =   $this->input->get('member');
-        $project                =   $this->input->get('project');
+        # Member Ids
+        $selected_member_ids_arr            =   [];
+        $selected_member_ids                =  $this->input->get('member');
 
-        $user_detail            =   $this->user();
+        # End Member Ids
+        $user_detail                        =   $this->user();
+
+        $account_id                         =   getAccountId();
+        $user_id                            =   $user_detail->user_id;
 
         # Init
-
-        $total_leads_count                  =   0;
-        $today_leads_count                  =   0;
-        $today_followup_count               =   0;
-        $missed_followup_count              =   0;
-
         $is_trial                           =   false;
         $trial_expired                      =   false;
         $trial_remaining_days               =   0;
         $expire_today                       =   0;
         # End Init
-        
+
         # Trial Plan
 
             # Magical Function
             $this->trial_plan($is_trial, $trial_expired, $trial_remaining_days, $expire_today);
             # End Magical Function
-        
+
+            #
+            $trial_alert_msg        = '';
+
+            if ($is_trial && $trial_expired):
+              $trial_alert_msg        = 'Your trial has ended.';
+    
+            elseif ($is_trial && $expire_today):
+              $trial_alert_msg        = 'Your trial expires today 11:59:00 PM';
+    
+            elseif ($is_trial && !$trial_expired):
+              $trial_alert_msg        = "Your trial expires in $trial_remaining_days days";
+    
+            elseif (!$is_trial && $expire_today):
+              $trial_alert_msg        = "Your plan expires today 11:59:00 PM";
+    
+            elseif (!$is_trial && $trial_remaining_days && $trial_remaining_days <= 10):
+              $trial_alert_msg        = "Your plan expires in $trial_remaining_days days";
+    
+            elseif (!$is_trial && $trial_remaining_days == 0):
+              $trial_alert_msg        = " Your plan has expired. Please update your payment details to reactive it.";
+            endif;
+            #
+
+            $tiral_data             =   (object) [
+                                                    'is_trial'      => $trial_alert_msg ? true : false,
+                                                    'message'       => $trial_alert_msg,
+                                                    'pay_url'       => base_url(AGENT_URL . 'pay')
+                                                ];
         # End Trial Plan
 
+        # Teams Member
+        $where                              =   "(user.role_id in ($user_detail->permission_roles) or user.user_id = '$user_detail->user_id') and user.user_status='1' AND (user.user_id='$account_id' OR user.parent_id='$account_id') ORDER BY user.user_id ASC";
+        $this->db->select("user.user_id as id, concat(IFNULL(user.user_title, ''),' ', IFNULL(user.first_name, ''), ' ', IFNULL(user.last_name, '')) as full_name, role.role_name");
+        $this->db->from('tbl_users as user');
+        $this->db->join('tbl_roles  as role', 'user.role_id = role.role_id', 'left');
+        $this->db->where($where);
+        $members                            =   $this->db->get()->result();
+
+        # End Team Member
+
+        # Member Ids
+                // Extracting IDs
+                $members_ids_arr                    =  null;
+                if(!$selected_member_ids):
+                    $members_ids_arr                =   array_map(function($member) {
+                                                                        return $member->id;
+                                                                    }, $members);
+                    
+                    $members_ids                    =   implode(",", $members_ids_arr);
+                endif;
+        # End Member Ids
         # Leads & Followup Query
-            $user_id                            = $this->user()->user_id;
-            # End Leads
-            $lead_select_query                  =   "
-                                                        count(*) as total_count,
-                                                        SUM(CASE WHEN STR_TO_DATE(lead_date, '%d-%m-%Y')  = CURDATE() THEN 1 ELSE 0 END) as today_count
-                                                    ";
+        
 
-            $this->db->select($lead_select_query);
-            $this->db->where("user_id = '$user_id'");
-            $this->db->from('tbl_leads as lead');
-            $leads                          =   $this->db->get()->row();
-            # End Leads
+        $where                              =   "(user.role_id in ($user_detail->permission_roles) or user.user_id = '$user_detail->user_id')";
+        
+        if(!$selected_member_ids):
+            $where                          .=   " and lead.user_id in ($members_ids) ";
+        else:
+            $where                          .=   " and lead.user_id in ($selected_member_ids) ";
+        endif;
 
-            # Followup
-            $followup_select_query                  =   "
+        $lead_select_query                  =   "
+                                                    count(*) as total_count,
+                                                    SUM(CASE WHEN STR_TO_DATE(lead_date, '%d-%m-%Y')  = CURDATE() THEN 1 ELSE 0 END) as today_count
+                                                ";
+                                               
+        $this->db->select($lead_select_query);
+        $this->db->where($where);
+        $this->db->from('tbl_leads as lead');
+        $this->db->join('tbl_users  as user', 'user.user_id = lead.user_id', 'left');
+        $leads                          =   $this->db->get()->row();
+       # End Leads
+
+
+        # Followup
+        $where                              =   "(user.role_id in ($user_detail->permission_roles) or user.user_id = '$user_detail->user_id') and followup.account_id='$account_id'";
+        
+        
+        if(!$selected_member_ids):
+            $where                          .=   " and followup.user_id in ($members_ids) ";
+        else:
+            $where                          .=   " and followup.user_id in ($selected_member_ids) ";
+        endif;
+
+        $followup_select_query                  =   "
                                                         count(*) as total_count,
                                                         SUM(CASE WHEN ( STR_TO_DATE(next_followup_date, '%d-%m-%Y')  = CURDATE() AND followup_status = '1' AND lead_status_id = 1 ) THEN 1 ELSE 0 END) as today_count,
                                                         SUM(CASE WHEN ( STR_TO_DATE(next_followup_date, '%d-%m-%Y')  < CURDATE() AND followup_status = '1' AND lead_status_id = 1 ) THEN 1 ELSE 0 END) as missed_count,
@@ -159,37 +263,32 @@ class Agent extends CI_Controller
                                                         SUM(CASE WHEN lead_stage_id = '7' THEN 1 ELSE 0 END) as total_dump_count
                                                     ";
 
-            $this->db->select($followup_select_query);
-            $this->db->where("user_id = '$user_id'");
-            $this->db->from('tbl_followup as followup');
-            $followups                          =   $this->db->get()->row();
-            # End Followup
+        $this->db->select($followup_select_query);
+        $this->db->where($where);
+        $this->db->from('tbl_followup as followup');
+        $this->db->join('tbl_users  as user', 'user.user_id = followup.user_id', 'left');
+        $followups                          =   $this->db->get()->row();
 
-            // echo "<pre>";
-            // echo $this->db->last_query();
-            // print_r($followups);
-            // die;
+        # End Followup
+
 
         # End Leads & Followup Query
 
         # Data   
-        $data['is_trial']                   =   $is_trial;
-        $data['trial_expired']              =   $trial_expired;
-        $data['trial_remaining_days']       =   $trial_remaining_days;
-        $data['expire_today']               =   $expire_today;
-        
+        $data['trial']                      =   $tiral_data;
+
         # Count
         $data['leads']                      =   $leads;
         $data['followups']                  =   $followups;
         # End Count
-
+        $data['members']                    =   $members;
+        $data['property_types']             =   $property_types ?? [];
         $data['user_detail']                =   $user_detail;
         # End Data   
-        
-        
+
         $this->load->view(AGENT_URL . 'index', $data);
     }
-    
+
     public function index_old()
     {
 
@@ -490,7 +589,7 @@ class Agent extends CI_Controller
         $this->load->view(AGENT_URL . 'index', $data);
     }
 
-    
+
     public function get_level_user_ids($value = '')
     {
         $account_id = getAccountId();
@@ -2787,24 +2886,24 @@ class Agent extends CI_Controller
         $costing_price                              =   $this->input->post('costing_price');
         $youtube_data                               =   $this->input->post('youtube_data');
         $inventory_id                               =   $this->input->post('inventory_id');
-        
+
         # Validation
         # Unit Code Validation
-        if(isset($property_details['unit_code']) ):
-            if($property_details['unit_code'] == '' ):
+        if (isset($property_details['unit_code'])):
+            if ($property_details['unit_code'] == ''):
                 echo json_encode(['status' => false, 'message' => 'Unit code requried']);
                 exit;
             endif;
         endif;
         # End Unit Code Validation
-        
+
         # Validation
-        if(!isset($property_details['plot_number']) &&  !isset($property_details['unit_no'])):
+        if (!isset($property_details['plot_number']) &&  !isset($property_details['unit_no'])):
             echo json_encode(['status' => false, 'message' => 'Either Plot Number or Unit Number is required']);
             exit;
         endif;
         # End Validation
-        
+
         # Plot Number Validation
         // if(isset($property_details['plot_number']) ):
         //     if($property_details['plot_number'] == '' ||  ):
@@ -2913,7 +3012,7 @@ class Agent extends CI_Controller
                     break;
             endswitch;
 
-            if($inventory_status):
+            if ($inventory_status):
                 $this->db->where("inventory_id = '$inventory_id'")->update('tbl_inventory', ['inventory_status' => $inventory_status]);
             endif;
         endif;
@@ -3118,53 +3217,51 @@ class Agent extends CI_Controller
     }
 
     /*************************************************************************************** 
-    * Helper Function
-    ****************************************************************************************/
+     * Helper Function
+     ****************************************************************************************/
 
     # Trial Plan
-    public function trial_plan(&$is_trial, &$trial_expired, &$trial_remaining_days, &$expire_today){
+    public function trial_plan(&$is_trial, &$trial_expired, &$trial_remaining_days, &$expire_today)
+    {
         $where = "plan_id='" .  $this->user()->plan_id . "'";
         $plan_detail = $this->Action_model->select_single('tbl_plan', $where);
 
-        if ( $this->user()->plan_id == 1) {
+        if ($this->user()->plan_id == 1) {
 
             $date1 = new DateTime(date("d-m-Y") . " 00:00:00");
-            $date2 = new DateTime( $this->user()->next_due_date . " 00:00:00");
+            $date2 = new DateTime($this->user()->next_due_date . " 00:00:00");
             $interval = $date1->diff($date2);
             $days = $interval->days;
 
             $is_trial = true;
 
-            if ( $this->user()->next_due_date == date("d-m-Y")) {
+            if ($this->user()->next_due_date == date("d-m-Y")) {
                 $expire_today = 1;
-            } else if (strtotime( $this->user()->next_due_date . " 00:00:00") < strtotime(date("d-m-Y") . " 00:00:00")) {
+            } else if (strtotime($this->user()->next_due_date . " 00:00:00") < strtotime(date("d-m-Y") . " 00:00:00")) {
                 $trial_expired = true;
                 $trial_remaining_days = 0;
             } else {
                 $trial_remaining_days = $days;
             }
-        } else if ( $this->user()->plan_id == 2) {
+        } else if ($this->user()->plan_id == 2) {
 
             $date1 = new DateTime(date("d-m-Y") . " 00:00:00");
-            $date2 = new DateTime( $this->user()->next_due_date . " 00:00:00");
+            $date2 = new DateTime($this->user()->next_due_date . " 00:00:00");
             $interval = $date1->diff($date2);
             $days = $interval->days;
 
-            if ( $this->user()->next_due_date == date("d-m-Y")) {
+            if ($this->user()->next_due_date == date("d-m-Y")) {
                 $expire_today = 1;
-            } else if (strtotime( $this->user()->next_due_date . " 00:00:00") < strtotime(date("d-m-Y") . " 00:00:00")) {
+            } else if (strtotime($this->user()->next_due_date . " 00:00:00") < strtotime(date("d-m-Y") . " 00:00:00")) {
                 $trial_remaining_days = 0;
             } else {
                 $trial_remaining_days = $days;
             }
         }
-
     }
     # End Trial Plan
-    
-    /*************************************************************************************** 
-    *  Helper Function
-    *************************************************************************************** */
 
-    
+    /*************************************************************************************** 
+     *  Helper Function
+     *************************************************************************************** */
 }

@@ -10,12 +10,69 @@ class Agent_api extends CI_Controller
         $this->load->library('form_validation');
     }
 
+    # User
+    public function user()
+    {
+        $user               =   null;
+
+        $agent_hash         =   $this->session->userdata('agent_hash');
+
+        if ($agent_hash):
+            $where              =   "user_hash='" . $agent_hash . "'";
+                                                    $this->db->select('user.*,  role.role_name');
+                                                    $this->db->where($where);
+                                                    $this->db->from('tbl_users as user');
+                                                    $this->db->join('tbl_roles  as role', 'user.role_id = role.role_id', 'left');
+            $user               =                   $this->db->get()->row();
+    
+        endif;
+
+        if (!$user):
+            echo "Unauthorized";
+            die;
+        endif;
+
+        # Permission Roles
+            $permission_roles                       =   [];
+            
+            # For Agent 
+            if($user->role_id == 2):
+                $permission_roles                       =   [3,4,5];
+            endif;
+            # End For Agent 
+
+            # Level 1
+            if($user->role_id == 3):
+                $permission_roles                       =   [0];
+            endif;
+            # End Level 1
+
+            # Level 2
+            if($user->role_id == 4):
+                $permission_roles                       =   [3];
+            endif;
+            # End Level 2
+
+            # Level 3
+            if($user->role_id == 5):
+                $permission_roles                       =   [3, 4];
+            endif;
+            # End Level 3
+
+            $user->permission_roles                 =   implode(',', $permission_roles);
+        # Permission Roles
+
+        return $user;
+    }
+    # End User
+
     public function index()
     {
 
         $array = array('status' => 'error', 'message' => 'Some error occurred, please try again.');
         echo json_encode($array);
     }
+    
 
     public function followup_property()
     {

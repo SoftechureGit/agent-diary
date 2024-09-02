@@ -1,5 +1,7 @@
 <?php include('include/header.php'); ?>
 <?php include('include/sidebar.php'); ?>
+
+
 <!--**********************************
   Content body start
   ***********************************-->
@@ -12,34 +14,12 @@
       <div class="col-md-12">
 
         <!-- Trial Alert -->
-        <?php
-        $trial_alert_msg        = '';
-
-        if ($is_trial && $trial_expired):
-          $trial_alert_msg        = 'Your trial has ended.';
-
-        elseif ($is_trial && $expire_today):
-          $trial_alert_msg        = 'Your trial expires today 11:59:00 PM';
-
-        elseif ($is_trial && !$trial_expired):
-          $trial_alert_msg        = "Your trial expires in $trial_remaining_days days";
-
-        elseif (!$is_trial && $expire_today):
-          $trial_alert_msg        = "Your plan expires today 11:59:00 PM";
-
-        elseif (!$is_trial && $trial_remaining_days && $trial_remaining_days <= 10):
-          $trial_alert_msg        = "Your plan expires in $trial_remaining_days days";
-
-        elseif (!$is_trial && $trial_remaining_days == 0):
-          $trial_alert_msg        = " Your plan has expired. Please update your payment details to reactive it.";
-        endif;
-        ?>
-
-        <?php if ($trial_alert_msg): ?>
+       
+        <?php if ($trial->is_trial): ?>
           <div class="alert alert-danger alert-dismissible fade show">
             <div class="row align-items-center">
               <div class="col-md-9">
-                <?= $trial_alert_msg; ?>
+                <?= $trial->message; ?>
               </div>
               <div class="col-md-3" align="right">
                 <a href="<?= base_url(AGENT_URL . 'pay') ?>" class="btn btn-dark btn-sm" title="Pay">Pay
@@ -78,13 +58,25 @@
 
         <div class="row align-items-end">
           <!-- Team Member -->
-          <div class="col-md-3 mtm">
+          <div class="col-md-6 mtm">
             <div class="form-group  m-0">
+              <?php
+              $selected_member_ids      =  $this->input->get('member');
+
+              $selected_member_ids_arr  = [];
+
+              $selected_member_ids_arr = explode(',', $selected_member_ids);
+              ?>
+
               <label for="team_member">Team Member</label>
-              <select class="form-control" id="member" name="member">
-                <option value="all" selected>All</option>
-                <?php foreach ($member_list as $row) { ?>
-                  <option value="<?= $row->user_id ?>" <?= ($this->input->get('member') == $row->user_id) ? "selected" : "" ?>><?= $this->Action_model->get_name($row->user_id) ?></option>
+              <select class="form-control multi-team-members-select2" id="member" name="member" multiple>
+                <option value="0" class="default-option" <?= in_array(0, $selected_member_ids_arr) ? "selected" : "" ?>>All</option>
+                <?php foreach ($members as $member) { ?>
+                  <option
+                    value="<?= $member->id ?>"
+                    <?= in_array($member->id, $selected_member_ids_arr) ? "selected" : "" ?>>
+                    <?= $member->full_name ?> ( <?= $member->role_name ?> )
+                  </option>
                 <?php } ?>
               </select>
             </div>
@@ -92,13 +84,13 @@
           <!-- End Team Member -->
 
           <!-- Property Type -->
-          <div class="col-md-3 mtm">
+          <div class="col-md-3 mtm d-none">
             <div class="form-group m-0">
               <label for="team_member">Property Type</label>
               <select class="form-control bdr10" id="project_id" name="project">
                 <option value="all" selected>All</option>
-                <?php foreach ($project_list as $row) { ?>
-                  <option value="<?= $row->product_id ?>" <?= ($this->input->get('project') == $row->product_id) ? "selected" : "" ?>><?= $row->project_name ?></option>
+                <?php foreach ($property_types as $property_type) { ?>
+                  <option value="<?= $property_type->id ?>" <?= ($this->input->get('project') == $property_type->id) ? "selected" : "" ?>><?= $property_type->name ?></option>
                 <?php } ?>
               </select>
             </div>
@@ -199,34 +191,34 @@
                         </tr>
                       </thead>
                       <tbody>
-                        
+
                         <tr>
                           <td>Initial</td>
-                          <td class="text-center"><?= $followups->total_initial_count ?></td>
+                          <td class="text-center"><?= $followups->total_initial_count ?? 0 ?></td>
                         </tr>
-                        <tr>
+                        <tr class="text-primary">
                           <td>Followup</td>
-                          <td class="text-center"><?= $followups->total_followup_count ?></td>
+                          <td class="text-center"><?= $followups->total_followup_count ?? 0 ?></td>
                         </tr>
                         <tr>
                           <td>Enquiry</td>
-                          <td class="text-center"><?= $followups->total_enquiry_count ?></td>
+                          <td class="text-center"><?= $followups->total_enquiry_count ?? 0 ?></td>
                         </tr>
                         <tr>
                           <td>Site Visit</td>
-                          <td class="text-center"><?= $followups->total_site_visit_count ?></td>
+                          <td class="text-center"><?= $followups->total_site_visit_count ?? 0 ?></td>
                         </tr>
                         <tr>
                           <td>Metting</td>
-                          <td class="text-center"><?= $followups->total_metting_count ?></td>
+                          <td class="text-center"><?= $followups->total_metting_count ?? 0 ?></td>
                         </tr>
-                        <tr>
-                          <td>Success</td>
-                          <td class="text-center"><?= $followups->total_success_count ?></td>
-                        </tr>
-                        <tr>
+                        <tr class="text-danger">
                           <td>Dump</td>
-                          <td class="text-center"><?= $followups->total_dump_count ?></td>
+                          <td class="text-center"><?= $followups->total_dump_count ?? 0 ?></td>
+                        </tr>
+                        <tr class="text-success">
+                          <td>Success</td>
+                          <td class="text-center"><?= $followups->total_success_count ?? 0 ?></td>
                         </tr>
 
                       </tbody>
@@ -300,15 +292,35 @@
 <!-- <script src="<?php echo base_url('public/admin/') ?>js/dashboard/dashboard-1.js"></script> -->
 
 <script>
-  function filterDashboard() {
-    var member = $("#member").val();
-    var project = $("#project_id").val();
+  /** */
+  $(document).ready(function() {
+    // Initialize Select2
+    $('.multi-team-members-select2').select2({
+      placeholder: 'Choose...',
+      allowClear: true
+    });
 
-    if(member == 'all' && project == 'all'){
-      window.location.href  = "<?= base_url('agent'); ?>";
-      return false
+
+  });
+
+  $('.multi-team-members-select2').on('select2:select', function(e) {
+    var data = e.params.data;
+    console.log(data.id)
+    if(data.id == 0){
+      $('.multi-team-members-select2 option').prop('selected', false)
+      $('.default-option').prop('selected', true)
+      $('.multi-team-members-select2').trigger('change')
+    }else{
+      $('.default-option').prop('selected', false)
+      $('.multi-team-members-select2').trigger('change')
     }
+  });
+  /** */
 
-    window.location.href = "?member=" + member + "&project=" + project;
+  function filterDashboard() {
+    var members = $("#member").val();
+
+    redirect_url = "?member=" + members;
+    window.location.href = redirect_url
   }
 </script>
