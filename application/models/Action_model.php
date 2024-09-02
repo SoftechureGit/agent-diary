@@ -668,21 +668,26 @@ public function apiPagination($select='',$page,$limit,$join='',$where='',$table)
 
    # for pagination  
      $offset          =   ($page - 1) * $limit;
+     $this->db->select($select); 
      if($where){
-      $this->db->where($where);
+       $this->db->where($where);
+     }
+    //  $this->db->limit($limit, $offset);
+     if ($join) {
+        $count  = count($join);
+        $ct     = 0;
+        $ct1    = 0;
+     for ($i=0; $i <($count/2) ; $i++)
+      { 
+        $ct1=$ct+1 ;
+        $this->db->join($join[$ct],$join[$ct1],'left');  
+        $ct=$ct+2 ;
+      }
     }
-    if ($join) {
-      $count  = count($join);
-      $ct     = 0;
-      $ct1    = 0;
-   for ($i=0; $i <($count/2) ; $i++)
-    { 
-      $ct1=$ct+1 ;
-      $this->db->join($join[$ct],$join[$ct1],'left');  
-      $ct=$ct+2 ;
-    }
-  }
-     $total_records   =   $this->db->count_all_results($table);
+
+     $total_records   =   count($this->db->get($table)->result());
+
+     
 
    # end for pagination 
 
@@ -708,6 +713,8 @@ public function apiPagination($select='',$page,$limit,$join='',$where='',$table)
 
      $data                = $this->db->get($table)->result();
 
+    
+
      $total_pages         = ceil($total_records / $limit);
 
      $pagination_metadata =   [
@@ -725,6 +732,7 @@ public function apiPagination($select='',$page,$limit,$join='',$where='',$table)
 
 
 }
+
 public function webPagination($select='',$page,$limit,$join='',$where='',$table){
 
    # for pagination  

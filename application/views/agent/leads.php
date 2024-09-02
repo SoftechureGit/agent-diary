@@ -299,7 +299,7 @@
                           <div class="col-md-6">
                             <div class="form-group">
                             <label for="">Agent</label>
-                            <select class="form-control" id="search_agent_id" name="search_agent_id" style="height: 38px;border-radius: 6px;margin-top: 10px;">
+                            <select class="form-control" id="search_agent_id" name="search_agent_id[]" style="height: 38px;border-radius: 6px;margin-top: 10px;" multiple="true">
                               <option value="">Select Agent</option>
                               <?php foreach ($filter_user_list as $item) { ?>
                                 <option value="<?= $item->user_id ?>"><?= ($item->parent_id == 0) ? (($item->is_individual) ? (ucwords($item->user_title . ' ' . $item->first_name . ' ' . $item->last_name)) : $item->firm_name) : $item->first_name . ' ' . $item->last_name . (($item->parent_id) ? ' (Team)' : '') ?></option>
@@ -311,7 +311,7 @@
 
                           <div class="col-md-4">
                           <label for="">Source</label>
-                            <select class="form-control" id="search_source_id" name="search_source_id" style="height: 38px;border-radius: 6px;margin-top: 10px;">
+                            <select class="form-control" id="search_source_id" name="search_source_id[]" style="height: 38px;border-radius: 6px;margin-top: 10px;" multiple="true">
                               <option value="">Select Source</option>
                               <?php foreach ($lead_source_list as $lead_source) { ?>
                                 <option value="<?= $lead_source->lead_source_id ?>"><?= $lead_source->lead_source_name ?></option>
@@ -321,7 +321,7 @@
 
                           <div class="col-md-4">
                           <label for="">Stage</label>
-                            <select class="form-control" id="search_stage_id" name="search_stage_id" style="height: 38px;border-radius: 6px;margin-top: 10px;">
+                            <select class="form-control" id="search_stage_id" name="search_stage_id[]" style="height: 38px;border-radius: 6px;margin-top: 10px;" multiple="true">
                               <option value="">Select Stage</option>
                               <?php foreach ($lead_stage_list as $lead_stage) { ?>
                                 <option value="<?= $lead_stage->lead_stage_id ?>"><?= $lead_stage->lead_stage_name ?></option>
