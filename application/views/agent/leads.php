@@ -403,12 +403,12 @@
                         </div>
                       </div>
                     </div>
-
+<!-- 
                     <div class="followup-chart pt-2">
                       <h4 class="card-title text-center pb-2">Meeting</h4>
 
                       <div id="followup-pie-chart" class="flot-chart" style="height: 180px;"></div>
-                    </div>
+                    </div> -->
 
                   </div>
                 </div>
