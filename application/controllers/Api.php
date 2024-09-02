@@ -223,6 +223,33 @@ class Api extends CI_Controller
             $this->trial_plan($is_trial, $trial_expired, $trial_remaining_days, $expire_today);
             # End Magical Function
 
+            #
+            $trial_alert_msg        = '';
+
+            if ($is_trial && $trial_expired):
+              $trial_alert_msg        = 'Your trial has ended.';
+    
+            elseif ($is_trial && $expire_today):
+              $trial_alert_msg        = 'Your trial expires today 11:59:00 PM';
+    
+            elseif ($is_trial && !$trial_expired):
+              $trial_alert_msg        = "Your trial expires in $trial_remaining_days days";
+    
+            elseif (!$is_trial && $expire_today):
+              $trial_alert_msg        = "Your plan expires today 11:59:00 PM";
+    
+            elseif (!$is_trial && $trial_remaining_days && $trial_remaining_days <= 10):
+              $trial_alert_msg        = "Your plan expires in $trial_remaining_days days";
+    
+            elseif (!$is_trial && $trial_remaining_days == 0):
+              $trial_alert_msg        = " Your plan has expired. Please update your payment details to reactive it.";
+            endif;
+            #
+
+            $tiral_data             =   (object) [
+                                                            'is_trial'      => $is_trial,
+                                                            'message'       => $trial_alert_msg
+                                                        ];
         # End Trial Plan
 
         # Teams Member
@@ -304,18 +331,13 @@ class Api extends CI_Controller
         # End Leads & Followup Query
 
         # Data   
-        $data['is_trial']                   =   $is_trial;
-        $data['trial_expired']              =   $trial_expired;
-        $data['trial_remaining_days']       =   $trial_remaining_days;
-        $data['expire_today']               =   $expire_today;
+        $data['trial']                   =   $tiral_data;
 
         # Count
         $data['leads']                      =   $leads;
         $data['followups']                  =   $followups;
         # End Count
         $data['members']                    =   $members;
-        $data['property_types']             =   $property_types ?? [];
-        $data['user_detail']                =   $user_detail;
         # End Data   
 
         echo json_encode(['status' => true, 'message' => 'Data fetched', 'data' => $data]);
