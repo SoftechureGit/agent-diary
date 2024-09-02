@@ -1542,26 +1542,46 @@ class Agent extends CI_Controller
         $today_followup = 0;
         $missed_followup = 0;
 
-        $account_id = getAccountId();
+        # user data
+        $where_user     = "user_hash='" . $this->session->userdata('agent_hash') . "'";
+        $user_detail    = $this->Action_model->select_single('tbl_users', $where_user);
+        $account_id     = $user_detail->user_id;
 
-        $where = "account_id='" . $account_id . "'";
+        if ($user_detail->role_id < 3 || $user_detail->role_id == 5) {
+
+            if ($user_detail->parent_id == 0) {
+                $where_role = "is_customer ='0' AND tbl_leads.account_id='" . $account_id . "'";
+            } else {
+                $where_role = "is_customer ='0' AND tbl_leads.user_id='" . $account_id . "'";
+            }
+        } else {
+            $where_role = "tbl_leads.user_id='" . $account_id . "' AND is_customer='0'";
+        }
+        
+        #end user data
+
+        // print_r($where_role); die;
+
+
+
+        $where = $where_role;
         $tb_data = $this->Action_model->select_single('tbl_leads', $where, "COUNT(CASE WHEN added_to_followup = 1 THEN lead_id END) as total_followup,COUNT(CASE WHEN followup_date = '" . date('d-m-Y') . "' THEN lead_id END) as today_followup,COUNT(CASE WHEN added_to_followup = 0 THEN lead_id END) as missed_followup");
 
         $today_date                 = date('Y-m-d');
         # Total New Leads
-        $total_new_leads            = $this->db->where("account_id = $account_id and DATE(STR_TO_DATE(`lead_date`, '%d-%m-%Y')) = '$today_date'")->get('tbl_leads')->num_rows();
+        $total_new_leads            = $this->db->where("$where_role and DATE(STR_TO_DATE(`lead_date`, '%d-%m-%Y')) = '$today_date'")->get('tbl_leads')->num_rows();
         # End Total New Leads
 
         # Today Followup 
-        $today_followups            = $this->db->where("account_id = $account_id and DATE(STR_TO_DATE(`followup_date`, '%d-%m-%Y')) = '$today_date'")->get('tbl_leads')->num_rows();
+        $today_followups            = $this->db->where("$where_role and DATE(STR_TO_DATE(`followup_date`, '%d-%m-%Y')) = '$today_date'")->get('tbl_leads')->num_rows();
         # Today Followup 
 
         # Total Followup 
-        $total_followups            = $this->db->where("account_id = $account_id and followup_date IS NOT NULL ")->get('tbl_leads')->num_rows();
+        $total_followups            = $this->db->where("$where_role and followup_date IS NOT NULL ")->get('tbl_leads')->num_rows();
         # Total Followup 
 
         # Missed Followup 
-        $missed_followups            =  $this->db->where("account_id = $account_id and DATE(STR_TO_DATE(`followup_date`, '%d-%m-%Y')) < '$today_date'")->get('tbl_leads')->num_rows();
+        $missed_followups            =  $this->db->where("$where_role and DATE(STR_TO_DATE(`followup_date`, '%d-%m-%Y')) < '$today_date'")->get('tbl_leads')->num_rows();
         # Missed Followup 
 
 
