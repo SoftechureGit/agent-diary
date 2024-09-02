@@ -190,7 +190,7 @@ class Api extends CI_Controller
             ];
             # End User Data
 
-            $this->user = $user_data;
+            $this->user = $user;
             return true;
         endif;
 
