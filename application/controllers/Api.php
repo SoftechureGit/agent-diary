@@ -248,7 +248,8 @@ class Api extends CI_Controller
 
             $tiral_data             =   (object) [
                                                             'is_trial'      => $is_trial,
-                                                            'message'       => $trial_alert_msg
+                                                            'message'       => $trial_alert_msg,
+                                                            'pay_url'       => base_url(AGENT_URL . 'pay')
                                                         ];
         # End Trial Plan
 
