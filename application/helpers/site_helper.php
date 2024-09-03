@@ -42,25 +42,56 @@ if (!function_exists('user')) {
             $where              .=   " and user.user_hash = '$access_token'";
         endif;
 
-        return  db_instance()
+        $user =  db_instance()
             ->select(
                 "
-                            user.user_id, 
-                            user.role_id, 
-                            user.username, 
+                            user.*, 
                             CONCAT(
                                     IFNULL(user.user_title, ''), ' ', 
                                     IFNULL(user.first_name, ''), ' ', 
                                     IFNULL(user.last_name, '')
                                 ) AS full_name,
-                            user.email, 
-                            user.mobile,
-                            role.role_name,
-                            parent_id"
+                            role.role_name"
             )
             ->join('tbl_roles as role', 'role.role_id = user.role_id', 'left')
             ->where($where)
             ->get('tbl_users as user')->row();
+            
+
+            # Permission Roles
+            $permission_roles                           =   [];
+            
+            # For Agent 
+            if($user->role_id == 2):
+                $permission_roles                       =   [3,4,5];
+            endif;
+            # End For Agent 
+
+            # Level 1
+            if($user->role_id == 3):
+                $permission_roles                       =   [0];
+            endif;
+            # End Level 1
+
+            # Level 2
+            if($user->role_id == 4):
+                $permission_roles                       =   [3];
+            endif;
+            # End Level 2
+
+            # Level 3
+            if($user->role_id == 5):
+                $permission_roles                       =   [3, 4];
+            endif;
+            # End Level 3
+
+            $user->permission_roles                 =   implode(',', $permission_roles);
+        # Permission Roles
+
+        # Permission User Ids
+        # End Permission User Ids
+
+        return $user;
     }
 }
 
