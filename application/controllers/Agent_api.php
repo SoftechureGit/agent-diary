@@ -9238,18 +9238,39 @@ WHERE lead_id='" . $lead_id . "'
     public function get_booking_form()
     {
         if ($this->input->post()) {
+            $data                       =   [];
 
             $account_id                 =   getAccountId();
 
             $lead_id                    =   $this->input->post('lead_id');
 
-            $where                      =   "lead_id='$lead_id' AND account_id='$account_id'";
+            
 
-            $lead_select                =   "lead_id as id, CONCAT(IFNULL(lead_title, ''), ' ',IFNULL(lead_first_name, ''), ' ', IFNULL(lead_last_name, '')) as full_name";
-            $lead_data                  =   $this->db->select($lead_select)->where($where)->get('tbl_leads')->row();
+            $lead_select_query          =   "lead_id as id, CONCAT(IFNULL(lead_title, ''), ' ',IFNULL(lead_first_name, ''), ' ', IFNULL(lead_last_name, '')) as full_name";
+            $lead_data                  =   leads(['id' => $lead_id, 'select' => $lead_select_query]);
 
             if ($lead_data) {
-                $data['lead_data']      =   $lead_data;
+                $data['lead']           =   $lead_data;
+                
+                # All Leads 
+                $leads_select_query          =  "   lead_id as id, 
+                                                    CONCAT(IFNULL(lead_title, ''), ' ',IFNULL(lead_first_name, ''), ' ', IFNULL(lead_last_name, '')) as full_name, 
+                                                    CONCAT(
+                                                        IF(
+                                                            JSON_UNQUOTE(JSON_EXTRACT(primary_mobile_number_country_data, '$.dialCode')) IS NOT NULL, 
+                                                            CONCAT('+', JSON_UNQUOTE(JSON_EXTRACT(primary_mobile_number_country_data, '$.dialCode'))), 
+                                                            ''
+                                                        ),
+                                                        ' ',
+                                                        lead_mobile_no
+                                                    ) AS mobile
+                                                ";
+                $leads_where_query           =   "lead_status = '1'";
+                $leads_data                  =   leads(['select' => $leads_select_query, 'where' => $leads_where_query]);
+
+                $data['leads']               =    $leads_data;
+                # End All Leads 
+
 
                 // $where = "agent_id='" . $account_id . "' OR share_account_id='" . $account_id . "'";
                 // $this->db->select("*");

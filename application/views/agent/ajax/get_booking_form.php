@@ -7,7 +7,7 @@
     <div class="col-md-6">
       <div class="form-group">
         <label>Buyer Name <span class="text-danger">*</span></label>
-        <input type="text" class="form-control" id="booking_buyer_name" name="booking_buyer_name" value="<?= $buyer_name ?? '' ?>" placeholder="Enter buyer name" readonly required/>
+        <input type="text" class="form-control" id="booking_buyer_name" name="booking_buyer_name" value="<?= $lead->full_name ?? '' ?>" placeholder="Enter buyer name" readonly required/>
       </div>
     </div>
     <!-- End Buyer Name -->
@@ -26,7 +26,10 @@
       <div class="form-group">
         <label>Seller Name <span class="text-danger">*</span></label>
         <select name="booking_seller_name" class="form-control" required>
-          <option value="">Choose...</option>
+          <option value="" selected disabled>Choose...</option>
+          <?php foreach($leads ?? [] as $lead_item): ?>
+            <option value="<?= $lead_item->id ?>"><?= $lead_item->full_name." ( $lead_item->mobile )" ?></option>
+          <?php endforeach; ?>
         </select>
       </div>
     </div>

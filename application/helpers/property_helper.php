@@ -28,19 +28,49 @@ if (!function_exists('facings')) {
 }
 # End Facings
 
-# Lead Details
-if (function_exists('lead')) {
-    function lead($id)
+# Leads 
+if (!function_exists('leads')) {
+    function leads($params = [])
     {
-        echo $id;
-        die;
+        
+        $account_id                 =   getAccountId();
+        
+        $id                             =   $params['id'] ?? null;;
+        $select                         =   $params['select'] ?? null;;
+        $where                          =   $params['where'] ?? null;;
 
-        if (!$id) return null;
+        $where_query                          =   "account_id='$account_id' ";
+        
+        if($id):
+            $where_query                      .=   " and lead_id = '$id' ";
+        endif;       
 
-        return db_instance()->where("lead_id = $id")->get('tbl_leads')->row();
+        if($where):
+            $where_query                =   "$where_query and ";
+            $where_query                .=   $where;
+        endif;       
+        
+        if($select):
+            $lead_select                = $select;
+        else:
+            $lead_select                = "*, lead_id as id, CONCAT(IFNULL(lead_title, ''), ' ',IFNULL(lead_first_name, ''), ' ', IFNULL(lead_last_name, '')) as full_name";
+        endif;
+
+        $query = db_instance()->select($lead_select)->where($where_query)->get('tbl_leads');
+
+        if($id):
+            $records        =   $query->row();
+        else:
+            $records        =   $query->result();
+        endif;
+
+        return $records;
+
+
     }
 }
-# End Lead Details
+# End Leads 
+
 
 # Lead Details
 
