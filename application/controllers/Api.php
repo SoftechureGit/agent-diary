@@ -727,6 +727,11 @@ class Api extends CI_Controller
         echo json_encode($array);
     }
 
+    public function profile(){
+        $array = array('status' => true, 'msg' => 'data fetched.', 'data' => $this->user);
+        echo json_encode($array);
+    }
+
     public function update_profile()
     {
         $array = array();

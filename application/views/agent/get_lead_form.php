@@ -184,7 +184,7 @@
                 <select class="form-control" name="lead_status" required="">
                     <option value="" disabled="">Select Status</option>
                     <?php foreach ($lead_type_list as $item) { ?>
-                        <option value="1" <?php if($id && $lead_detail->lead_status==$item->lead_type_id) { echo 'selected'; } ?>><?= $item->lead_type_name ?></option>
+                        <option value="<?= $item->lead_type_id ?>" <?php if($id && $lead_detail->lead_status==$item->lead_type_id) { echo 'selected'; } ?>><?= $item->lead_type_name ?></option>
                     <?php } ?>
                 </select>
             </div>

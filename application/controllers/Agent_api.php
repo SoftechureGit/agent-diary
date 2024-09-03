@@ -9238,37 +9238,48 @@ WHERE lead_id='" . $lead_id . "'
     public function get_booking_form()
     {
         if ($this->input->post()) {
+            $data                       =   [];
 
-            $account_id = getAccountId();
+            $account_id                 =   getAccountId();
 
-            $lead_id = $this->input->post('lead_id');
-            $where = "lead_id='" . $lead_id . "' AND account_id='" . $account_id . "'";
-            $lead_data = $this->Action_model->select_single('tbl_leads', $where);
+            $lead_id                    =   $this->input->post('lead_id');
+
+            
+
+            $lead_select_query          =   "lead_id as id, CONCAT(IFNULL(lead_title, ''), ' ',IFNULL(lead_first_name, ''), ' ', IFNULL(lead_last_name, '')) as full_name";
+            $lead_data                  =   leads(['id' => $lead_id, 'select' => $lead_select_query]);
+
             if ($lead_data) {
-                $data['lead_data'] = $lead_data;
+                $data['lead']           =   $lead_data;
+                
+                # All Leads 
+                $leads_select_query          =  "   lead_id as id, 
+                                                    CONCAT(IFNULL(lead_title, ''), ' ',IFNULL(lead_first_name, ''), ' ', IFNULL(lead_last_name, '')) as full_name, 
+                                                    CONCAT(
+                                                        IF(
+                                                            JSON_UNQUOTE(JSON_EXTRACT(primary_mobile_number_country_data, '$.dialCode')) IS NOT NULL, 
+                                                            CONCAT('+', JSON_UNQUOTE(JSON_EXTRACT(primary_mobile_number_country_data, '$.dialCode'))), 
+                                                            ''
+                                                        ),
+                                                        ' ',
+                                                        lead_mobile_no
+                                                    ) AS mobile
+                                                ";
+                $leads_where_query           =   "lead_status = '1'";
+                $leads_data                  =   leads(['select' => $leads_select_query, 'where' => $leads_where_query]);
 
-                $where = "country_id='1' AND state_status=1";
-                $state_list = $this->Action_model->detail_result('tbl_states', $where);
-                $data['state_list'] = $state_list;
+                $data['leads']               =    $leads_data;
+                # End All Leads 
 
-                $city_list = array();
-                $where = "city_status=1 AND state_id='" . $lead_data->lead_state_id . "'";
-                $city_list = $this->Action_model->detail_result('tbl_city', $where);
-                $data['city_list'] = $city_list;
 
-                $data['accomodation_list'] = $this->Action_model->detail_result('tbl_accomodations', "accomodation_status='1'");
-                $data['floor_list'] = $this->Action_model->detail_result('tbl_floors', "floor_id!=''");
-
-                $where = "agent_id='" . $account_id . "' OR share_account_id='" . $account_id . "'";
-                //$project_list = $this->Action_model->detail_result('tbl_products',$where);
-                //$data['project_list'] = $project_list;
-                $this->db->select("*");
-                $this->db->from('tbl_products');
-                $this->db->join('tbl_project_share', "tbl_project_share.project_id = tbl_products.product_id AND share_account_id='" . $account_id . "'", 'left');
-                $this->db->where($where);
-                $query = $this->db->get();
-                $project_list = $query->result();
-                $data['project_list'] = $project_list;
+                // $where = "agent_id='" . $account_id . "' OR share_account_id='" . $account_id . "'";
+                // $this->db->select("*");
+                // $this->db->from('tbl_products');
+                // $this->db->join('tbl_project_share', "tbl_project_share.project_id = tbl_products.product_id AND share_account_id='" . $account_id . "'", 'left');
+                // $this->db->where($where);
+                // $query = $this->db->get();
+                // $project_list = $query->result();
+                // $data['project_list'] = $project_list;
 
                 $this->load->view(AGENT_URL . 'ajax/get_booking_form', $data);
             }

@@ -49,9 +49,9 @@ endif;
     max-width: 1140px;
   }
 
-  #unitModal .clone-template .form-control {
+ .clone-template .form-control {
     border-radius: 5px;
-    height: 1.8rem;
+    height: 1.3rem;
   }
 
   /* Unit Modal */
@@ -69,11 +69,11 @@ endif;
     padding-top: 0;
   }
 
-  #lead-unit-form details {
+details {
     background: #b2cbff57;
   }
 
-  #lead-unit-form summary {
+summary {
     font-size: 15px;
     background: #b2cbff57;
     padding: 1rem;
@@ -115,7 +115,7 @@ endif;
     z-index: 9;
   }
 
-  .property-documents.clone-template .form-group {
+ .clone-template .form-group {
     margin-bottom: 0;
   }
 

@@ -306,7 +306,21 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id, $use
         .select2-selection__rendered { color: #9d9d9d; }
         .logo-img{ height: 94px; padding: 0.5rem;}
 
+        /* Select 2 */
+        .select2-container--default .select2-selection--single{
+            border: 1px solid #ced4da;
+        }
+
+        .select2-container .select2-selection--single{
+            height: 32px;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+                line-height: 31px;
+            }
+        /* Select 2 */
         /*  */
+
     </style>
 
 </head>
