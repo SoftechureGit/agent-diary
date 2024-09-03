@@ -1,181 +1,135 @@
   <hr>
   <h4 class="text-center" style="margin-top: 8px;margin-bottom: 10px;">Booking Application Request</h4>
+  <hr>
   <div class="row">
-  <div class="col-md-6">
-    <label>Customer Name:</label>
-    <?php
-    $customer_name = "";
-    if ($lead_data->lead_title) {
-      $customer_name = $lead_data->lead_title;
-    }
-    if ($lead_data->lead_first_name) {
-      $customer_name .= ($customer_name)?" ".$lead_data->lead_first_name:$lead_data->lead_first_name;
-    }
-    if ($lead_data->lead_last_name) {
-      $customer_name .= ($customer_name)?" ".$lead_data->lead_last_name:$lead_data->lead_last_name;
-    }
-    ?>
-    <input type="text" class="form-control" id="bk_customer_name" name="bk_customer_name" value="<?= $customer_name ?>" required="" />
-  </div>
-  <div class="col-md-6">
-    <label>DOB:</label>
-    <input type="text" class="form-control" id="bk_dob" name="bk_dob" value="<?= $lead_data->lead_dob ?>" />
-  </div>
 
-  <div class="col-md-6" style="margin-top: 10px;">
-    <label>S/D/W Of:</label>
-    <div class="row">
-      <div class="col-md-5">
-        <select class="form-control valid" id="bk_sdw_title" name="bk_sdw_title" aria-invalid="false">
-            <option selected="selected" value="">Select Title</option>
-            <option value="Mr.">Mr.</option>
-            <option value="Ms.">Ms.</option>
-            <option value="Mrs.">Mrs.</option>
-            <option value="Dr.">Dr.</option>
-            <option value="Prof.">Prof.</option>
-           
+    <!-- Buyer Name -->
+    <div class="col-md-6">
+      <div class="form-group">
+        <label>Buyer Name <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="booking_buyer_name" name="booking_buyer_name" value="<?= $buyer_name ?? '' ?>" placeholder="Enter buyer name" readonly required/>
+      </div>
+    </div>
+    <!-- End Buyer Name -->
+
+    <!-- Buyer S/W/D -->
+    <div class="col-md-6">
+      <div class="form-group">
+        <label>Buyer S/W/D <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="booking_buyer_sdw" name="booking_buyer_sdw" value="<?= $booking_buyer_sdw ?? '' ?>" placeholder="Name of S/D/W" required="" />
+      </div>
+    </div>
+    <!-- End Buyer S/W/D -->
+
+    <!-- Seller Name -->
+    <div class="col-md-6">
+      <div class="form-group">
+        <label>Seller Name <span class="text-danger">*</span></label>
+        <select name="booking_seller_name" class="form-control" required>
+          <option value="">Choose...</option>
         </select>
       </div>
-      <div class="col-md-7">
-          <input type="text" class="form-control" id="bk_sdw" name="bk_sdw" value="" placeholder="Name of S/D/W" />
+    </div>
+    <!-- End Seller Name -->
+
+    <!-- Seller S/W/D -->
+    <div class="col-md-6">
+      <div class="form-group">
+        <label>Seller S/W/D <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="booking_seller_sdw" name="booking_seller_sdw" value="<?= $booking_seller_sdw ?? '' ?>" placeholder="Name of S/D/W" required="" />
       </div>
     </div>
-  </div>
+    <!-- End Seller S/W/D -->
 
-  <div class="col-md-6"></div>
-  <div class="col-md-6" style="margin-top: 10px;">
-    <label>State:</label>
-    <select class="form-control" id="bk_state_id" name="bk_state_id" onchange="getCityBooking(this.value)">
-       <option value="">Select State</option>
-        <?php foreach ($state_list as $state) { ?>
-      <option value="<?= $state->state_id ?>" <?= ($state->state_id==$lead_data->lead_state_id)?'selected':'' ?>><?= $state->state_name ?></option>
-        <?php } ?>
-   </select>
-  </div>
+    <!-- State -->
+    <div class="col-md-4">
+      <div class="form-group">
+        <label for="">State <span class="text-danger">*</span></label>
+        <select name="booking_state_id" id="" class="form-control get_cities select2" data-selected_id="<?= $record->state_id ?? 0 ?>" required>
+          <option value="" selected disabled>Choose..</option>
+          <?php
+          foreach (states() as $state) :
+            $selected         = ($record->state_id ?? 0) == $state->id ? 'selected' : '';
+            echo "<option value='$state->id' $selected>$state->name</option>";
+          endforeach;
+          ?>
+        </select>
+      </div>
+    </div>
+    <!-- End State -->
 
-  <div class="col-md-6" style="margin-top: 10px;">
-    <label>City:</label>
-    <select class="form-control" id="bk_city_id" name="bk_city_id">
-       <option value="">Select City</option>
-        <?php foreach ($city_list as $city) { ?>
-      <option value="<?= $city->city_id ?>" <?= ($city->city_id==$lead_data->lead_city_id)?'selected':'' ?>><?= $city->city_name ?></option>
-        <?php } ?>
-   </select>
-  </div>
+    <!-- City -->
+    <div class="col-md-4">
+      <div class="form-group">
+        <label for="">City <span class="text-danger">*</span></label>
+        <select name="booking_city_id" id="" class="form-control set_cities get_locations" data-selected_id="<?= $record->city_id ?? 0 ?>" required>
+          <option value="" selected disabled>Choose..</option>
+        </select>
+      </div>
+    </div>
+    <!-- End City -->
 
-  <div class="col-md-12" style="margin-top: 10px;">
-    <label>Address:</label>
-    <textarea class="form-control" rows="2" id="bk_address" name="bk_address"><?= $lead_data->lead_address ?></textarea>
-  </div>
-  
-  <div class="col-md-12" style="margin-top: 10px;">
-    <label>Project Name:</label>
-    <select class="form-control" id="bk_project_id" name="bk_project_id" onchange="getProductDataBooking(this.value)" required="">
-       <option value="">Select Project</option>
-        <?php foreach ($project_list as $item) { ?>
-      <option value="<?= $item->product_id ?>"><?= $item->project_name ?></option>
-        <?php } ?>
-   </select>
-  </div>
-  
-  <div class="col-md-4" style="margin-top: 10px;">
-    <label>Size:</label>
-    <select class="form-control" id="bk_size" name="bk_size" onchange="get_booking_unit_no()" required="">
-       <option value="">Select Size</option>
-   </select>
-  </div>
-  
-  <div class="col-md-4" style="margin-top: 10px;">
-    <label>Tower:</label>
-    <select class="form-control" id="bk_tower" name="bk_tower" onchange="get_booking_unit_no()">
-       <option value="">Select Tower</option>
-   </select>
-  </div>
-  
-  <div class="col-md-4" style="margin-top: 10px;">
-    <label>Floor:</label>
-    <select class="form-control" id="bk_floor" name="bk_floor" onchange="get_booking_unit_no()">
-       <option value="">Select Floor</option>
-        <?php foreach ($floor_list as $item) { ?>
-      <option value="<?= $item->floor_id ?>"><?= $item->floor_name ?></option>
-        <?php } ?>
-   </select>
-  </div>
+    <!-- Location -->
+    <div class="col-md-4">
+      <div class="form-group">
+        <label for="">Location <span class="text-danger">*</span></label>
+        <select name="booking_location_id" id="" class="form-control set_locations" data-selected_id="<?= $record->location_id ?? 0 ?>" required>
+          <option value="" selected disabled>Choose..</option>
+        </select>
+      </div>
+    </div>
+    <!-- End Location -->
 
-  <div class="col-md-4" style="margin-top: 10px;">
-    <label>Unit No:</label>
-    <select class="form-control" id="bk_unit_no" name="bk_unit_no" onchange="getUnitRefNo(this.value)" required="">
-       <option value="">Select Unit No</option>
-   </select>
-  </div>
-  
-  <div class="col-md-4" style="margin-top: 10px;">
-    <label>Accommodation:</label>
-    <input type="text" class="form-control" id="bk_accommodation_value" name="bk_accommodation_value" value="" readonly="" />
-    <input type="hidden" class="form-control" id="bk_accommodation" name="bk_accommodation" value="" readonly="" />
-    <input type="hidden" class="form-control" id="bk_product_unit_detail_id" name="bk_product_unit_detail_id" value="" readonly="" />
-    <input type="hidden" class="form-control" id="bk_inventory_id" name="bk_inventory_id" value="" readonly="" />
-   </select>
-  </div>
 
-  <div class="col-md-4" style="margin-top: 10px;">
-    <label>Unit Ref No:</label>
-    <input type="text" class="form-control" id="bk_unit_ref_no" name="bk_unit_ref_no" value="" readonly="" />
-  </div>
-  
-  <div class="col-md-6" style="margin-top: 10px;">
-    <label>Deal Amount:</label>
-    <input type="text" class="form-control" id="bk_deal_amount" name="bk_deal_amount" value="" />
-  </div>
-  
-  <div class="col-md-6" style="margin-top: 10px;">
-    <label>Booking Amount :</label>
-    <input type="text" class="form-control" id="bk_booking_amount" name="bk_booking_amount" value="" />
-  </div>
-  
-  <div class="col-md-6" style="margin-top: 10px;">
-    <label>Payment Mode:</label>
-    <select class="form-control" id="bk_payment_mode" name="bk_payment_mode">
-      <option value="">Select Payment Mode</option>
-      <option value="cheque">By Cheque</option>
-      <option value="cash">By Cash</option>
-      <option value="online_transfer">Online Transfer</option>
-    </select>
-  </div>
-  
-  <div class="col-md-6" style="margin-top: 10px;">
-    <label>Cheque No/Ref No:</label>
-    <input type="text" class="form-control" id="bk_cheque_no" name="bk_cheque_no" value="" />
-  </div>
-  
-  <div class="col-md-6" style="margin-top: 10px;">
-    <label>Drawn On:</label>
-    <input type="text" class="form-control" id="bk_drawn_on" name="bk_drawn_on" value="" />
-  </div>
-  
-  <div class="col-md-6" style="margin-top: 10px;">
-    <label>Date:</label>
-    <input type="text" class="form-control" id="bk_booking_date" name="bk_booking_date" value="" />
-  </div>
+    <!-- List of Project -->
+    <div class="col-md-4 project_list_wrapper">
+      <div class="form-group">
+        <label for="">List of Project <span class="text-danger">*</span></label>
+        <select name="booking_project_id" id="" class="form-control" data-selected_id="<?= $record->project_id ?? 0 ?>" required>
+          <option value="" selected disabled>Choose..</option>
+        </select>
+      </div>
+    </div>
+    <!-- End List of Project -->
 
-  <div class="col-md-12" style="margin-top: 10px;">
-    <label>Remarks:</label>
-    <textarea class="form-control" rows="2" id="bk_remark" name="bk_remark"></textarea>
-  </div>
 
+    <div class="col-md-4">
+      <label>Unit No <span class="text-danger">*</span></label>
+      <select class="form-control" id="booking_unit_no" name="booking_unit_no" onchange="getUnitRefNo(this.value)" required="">
+        <option value="">Select Unit No</option>
+      </select>
     </div>
 
-    <script>
-      
-$('#bk_dob').bootstrapMaterialDatePicker({
-    weekStart: 0,
-    time: false,
-    format: 'DD-MM-YYYY'
-});
+    <!-- Booking Deal Amount -->
+    <div class="col-md-12 mt-2">
+      <details <?= isset($record) ? 'open' : '' ?>>
+        <summary>Deal Amount</summary>
+        <div class="booking-deal-amount-container p-4">
+        <?php $this->view('components/other/add-more/booking-deal-amount', [ 'records' => $record->booking_deal_amount ?? [] ]) ?>
 
-$('#bk_booking_date').bootstrapMaterialDatePicker({
-    weekStart: 0,
-    time: false,
-    format: 'DD-MM-YYYY'
-});
-    </script>
+        <div class="text-right">
+          <button type="button" class="btn btn-warning btn-sm text-white add-more-btn" onclick="add_more(this, 'booking-deal-amount' ,'.booking-deal-amount-container')">Add More</button>
+        </div>
+        </div>
+        
+      </details>
+     </div>
+    <!-- End Booking Deal Amount -->
+
+    <!-- Payment Terms -->
+    <div class="col-md-12 mt-4">
+      <details <?= isset($record) ? 'open' : '' ?>>
+        <summary>Payment Terms</summary>
+        <div class="payment-terms-container p-4">
+        <?php $this->view('components/other/add-more/booking-payment-terms', [ 'records' => $record->payment_terms ?? [] ]) ?>
+
+        <div class="text-right">
+          <button type="button" class="btn btn-warning btn-sm text-white add-more-btn" onclick="add_more(this, 'payment-terms' ,'.payment-terms-container')">Add More</button>
+        </div>
+        </div>
+        
+      </details>
+     </div>
+    <!-- End Payment Terms -->
+
+  </div>

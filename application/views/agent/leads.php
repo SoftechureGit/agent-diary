@@ -221,96 +221,96 @@
 
                       <div class="form-group advance_search" style="padding-bottom: 8px;">
                         <div class="row">
-                        <!-- Lead Date Filter -->
-                         <div class="col-md-12">
-                          <div class="text-left">
-                            <h4>
-                              Leads
-                            </h4>
+                          <!-- Lead Date Filter -->
+                          <div class="col-md-12">
+                            <div class="text-left">
+                              <h4>
+                                Leads
+                              </h4>
+                            </div>
                           </div>
-                         </div>
-                         <div class="col-md-6">
-                          <div class="form-group">
-                            <label for="">From</label>
-                            <input type="date" id="lead_from" name="lead_from" class="form-control">
-                         </div>
-                         </div>
-                         <div class="col-md-6">
-                          <div class="form-group">
-                            <label for="">To</label>
-                            <input type="date" id="lead_to" name="lead_to" class="form-control">
-                         </div>
-                         </div>
-                         <!-- End Lead Date Filter -->
-                         
-                         <!-- Followup Date Filter -->
-                         <div class="col-md-12">
-                          <div class="text-left">
-                          <h4>  
-                          Followup
-                          </h4>
-                        </div>
-                         </div>
-                         <div class="col-md-6">
-                          <div class="form-group">
-                            <label for="">From</label>
-                            <input type="date" id="followup_from" name="followup_from" class="form-control">
-                         </div>
-                         </div>
-                         <div class="col-md-6">
-                          <div class="form-group">
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label for="">From</label>
+                              <input type="date" id="lead_from" name="lead_from" class="form-control">
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label for="">To</label>
+                              <input type="date" id="lead_to" name="lead_to" class="form-control">
+                            </div>
+                          </div>
+                          <!-- End Lead Date Filter -->
 
-                            <label for="">To</label>
-                            <input type="date" id="followup_to" name="followup_to" class="form-control">
+                          <!-- Followup Date Filter -->
+                          <div class="col-md-12">
+                            <div class="text-left">
+                              <h4>
+                                Followup
+                              </h4>
+                            </div>
                           </div>
-                         </div>
-                        <!-- End Followup Date Filter -->
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label for="">From</label>
+                              <input type="date" id="followup_from" name="followup_from" class="form-control">
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="form-group">
+
+                              <label for="">To</label>
+                              <input type="date" id="followup_to" name="followup_to" class="form-control">
+                            </div>
+                          </div>
+                          <!-- End Followup Date Filter -->
 
                           <div class="col-md-6">
                             <div class="form-group">
-                            <label for="">State</label>
-                            <select class="form-control" id="search_state_id" name="search_state_id" onchange="getCitySearch(this.value)" style="height: 38px;border-radius: 6px;margin-top: 10px;">
-                              <option value="">Select State</option>
-                              <?php foreach ($state_list as $state) { ?>
-                                <option value="<?= $state->state_id ?>"><?= $state->state_name ?></option>
-                              <?php } ?>
-                            </select>
-                          </div>
-                          </div>
-
-                          <div class="col-md-6">
-                            <div class="form-group">
-                            <label for="">City</label>
-                            <select class="form-control" id="search_city_id" name="search_city_id" style="height: 38px;border-radius: 6px;margin-top: 10px;" onchange="getLocationSearch(this.value)">
-                              <option value="">Select City</option>
-                            </select>
-                          </div>
+                              <label for="">State</label>
+                              <select class="form-control" id="search_state_id" name="search_state_id" onchange="getCitySearch(this.value)" style="height: 38px;border-radius: 6px;margin-top: 10px;">
+                                <option value="">Select State</option>
+                                <?php foreach ($state_list as $state) { ?>
+                                  <option value="<?= $state->state_id ?>"><?= $state->state_name ?></option>
+                                <?php } ?>
+                              </select>
+                            </div>
                           </div>
 
                           <div class="col-md-6">
                             <div class="form-group">
-                            <label for="">Location</label>
-                            <select class="form-control" id="search_location_id" name="search_location_id" style="height: 38px;border-radius: 6px;margin-top: 10px;">
-                              <option value="">Select Location</option>
-                            </select>
-                          </div>
+                              <label for="">City</label>
+                              <select class="form-control" id="search_city_id" name="search_city_id" style="height: 38px;border-radius: 6px;margin-top: 10px;" onchange="getLocationSearch(this.value)">
+                                <option value="">Select City</option>
+                              </select>
+                            </div>
                           </div>
 
                           <div class="col-md-6">
                             <div class="form-group">
-                            <label for="">Agent</label>
-                            <select class="form-control" id="search_agent_id" name="search_agent_id[]" style="height: 38px;border-radius: 6px;margin-top: 10px;" multiple="true">
-                              <option value="">Select Agent</option>
-                              <?php foreach ($filter_user_list as $item) { ?>
-                                <option value="<?= $item->user_id ?>"><?= ($item->parent_id == 0) ? (($item->is_individual) ? (ucwords($item->user_title . ' ' . $item->first_name . ' ' . $item->last_name)) : $item->firm_name) : $item->first_name . ' ' . $item->last_name . (($item->parent_id) ? ' (Team)' : '') ?></option>
-                              <?php } ?>
-                            </select>
+                              <label for="">Location</label>
+                              <select class="form-control" id="search_location_id" name="search_location_id" style="height: 38px;border-radius: 6px;margin-top: 10px;">
+                                <option value="">Select Location</option>
+                              </select>
+                            </div>
                           </div>
+
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label for="">Agent</label>
+                              <select class="form-control" id="search_agent_id" name="search_agent_id[]" style="height: 38px;border-radius: 6px;margin-top: 10px;" multiple="true">
+                                <option value="">Select Agent</option>
+                                <?php foreach ($filter_user_list as $item) { ?>
+                                  <option value="<?= $item->user_id ?>"><?= ($item->parent_id == 0) ? (($item->is_individual) ? (ucwords($item->user_title . ' ' . $item->first_name . ' ' . $item->last_name)) : $item->firm_name) : $item->first_name . ' ' . $item->last_name . (($item->parent_id) ? ' (Team)' : '') ?></option>
+                                <?php } ?>
+                              </select>
+                            </div>
                           </div>
 
 
                           <div class="col-md-4">
-                          <label for="">Source</label>
+                            <label for="">Source</label>
                             <select class="form-control" id="search_source_id" name="search_source_id[]" style="height: 38px;border-radius: 6px;margin-top: 10px;" multiple="true">
                               <option value="">Select Source</option>
                               <?php foreach ($lead_source_list as $lead_source) { ?>
@@ -320,7 +320,7 @@
                           </div>
 
                           <div class="col-md-4">
-                          <label for="">Stage</label>
+                            <label for="">Stage</label>
                             <select class="form-control" id="search_stage_id" name="search_stage_id[]" style="height: 38px;border-radius: 6px;margin-top: 10px;" multiple="true">
                               <option value="">Select Stage</option>
                               <?php foreach ($lead_stage_list as $lead_stage) { ?>
@@ -328,33 +328,33 @@
                               <?php } ?>
                             </select>
                           </div>
-                            
-                          <?php if(user()->role_id == 1 || user()->role_id == 5 || true): ?>
-                          <div class="col-md-4">
-                          <label for="">Status</label>
-                            <select class="form-control" id="search_status" name="search_status" style="height: 38px;border-radius: 6px;margin-top: 10px;">
-                              <option value="">Select Status</option>
-                              <?php foreach ($lead_type_list as $item) { ?>
-                                <option value="<?= $item->lead_type_id ?>" <?=$item->lead_type_id==1 ? 'Selected' : ''  ?> ><?= $item->lead_type_name ?></option>
-                              <?php } ?>
-                            </select>
-                          </div>
+
+                          <?php if (user()->role_id == 1 || user()->role_id == 5 || true): ?>
+                            <div class="col-md-4">
+                              <label for="">Status</label>
+                              <select class="form-control" id="search_status" name="search_status" style="height: 38px;border-radius: 6px;margin-top: 10px;">
+                                <option value="">Select Status</option>
+                                <?php foreach ($lead_type_list as $item) { ?>
+                                  <option value="<?= $item->lead_type_id ?>" <?= $item->lead_type_id == 1 ? 'Selected' : ''  ?>><?= $item->lead_type_name ?></option>
+                                <?php } ?>
+                              </select>
+                            </div>
                           <?php endif; ?>
                         </div>
                       </div>
 
                       <div class="form-group text-right">
-                      <a class="btn btn-dark text-white" href="<?= base_url(AGENT_URL . 'lead-detail/') ?>"> Add New </a>
+                        <a class="btn btn-dark text-white" href="<?= base_url(AGENT_URL . 'lead-detail/') ?>"> Add New </a>
                         <button type="submit" class="btn btn-dark search_btn">Search</button>&nbsp;&nbsp;
 
                         <?php if (isset($menu_item_array['followup_advance_search']) && $menu_item_array['followup_advance_search']['rr_view']) { ?>
                           <button type="button" class="btn btn-dark adv_btn">Advance Search</button>&nbsp;&nbsp;
-                          
-                          <?php if(user()->role_id == 1 || user()->role_id == 2): ?>
-                          <button type="button" class="btn btn-info" onclick="downloadLeads()">Download</button>
+
+                          <?php if (user()->role_id == 1 || user()->role_id == 2): ?>
+                            <button type="button" class="btn btn-info" onclick="downloadLeads()">Download</button>
                           <?php endif; ?>
                         <?php } ?>
-                        
+
                       </div>
                     </form>
 
@@ -403,7 +403,7 @@
                         </div>
                       </div>
                     </div>
-<!-- 
+                    <!-- 
                     <div class="followup-chart pt-2">
                       <h4 class="card-title text-center pb-2">Meeting</h4>
 
@@ -429,7 +429,7 @@
 </div>
 
 <!-- start requirement modal -->
-<div class="modal fade" id="requirementModal"  role="dialog" aria-hidden="true">
+<div class="modal fade" id="requirementModal" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -584,16 +584,16 @@
           <input type="hidden" name="followup_lead_id" id="followup_lead_id" value="">
           <input type="hidden" name="followup_status" id="followup_status" value="">
           <div class="row">
-            <div class="col-md-6" style="margin-top: 10px;">
+            <div class="col-md-4" style="margin-top: 10px;">
               <label>Lead Stage:</label>
               <select class="form-control" id="lead_stage_id" name="lead_stage_id" onchange="changeLeadStage()">
-                <option value="0" disabled="">Select Stage</option>
+                <option value="" disabled selected>Choose...</option>
                 <?php foreach ($lead_stage_list as $item) { ?>
                   <option value="<?= $item->lead_stage_id ?>"><?= $item->lead_stage_name ?></option>
                 <?php } ?>
               </select>
             </div>
-            <div class="col-md-6 booking_hide" style="margin-top: 10px;">
+            <div class="col-md-4 booking_hide" style="margin-top: 10px;">
               <label>Lead Status:</label>
               <select class="form-control" id="lead_status_id" name="lead_status_id">
                 <?php foreach ($lead_type_list as $item) { ?>
@@ -601,11 +601,8 @@
                 <?php } ?>
               </select>
             </div>
-            <div class="col-md-6" style="margin-top: 10px;">
-              <label>Comment:</label>
-              <textarea class="form-control" rows="2" id="comment" name="comment"></textarea>
-            </div>
-            <div class="col-md-6 booking_hide" style="margin-top: 10px;">
+            
+            <div class="col-md-4 booking_hide" style="margin-top: 10px;">
               <label>Next Action:</label>
               <select class="form-control" id="next_action" name="next_action" onchange="nextAction()">
                 <option value="">Select Next Action</option>
@@ -614,7 +611,7 @@
                 <?php } ?>
               </select>
             </div>
-            <div class="col-md-6 booking_hide" style="margin-top: 10px;">
+            <div class="col-md-4 booking_hide" style="margin-top: 10px;">
               <label>Next Followup:</label>
               <div class="row">
                 <div class="col-md-6">
@@ -627,7 +624,7 @@
             </div>
 
 
-            <div class="col-md-6" style="margin-top: 10px;">
+            <div class="col-md-4" style="margin-top: 10px;">
               <label>Project:</label>
               <select class="form-control" id="fp_project_id" name="fp_project_id[]" multiple="" style="width: 100%;">
                 <?php foreach ($product_list as $item) { ?>
@@ -637,7 +634,7 @@
               <label id="fp_project_id-error" class="error" for="fp_project_id" style=""></label>
             </div>
 
-            <div class="col-md-6" style="margin-top: 10px;">
+            <div class="col-md-4" style="margin-top: 10px;">
               <label>Assign To:</label>
               <select class="form-control" id="fp_assign_to" name="fp_assign_to">
                 <option value="">Select User</option>
@@ -647,7 +644,12 @@
               </select>
             </div>
 
-            <div class="col-md-12 booking_hide" style="margin-top: 10px;">
+            <div class="col-md-6" style="margin-top: 10px;">
+              <label>Comment:</label>
+              <textarea class="form-control" rows="2" id="comment" name="comment"></textarea>
+            </div>
+
+            <div class="col-md-6 booking_hide" style="margin-top: 10px;">
               <label>Task Description:</label>
               <textarea class="form-control" rows="2" id="task_desc" name="task_desc"></textarea>
             </div>
@@ -749,7 +751,7 @@
 <!-- end feedback form modal -->
 
 <!-- start booking modal -->
-<div class="modal fade" id="bookingModal" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" id="bookingModal" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -1018,13 +1020,13 @@
     var search_text = $("#search_text").val();
 
     /** Lead Filter */
-    var lead_from                 =   $("#lead_from").val();
-    var lead_to                   =   $("#lead_to").val();
+    var lead_from = $("#lead_from").val();
+    var lead_to = $("#lead_to").val();
     /** End Lead Filter */
-    
+
     /** Follow Up Filter */
-    var followup_from             =   $("#followup_from").val();
-    var followup_to               =   $("#followup_to").val();
+    var followup_from = $("#followup_from").val();
+    var followup_to = $("#followup_to").val();
     /** End Follow Up Filter */
 
     var search_date_from = $("#search_date_from").val();
@@ -1045,23 +1047,23 @@
       type: "POST",
       url: "<?php echo base_url(AGENT_URL . 'api/get_followup_list'); ?>",
       data: {
-        page                    : page,
-        filter_by               : filter_by,
-        search_text             : search_text,
-        
-        lead_from               : lead_from,
-        lead_to                 : lead_to,
+        page: page,
+        filter_by: filter_by,
+        search_text: search_text,
 
-        followup_from           : followup_from,
-        followup_to             : followup_to,
+        lead_from: lead_from,
+        lead_to: lead_to,
 
-        search_state_id         : search_state_id,
-        search_city_id          : search_city_id,
-        search_source_id        : search_source_id,
-        search_stage_id         : search_stage_id,
-        search_status           : search_status,
-        search_location_id      : search_location_id,
-        search_agent_id         : search_agent_id
+        followup_from: followup_from,
+        followup_to: followup_to,
+
+        search_state_id: search_state_id,
+        search_city_id: search_city_id,
+        search_source_id: search_source_id,
+        search_stage_id: search_stage_id,
+        search_status: search_status,
+        search_location_id: search_location_id,
+        search_agent_id: search_agent_id
       },
       beforeSend: function() {
         $(".error-msg-left").html('');
@@ -1112,10 +1114,12 @@
                 //   "  </div>" +
                 //   "</div>";
 
-             
-                delete_lead_btn         =  <?php if(user()->role_id == 1 || user()->role_id == 5): ?> `<div class="delete-lead" data-id="${record.lead_id}"><i class="fa fa-times"></i></div>`<?php else: ?> '' <?php endif;?>;
-                 
-                html += `<div class='customer position-relative'>
+
+                delete_lead_btn = <?php if (user()->role_id == 1 || user()->role_id == 5): ?> `<div class="delete-lead" data-id="${record.lead_id}"><i class="fa fa-times"></i></div>`
+              <?php else: ?> ''
+              <?php endif; ?>;
+
+              html += `<div class='customer position-relative'>
                     ${delete_lead_btn}
                      <div class='row data-add-${record.lead_id}'  onclick='showCustomer(${record.lead_id},0)'>
 
@@ -2093,13 +2097,13 @@
 
       var base_url_of_followup = 'followup_save';
 
-      if($('#followup_id').val() == 0){
+      if ($('#followup_id').val() == 0) {
         var base_url_of_followup = 'add_to_followup';
       }
 
       $.ajax({
         type: "POST",
-        url: "<?= base_url(AGENT_URL . 'api/') ?>"+base_url_of_followup,
+        url: "<?= base_url(AGENT_URL . 'api/') ?>" + base_url_of_followup,
         data: fd,
         cache: false,
         processData: false,
@@ -2121,13 +2125,13 @@
                 get_followup_list();
 
                 // if($('#followup_id').val() == 0){
-                    $('.customer_detail').hide();
-                    $('.search_box').show();
+                $('.customer_detail').hide();
+                $('.search_box').show();
                 // }
                 // else{
                 //   get_followup();
                 // }
-                
+
                 $("#followUpTabModal input").val('');
                 $("#followUpTabModal select").val('');
                 $("#followUpTabModal textarea").val('');
@@ -2213,11 +2217,12 @@
               $(".followup-error-msg").html('');
 
               var record = obj.record;
-              $("#lead_status_id").val(record.lead_status);
-              $("#lead_stage_id").val(record.lead_stage_id);
+              $("#lead_status_id").val(record.lead_status).trigger('change');
+              $("#lead_stage_id").val(record.lead_stage_id).trigger('change');
 
               changeLeadStage();
               nextAction();
+             
             } else {
               alert(obj.message);
             }
@@ -2268,7 +2273,7 @@
               keyboard: false
             });
             $(".lead_form").html(response);
-            
+
             primary_mobile_number_with_dial_code();
             secondary_mobile_number_with_dial_code();
             $('.get_locations').trigger('change')
@@ -2436,6 +2441,7 @@
         //setTimeout(function() {
         $(".booking_form").html(response);
         //},500);
+        convertToSelect2()
       },
       error: function() {
         $(".booking_form").html("<div class='alert alert-danger'>Some error occurred, please try again.</div>");

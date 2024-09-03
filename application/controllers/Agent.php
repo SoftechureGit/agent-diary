@@ -1545,7 +1545,8 @@ class Agent extends CI_Controller
         # user data
         $where_user     = "user_hash='" . $this->session->userdata('agent_hash') . "'";
         $user_detail    = $this->Action_model->select_single('tbl_users', $where_user);
-        $account_id     = $user_detail->user_id;
+        // $account_id     = $user_detail->user_id;
+        $account_id     = getAccountId();
 
         if ($user_detail->role_id < 3 || $user_detail->role_id == 5) {
 
@@ -1619,6 +1620,8 @@ class Agent extends CI_Controller
         $this->db->where($where);
         $query = $this->db->get();
         $product_list = $query->result();
+
+        
         $data['product_list'] = $product_list;
 
         $data['pie_chart_values'] = $pie_chart_values;
