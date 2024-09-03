@@ -2433,7 +2433,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
       
     //   echo json_encode($where); die;
        
-      $record                       =   $this->Action_model->apiPagination($select,$page,$limit,$join,$where,'tbl_leads');
+      $record                       =   $this->Action_model->webPagination($select,$page,$limit,$join,$where,'tbl_leads');
 
     //   print_r($record); die;
 
@@ -2473,7 +2473,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
     }
 
       
-      $array = array('status' => 'success', 'message' => 'Lead Found', 'records' =>  $records, 'total_records' =>$pagination['total_records'], 'total_pages' => $pagination['total_pages'], 'next_page' => $pagination['current_page']+1);
+      $array = array('status' => 'success', 'message' => 'Lead Found', 'records' =>  $records, 'total_records' =>$pagination['total_records'], 'total_pages' => $pagination['total_pages'], 'next_page' => $pagination['next_page']);
       
       echo json_encode($array); die;
     }
