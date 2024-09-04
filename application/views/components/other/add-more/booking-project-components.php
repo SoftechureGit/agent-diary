@@ -7,11 +7,11 @@
                 <div class="form-group">
                     <label for="project_component_id">Components</label>
                     
-                    <select name="project_component[1][id]" id="" class="project_component_id form-control set_propety_components" >
+                    <select name="project_component[1][id]" id="" class="project_component_id form-control set_propety_components" onchange="calculatePCTotalAmount(this)">
                         <option value="">Choose...</option>
                     </select>
 
-                    <input type="hidden" name="project_components[1][component_type]">
+                    <input type="hidden" name="project_components[1][type]" class="type">
                 </div>
             </div>
             <!-- End Project Components -->
@@ -20,7 +20,7 @@
             <div class="col">
                 <div class="form-group">
                     <label for="amount">Amount</label>
-                    <input type="text" class="form-control amount" placeholder="Enter amount" name="project_components[1][amount]">
+                    <input type="text" class="form-control amount" placeholder="Enter amount" name="project_components[1][amount]" oninput="calculatePCTotalAmount(this)">
                 </div>
             </div>
             <!-- End Project Components Amount -->

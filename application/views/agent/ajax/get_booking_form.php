@@ -7,7 +7,7 @@
     <div class="col-md-6">
       <div class="form-group">
         <label>Buyer Name <span class="text-danger">*</span></label>
-        <input type="text" class="form-control" id="booking_buyer_name" name="booking_buyer_name" value="<?= $lead->full_name ?? '' ?>" placeholder="Enter buyer name" readonly required/>
+        <input type="text" class="form-control" id="booking_buyer_name" name="booking_buyer_name" value="<?= $lead->full_name ?? '' ?>" placeholder="Enter buyer name" readonly required />
       </div>
     </div>
     <!-- End Buyer Name -->
@@ -27,8 +27,8 @@
         <label>Seller Name <span class="text-danger">*</span></label>
         <select name="booking_seller_name" class="form-control" required>
           <option value="" selected disabled>Choose...</option>
-          <?php foreach($leads ?? [] as $lead_item): ?>
-            <option value="<?= $lead_item->id ?>"><?= $lead_item->full_name." ( $lead_item->mobile )" ?></option>
+          <?php foreach ($leads ?? [] as $lead_item): ?>
+            <option value="<?= $lead_item->id ?>"><?= $lead_item->full_name . " ( $lead_item->mobile )" ?></option>
           <?php endforeach; ?>
         </select>
       </div>
@@ -108,15 +108,15 @@
       <details <?= isset($record) ? 'open' : '' ?>>
         <summary>Deal Amount</summary>
         <div class="booking-deal-amount-container p-4">
-        <?php $this->view('components/other/add-more/booking-project-components', [ 'records' => $record->booking_deal_amount ?? [] ]) ?>
+          <?php $this->view('components/other/add-more/booking-project-components', ['records' => $record->booking_deal_amount ?? []]) ?>
 
-        <div class="text-right">
-          <button type="button" class="btn btn-warning btn-sm text-white add-more-btn" onclick="add_more(this, 'booking-deal-amount' ,'.booking-deal-amount-container')">Add More</button>
+          <div class="text-right">
+            <button type="button" class="btn btn-warning btn-sm text-white add-more-btn" onclick="add_more(this, 'booking-deal-amount' ,'.booking-deal-amount-container')">Add More</button>
+          </div>
         </div>
-        </div>
-        
+
       </details>
-     </div>
+    </div>
     <!-- End Booking Deal Amount -->
 
     <!-- Payment Terms -->
@@ -124,15 +124,15 @@
       <details <?= isset($record) ? 'open' : '' ?>>
         <summary>Payment Terms</summary>
         <div class="payment-terms-container p-4">
-        <?php $this->view('components/other/add-more/booking-payment-terms', [ 'records' => $record->payment_terms ?? [] ]) ?>
+          <?php $this->view('components/other/add-more/booking-payment-terms', ['records' => $record->payment_terms ?? []]) ?>
 
-        <div class="text-right">
-          <button type="button" class="btn btn-warning btn-sm text-white add-more-btn" onclick="add_more(this, 'payment-terms' ,'.payment-terms-container')">Add More</button>
+          <div class="text-right">
+            <button type="button" class="btn btn-warning btn-sm text-white add-more-btn" onclick="add_more(this, 'payment-terms' ,'.payment-terms-container')">Add More</button>
+          </div>
         </div>
-        </div>
-        
+
       </details>
-     </div>
+    </div>
     <!-- End Payment Terms -->
 
   </div>

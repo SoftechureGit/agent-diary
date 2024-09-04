@@ -975,13 +975,14 @@ function property_components($param)
         $where                  =   "plc.product_id = $property_id";
     endif;
 
-                                db_instance()->select('plc.product_plc_detail_id as id, plc.price, pc.price_component_name as name');
+                                    db_instance()->select('plc.product_plc_detail_id as id, plc.price, pc.price_component_name as name, "plc" as type');
                                 db_instance()->from('tbl_product_plc_details as plc');
                                 db_instance()->join('tbl_price_components as pc', 'pc.price_component_id = plc.price_comp_id');
                                 db_instance()->where($where);
     $plc_components         =   db_instance()->get()->result();
 
-                                db_instance()->select('plc.product_additional_detail_id as id, plc.price, pc.price_component_name as name');
+
+                                db_instance()->select('plc.product_additional_detail_id as id, plc.price, pc.price_component_name as name, "additional" as type');
                                 db_instance()->from('tbl_product_additional_details as plc');
                                 db_instance()->join('tbl_price_components as pc', 'pc.price_component_id = plc.price_comp_id');
                                 db_instance()->where($where);
