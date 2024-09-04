@@ -319,6 +319,8 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id, $use
                 line-height: 31px;
             }
         /* Select 2 */
+
+        /* .clone-template .form-control{ width: -webkit-fill-available !important; } */
         /*  */
 
     </style>

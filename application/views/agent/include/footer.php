@@ -707,7 +707,7 @@
            case 'booking-deal-amount':
              dublicate_clone_template.find('.select2').remove();
              dublicate_clone_template.find('.project_component_id').attr('name', "project_components[" + clone_template_id + "][id]").select2().val('').trigger('change');
-             dublicate_clone_template.find('.amount').attr('name', "project_components[" + clone_template_id + "][amount]").val('');
+             dublicate_clone_template.find('.rate').attr('name', "project_components[" + clone_template_id + "][rate]").val('');
              dublicate_clone_template.find('.total_amount').attr('name', "project_components[" + clone_template_id + "][total_amount]").val('');
              convertToSelect2()
              break;
@@ -1082,6 +1082,18 @@
          })
        }
 
+       /** Followup Success Booking Form */
+       $(document).on('change', '.get_inventory_plot_or_unit_numbers', function(){
+          property_id       =   $('.booking_project_id').val()
+          unit_code       =  this.value
+
+          get_set_inventory_plot_numbers({
+             'property_id': property_id,
+             'unit_code': unit_code
+           })
+       })
+       /** End Followup Success Booking Form */
+
        /** get_set_inventory_plot_numbers */
        function get_set_inventory_plot_numbers({
          property_id = 0,
@@ -1111,6 +1123,8 @@
 
                  $('[name="property_details[plot_number]"]').html(res.options_view)
                  $('[name="property_details[unit_no]"]').html(res.options_view)
+
+                 $('.inventory_plot_or_unit_numbers').html(res.options_view)
                  resolve(true);
 
                } else {
