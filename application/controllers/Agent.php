@@ -1586,7 +1586,7 @@ class Agent extends CI_Controller
         # Today Followup 
         $today_followups            = $this->db->where("$where_role and ( lead_stage_id != '6' or lead_stage_id != '7' )  and DATE(STR_TO_DATE(`followup_date`, '%Y-%m-%d')) = '$today_date'")->get('tbl_leads')->num_rows();
         # Today Followup 
-        print_r($this->db->last_query()); die;
+        // print_r($this->db->last_query()); die;
 
         # Total Followup 
         $total_followups            = $this->db->where("$where_role and ( lead_stage_id = '2' or lead_stage_id = '3' or lead_stage_id = '4' or lead_stage_id = '5'  )  and followup_date IS NOT NULL ")->get('tbl_leads')->num_rows();
