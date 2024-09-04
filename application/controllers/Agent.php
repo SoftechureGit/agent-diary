@@ -1553,19 +1553,18 @@ class Agent extends CI_Controller
             $account_id_for_where       = $user_detail->user_id;
             $account_id                 = getAccountId();
 
-        if ($user_detail->role_id < 3 || $user_detail->role_id == 5) {
-
-            if ($user_detail->parent_id == 0) {
-                $where_role = "is_customer ='0' AND tbl_leads.account_id='" . $account_id_for_where . "'";
-                $where_f    = "account_id='" . $account_id_for_where . "'";
+            if ($user_detail->role_id < 3 || $user_detail->role_id == 5) {
+                if ($user_detail->parent_id == 0) {
+                    $where_role = "is_customer = '0' AND tbl_leads.account_id = '" . $account_id_for_where . "'";
+                    $where_f = "account_id = '" . $account_id_for_where . "'";
+                } else {
+                    $where_role = "is_customer = '0' AND tbl_leads.user_id = '" . $account_id_for_where . "'";
+                    $where_f = "user_id = '" . $account_id_for_where . "'";
+                }
             } else {
-                $where_role = "is_customer ='0' AND tbl_leads.user_id='" . $account_id_for_where . "'";
-                $where_f    = " user_id='" . $account_id_for_where . "'";
+                $where_role = "tbl_leads.user_id = '" . $account_id_for_where . "' AND is_customer = '0'";
+                $where_f = "followup.user_id = '" . $account_id_for_where . "'";
             }
-        } else {
-            $where_role = "tbl_leads.user_id='" . $account_id_for_where . "' AND is_customer='0'";
-            $where_f    = "user_id='" . $account_id_for_where . "' AND is_customer='0'";
-        }
 
         // print_r($where_role); die;
         
@@ -1575,8 +1574,8 @@ class Agent extends CI_Controller
 
 
 
-        $where = $where_role;
-        $tb_data = $this->Action_model->select_single('tbl_leads', $where, "COUNT(CASE WHEN added_to_followup = 1 THEN lead_id END) as total_followup,COUNT(CASE WHEN followup_date = '" . date('d-m-Y') . "' THEN lead_id END) as today_followup,COUNT(CASE WHEN added_to_followup = 0 THEN lead_id END) as missed_followup");
+        $where      = $where_role;
+        $tb_data    = $this->Action_model->select_single('tbl_leads', $where, "COUNT(CASE WHEN added_to_followup = 1 THEN lead_id END) as total_followup,COUNT(CASE WHEN followup_date = '" . date('d-m-Y') . "' THEN lead_id END) as today_followup,COUNT(CASE WHEN added_to_followup = 0 THEN lead_id END) as missed_followup");
 
         $today_date                 = date('Y-m-d');
         # Total New Leads
@@ -1604,32 +1603,23 @@ class Agent extends CI_Controller
 
           # Followup
 
-        //   $where                              =   "(user.role_id in ($user_detail->permission_roles) or user.user_id = '$user_detail->user_id') and followup.account_id='$account_id'";
-   
-        //   if(!$selected_member_ids):
-        //       $where                          .=   " and followup.user_id in ($members_ids) ";
-        //   else:
-        //       $where                          .=   " and followup.user_id in ($selected_member_ids) ";
-        //   endif;
-  
           $followup_select_query                  =   "
-                                                          count(*) as total_count,
-                                                          SUM(CASE WHEN ( STR_TO_DATE(next_followup_date, '%d-%m-%Y')  = CURDATE() AND followup_status = '1' AND lead_status_id = 1 ) THEN 1 ELSE 0 END) as today_count,
-                                                          SUM(CASE WHEN ( STR_TO_DATE(next_followup_date, '%d-%m-%Y')  < CURDATE() AND followup_status = '1' AND lead_status_id = 1 ) THEN 1 ELSE 0 END) as missed_count,
-                                                          SUM(CASE WHEN lead_stage_id = '1' THEN 1 ELSE 0 END) as total_initial_count,
-                                                          SUM(CASE WHEN lead_stage_id = '2' THEN 1 ELSE 0 END) as total_followup_count,
-                                                          SUM(CASE WHEN lead_stage_id = '3' THEN 1 ELSE 0 END) as total_enquiry_count,
-                                                          SUM(CASE WHEN lead_stage_id = '4' THEN 1 ELSE 0 END) as total_site_visit_count,
-                                                          SUM(CASE WHEN lead_stage_id = '5' THEN 1 ELSE 0 END) as total_metting_count,
-                                                          SUM(CASE WHEN lead_stage_id = '6' THEN 1 ELSE 0 END) as total_success_count,
-                                                          SUM(CASE WHEN lead_stage_id = '7' THEN 1 ELSE 0 END) as total_dump_count
-                                                      ";
-  
-          $this->db->select($followup_select_query);
-          $this->db->where($where_f);
-          $this->db->from('tbl_followup as followup');
-          $this->db->join('tbl_users  as user', 'user.user_id = followup.user_id', 'left');
-          $followups                          =   $this->db->get()->row();
+          count(*) as total_count,
+          SUM(CASE WHEN ( STR_TO_DATE(next_followup_date, '%d-%m-%Y')  = CURDATE() AND followup_status = '1' AND lead_status_id = 1 ) THEN 1 ELSE 0 END) as today_count,
+          SUM(CASE WHEN ( STR_TO_DATE(next_followup_date, '%d-%m-%Y')  < CURDATE() AND followup_status = '1' AND lead_status_id = 1 ) THEN 1 ELSE 0 END) as missed_count,
+          SUM(CASE WHEN lead_stage_id = '1' THEN 1 ELSE 0 END) as total_initial_count,
+          SUM(CASE WHEN lead_stage_id = '2' THEN 1 ELSE 0 END) as total_followup_count,
+          SUM(CASE WHEN lead_stage_id = '3' THEN 1 ELSE 0 END) as total_enquiry_count,
+          SUM(CASE WHEN lead_stage_id = '4' THEN 1 ELSE 0 END) as total_site_visit_count,
+          SUM(CASE WHEN lead_stage_id = '5' THEN 1 ELSE 0 END) as total_metting_count,
+          SUM(CASE WHEN lead_stage_id = '6' THEN 1 ELSE 0 END) as total_success_count,
+          SUM(CASE WHEN lead_stage_id = '7' THEN 1 ELSE 0 END) as total_dump_count";
+
+            $this->db->select($followup_select_query);
+            $this->db->where($where_f);
+            $this->db->from('tbl_followup as followup');
+            $this->db->join('tbl_users  as user', 'user.user_id = followup.user_id', 'left');
+            $followups                          =   $this->db->get()->row();
 
 
           $data['followups']  = $followups;
