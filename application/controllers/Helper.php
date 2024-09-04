@@ -79,6 +79,35 @@ class Helper extends CI_Controller
     }
     # End Get Locations
 
+    # Unit Codes
+    public function unit_codes()
+    {
+        $property_id                =   $this->input->get('property_id');
+        $is_view                    =   $this->input->get('view');
+
+        if($property_id):
+            $where                      =   "product_id = $property_id";    
+        endif;
+
+        $unit_codes_query_data       =   (object)[
+                                                    'where' => $where
+                                                ];
+
+        $records                =   unit_codes($unit_codes_query_data);
+
+        $view                   =   null;
+        if ($is_view) :
+            $view                =   "<option value=''>Choose...</option>";
+
+            foreach ($records ?? [] as $record) :
+                $view            .=   "<option value='$record->id'>$record->name</option>";
+            endforeach;
+        endif;
+
+        echo json_encode(['status' => true, 'message' => 'Successfully data fetched', 'data' => $records, 'view' => $view]);
+    }
+    # End Unit Codes
+
     # Get Inventory Details
     public function get_inventory_details(){
         $arr                        =   [];
@@ -509,4 +538,20 @@ class Helper extends CI_Controller
         echo json_encode(['status' => true, 'message' => 'Successfully data fetched', 'data' => $records, 'options_view' => $options]);
     }
     # End Inventory Plot Or Unit Numbers
+
+    # Components
+        public function property_components(){
+           
+        $property_id            =   $this->input->get('project_id');
+        $records                =   property_components((object) [ 'property_id' => $property_id ]);
+
+        $options                =   "<option value=''>Choose...</option>";
+
+        foreach ($records->all_components ?? [] as $record) :
+            $options            .=   "<option value='$record->id' >$record->name</option>";
+        endforeach;
+
+        echo json_encode(['status' => true, 'message' => 'Successfully data fetched', 'data' => $records, 'view' => $options]); 
+        }
+    # Components
 }

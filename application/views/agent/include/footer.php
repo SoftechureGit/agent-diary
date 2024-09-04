@@ -352,6 +352,87 @@
        }
        /*  End Ajax : Get Locations */
 
+       /** Get Properties via location */
+
+       $(document).on('change', '.get_properties_via_location', function() {
+         var location_id = $(this).val();
+
+         /** Ajax */
+         if (!location_id) return;
+
+         $.ajax({
+           method: 'GET',
+           //  async: false,
+           url: "<?= base_url('helper/projects'); ?>",
+           data: {
+            location_id: location_id,
+            view:true
+           },
+           dataType: 'json',
+           success: (res) => {
+             if (res.status) {
+               $('.set_properties_via_location').html(res.view)
+             }
+           }
+         })
+         /** Ajax */
+       })
+       /** End Get Properties via location  */
+
+       /** Get Properties Components */
+
+       $(document).on('change', '.get_propety_components', function() {
+         var project_id = $('[name="booking_project_id"]').val();
+
+         /** Ajax */
+         if (!project_id) return;
+
+         $.ajax({
+           method: 'GET',
+           //  async: false,
+           url: "<?= base_url('helper/property_components'); ?>",
+           data: {
+            project_id: project_id,
+            view:true
+           },
+           dataType: 'json',
+           success: (res) => {
+             if (res.status) {
+               $('.set_propety_components').html(res.view)
+             }
+           }
+         })
+         /** Ajax */
+       })
+       /** End Get Properties Components  */
+
+       /** Get property unit codes */
+
+       $(document).on('change', '.get_property_unit_codes', function() {
+         var property_id = $(this).val();
+
+         /** Ajax */
+         if (!property_id) return;
+
+         $.ajax({
+           method: 'GET',
+           //  async: false,
+           url: "<?= base_url('helper/unit_codes'); ?>",
+           data: {
+            property_id: property_id,
+            view:true
+           },
+           dataType: 'json',
+           success: (res) => {
+             if (res.status) {
+               $('.set_property_unit_codes').html(res.view)
+             }
+           }
+         })
+         /** Ajax */
+       })
+       /** End Get property unit codes */
+
 
        /*  Lead Units */
        function lead_units(lead_id) {
@@ -423,9 +504,9 @@
                  $('#lead-unit-form .project_list_wrapper').removeClass('d-none')
                  $('#lead-unit-form .project_properties').removeClass('d-none')
 
-                //  $('#lead-unit-form [name="property_details[unit_code]"]').prop('required', false).removeClass('d-none')
-                //  $('#lead-unit-form [name="property_details[unit_code]"] + .select2').removeClass('d-none')
-                //  $('#lead-unit-form [name="property_details[unit_code_name]"]').prop('required', false).addClass('d-none')
+                 //  $('#lead-unit-form [name="property_details[unit_code]"]').prop('required', false).removeClass('d-none')
+                 //  $('#lead-unit-form [name="property_details[unit_code]"] + .select2').removeClass('d-none')
+                 //  $('#lead-unit-form [name="property_details[unit_code_name]"]').prop('required', false).addClass('d-none')
 
                  /** Lead Unit Property List : Trigger  */
                  if ($('#lead-unit-form [name="project_id"]').data('selected_id') != '') {
@@ -438,10 +519,10 @@
                  $('#lead-unit-form .project_properties').addClass('d-none')
                  $('#lead-unit-form .project_properties').addClass('d-none')
 
-                //  $('#lead-unit-form [name="property_details[unit_code]"]').html('')
-                //  $('#lead-unit-form [name="property_details[unit_code]"]').prop('required', true).addClass('d-none')
-                //  $('#lead-unit-form [name="property_details[unit_code]"] + .select2').addClass('d-none')
-                //  $('#lead-unit-form [name="property_details[unit_code_name]"]').prop('required', true).removeClass('d-none')
+                 //  $('#lead-unit-form [name="property_details[unit_code]"]').html('')
+                 //  $('#lead-unit-form [name="property_details[unit_code]"]').prop('required', true).addClass('d-none')
+                 //  $('#lead-unit-form [name="property_details[unit_code]"] + .select2').addClass('d-none')
+                 //  $('#lead-unit-form [name="property_details[unit_code_name]"]').prop('required', true).removeClass('d-none')
 
                }
                //  $('#lead-unit-form [name="project_id"]').trigger('change')
@@ -622,8 +703,18 @@
              dublicate_clone_template.find('.youtube-title').attr('name', "youtube_data[" + clone_template_id + "][title]").val('');
              dublicate_clone_template.find('.link').attr('name', "youtube_data[" + clone_template_id + "][link]").val('');
              break;
-
-           case 'booking-deal-amount':
+             
+             case 'booking-deal-amount':
+               dublicate_clone_template.find('.select2').remove();
+               dublicate_clone_template.find('.project_component_id').attr('name', "project_components[" + clone_template_id + "][id]").select2().val('').trigger('change');
+               dublicate_clone_template.find('.amount').attr('name', "project_components[" + clone_template_id + "][amount]").val('');
+               dublicate_clone_template.find('.total_amount').attr('name', "project_components[" + clone_template_id + "][total_amount]").val('');
+               break;
+               
+               case 'payment-terms':
+             dublicate_clone_template.find('.payment_term_title').attr('name', "payment_terms[" + clone_template_id + "][title]").val('');
+             dublicate_clone_template.find('.amount').attr('name', "payment_terms[" + clone_template_id + "][amount]").val('');
+             dublicate_clone_template.find('.date').attr('name', "payment_terms[" + clone_template_id + "][date]").val('');
              break;
          }
 
@@ -1118,7 +1209,7 @@
          /************************************************************
           *  Saved Data set in fields
           *************************************************************/
-         if(!set_saved_data_in_form_fields(this)) return false
+         if (!set_saved_data_in_form_fields(this)) return false
          /************************************************************
           * End Saved Data set in fields
           ************************************************************/

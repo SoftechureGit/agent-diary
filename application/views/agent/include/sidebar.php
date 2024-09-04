@@ -18,7 +18,7 @@
                     <?php if(isset($menu_item_array['raw_data']) && $menu_item_array['raw_data']['rr_view']) { ?>  
                     <li>
                         <a href="<?= base_url(AGENT_URL.'data/') ?>" aria-expanded="false">
-                            <i class="icon-screen-tablet menu-icon"></i> <span class="nav-text">Data</span>
+                            <i class="icon-notebook menu-icon"></i> <span class="nav-text">Data</span>
                         </a>
                        
                     </li>
@@ -46,7 +46,7 @@
 
                     <li>
                         <a href="<?= base_url(AGENT_URL.'leads') ?>" aria-expanded="false">
-                            <i class="icon-screen-tablet menu-icon"></i> <span class="nav-text">Leads</span>
+                            <i class="icon-chart menu-icon"></i> <span class="nav-text">Leads</span>
                         </a>
                        
                     </li>
@@ -102,7 +102,7 @@
                     <?php if(isset($menu_item_array['customer']) && $menu_item_array['customer']['rr_view']) { ?>
                     <li>
                         <a href="<?= base_url(AGENT_URL.'customers/') ?>" aria-expanded="false">
-                            <i class="icon-user menu-icon"></i><span class="nav-text">Customers</span>
+                            <i class="icon-people menu-icon"></i><span class="nav-text">Customers</span>
                         </a>
                        
                     </li>
@@ -111,7 +111,7 @@
                     <?php if(isset($menu_item_array['chat']) && $menu_item_array['chat']['rr_view']) { ?>
                     <li>
                         <a href="<?= base_url(AGENT_URL.'tickets/') ?>" aria-expanded="false">
-                            <i class="icon-badge menu-icon"></i><span class="nav-text">Chat</span>
+                            <i class="icon-bubbles menu-icon"></i><span class="nav-text">Chat</span>
                         </a>
                        
                     </li>
@@ -119,7 +119,7 @@
                     
                     <li>
                         <a class="has-arrow" href="javascript:void()" aria-expanded="false">
-                            <i class="icon-note menu-icon"></i><span class="nav-text">Setting</span>
+                            <i class="icon-settings menu-icon"></i><span class="nav-text">Setting</span>
                         </a>
                         <ul aria-expanded="false">
                             

@@ -11,7 +11,7 @@ $property_layout_url        =   $property_layout ? base_url("uploads/images/prop
           <?php if ($unit_code ?? $unit_code_name ?? 0) : ?>
                 <tr>
                     <th>Unit Code</th>
-                    <td><?= ($unit_code ?? 0) ? unit_code($unit_code)->name ?? '' : $unit_code_name ?? '' ?></td>
+                    <td><?= ($unit_code ?? 0) ? unit_codes((object) [ 'id' => $unit_code ])->name ?? '' : $unit_code_name ?? '' ?></td>
                 </tr>
                 <?php endif; ?>
                 <!-- End Unit Code -->

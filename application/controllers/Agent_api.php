@@ -9244,6 +9244,8 @@ WHERE lead_id='" . $lead_id . "'
             $data                       =   [];
 
             $account_id                 =   getAccountId();
+            $user_ids                   =   $this->get_level_user_ids();
+
 
             $lead_id                    =   $this->input->post('lead_id');
 
@@ -9269,7 +9271,18 @@ WHERE lead_id='" . $lead_id . "'
                                                     ) AS mobile
                                                 ";
                 $leads_where_query           =   "lead_status = '1'";
+
+                if (count($user_ids)) {
+                    
+                    $leads_where_query           .= " AND (user_id='" . implode("' OR user_id='", $user_ids) . "')";
+                }
+
+                // echo $leads_where_query;
+                // die;
+                
+                
                 $leads_data                  =   leads(['select' => $leads_select_query, 'where' => $leads_where_query]);
+                
 
                 $data['leads']               =    $leads_data;
                 # End All Leads 
@@ -9284,6 +9297,8 @@ WHERE lead_id='" . $lead_id . "'
                 // $project_list = $query->result();
                 // $data['project_list'] = $project_list;
 
+
+          
                 $this->load->view(AGENT_URL . 'ajax/get_booking_form', $data);
             }
         }

@@ -76,7 +76,7 @@
     <div class="col-md-4">
       <div class="form-group">
         <label for="">Location <span class="text-danger">*</span></label>
-        <select name="booking_location_id" id="" class="form-control set_locations" data-selected_id="<?= $record->location_id ?? 0 ?>" required>
+        <select name="booking_location_id" id="" class="form-control set_locations get_properties_via_location" data-selected_id="<?= $record->location_id ?? 0 ?>" required>
           <option value="" selected disabled>Choose..</option>
         </select>
       </div>
@@ -88,7 +88,7 @@
     <div class="col-md-4 project_list_wrapper">
       <div class="form-group">
         <label for="">List of Project <span class="text-danger">*</span></label>
-        <select name="booking_project_id" id="" class="form-control" data-selected_id="<?= $record->project_id ?? 0 ?>" required>
+        <select name="booking_project_id" id="" class="form-control set_properties_via_location get_property_unit_codes get_propety_components" data-selected_id="<?= $record->project_id ?? 0 ?>" required>
           <option value="" selected disabled>Choose..</option>
         </select>
       </div>
@@ -97,8 +97,8 @@
 
 
     <div class="col-md-4">
-      <label>Unit No <span class="text-danger">*</span></label>
-      <select class="form-control" id="booking_unit_no" name="booking_unit_no" onchange="getUnitRefNo(this.value)" required="">
+      <label>Unit Code <span class="text-danger">*</span></label>
+      <select class="form-control set_property_unit_codes" id="booking_unit_no" name="booking_unit_no" onchange="getUnitRefNo(this.value)" required="">
         <option value="">Select Unit No</option>
       </select>
     </div>
@@ -108,7 +108,7 @@
       <details <?= isset($record) ? 'open' : '' ?>>
         <summary>Deal Amount</summary>
         <div class="booking-deal-amount-container p-4">
-        <?php $this->view('components/other/add-more/booking-deal-amount', [ 'records' => $record->booking_deal_amount ?? [] ]) ?>
+        <?php $this->view('components/other/add-more/booking-project-components', [ 'records' => $record->booking_deal_amount ?? [] ]) ?>
 
         <div class="text-right">
           <button type="button" class="btn btn-warning btn-sm text-white add-more-btn" onclick="add_more(this, 'booking-deal-amount' ,'.booking-deal-amount-container')">Add More</button>
