@@ -690,8 +690,11 @@ if (!function_exists('inventory_plot_or_unit_numbers')):
         endif;
         # End Conditions
 
-        db_instance()->select("inventory_id, JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.plot_number')) as plot_number, 
-           JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.unit_no')) as unit_number");
+        db_instance()->select("
+                                inventory_id, 
+                                JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.plot_number')) as plot_number, 
+                                JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.unit_no')) as unit_number,
+                                ");
         db_instance()->where($where);
         db_instance()->from('tbl_inventory as inventory');
 
@@ -986,16 +989,18 @@ function property_components($param)
     $where   = '';
 
     $property_id                =   $param->property_id ?? 0;
+    $unit_code_id                =   $param->unit_code_id ?? 0;
 
     if ($property_id):
         $where                  =   "plc.product_id = $property_id";
     endif;
 
-    db_instance()->select('plc.product_plc_detail_id as id, plc.price, pc.price_component_name as name, "plc" as type');
+    db_instance()->select('plc.product_plc_detail_id as id, plc.price, pc.price_component_name as name, unit.unit_id as unit_type_id, unit.unit_name as unit_type, , "plc" as type');
     db_instance()->from('tbl_product_plc_details as plc');
     db_instance()->join('tbl_price_components as pc', 'pc.price_component_id = plc.price_comp_id');
+    db_instance()->join('tbl_units as unit', 'unit.unit_id = plc.unit');
     db_instance()->where($where);
-    $plc_components         =   db_instance()->get()->result();
+    $plc_components         = db_instance()->get()->result();
 
 
     db_instance()->select('plc.product_additional_detail_id as id, plc.price, pc.price_component_name as name, "additional" as type');
@@ -1004,21 +1009,51 @@ function property_components($param)
     db_instance()->where($where);
     $additional_components  =    db_instance()->get()->result();
 
+    # tbl_product_unit_details
+     $where                  =   " 1 = 1";
+    if ($property_id):
+        $where                  .=   " and property_unit.product_id = $property_id";
+    endif;
+
+    if ($unit_code_id):
+        $where                  .=   " and property_unit.product_unit_detail_id = $unit_code_id";
+    endif;
+
+        db_instance()->select('property_unit.basic_cost as basic_selling_price, 
+                                property_unit.charges as club_cost, 
+                                property.b_cost_unit as basic_cost_unit_type_id, 
+                                property.club_cost_unit as club_cost_unit_type_id,
+                                basic_unit.unit_name as basic_unit_type_name,
+                                club_unit.unit_name as club_unit_type_name,
+                            ');
+        db_instance()->from('tbl_product_unit_details as property_unit');
+        db_instance()->join('tbl_products as property', 'property.product_id = property_unit.product_id');
+        db_instance()->join('tbl_units as basic_unit', 'basic_unit.unit_id = property.b_cost_unit');
+        db_instance()->join('tbl_units as club_unit', 'club_unit.unit_id = property.club_cost_unit');
+        db_instance()->where($where);
+    $property_unit_details  =    db_instance()->get()->row();
+
+    
+    # tbl_product_unit_details
 
     $basic_components       =    [
         (object)       [
 
-            'id'        => 1,
-            'price'      => 1000,
-            'name'      => 'Basic Cost',
-            'type'      => 'basic_component'
+            'id'            => 1,
+            'name'          => 'Basic Cost',
+            'price'         => $property_unit_details->basic_selling_price ?? 0,
+            'unit_type_id'  => $property_unit_details->basic_cost_unit_type_id ?? 0,
+            'unit_type'     => $property_unit_details->basic_unit_type_name ?? '-',
+            'type'          => 'basic_component'
         ],
         (object)  [
-            
+
             'id'        => 1,
-            'price'      => 1000,
             'name'      => 'Club Cost',
-            'type'      => 'basic_component'
+            'price'         => $property_unit_details->club_cost ?? 0,
+            'unit_type_id'  => $property_unit_details->club_cost_unit_type_id ?? 0,
+            'unit_type'     => $property_unit_details->club_unit_type_name ?? '-',
+            'type'      => 'club_component'
         ],
     ];
 

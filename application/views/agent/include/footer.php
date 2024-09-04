@@ -70,15 +70,19 @@
      <!--  -->
      <script>
        function convertToSelect2() {
-         //  $('select').select2({
-         //   placeholder: "Choose..."
-         // });
 
          $('select').each(function() {
-           $(this).select2({
-             placeholder: "Choose...",
-             dropdownParent: $(this).parent(),
-           });
+
+           if ($(this).hasClass('select2-hidden-accessible')) {
+             $(this).select2('destroy');
+           }
+
+           if (!$(this).hasClass('select2-hidden-accessible')) {
+             $(this).select2({
+               placeholder: "Choose...",
+               dropdownParent: $(this).parent(),
+             });
+           }
          });
        }
 
@@ -383,6 +387,7 @@
 
        $(document).on('change', '.get_propety_components', function() {
          var project_id = $('[name="booking_project_id"]').val();
+         var unit_code_id = $('[name="booking_unit_code_id"]').val();
 
          /** Ajax */
          if (!project_id) return;
@@ -393,6 +398,7 @@
            url: "<?= base_url('helper/property_components'); ?>",
            data: {
              project_id: project_id,
+             unit_code_id: unit_code_id,
              view: true
            },
            dataType: 'json',
@@ -705,11 +711,12 @@
              break;
 
            case 'booking-deal-amount':
-             dublicate_clone_template.find('.select2').remove();
              dublicate_clone_template.find('.project_component_id').attr('name', "project_components[" + clone_template_id + "][id]").select2().val('').trigger('change');
              dublicate_clone_template.find('.rate').attr('name', "project_components[" + clone_template_id + "][rate]").val('');
              dublicate_clone_template.find('.total_amount').attr('name', "project_components[" + clone_template_id + "][total_amount]").val('');
-             convertToSelect2()
+             dublicate_clone_template.find('.select2').remove();
+             dublicate_clone_template.find('.component-measure-msg').text('');
+              convertToSelect2()
              break;
 
            case 'payment-terms':
@@ -830,6 +837,14 @@
          $('#view-inventory-details-Modal').modal('show')
        })
 
+       // 
+       $(document).on('change', '.inventory_plot_or_unit_numbers', function() {
+         var id = $(this).find('option:checked').data('inventory-id')
+
+         get_inventory_details(id);
+
+       })
+
        /** Get Inventory Details */
        function get_inventory_details(id) {
          if (!id) return
@@ -848,6 +863,11 @@
            success: function(res) {
              if (res.status) {
                $('#view-inventory-details-Modal .inventory-details-container').html(res.detail_view)
+               
+               $('.plot-unit-number-measure-msg').text(res.data.property_detail.measure_msg)
+
+               $('input.plot_or_unit_size').val(res.data.property_detail.plot_size)
+
              } else {
                showToast(res.message);
              }
@@ -1083,14 +1103,14 @@
        }
 
        /** Followup Success Booking Form */
-       $(document).on('change', '.get_inventory_plot_or_unit_numbers', function(){
-          property_id       =   $('.booking_project_id').val()
-          unit_code       =  this.value
+       $(document).on('change', '.get_inventory_plot_or_unit_numbers', function() {
+         property_id = $('.booking_project_id').val()
+         unit_code = this.value
 
-          get_set_inventory_plot_numbers({
-             'property_id': property_id,
-             'unit_code': unit_code
-           })
+         get_set_inventory_plot_numbers({
+           'property_id': property_id,
+           'unit_code': unit_code
+         })
        })
        /** End Followup Success Booking Form */
 
@@ -1125,6 +1145,7 @@
                  $('[name="property_details[unit_no]"]').html(res.options_view)
 
                  $('.inventory_plot_or_unit_numbers').html(res.options_view)
+                 $('.plot-unit-number-measure-msg').text('')
                  resolve(true);
 
                } else {
@@ -1381,31 +1402,44 @@
        /***********************************************************************
         * Calculate Project Component Total Amount
         ************************************************************************/
-       function calculatePCTotalAmount(e){
-          parent =  $(e).parents('.clone-template');
+       function calculatePCTotalAmount(e) {
+         parent = $(e).parents('.clone-template');
 
-          component = parent.find('.project_component_id')
-          id = component.val()
-          price = component.find('option:checked').data('price')
-          type = component.find('option:checked').data('type')
-        
+         component = parent.find('.project_component_id')
+         id = component.val()
+         price = component.find('option:checked').data('price')
+         type = component.find('option:checked').data('type')
 
-          manully_amount = parent.find('.amount').val()
-          manully_amount = manully_amount ? manully_amount : 0;
+         unit_type = component.find('option:checked').data('unit-type')
+         unit_type_id = component.find('option:checked').data('unit-type-id')
 
-          total_amount = parseFloat(price) * parseFloat(manully_amount);
-
-          parent.find('.type').val(type)
-          parent.find('.total_amount').val(total_amount)
+         manully_amount = parent.find('.amount').val()
+         manully_amount = manully_amount ? manully_amount : 0;
 
 
-       }  
+         plot_or_unit_size = $('.plot_or_unit_size').val()
+         plot_or_unit_size = plot_or_unit_size ? plot_or_unit_size : 0;
+         
+         console.log(plot_or_unit_size);
+          total_amount = parseFloat(plot_or_unit_size) * parseFloat(manully_amount);
+         console.log(total_amount);
+
+         parent.find('.type').val(type)
+         parent.find('.total_amount').val(total_amount)
+
+         /** Size */
+         parent.find('.calculate_on_size_unit').val(unit_type_id).trigger('change');
+         /** Size */
+
+         /** Measure Message */
+         component_measure_msg = `${price} / ${unit_type}`;
+         parent.find('.component-measure-msg').text(component_measure_msg);
+         /** Measure Message */
+
+       }
        /***********************************************************************
         * End Calculate Project Component Total Amount
         ************************************************************************/
-
-
-
      </script>
      <!--  -->
 

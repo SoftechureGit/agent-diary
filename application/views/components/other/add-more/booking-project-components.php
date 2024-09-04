@@ -11,6 +11,7 @@
                 </select>
 
                 <input type="hidden" name="project_components[1][type]" class="type">
+                <small><span class="component-measure-msg text-muted font-italic"></span></small>
             </div>
         </div>
         <!-- End Project Components -->
@@ -26,7 +27,7 @@
 
         <div class="col">
             <label for="">Calculate on</label>
-            <select class="form-control" id="" name="project_components[calculate_on_size_unit]">
+            <select class="form-control calculate_on_size_unit" id="" name="project_components[calculate_on_size_unit]">
                 <option value="">Select Unit</option>
                 <?php foreach (sizeUnits() ?? []  as $item) : ?>
                     <option value="<?= $item->unit_id ?>"><?= $item->unit_name ?></option>

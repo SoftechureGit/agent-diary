@@ -543,12 +543,18 @@ class Helper extends CI_Controller
         public function property_components(){
            
         $property_id            =   $this->input->get('project_id');
-        $records                =   property_components((object) [ 'property_id' => $property_id ]);
+        $unit_code_id              =   $this->input->get('unit_code_id');
+
+        $records                =   property_components((object) [ 'property_id' => $property_id, 'unit_code_id' => $unit_code_id ]);
 
         $options                =   "<option value=''>Choose...</option>";
 
         foreach ($records->all_components ?? [] as $record) :
-            $options            .=   "<option value='$record->id' data-price='$record->price' data-type='$record->type'>$record->name</option>";
+            $price              = $record->price ?? 0;
+            $unit_type_id       = $record->unit_type_id ?? 0;
+            $unit_type          = $record->unit_type ?? 'N/A';
+
+            $options            .=   "<option value='$record->id' data-price='$price' data-type='$record->type' data-unit-type-id='$unit_type_id' data-unit-type='$unit_type'>$record->name</option>";
         endforeach;
 
         echo json_encode(['status' => true, 'message' => 'Successfully data fetched', 'data' => $records, 'view' => $options]); 

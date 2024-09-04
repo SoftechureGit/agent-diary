@@ -11841,7 +11841,16 @@ WHERE lead_id='" . $lead_id . "'
 
         if ($data->property_details ?? 0) :
 
-            $property_details = json_decode($data->property_details);
+            # Decode
+            $data->property_detail = $property_details = json_decode($data->property_details);
+
+            if($data->property_detail->size_unit ?? 0):
+                $data->property_detail->size_unit_name   = sizeUnits($data->property_detail->size_unit)->unit_name ?? 'N/A';
+                $data->property_detail->measure_msg     =  $data->property_detail->plot_size." / ".$data->property_detail->size_unit_name;
+            endif;
+            # End Decode
+
+
             $property_id = $property_details->product_id ?? 0;
             $unit_code = $property_details->unit_code ?? 0;
 
