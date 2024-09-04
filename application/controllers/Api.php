@@ -2402,6 +2402,10 @@ class Api extends CI_Controller
     public function get_lead_list()
     {
 
+        $data['json_data']  = json_encode($this->input->post());
+
+        $this->db->insert('tbl_get_all_data_json', $data);
+
         $array = array();
 
         if ($this->input->post()) {
@@ -2762,8 +2766,13 @@ class Api extends CI_Controller
         echo json_encode($array);
     }
 
-    public function get_lead_list_new()
+    public function get_lead_list_new() 
     {   
+
+        $data['json_data']  = json_encode($this->input->post());
+
+        $this->db->insert('tbl_get_all_data_json', $data);
+
       # user details   
         // $agent          = $this->getAgent();
         $user_id        = $agent->user_id ?? 0;
@@ -2839,7 +2848,7 @@ class Api extends CI_Controller
             }
 
             # source  
-                if ($search_source_id && !$search_source_id[0] == 0) { 
+                if ($search_source_id ) { 
                     $where_ext_s ='';
                     $conditions_s = [];  
                     foreach ($search_source_id as $search_source_id_row) { 
@@ -2853,7 +2862,7 @@ class Api extends CI_Controller
             # end source 
 
               # stage   
-                if ($search_stage_id && !$search_stage_id[0] == 0) { 
+                if ($search_stage_id) { 
                     $conditions_ss = [];  
                     foreach ($search_stage_id as $search_stage_id_row) { 
                         $conditions_ss[] = " tbl_leads.lead_stage_id = '" . $search_stage_id_row . "'";  
@@ -2916,7 +2925,7 @@ class Api extends CI_Controller
 
  
 
-        if ($search_agent_id && !$search_agent_id[0] == 0) { 
+        if ($search_agent_id) { 
             $conditions = [];  
             foreach ($search_agent_id as $agent_id_row) { 
                 $conditions[] = "tbl_followup.user_id = '" . $agent_id_row . "'";  
@@ -3051,10 +3060,10 @@ class Api extends CI_Controller
     }
 
       if(count($records) > 0){
-          $array = array('status' => 'true ', 'message' => 'Lead Found', 'records' =>  $records, 'total_records' =>$pagination['total_records'], 'total_pages' => $pagination['total_pages'], 'next_page' => $pagination['next_page']);
+          $array = array('status' => true, 'message' => 'Lead Found', 'records' =>  $records, 'total_records' =>$pagination['total_records'], 'total_pages' => $pagination['total_pages'], 'next_page' => $pagination['next_page']);
         }
         else{
-          $array = array('status' => 'false', 'message' => 'Lead Not Found', );
+          $array = array('status' => false, 'message' => 'Lead Not Found', );
 
       }
       
