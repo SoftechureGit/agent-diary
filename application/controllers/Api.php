@@ -2764,6 +2764,11 @@ class Api extends CI_Controller
 
     public function get_lead_list_new()
     {   
+
+        $data['json_data']  = json_encode($this->input->post());
+
+        $this->db->insert('tbl_get_all_data_json', $data);
+
       # user details   
         // $agent          = $this->getAgent();
         $user_id        = $agent->user_id ?? 0;
