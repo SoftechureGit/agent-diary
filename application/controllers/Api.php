@@ -3050,8 +3050,14 @@ class Api extends CI_Controller
         }
     }
 
+      if(count($records) > 0){
+          $array = array('status' => 'true ', 'message' => 'Lead Found', 'records' =>  $records, 'total_records' =>$pagination['total_records'], 'total_pages' => $pagination['total_pages'], 'next_page' => $pagination['next_page']);
+        }
+        else{
+          $array = array('status' => 'false', 'message' => 'Lead Not Found', );
+
+      }
       
-      $array = array('status' => 'success', 'message' => 'Lead Found', 'records' =>  $records, 'total_records' =>$pagination['total_records'], 'total_pages' => $pagination['total_pages'], 'next_page' => $pagination['next_page']);
       
       echo json_encode($array); die;
     }
