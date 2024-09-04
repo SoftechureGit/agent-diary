@@ -1538,26 +1538,36 @@ class Agent extends CI_Controller
         $lead_action_list = $this->Action_model->detail_result('tbl_lead_actions', $where, 'lead_action_id,lead_action_name');
         $data['lead_action_list'] = $lead_action_list;
 
+
+        # stage 
+
+        # end stage 
+
         $total_followup = 0;
         $today_followup = 0;
         $missed_followup = 0;
 
         # user data
-        $where_user     = "user_hash='" . $this->session->userdata('agent_hash') . "'";
-        $user_detail    = $this->Action_model->select_single('tbl_users', $where_user);
-        // $account_id     = $user_detail->user_id;
-        $account_id     = getAccountId();
+            $where_user                 = "user_hash='" . $this->session->userdata('agent_hash') . "'";
+            $user_detail                = $this->Action_model->select_single('tbl_users', $where_user);
+            $account_id_for_where       = $user_detail->user_id;
+            $account_id                 = getAccountId();
 
         if ($user_detail->role_id < 3 || $user_detail->role_id == 5) {
 
             if ($user_detail->parent_id == 0) {
-                $where_role = "is_customer ='0' AND tbl_leads.account_id='" . $account_id . "'";
+                $where_role = "is_customer ='0' AND tbl_leads.account_id='" . $account_id_for_where . "'";
+                $where_f    = "account_id='" . $account_id_for_where . "'";
             } else {
-                $where_role = "is_customer ='0' AND tbl_leads.user_id='" . $account_id . "'";
+                $where_role = "is_customer ='0' AND tbl_leads.user_id='" . $account_id_for_where . "'";
+                $where_f    = " user_id='" . $account_id_for_where . "'";
             }
         } else {
-            $where_role = "tbl_leads.user_id='" . $account_id . "' AND is_customer='0'";
+            $where_role = "tbl_leads.user_id='" . $account_id_for_where . "' AND is_customer='0'";
+            $where_f    = "user_id='" . $account_id_for_where . "' AND is_customer='0'";
         }
+
+        // print_r($where_role); die;
         
         #end user data
 
@@ -1570,35 +1580,70 @@ class Agent extends CI_Controller
 
         $today_date                 = date('Y-m-d');
         # Total New Leads
-        $total_new_leads            = $this->db->where("$where_role and DATE(STR_TO_DATE(`lead_date`, '%d-%m-%Y')) = '$today_date'")->get('tbl_leads')->num_rows();
+        $total_new_leads            = $this->db->where("$where_role and lead_stage_id = '1'")->get('tbl_leads')->num_rows();
         # End Total New Leads
 
         # Today Followup 
-        $today_followups            = $this->db->where("$where_role and DATE(STR_TO_DATE(`followup_date`, '%d-%m-%Y')) = '$today_date'")->get('tbl_leads')->num_rows();
+        $today_followups            = $this->db->where("$where_role and ( lead_stage_id = '2' or lead_stage_id = '3' or lead_stage_id = '4' or lead_stage_id = '5'  )  and DATE(STR_TO_DATE(`followup_date`, '%d-%m-%Y')) = '$today_date'")->get('tbl_leads')->num_rows();
         # Today Followup 
 
         # Total Followup 
-        $total_followups            = $this->db->where("$where_role and followup_date IS NOT NULL ")->get('tbl_leads')->num_rows();
+        $total_followups            = $this->db->where("$where_role and ( lead_stage_id = '2' or lead_stage_id = '3' or lead_stage_id = '4' or lead_stage_id = '5'  )  and followup_date IS NOT NULL ")->get('tbl_leads')->num_rows();
         # Total Followup 
 
         # Missed Followup 
         $missed_followups            =  $this->db->where("$where_role and DATE(STR_TO_DATE(`followup_date`, '%d-%m-%Y')) < '$today_date'")->get('tbl_leads')->num_rows();
         # Missed Followup 
 
+        // print_r($total_new_leads); die;
 
-        $data['total_new_leads'] = $total_new_leads;
-        $data['total_followup'] = $total_followups;
-        $data['today_followup'] = $today_followups;
-        $data['missed_followup'] = $missed_followups;
+        $data['total_new_leads']    = $total_new_leads;
+        $data['total_followup']     = $total_followups;
+        $data['today_followup']     = $today_followups;
+        $data['missed_followup']    = $missed_followups;
 
-        $where = "account_id='" . $account_id . "'";
+          # Followup
+
+        //   $where                              =   "(user.role_id in ($user_detail->permission_roles) or user.user_id = '$user_detail->user_id') and followup.account_id='$account_id'";
+   
+        //   if(!$selected_member_ids):
+        //       $where                          .=   " and followup.user_id in ($members_ids) ";
+        //   else:
+        //       $where                          .=   " and followup.user_id in ($selected_member_ids) ";
+        //   endif;
+  
+          $followup_select_query                  =   "
+                                                          count(*) as total_count,
+                                                          SUM(CASE WHEN ( STR_TO_DATE(next_followup_date, '%d-%m-%Y')  = CURDATE() AND followup_status = '1' AND lead_status_id = 1 ) THEN 1 ELSE 0 END) as today_count,
+                                                          SUM(CASE WHEN ( STR_TO_DATE(next_followup_date, '%d-%m-%Y')  < CURDATE() AND followup_status = '1' AND lead_status_id = 1 ) THEN 1 ELSE 0 END) as missed_count,
+                                                          SUM(CASE WHEN lead_stage_id = '1' THEN 1 ELSE 0 END) as total_initial_count,
+                                                          SUM(CASE WHEN lead_stage_id = '2' THEN 1 ELSE 0 END) as total_followup_count,
+                                                          SUM(CASE WHEN lead_stage_id = '3' THEN 1 ELSE 0 END) as total_enquiry_count,
+                                                          SUM(CASE WHEN lead_stage_id = '4' THEN 1 ELSE 0 END) as total_site_visit_count,
+                                                          SUM(CASE WHEN lead_stage_id = '5' THEN 1 ELSE 0 END) as total_metting_count,
+                                                          SUM(CASE WHEN lead_stage_id = '6' THEN 1 ELSE 0 END) as total_success_count,
+                                                          SUM(CASE WHEN lead_stage_id = '7' THEN 1 ELSE 0 END) as total_dump_count
+                                                      ";
+  
+          $this->db->select($followup_select_query);
+          $this->db->where($where_f);
+          $this->db->from('tbl_followup as followup');
+          $this->db->join('tbl_users  as user', 'user.user_id = followup.user_id', 'left');
+          $followups                          =   $this->db->get()->row();
+
+
+          $data['followups']  = $followups;
+          # End Followup
+
+
+        $where      = "account_id='" . $account_id . "'";
         $chart_data = $this->Action_model->select_single('tbl_leads', $where, 'COUNT(CASE WHEN lead_stage_id = 3 THEN lead_id END) as total_enquiry,COUNT(CASE WHEN lead_stage_id = 1 THEN lead_id END) as total_initial,COUNT(CASE WHEN lead_stage_id = 4 THEN lead_id END) as total_site_visit,COUNT(CASE WHEN added_to_followup = 1 THEN lead_id END) as total_followup');
 
-        $pie_chart_values = array();
-        $pie_chart_values[] = array('label' => 'Enquiry', 'color' => '#ff9f5f', 'value' => $chart_data->total_enquiry);
-        $pie_chart_values[] = array('label' => 'Initial', 'color' => '#7571F9', 'value' => $chart_data->total_initial);
-        $pie_chart_values[] = array('label' => 'Site Visit', 'color' => '#31b925', 'value' => $chart_data->total_site_visit);
-        $pie_chart_values[] = array('label' => 'Followup', 'color' => '#e62739', 'value' => $chart_data->total_followup);
+        $pie_chart_values   = array();
+        $pie_chart_values[] = array('label' => 'Enquiry', 'color'       => '#ff9f5f', 'value' => $chart_data->total_enquiry);
+        $pie_chart_values[] = array('label' => 'Initial', 'color'       => '#7571F9', 'value' => $chart_data->total_initial);
+        $pie_chart_values[] = array('label' => 'Site Visit', 'color'    => '#31b925', 'value' => $chart_data->total_site_visit);
+        $pie_chart_values[] = array('label' => 'Followup', 'color'      => '#e62739', 'value' => $chart_data->total_followup);
 
         $where = "user_status='1' AND ((parent_id='" . $account_id . "') OR (user_id='" . $account_id . "' AND role_id='2'))";
         $where_ids = "";
