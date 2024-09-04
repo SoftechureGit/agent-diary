@@ -353,6 +353,16 @@ summary {
               <!-- End Address -->
 
               <!-- City -->
+              
+              <?php if ($record->location_id): ?>
+                <tr>
+                  <th>Location</th>
+                  <td><?= $record->location_name ?></td>
+                </tr>
+              <?php endif; ?>
+              <!-- End City -->
+
+              <!-- City -->
               <?php if ($record->city_name): ?>
                 <tr>
                   <th>City</th>

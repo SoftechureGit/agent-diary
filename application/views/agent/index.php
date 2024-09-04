@@ -122,7 +122,7 @@
                 <div class="d-inline-block">
                   <h2 class="text-white"><?= $leads->today_count ?? 0 ?></h2>
                 </div>
-                <span class="float-right display-5 opacity-5"><i class="fa fa-users" aria-hidden="true"></i></span>
+                <span class="float-right display-5 opacity-5"><i class="icon-chart" aria-hidden="true"></i></span>
               </div>
             </div>
           </div>
@@ -136,7 +136,7 @@
                 <div class="d-inline-block">
                   <h2 class="text-white"><?= $followups->today_count ?? 0 ?></h2>
                 </div>
-                <span class="float-right display-5 opacity-5"><i class="fa fa-users" aria-hidden="true"></i></span>
+                <span class="float-right display-5 opacity-5"><i class="fa fa-bullseye" aria-hidden="true"></i></span>
               </div>
             </div>
           </div>

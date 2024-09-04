@@ -274,7 +274,7 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id, $use
         }
 
         /*  */
-        /* ::-webkit-scrollbar {
+        ::-webkit-scrollbar {
             width: 5px;
         }
         
@@ -283,9 +283,9 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id, $use
         }
         
         ::-webkit-scrollbar-thumb {
-            background-color: #ff9556;
+            background-color: #c2c2c2;
             border-radius: 20px;
-        } */
+        }
 
         /*  */
 
