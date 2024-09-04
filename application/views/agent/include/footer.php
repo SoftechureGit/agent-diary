@@ -365,8 +365,8 @@
            //  async: false,
            url: "<?= base_url('helper/projects'); ?>",
            data: {
-            location_id: location_id,
-            view:true
+             location_id: location_id,
+             view: true
            },
            dataType: 'json',
            success: (res) => {
@@ -392,8 +392,8 @@
            //  async: false,
            url: "<?= base_url('helper/property_components'); ?>",
            data: {
-            project_id: project_id,
-            view:true
+             project_id: project_id,
+             view: true
            },
            dataType: 'json',
            success: (res) => {
@@ -419,8 +419,8 @@
            //  async: false,
            url: "<?= base_url('helper/unit_codes'); ?>",
            data: {
-            property_id: property_id,
-            view:true
+             property_id: property_id,
+             view: true
            },
            dataType: 'json',
            success: (res) => {
@@ -703,15 +703,16 @@
              dublicate_clone_template.find('.youtube-title').attr('name', "youtube_data[" + clone_template_id + "][title]").val('');
              dublicate_clone_template.find('.link').attr('name', "youtube_data[" + clone_template_id + "][link]").val('');
              break;
-             
-             case 'booking-deal-amount':
-               dublicate_clone_template.find('.select2').remove();
-               dublicate_clone_template.find('.project_component_id').attr('name', "project_components[" + clone_template_id + "][id]").select2().val('').trigger('change');
-               dublicate_clone_template.find('.amount').attr('name', "project_components[" + clone_template_id + "][amount]").val('');
-               dublicate_clone_template.find('.total_amount').attr('name', "project_components[" + clone_template_id + "][total_amount]").val('');
-               break;
-               
-               case 'payment-terms':
+
+           case 'booking-deal-amount':
+             dublicate_clone_template.find('.select2').remove();
+             dublicate_clone_template.find('.project_component_id').attr('name', "project_components[" + clone_template_id + "][id]").select2().val('').trigger('change');
+             dublicate_clone_template.find('.amount').attr('name', "project_components[" + clone_template_id + "][amount]").val('');
+             dublicate_clone_template.find('.total_amount').attr('name', "project_components[" + clone_template_id + "][total_amount]").val('');
+             convertToSelect2()
+             break;
+
+           case 'payment-terms':
              dublicate_clone_template.find('.payment_term_title').attr('name', "payment_terms[" + clone_template_id + "][title]").val('');
              dublicate_clone_template.find('.amount').attr('name', "payment_terms[" + clone_template_id + "][amount]").val('');
              dublicate_clone_template.find('.date').attr('name', "payment_terms[" + clone_template_id + "][date]").val('');
@@ -1362,6 +1363,35 @@
        /***********************************************************************
         * End Set Saved Data In Form Fields
         ************************************************************************/
+
+       /***********************************************************************
+        * Calculate Project Component Total Amount
+        ************************************************************************/
+       function calculatePCTotalAmount(e){
+          parent =  $(e).parents('.clone-template');
+
+          component = parent.find('.project_component_id')
+          id = component.val()
+          price = component.find('option:checked').data('price')
+          type = component.find('option:checked').data('type')
+        
+
+          manully_amount = parent.find('.amount').val()
+          manully_amount = manully_amount ? manully_amount : 0;
+
+          total_amount = parseFloat(price) * parseFloat(manully_amount);
+
+          parent.find('.type').val(type)
+          parent.find('.total_amount').val(total_amount)
+
+
+       }  
+       /***********************************************************************
+        * End Calculate Project Component Total Amount
+        ************************************************************************/
+
+
+
      </script>
      <!--  -->
 
