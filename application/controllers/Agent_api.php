@@ -2294,7 +2294,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
             }
 
             # source  
-                if ($search_source_id) { 
+                if ($search_source_id && !$search_source_id[0] == 0) { 
                     $where_ext_s ='';
                     $conditions_s = [];  
                     foreach ($search_source_id as $search_source_id_row) { 
@@ -2308,7 +2308,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
             # end source 
 
               # stage   
-                if ($search_stage_id) { 
+                if ($search_stage_id && !$search_stage_id[0] == 0) { 
                     $conditions_ss = [];  
                     foreach ($search_stage_id as $search_stage_id_row) { 
                         $conditions_ss[] = " tbl_leads.lead_stage_id = '" . $search_stage_id_row . "'";  
@@ -2371,7 +2371,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
 
  
 
-        if ($search_agent_id) { 
+        if ($search_agent_id && !$search_agent_id[0] == 0) { 
             $conditions = [];  
             foreach ($search_agent_id as $agent_id_row) { 
                 $conditions[] = "tbl_followup.user_id = '" . $agent_id_row . "'";  
