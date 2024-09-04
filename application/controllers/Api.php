@@ -2850,6 +2850,7 @@ class Api extends CI_Controller
             # source  
                 if ($search_source_id ) { 
                     $where_ext_s ='';
+                    $search_source_id = explode(',' , $search_source_id);
                     $conditions_s = [];  
                     foreach ($search_source_id as $search_source_id_row) { 
                         $conditions_s[] = "tbl_leads.lead_source_id = '" . $search_source_id_row . "'";  
@@ -2863,6 +2864,7 @@ class Api extends CI_Controller
 
               # stage   
                 if ($search_stage_id) { 
+                    $search_stage_id = explode(',' , $search_stage_id);
                     $conditions_ss = [];  
                     foreach ($search_stage_id as $search_stage_id_row) { 
                         $conditions_ss[] = " tbl_leads.lead_stage_id = '" . $search_stage_id_row . "'";  
@@ -2926,6 +2928,7 @@ class Api extends CI_Controller
  
 
         if ($search_agent_id) { 
+            $search_agent_id = explode(',' , $search_agent_id);
             $conditions = [];  
             foreach ($search_agent_id as $agent_id_row) { 
                 $conditions[] = "tbl_followup.user_id = '" . $agent_id_row . "'";  
