@@ -2362,6 +2362,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
         }
 
         $where_ids = "";
+        
         $user_ids = $this->get_level_user_ids();
 
         $where .= $where_ids;
@@ -2444,6 +2445,8 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
       $profile_base_url             =   base_url('public/other/profile/');
 
       $records                      =  array();
+
+      
 
       if ($record_data) {
         foreach ($record_data as $item) {
