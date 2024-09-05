@@ -1583,7 +1583,7 @@ class Agent extends CI_Controller
 
         
 
-        $total_new_leads_2          = $this->db->where("$where_f and lead_stage_id = '1' AND followup_status= '1' ")->get('tbl_followup')->num_rows();
+        $total_new_leads_2          = $this->db->where("$where_f and lead_stage_id = '1' AND followup_status= '1' ")->get('tbl_followup as followup')->num_rows();
 
         // print_r($total_new_leads_2); die;
 
