@@ -269,6 +269,8 @@ class Helper extends CI_Controller
         $is_view                            =   $this->input->get('view');
         # End Init
 
+        $account_id                         = getAccountId();
+
         $records    =   $this->db
             ->select('project.product_id, project.project_name, product_type.product_type_name as project_type_name, unit_type.unit_type_name as property_type_name, state.state_name, city.city_name')
             ->join('tbl_product_types as product_type', 'product_type.product_type_id = project.project_type', 'left')
@@ -276,7 +278,7 @@ class Helper extends CI_Controller
             ->join('tbl_states as state', 'state.state_id = project.state_id', 'left')
             ->join('tbl_city as city', 'city.city_id = project.city_id', 'left')
             ->order_by("project.product_id", "desc")
-            ->where("project.product_status = 1");
+            ->where("project.agent_id = '$account_id' and project.product_status = '1'");
 
         if ($project_type_id) :
             $records->where("project.project_type = $project_type_id");
