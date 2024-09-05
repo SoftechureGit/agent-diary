@@ -907,7 +907,7 @@
 
                $('.plot-unit-number-measure-msg').text(res.data.property_detail.measure_msg)
 
-               $('input.plot_or_unit_size').val(res.data.property_detail.plot_size)
+               $('input.plot_or_unit_size').val(res.data.property_detail.plot_or_unit_size)
                $('.booking-deal-amount-container .rate').trigger('input')
 
              } else {
@@ -1493,6 +1493,7 @@
 
          total_amount = parseFloat(plot_or_unit_size) * parseFloat(manually_amount);
 
+         console.log(total_amount)
          if (unit_type_id == 5) { // Unit Type : Fix 
            total_amount = parseFloat(manually_amount).toFixed(2)
          } else if (unit_type_id == 6) { // Unit Type : % of BSP
@@ -1511,12 +1512,12 @@
                 basic_component_total         = ( parseFloat(plot_or_unit_size) * parseFloat(basic_component_price))  // size * price
                 total_amount                  = (( basic_component_total / 100) * manually_amount ) // percentage amount\
               }
-              
-          } 
-
+            } 
+            
 
           total_amount = parseFloat(total_amount).toFixed(2)
           
+          console.log(total_amount)
          parent.find('.type').val(type)
 
          parent.find('.total_amount').val(total_amount)

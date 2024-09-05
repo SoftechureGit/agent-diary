@@ -2127,6 +2127,18 @@
 
       var base_url_of_followup = 'followup_save';
 
+      var lead_stage_id = $("#lead_stage_id").val();
+
+      if(lead_stage_id == 6){
+        // Inventory ID
+        inventory_id   = $('.inventory_plot_or_unit_numbers option:checked').data('inventory-id')
+        fd.append('bk_inventory_id', inventory_id);
+        
+        console.log(inventory_id)
+        console.log(fd)
+        // End Inventory ID
+      }
+
       if ($('#followup_id').val() == 0) {
         var base_url_of_followup = 'add_to_followup';
       }
