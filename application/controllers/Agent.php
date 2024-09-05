@@ -1579,7 +1579,16 @@ class Agent extends CI_Controller
 
         $today_date                 = date('Y-m-d');
         # Total New Leads
-        $total_new_leads            = $this->db->where("$where_role and lead_stage_id = '1'")->get('tbl_leads')->num_rows();
+        $total_new_leads            = $this->db->where("$where_role and lead_stage_id = '1' AND added_to_followup = '0' ")->get('tbl_leads')->num_rows();
+
+        
+
+        $total_new_leads_2          = $this->db->where("$where_f and lead_stage_id = '1' AND followup_status= '1' ")->get('tbl_followup')->num_rows();
+
+        // print_r($total_new_leads_2); die;
+
+        $total_new_leads            = $total_new_leads + $total_new_leads_2;
+
         # End Total New Leads
 
         
