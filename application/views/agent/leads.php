@@ -177,10 +177,10 @@
                   </div>
 
 
-                  <div class="col-md-12">
+                  <div class="col-md-12 py-3">
 
                     <div style="height: 67vh;overflow-y: auto;overflow-x: hidden;">
-                      <div class="lead-list"></div>
+                      <div class="lead-list m-0"></div>
 
                       <div class="error-msg-left"></div>
                       <div class="wrapper-bottom" align="center">

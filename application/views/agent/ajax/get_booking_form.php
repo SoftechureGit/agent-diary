@@ -88,7 +88,7 @@
     <div class="col-md-4 project_list_wrapper">
       <div class="form-group">
         <label for="">List of Project <span class="text-danger">*</span></label>
-        <select name="booking_project_id" id="" class="form-control set_properties_via_location get_property_unit_codes get_propety_components" data-selected_id="<?= $record->project_id ?? 0 ?>" required>
+        <select name="booking_project_id" id="" class="form-control set_properties_via_location get_property_unit_codes booking_project_id" data-selected_id="<?= $record->project_id ?? 0 ?>" required>
           <option value="" selected disabled>Choose..</option>
         </select>
       </div>
@@ -98,10 +98,24 @@
 
     <div class="col-md-4">
       <label>Unit Code <span class="text-danger">*</span></label>
-      <select class="form-control set_property_unit_codes" id="booking_unit_no" name="booking_unit_no" onchange="getUnitRefNo(this.value)" required="">
-        <option value="">Select Unit No</option>
+      <select class="form-control set_property_unit_codes get_inventory_plot_or_unit_numbers get_propety_components" id="booking_unit_code" name="booking_unit_code" required>
+        <option value="">Choose..</option>
       </select>
     </div>
+
+    <!-- Plot Number or Unit Number -->
+    <div class="col-md-4">
+      <div class="form-group">
+        <label for="">Plot / Unit Number <span class="text-danger">*</span></label>
+        <select class="form-control inventory_plot_or_unit_numbers" name="booking_inventory_plot_or_unit_number" required>
+          <option value="">Choose...</option>
+        </select>
+
+        <input type="hidden" class="plot_or_unit_size">
+        <small><span class="plot-unit-number-measure-msg text-muted font-italic"></span></small>
+      </div>
+    </div>
+    <!-- End Plot Number or Unit Number -->
 
     <!-- Booking Deal Amount -->
     <div class="col-md-12 mt-2">

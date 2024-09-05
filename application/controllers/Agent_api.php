@@ -2827,6 +2827,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
             $this->db->from('tbl_leads');
             $this->db->join('tbl_states', 'tbl_states.state_id = tbl_leads.lead_state_id', 'left');
             $this->db->join('tbl_city', 'tbl_city.city_id = tbl_leads.lead_city_id', 'left');
+            $this->db->join('tbl_locations', 'tbl_locations.location_id = tbl_leads.location_id', 'left');
             $this->db->join('tbl_occupations', 'tbl_occupations.occupation_id = tbl_leads.lead_occupation_id', 'left');
             $this->db->join('tbl_lead_stages', 'tbl_lead_stages.lead_stage_id = tbl_leads.lead_stage_id', 'left');
             $this->db->join('tbl_lead_sources', 'tbl_lead_sources.lead_source_id = tbl_leads.lead_source_id', 'left');
@@ -11844,7 +11845,16 @@ WHERE lead_id='" . $lead_id . "'
 
         if ($data->property_details ?? 0) :
 
-            $property_details = json_decode($data->property_details);
+            # Decode
+            $data->property_detail = $property_details = json_decode($data->property_details);
+
+            if($data->property_detail->size_unit ?? 0):
+                $data->property_detail->size_unit_name   = sizeUnits($data->property_detail->size_unit)->unit_name ?? 'N/A';
+                $data->property_detail->measure_msg     =  $data->property_detail->plot_size." / ".$data->property_detail->size_unit_name;
+            endif;
+            # End Decode
+
+
             $property_id = $property_details->product_id ?? 0;
             $unit_code = $property_details->unit_code ?? 0;
 
