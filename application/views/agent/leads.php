@@ -149,6 +149,7 @@
   .customer {
     margin: 5px;
   }
+
 </style>
 <!--  -->
 
@@ -2192,17 +2193,24 @@
     }
   });
 
+  $(document).on('change', '#lead_status_id', function(){
+    if( this.value == 2 && $('#lead_stage_id').val() != 7){ $('#lead_stage_id').val(7).trigger('change') }
+  })
+
   function changeLeadStage() {
     $(".booking_form").html("");
     $(".booking_hide").show();
+    $("#lead_status_id").val('1').trigger('change');
 
     var lead_stage_id = $("#lead_stage_id").val();
     if (lead_stage_id == '7') {
-      $("#lead_status_id").val('2');
       $("#lead_status_id, #next_action, #next_followup_date, #next_followup_time, #task_desc").attr("disabled", true);
       $("#next_action, #fp_assign_to").attr("required", false);
+
+      if($('#lead_status_id').val() != 2){ $('#lead_status_id').val(2).trigger('change') }
+
     } else if (lead_stage_id == '6') {
-      $("#lead_status_id").val('3');
+      $("#lead_status_id").val('3').trigger('change');
       $("#lead_status_id, #next_action, #next_followup_date, #next_followup_time, #task_desc").attr("disabled", true);
       $(".booking_hide").hide();
       $("#next_action, #fp_assign_to").attr("required", false);

@@ -25,10 +25,10 @@
         </div>
         <!-- End Project Components Amount -->
 
-        <div class="col">
+        <div class="col d-none">
             <label for="">Calculate on</label>
             <select class="form-control calculate_on_size_unit" id="" name="project_components[calculate_on_size_unit]">
-                <option value="">Select Unit</option>
+                <option value="" disabled selected>Choose...</option>
                 <?php foreach (sizeUnits() ?? []  as $item) : ?>
                     <option value="<?= $item->unit_id ?>"><?= $item->unit_name ?></option>
                 <?php endforeach; ?>

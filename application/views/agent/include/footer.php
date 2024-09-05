@@ -73,16 +73,16 @@
 
          $('select').each(function() {
 
-           if ($(this).hasClass('select2-hidden-accessible')) {
-             $(this).select2('destroy');
-           }
+           //  if ($(this).hasClass('select2-hidden-accessible')) {
+           //    $(this).select2('destroy');
+           //  }
 
-           if (!$(this).hasClass('select2-hidden-accessible')) {
-             $(this).select2({
-               placeholder: "Choose...",
-               dropdownParent: $(this).parent(),
-             });
-           }
+           //  if (!$(this).hasClass('select2-hidden-accessible')) {
+           $(this).select2({
+             placeholder: "Choose...",
+             dropdownParent: $(this).parent(),
+           });
+           //  }
          });
        }
 
@@ -711,12 +711,51 @@
              break;
 
            case 'booking-deal-amount':
-             dublicate_clone_template.find('.project_component_id').attr('name', "project_components[" + clone_template_id + "][id]").select2().val('').trigger('change');
+
+             //
+             let selectedValue = []; // Initialize the array for selected values
+
+             // Collect all selected values
+             $('.booking-deal-amount-container select.project_component_id').each(function() {
+               let selectedOption = $(this).find('option:selected'); // Get the selected option
+               if (selectedOption.length) {
+                 // Store the value and data-type of the selected option
+                 selectedValue.push({
+                   value: selectedOption.val(),
+                   type: selectedOption.data('type')
+                 });
+               }
+             });
+
+
+             // Remove already selected options from the new select element
+             dublicate_clone_template.find('.project_component_id option').each(function() {
+               let optionValue = $(this).val();
+               let optionType = $(this).data('type');
+
+               // Check if the option's value and type match any of the selected values
+               let isSelected = selectedValue.some(function(item) {
+                 return item.value === optionValue && item.type === optionType;
+               });
+
+               if (isSelected) {
+                 $(this).prop('disabled', true); // Remove the option if it is already selected
+               }
+             });
+
+
+             //
+             dublicate_clone_template.find('.select2').remove();
+             dublicate_clone_template.find('.project_component_id').attr('name', "project_components[" + clone_template_id + "][id]").val('').trigger('change');
+
+
              dublicate_clone_template.find('.rate').attr('name', "project_components[" + clone_template_id + "][rate]").val('');
              dublicate_clone_template.find('.total_amount').attr('name', "project_components[" + clone_template_id + "][total_amount]").val('');
-             dublicate_clone_template.find('.select2').remove();
+
              dublicate_clone_template.find('.component-measure-msg').text('');
-              convertToSelect2()
+
+             dublicate_clone_template.find('.project_component_id').select2()
+             dublicate_clone_template.find('.calculate_on_size_unit').select2()
              break;
 
            case 'payment-terms':
@@ -843,6 +882,8 @@
 
          get_inventory_details(id);
 
+
+
        })
 
        /** Get Inventory Details */
@@ -863,10 +904,11 @@
            success: function(res) {
              if (res.status) {
                $('#view-inventory-details-Modal .inventory-details-container').html(res.detail_view)
-               
+
                $('.plot-unit-number-measure-msg').text(res.data.property_detail.measure_msg)
 
                $('input.plot_or_unit_size').val(res.data.property_detail.plot_size)
+               $('.booking-deal-amount-container .rate').trigger('input')
 
              } else {
                showToast(res.message);
@@ -1402,6 +1444,24 @@
        /***********************************************************************
         * Calculate Project Component Total Amount
         ************************************************************************/
+
+       $(document).on('change', '.clone-template .project_component_id', function() {
+
+         id = this.value
+
+
+         parent = $(this).parents('.clone-template');
+
+         price = $(this).find('option:checked').data('price')
+         parent.find('.rate').val(price)
+
+         if (!id) {
+           parent.find('.component-measure-msg').val('')
+         }
+
+         calculatePCTotalAmount(this)
+       })
+
        function calculatePCTotalAmount(e) {
          parent = $(e).parents('.clone-template');
 
@@ -1413,28 +1473,43 @@
          unit_type = component.find('option:checked').data('unit-type')
          unit_type_id = component.find('option:checked').data('unit-type-id')
 
-         manully_amount = parent.find('.amount').val()
+         console.log(unit_type_id)
+
+         manully_amount = parent.find('.rate').val()
+
          manully_amount = manully_amount ? manully_amount : 0;
 
 
          plot_or_unit_size = $('.plot_or_unit_size').val()
          plot_or_unit_size = plot_or_unit_size ? plot_or_unit_size : 0;
-         
-         console.log(plot_or_unit_size);
-          total_amount = parseFloat(plot_or_unit_size) * parseFloat(manully_amount);
-         console.log(total_amount);
+
+
+         /** Measure Message */
+         if (price != undefined && unit_type != undefined) {
+           component_measure_msg = `${price} / ${unit_type}`;
+           parent.find('.component-measure-msg').text(component_measure_msg);
+         }
+         /** Measure Message */
+
+         total_amount = parseFloat(plot_or_unit_size) * parseFloat(manully_amount);
+
+         if (unit_type_id == 5) { // Unit Type : Fix 
+           total_amount = parseFloat(manully_amount).toFixed(2)
+         } else if (unit_type_id == 6) { // Unit Type : % of BSP
+          // total_amount = total_amount.toFixed(2)
+         } else {
+           total_amount = total_amount.toFixed(2)
+         }
 
          parent.find('.type').val(type)
+
          parent.find('.total_amount').val(total_amount)
 
          /** Size */
          parent.find('.calculate_on_size_unit').val(unit_type_id).trigger('change');
          /** Size */
 
-         /** Measure Message */
-         component_measure_msg = `${price} / ${unit_type}`;
-         parent.find('.component-measure-msg').text(component_measure_msg);
-         /** Measure Message */
+
 
        }
        /***********************************************************************
