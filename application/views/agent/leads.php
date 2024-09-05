@@ -299,9 +299,9 @@
                           <div class="col-md-6">
                             <div class="form-group">
                               <label for="">Agent</label>
-                              <select class="form-control" id="search_agent_id" name="search_agent_id[]" style="height: 38px;border-radius: 6px;margin-top: 10px;" multiple="true">
+                              <select class="form-control multi-team-members-select2" id="search_agent_id" name="search_agent_id[]" style="height: 38px;border-radius: 6px;margin-top: 10px;" multiple="true">
                                 <option value="">Select Agent</option>
-                                 <option value="0" selected disabled >All</option>
+                                <option value="0" class="default-option" selected >All</option>
                                 <?php foreach ($filter_user_list as $item) { ?>
                                   <option value="<?= $item->user_id ?>"><?= ($item->parent_id == 0) ? (($item->is_individual) ? (ucwords($item->user_title . ' ' . $item->first_name . ' ' . $item->last_name)) : $item->firm_name) : $item->first_name . ' ' . $item->last_name . (($item->parent_id) ? ' (Team)' : '') ?></option>
                                 <?php } ?>
@@ -312,9 +312,9 @@
 
                           <div class="col-md-4">
                             <label for="">Source</label>
-                            <select class="form-control" id="search_source_id" name="search_source_id[]" style="height: 38px;border-radius: 6px;margin-top: 10px;" multiple="true">
+                            <select class="form-control multi-team-source-select2" id="search_source_id" name="search_source_id[]" style="height: 38px;border-radius: 6px;margin-top: 10px;" multiple="true">
                               <option value="">Select Source</option>
-                              <option value="0" selected disabled>All</option>
+                              <option value="0" class="default-option" selected >All</option>
                               <?php foreach ($lead_source_list as $lead_source) { ?>
                                 <option value="<?= $lead_source->lead_source_id ?>"><?= $lead_source->lead_source_name ?></option>
                               <?php } ?>
@@ -323,7 +323,7 @@
 
                           <div class="col-md-4">
                             <label for="">Stage</label>
-                            <select class="form-control" id="search_stage_id" name="search_stage_id[]" style="height: 38px;border-radius: 6px;margin-top: 10px;" multiple="true">
+                            <select class="form-control multi-team-stage-select2" id="search_stage_id" name="search_stage_id[]" style="height: 38px;border-radius: 6px;margin-top: 10px;" multiple="true">
                               <option value="" >Select Stage</option>
                               <option value="0" class="default-option" selected >All</option>
                               <?php foreach ($lead_stage_list as $lead_stage) { ?>
@@ -2930,7 +2930,23 @@
 
   });
 
-  $('.multi-team-members-select2').on('select2:select', function(e) {
+
+
+  $(document).ready(function() {
+
+        $('#followup_from').on('change', function() {
+            var fromDate = $(this).val();
+            $('#followup_to').attr('min', fromDate);
+        });
+
+        $('#lead_from').on('change', function() {
+            var fromDate = $(this).val();
+            $('#lead_to').attr('min', fromDate);
+        });
+    });
+
+
+    $('.multi-team-members-select2').on('select2:select', function(e) {
     var data = e.params.data;
     console.log(data.id)
     if(data.id == 0){
@@ -2942,6 +2958,33 @@
       $('.multi-team-members-select2').trigger('change')
     }
   });
-  /** */
+
+    $('.multi-team-stage-select2').on('select2:select', function(e) {
+    var data = e.params.data;
+    console.log(data.id)
+    if(data.id == 0){
+      $('.multi-team-stage-select2 option').prop('selected', false)
+      $('.default-option').prop('selected', true)
+      $('.multi-team-stage-select2').trigger('change')
+    }else{
+      $('.default-option').prop('selected', false)
+      $('.multi-team-stage-select2').trigger('change')
+    }
+  });
+
+    $('.multi-team-source-select2').on('select2:select', function(e) {
+    var data = e.params.data;
+    console.log(data.id)
+    if(data.id == 0){
+      $('.multi-team-source-select2 option').prop('selected', false)
+      $('.default-option').prop('selected', true)
+      $('.multi-team-source-select2').trigger('change')
+    }else{
+      $('.default-option').prop('selected', false)
+      $('.multi-team-source-select2').trigger('change')
+    }
+  });
+
+  
 
 </script>

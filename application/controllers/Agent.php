@@ -1579,14 +1579,23 @@ class Agent extends CI_Controller
 
         $today_date                 = date('Y-m-d');
         # Total New Leads
-        $total_new_leads            = $this->db->where("$where_role and lead_stage_id = '1'")->get('tbl_leads')->num_rows();
+        $total_new_leads            = $this->db->where("$where_role and lead_stage_id = '1' AND added_to_followup = '0' ")->get('tbl_leads')->num_rows();
+
+        
+
+        $total_new_leads_2          = $this->db->where("$where_f and lead_stage_id = '1' AND followup_status= '1' ")->get('tbl_followup')->num_rows();
+
+        // print_r($total_new_leads_2); die;
+
+        $total_new_leads            = $total_new_leads + $total_new_leads_2;
+
         # End Total New Leads
 
         
         # Today Followup 
         $today_followups            = $this->db->where("$where_role and ( lead_stage_id != '6' or lead_stage_id != '7' )  and DATE(STR_TO_DATE(`followup_date`, '%Y-%m-%d')) = '$today_date'")->get('tbl_leads')->num_rows();
         # Today Followup 
-        print_r($this->db->last_query()); die;
+        // print_r($this->db->last_query()); die;
 
         # Total Followup 
         $total_followups            = $this->db->where("$where_role and ( lead_stage_id = '2' or lead_stage_id = '3' or lead_stage_id = '4' or lead_stage_id = '5'  )  and followup_date IS NOT NULL ")->get('tbl_leads')->num_rows();

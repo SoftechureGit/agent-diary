@@ -2276,13 +2276,15 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 $where_ext .= " AND DATE(STR_TO_DATE(tbl_leads.lead_date, '%d-%m-%Y')) BETWEEN '$lead_from' AND '$lead_to'";
             }
 
+
+
             if ($followup_from && !$followup_to) {
-                $where_ext .= " AND DATE(STR_TO_DATE(tbl_leads.followup_date, '%d-%m-%Y')) >= '$followup_from'";
+                $where_ext .= " AND DATE(STR_TO_DATE(tbl_followup.next_followup_date, '%d-%m-%Y')) >= '$followup_from'";
             }
 
             if ($followup_from && $followup_to) {
 
-                $where_ext .= " AND DATE(STR_TO_DATE(tbl_leads.followup_date, '%d-%m-%Y')) BETWEEN '$followup_from' AND '$followup_to'";
+                $where_ext .= " AND DATE(STR_TO_DATE(tbl_followup.next_followup_date, '%d-%m-%Y')) BETWEEN '$followup_from' AND '$followup_to'";
             }
 
             if ($search_state_id) {
@@ -2369,22 +2371,24 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
 
         $where .= $where_ext;
 
- 
+        
+        // print_r($where); die;
 
         if ($search_agent_id && !$search_agent_id[0] == 0) { 
+
             $conditions = [];  
             foreach ($search_agent_id as $agent_id_row) { 
-                $conditions[] = "tbl_followup.user_id = '" . $agent_id_row . "'";  
+                $conditions[] = "tbl_leads.user_id = '" . $agent_id_row . "'";  
             }
             if (!empty($conditions)) {  
                 $where_ids .= " AND (" . implode(' OR ', $conditions) . ")";  
             }
         }
 
-        // print_r($where_ids); die;
-
+        
         $where .= $where_ids;
         
+        // print_r($where); die;
 
       # end where 
 
