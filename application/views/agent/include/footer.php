@@ -1473,11 +1473,10 @@
          unit_type = component.find('option:checked').data('unit-type')
          unit_type_id = component.find('option:checked').data('unit-type-id')
 
-         console.log(unit_type_id)
 
-         manully_amount = parent.find('.rate').val()
+         manually_amount = parent.find('.rate').val()
 
-         manully_amount = manully_amount ? manully_amount : 0;
+         manually_amount = manually_amount ? manually_amount : 0;
 
 
          plot_or_unit_size = $('.plot_or_unit_size').val()
@@ -1491,16 +1490,33 @@
          }
          /** Measure Message */
 
-         total_amount = parseFloat(plot_or_unit_size) * parseFloat(manully_amount);
+
+         total_amount = parseFloat(plot_or_unit_size) * parseFloat(manually_amount);
 
          if (unit_type_id == 5) { // Unit Type : Fix 
-           total_amount = parseFloat(manully_amount).toFixed(2)
+           total_amount = parseFloat(manually_amount).toFixed(2)
          } else if (unit_type_id == 6) { // Unit Type : % of BSP
-          // total_amount = total_amount.toFixed(2)
-         } else {
-           total_amount = total_amount.toFixed(2)
-         }
 
+
+            basic_component_manual_price           = $('[data-type="basic_component"]:checked').parents('.clone-template').find('.rate').val()
+            basic_component_price           = $('[data-type="basic_component"]').data('price')
+            basic_component_unit_type_id    = $('[data-type="basic_component"]').data('unit-type-id')
+
+            basic_component_price     = basic_component_manual_price ? basic_component_manual_price : basic_component_price
+
+              if(basic_component_unit_type_id == 5){
+                manually_amount_percentage          = manually_amount ? manually_amount : basic_component_price
+                total_amount                  = (( basic_component_price / 100) * manually_amount_percentage ) // percentage amount\
+              }else{
+                basic_component_total         = ( parseFloat(plot_or_unit_size) * parseFloat(basic_component_price))  // size * price
+                total_amount                  = (( basic_component_total / 100) * manually_amount ) // percentage amount\
+              }
+              
+          } 
+
+
+          total_amount = parseFloat(total_amount).toFixed(2)
+          
          parent.find('.type').val(type)
 
          parent.find('.total_amount').val(total_amount)
