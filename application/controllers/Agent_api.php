@@ -11848,9 +11848,15 @@ WHERE lead_id='" . $lead_id . "'
             # Decode
             $data->property_detail = $property_details = json_decode($data->property_details);
 
-            if($data->property_detail->size_unit ?? 0):
-                $data->property_detail->size_unit_name   = sizeUnits($data->property_detail->size_unit)->unit_name ?? 'N/A';
-                $data->property_detail->measure_msg     =  $data->property_detail->plot_size." / ".$data->property_detail->size_unit_name;
+            if(( $data->property_detail->size_unit ?? 0 ) || ( $data->property_detail->sa_size_unit ?? 0 )):
+                $size_unit      =   '';
+                $size_unit = ( ( $data->property_detail->size_unit ?? 0 ) ? $data->property_detail->size_unit : ($data->property_detail->sa_size_unit ?? '')) ;
+
+                $plot_or_unit_size                          =   ( $data->property_detail->plot_size ?? 0 ) ? $data->property_detail->plot_size : ($data->property_detail->sa ?? '');
+
+                $data->property_detail->size_unit_name   = $size_unit ? sizeUnits($size_unit)->unit_name : 'N/A';
+                $data->property_detail->measure_msg     =  $plot_or_unit_size." / ".$data->property_detail->size_unit_name;
+                $data->property_detail->plot_or_unit_size     =  $plot_or_unit_size;
             endif;
             # End Decode
 
