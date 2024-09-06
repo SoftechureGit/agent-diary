@@ -12600,10 +12600,27 @@ class Api extends CI_Controller
 
             if(count($unit_list) > 0 ){
 
+                $unit_limited_arr = array();
 
-                echo json_encode(['status' => true, 'message' => 'Successfully data fetched' , 'unit_list' => $unit_list ]);
+                foreach($unit_list as $unit_row):
+                    $unit_limited_arr[]= array(
+                        'id'                    => $unit_row->id, 
+                        'lead_id'               => $unit_row->lead_id ,
+                        'project_type_name'     => $unit_row->project_type_name, 
+                        'property_type_name'    => $unit_row->property_type_name, 
+                        'location'              => $unit_row->location_name.','. $unit_row->city_name .','. $unit_row->state_name , 
+                        'plot_size'             => $unit_row->property_details->plot_size, 
+                        'booking_date'          => $unit_row->booking_date, 
+                        'referance_number'      => $unit_row->property_details->referance_number, 
+                        
+                    );
+                endforeach;    
+
+                echo json_encode(['status' => true, 'message' => 'Successfully data fetched' , 'unit_list' => $unit_limited_arr ]);
+
             }
             else{
+
                 echo json_encode(['status' => false, 'message' => 'Data not found']);
             }
 
