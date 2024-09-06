@@ -2399,7 +2399,7 @@ class Api extends CI_Controller
 
 
     # new lead data 
-    public function get_lead_list()
+    public function get_lead_list_old_2()
     {
 
         $data['json_data']  = json_encode($this->input->post());
@@ -2766,7 +2766,7 @@ class Api extends CI_Controller
         echo json_encode($array);
     }
 
-    public function get_lead_list_new() 
+    public function get_lead_list() 
     {   
 
         $data['json_data']  = json_encode($this->input->post());
@@ -2830,6 +2830,7 @@ class Api extends CI_Controller
                 $where_ext .= " AND DATE(STR_TO_DATE(tbl_leads.lead_date, '%d-%m-%Y')) BETWEEN '$lead_from' AND '$lead_to'";
             }
 
+          
             if ($followup_from && !$followup_to) {
                 $where_ext .= " AND DATE(STR_TO_DATE(tbl_followup.next_followup_date, '%d-%m-%Y')) >= '$followup_from'";
             }
@@ -2838,6 +2839,7 @@ class Api extends CI_Controller
 
                 $where_ext .= " AND DATE(STR_TO_DATE(tbl_followup.next_followup_date, '%d-%m-%Y')) BETWEEN '$followup_from' AND '$followup_to'";
             }
+
 
             if ($search_state_id) {
                 $where_ext .= " AND lead_state_id='" . $search_state_id . "'";
