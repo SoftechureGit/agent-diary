@@ -2773,6 +2773,10 @@ class Api extends CI_Controller
 
         $this->db->insert('tbl_get_all_data_json', $data);
 
+        # Is Details View
+            $is_detail_view                 =   $this->input->post('is_detail_view');
+        # End Is Details View
+
       # user details   
         // $agent          = $this->getAgent();
         $user_id        = $agent->user_id ?? 0;
@@ -3038,18 +3042,30 @@ class Api extends CI_Controller
       $records                      =  array();
 
       if ($record_data) {
-        foreach ($record_data as $item) {
+        foreach ($record_data as $key => $item) {
+
+            #
+            # Primary Mobile Number Country Code
+            $primary_country_code                           =   ($item->primary_mobile_number_country_data ?? null) ? (json_decode($item->primary_mobile_number_country_data)->dialCode ?? '') : '';
+            $primary_mobile_number_with_country_code             =  ($item->lead_mobile_no ?? null) ? '+' . $primary_country_code . ' ' . $item->lead_mobile_no : null;
+            # End Primary Mobile Number Country Code
+
+            # Secondary Mobile Number Country Code
+            $secondary_country_code                           =   ($item->secondary_mobile_number_country_data ?? null) ? (json_decode($item->secondary_mobile_number_country_data)->dialCode ?? '') : '';
+            $secondary_mobile_number_with_country_code             =  ($item->lead_mobile_no_2 ?? null) ? '+' . $secondary_country_code . ' ' . $item->lead_mobile_no_2 : null;
+            # End Secondary Mobile Number Country Code
+            #
 
             $lead_or_next_followp_date                  =   $item->next_followup_date ? date('d-m-Y', strtotime($item->next_followup_date)) : ($item->lead_date ? date('d-m-Y', strtotime($item->lead_date)) : 'N/A');
-
             $lead_or_next_followp_time                  =   $item->next_followup_time ? $item->next_followup_time : ($item->lead_time ? date('H:i', strtotime($item->lead_time)) : 'N/A');
 
-            $records[] = array(
+            $records[$key] = array(
                 'lead_id'                               => $item->lead_id,
                 'lead_title'                            => $item->lead_title,
                 'lead_first_name'                       => $item->lead_first_name,
                 'lead_last_name'                        => $item->lead_last_name,
-                'lead_mobile_no'                        => $item->lead_mobile_no,
+                'lead_full_name'                        => $item->lead_full_name,
+                'lead_mobile_no'                        => $primary_mobile_number_with_country_code,
                 'lead_stage_name'                       => $item->lead_stage_name ?? '',
                 'lead_source_name'                      => $item->lead_source_name ?? 'N/A',
                 'lead_email'                            => $item->lead_email,
@@ -3061,6 +3077,30 @@ class Api extends CI_Controller
                 'lead_or_next_followp_time'             => $lead_or_next_followp_time,
                 'lead_or_next_followp_date_and_time'    => $lead_or_next_followp_date . ' ( ' . $lead_or_next_followp_time . ' )'
             );
+
+            # Is Detail View
+            if ($is_detail_view):
+                $records[$key]['status']                          =  $item->lead_status;
+                $records[$key]['date']                            = $item->lead_date;
+                $records[$key]['seondary_mobile_number']          = $secondary_mobile_number_with_country_code;
+
+
+                $records[$key]['address']                         =  $item->lead_address;
+                $records[$key]['state']                           =  $item->state_name;
+                $records[$key]['city']                            =  $item->city_name;
+                $records[$key]['gender']                          =  $item->lead_gender;
+                $records[$key]['marital_status']                  =  $item->lead_marital_status;
+                $records[$key]['occupation']                      =  $item->occupation_name;
+                $records[$key]['designation']                     =  $item->designation_name;
+                $records[$key]['company_name']                    =  $item->lead_company;
+                $records[$key]['annual_income']                   =  $item->lead_annual_income;
+                $records[$key]['pan_card_number']                 =  $item->lead_pan_no;
+                $records[$key]['aadhar_card_number']              =  $item->lead_adhar_no;
+                $records[$key]['voter_id']                        =  $item->lead_voter_id;
+                $records[$key]['passport_number']                 =  $item->lead_passport_no;
+                $records[$key]['added_by']                        =  $item->added_by_user_full_name;
+            endif;
+            # End Is Detail View
         }
     }
 
