@@ -3042,9 +3042,10 @@ class Api extends CI_Controller
       $records                      =  array();
 
       if ($record_data) {
+
         foreach ($record_data as $key => $item) {
 
-            #
+            
             # Primary Mobile Number Country Code
             $primary_country_code                           =   ($item->primary_mobile_number_country_data ?? null) ? (json_decode($item->primary_mobile_number_country_data)->dialCode ?? '') : '';
             $primary_mobile_number_with_country_code             =  ($item->lead_mobile_no ?? null) ? '+' . $primary_country_code . ' ' . $item->lead_mobile_no : null;
