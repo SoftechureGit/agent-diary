@@ -319,7 +319,6 @@
 
   function filterDashboard() {
     var members = $("#member").val();
-
     redirect_url = "?member=" + members;
     window.location.href = redirect_url
   }
