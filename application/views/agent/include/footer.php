@@ -751,6 +751,8 @@
 
              dublicate_clone_template.find('.rate').attr('name', "project_components[" + clone_template_id + "][rate]").val('');
              dublicate_clone_template.find('.total_amount').attr('name', "project_components[" + clone_template_id + "][total_amount]").val('');
+             dublicate_clone_template.find('.calculate_on_size_unit').attr('name', "project_components[" + clone_template_id + "][calculate_on_size_unit]").val('');
+             dublicate_clone_template.find('.type').attr('name', "project_components[" + clone_template_id + "][type]").val('');
 
              dublicate_clone_template.find('.component-measure-msg').text('');
 
@@ -1440,9 +1442,22 @@
         ************************************************************************/
 
        /***********************************************************************
-        * Calculate Project Component Total Amount
+        * Project Component 
         ************************************************************************/
 
+        $(document).on('change', '.project_component_id', function(){
+            type = $(this).find('option:checked').data('type')
+            $(this).parents('.clone-template').find('.type').val(type)
+        })
+       /***********************************************************************
+        * End Project Component
+        ************************************************************************/
+
+
+       /***********************************************************************
+        * Calculate Project Component Total Amount
+        ************************************************************************/
+       
 
        function calculatePCTotalAmount(e) {
          parent = $(e).parents('.clone-template');

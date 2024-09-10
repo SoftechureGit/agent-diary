@@ -21,11 +21,11 @@
     </div>
     <!-- End Buyer S/W/D -->
 
-    <!-- Seller Name -->
+    <!-- Seller -->
     <div class="col-md-6">
       <div class="form-group">
-        <label>Seller Name <span class="text-danger">*</span></label>
-        <select name="booking_seller_name" class="form-control" required>
+        <label>Seller <span class="text-danger">*</span></label>
+        <select name="booking_seller_id" class="form-control" required>
           <option value="" selected disabled>Choose...</option>
           <?php foreach ($leads ?? [] as $lead_item): ?>
             <option value="<?= $lead_item->id ?>"><?= $lead_item->full_name . " ( $lead_item->mobile )" ?></option>
@@ -33,7 +33,7 @@
         </select>
       </div>
     </div>
-    <!-- End Seller Name -->
+    <!-- End Seller -->
 
     <!-- Seller S/W/D -->
     <div class="col-md-6">

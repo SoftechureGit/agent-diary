@@ -4293,8 +4293,7 @@ class Api extends CI_Controller
             // print_r($followup_id); die;
 
             $followup_lead_id = $this->input->post('followup_lead_id');
-            $followup_status  
-            = $this->input->post('followup_status');
+            $followup_status = $this->input->post('followup_status');
 
             if ($this->input->post("lead_stage_id") == 6) {
                 $inv_data = $this->Action_model->select_single('tbl_inventory', "inventory_id='" . $this->input->post("bk_inventory_id") . "' AND inventory_status='1'");
