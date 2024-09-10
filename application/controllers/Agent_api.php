@@ -4179,44 +4179,89 @@ WHERE lead_id='" . $lead_id . "'
 
                         $check = $this->Action_model->select_single('tbl_bookings', "inventory_id='" . $this->input->post("bk_inventory_id") . "'");
                         if (!$check) {
-                            $bk_size = "";
-                            if ($this->input->post("bk_size")) {
-                                $bk_size = $this->input->post("bk_size");
-                                $bk_size = explode("##", $bk_size);
-                                $bk_size = $bk_size[0];
-                            }
 
-                            $bk_unit_no = "";
-                            if ($this->input->post("bk_unit_no")) {
-                                $bk_unit_no = $this->input->post("bk_unit_no");
-                                $bk_unit_no = explode("##", $bk_unit_no);
-                                $bk_unit_no = $bk_unit_no[0];
-                            }
+                            # Booking Basic Details
+
+                                $buyer_name                                             =   $this->input->post('booking_buyer_name');
+                                $buyer_son_of_daughter_of_wife_of                       =   $this->input->post('booking_buyer_sdw');
+                                $seller_id                                            =   $this->input->post('booking_seller_id');
+                                $seller_son_of_daughter_of_wife_of                      =   $this->input->post('booking_seller_sdw');
+                                $state_id                                               =   $this->input->post('booking_state_id');
+                                $city_id                                                =   $this->input->post('booking_city_id');
+                                $location_id                                            =   $this->input->post('booking_location_id');
+                                $project_id                                             =   $this->input->post('booking_project_id');
+                                $unit_code_id                                           =   $this->input->post('booking_unit_code');
+                                $plot_or_unit_number                                    =   $this->input->post('booking_inventory_plot_or_unit_number');
+                                $inventory_id                                           =   $this->input->post('bk_inventory_id');
+
+                                $booking_basic_details          =   (object) [
+                                                                                    'buyer_name'                            => $buyer_name,
+                                                                                    'buyer_son_of_daughter_of_wife_of'      => $buyer_son_of_daughter_of_wife_of,
+                                                                                    'seller_id'                             => $seller_id,
+                                                                                    'seller_son_of_daughter_of_wife_of'     => $seller_son_of_daughter_of_wife_of,
+                                                                                    'state_id'                              => $state_id,
+                                                                                    'city_id'                               => $city_id,
+                                                                                    'location_id'                           => $location_id,
+                                                                                    'project_id'                            => $project_id,
+                                                                                    'unit_code_id'                          => $unit_code_id,
+                                                                                    'plot_or_unit_number'                   => $plot_or_unit_number,
+                                                                                    'inventory_id'                          => $inventory_id,
+                                                                                ];
+                            # End Booking Basic Details
+
+                            # Booking Component Details
+                                $project_components                                 =   $this->input->post('project_components');
+                                $booking_component_details_arr                          =   [];
+
+                                foreach($project_components ?? [] as $project_component):
+                                    $project_component          =   (object) $project_component;
+                                    $component_id                                   = $project_component->id;
+                                    $component_type                                 = $project_component->type;
+                                    $component_rate                                 = $project_component->rate;
+                                    $component_calculate_on_size_unit_id            = $project_component->calculate_on_size_unit;
+                                    $component_total_amount                         = $project_component->total_amount;
+                                
+                                    # List
+                                    $booking_component_details_arr[]          =   (object) [
+                                                                                        'component_id'                          => $component_id,
+                                                                                        'component_type'                        => $component_type,
+                                                                                        'rate'                                  => $component_rate,
+                                                                                        'calculate_on_size_unit_id'             => $component_calculate_on_size_unit_id,
+                                                                                        'total_amount'                          => $component_total_amount,
+                                                                                    ];
+                                    # End List
+                                endforeach;
+                            # End Booking Component Details
+
+                            # Payment Terms Details
+                                $payment_terms                                 =   $this->input->post('payment_terms');
+                                $booking_terms_details_arr                          =   [];
+
+                                foreach($payment_terms ?? [] as $payment_term):
+                                    $payment_term          =   (object) $payment_term;
+                                    $booking_title                                  = $payment_term->title;
+                                    $booking_amount                                 = $payment_term->amount;
+                                    $booking_date                                   = $payment_term->date;
+                                   
+                           
+                                    $booking_terms_details_arr[]          =   (object) [
+                                                                                'title'                                 => $booking_title,
+                                                                                'amount'                                => $booking_amount,
+                                                                                'date'                                  => $booking_date,
+                                                                            ];
+                                endforeach;
+                            # End Payment Terms Details
+
+                           
 
                             $bk_array = array(
-                                "customer_name" => $this->input->post("bk_customer_name"),
-                                "dob" => $this->input->post("bk_dob"),
-                                "sdw" => $this->input->post("bk_sdw"),
-                                "sdw_title" => $this->input->post("bk_sdw_title"),
-                                "unit_no" => $bk_unit_no,
-                                "unit_ref_no" => $this->input->post("bk_unit_ref_no"),
-                                "address" => $this->input->post("bk_address"),
-                                "state_id" => $this->input->post("bk_state_id"),
-                                "city_id" => $this->input->post("bk_city_id"),
-                                "project_id" => $this->input->post("bk_project_id"),
-                                "tower" => $this->input->post("bk_tower"),
-                                "floor" => $this->input->post("bk_floor"),
-                                "size" => $bk_size,
-                                "accommodation" => $this->input->post("bk_accommodation"),
-                                "product_unit_detail_id" => $this->input->post("bk_product_unit_detail_id"),
-                                "inventory_id" => $this->input->post("bk_inventory_id"),
-                                "deal_amount" => $this->input->post("bk_deal_amount"),
-                                "booking_amount" => $this->input->post("bk_booking_amount"),
-                                "payment_mode" => $this->input->post("bk_payment_mode"),
-                                "cheque_no" => $this->input->post("bk_cheque_no"),
-                                "drawn_on" => $this->input->post("bk_drawn_on"),
-                                "booking_date" => $this->input->post("bk_booking_date"),
-                                "remark" => $this->input->post("bk_remark")
+                                "project_id"                    => $project_id,
+                                "product_unit_detail_id"        => $unit_code_id,
+                                "inventory_id"                  => $inventory_id,
+                                "booking_date"                  => date('d-m-Y'),
+                                "booking_basic_details"         => json_encode($booking_basic_details),
+                                "component_details"             => count($booking_component_details_arr) ? json_encode($booking_component_details_arr) : null,
+                                "payment_terms_details"         => count($booking_terms_details_arr) ? json_encode($booking_terms_details_arr) : null,
                             );
 
                             $bk_array['account_id'] = $account_id;
@@ -7498,7 +7543,7 @@ WHERE lead_id='" . $lead_id . "'
                                             if ($b_cost_unit == '1') { // for Sq.Yd
                                                 $current_rate = $item->plot_size * $item->basic_cost;
                                             } else if ($b_cost_unit == '2') { // for Sq.Ft
-                                                $current_rate = $item->construction_area * $item->basic_cost;
+                                                $current_rate = ( $item->construction_area ?? 0 ) * $item->basic_cost;
                                             } else if ($b_cost_unit == '5') { // for Fix
                                                 $current_rate = $item->basic_cost;
                                             }
@@ -7749,7 +7794,7 @@ WHERE lead_id='" . $lead_id . "'
                                     if ($b_cost_unit == '1') { // for Sq.Yd
                                         $current_rate = $item->plot_size * $item->basic_cost;
                                     } else if ($b_cost_unit == '2') { // for Sq.Ft
-                                        $current_rate = $item->construction_area * $item->basic_cost;
+                                        $current_rate = ( $item->construction_area ?? 0 ) * $item->basic_cost;
                                     } else if ($b_cost_unit == '5') { // for Fix
                                         $current_rate = $item->basic_cost;
                                     }
@@ -9557,7 +9602,7 @@ WHERE lead_id='" . $lead_id . "'
     }
 
     /* booking report start */
-    public function booking_report_list()
+    public function booking_report_list_old()
     {
 
         $account_id = getAccountId();
@@ -9571,7 +9616,7 @@ WHERE lead_id='" . $lead_id . "'
         $search_from = $this->input->post('search_from');
         $search_to = $this->input->post('search_to');
 
-        $select = 'booking_id,customer_name,booking_date,unit_ref_no,project_name,tbl_builders.firm_name as b_firm_name,tbl_users.is_individual,tbl_users.firm_name as a_firm_name,tbl_users.first_name as a_first_name,tbl_users.last_name as a_last_name,booking_status';
+        $select = '*';
         $where = '';
 
         $searchValue = $postData['search']['value'];
@@ -9635,6 +9680,120 @@ WHERE lead_id='" . $lead_id . "'
         foreach ($aaData as $item) {
             $item->agent_name = ($item->is_individual) ? (ucwords($item->a_first_name . ' ' . $item->a_last_name)) : $item->a_firm_name;
         }
+        $data['aaData'] = $aaData;
+
+        echo json_encode($data);
+    }
+
+    public function booking_report_list()
+    {
+
+        $account_id = getAccountId();
+
+        $postData = $this->input->post();
+        $search_text = $this->input->post('search_text');
+        $search_agent_id = $this->input->post('search_agent_id');
+        $search_builder_id = $this->input->post('search_builder_id');
+        $search_product_id = $this->input->post('search_product_id');
+        $search_booking_status = $this->input->post('search_booking_status');
+        $search_from = $this->input->post('search_from');
+        $search_to = $this->input->post('search_to');
+
+      
+
+        $searchValue = $postData['search']['value'];
+        $searchQuery = '1 =1 ';
+
+        # Search Text
+        if ($search_text != '') {
+            $searchQuery .= " and   (project.project_name like '%" . $search_text . "%' 
+                                    OR 
+                                    JSON_UNQUOTE(JSON_EXTRACT(inventory.property_details, '$.referance_number')) like '%" . $search_text . "%'
+                                    OR
+                                    JSON_UNQUOTE(JSON_EXTRACT(booking.booking_basic_details, '$.buyer_name')) like '%" . $search_text . "%'
+                                    OR
+                                    CONCAT(IFNULL(seller.lead_title, ''), ' ', IFNULL(seller.lead_first_name, ''), ' ', IFNULL(seller.lead_last_name, '')) like '%" . $search_text . "%' 
+                                    OR
+                                    CONCAT(IFNULL(agent.user_title, ''), ' ', IFNULL(agent.first_name, ''), ' ', IFNULL(agent.last_name, '')) like '%" . $search_text . "%'
+                                   )";
+        }
+        # End Search Text
+
+        # Filter
+        if ($search_agent_id != '') {
+            $searchQuery .= " and booking.account_id='" . $search_agent_id . "' ";
+        }
+
+        if ($search_builder_id != '') {
+            $searchQuery .= " and project.builder_id='" . $search_builder_id . "' ";
+        }
+
+        if ($search_product_id != '') {
+            $searchQuery .= " and booking.project_id='" . $search_product_id . "' ";
+        }
+
+        if ($search_booking_status != '') {
+            $searchQuery .= " and booking.booking_status='" . $search_booking_status . "' ";
+        }
+
+        if ($search_from && $search_to) {
+            $searchQuery .= " and (str_to_date(booking.booking_date,'%d-%m-%Y') BETWEEN str_to_date('" . $search_from . "','%d-%m-%Y') AND str_to_date('" . $search_to . "','%d-%m-%Y'))";
+        } else if ($search_from && !$search_to) {
+            $searchQuery .= " and (str_to_date(booking.booking_date,'%d-%m-%Y')>=str_to_date('" . $search_from . "','%d-%m-%Y'))";
+        } else if (!$search_from && $search_to) {
+            $searchQuery .= " and (str_to_date(booking.booking_date,'%d-%m-%Y')<=str_to_date('" . $search_to . "','%d-%m-%Y'))";
+        }
+        # Filter
+        
+        $select         =   "
+                                booking.booking_id, 
+                                booking.lead_id,
+                                booking.inventory_id,
+                                booking.product_unit_detail_id,
+                                booking.booking_status,
+                                booking.account_id,
+                                booking.user_id,
+                                booking.booking_basic_details,
+                                booking.component_details,
+                                booking.payment_terms_details,
+                                booking.booking_date,
+                                
+                                project.project_name,
+
+                                JSON_UNQUOTE(JSON_EXTRACT(inventory.property_details, '$.referance_number')) as unit_refernce_number,
+
+                                CONCAT(IFNULL(seller.lead_title, ''), ' ', IFNULL(seller.lead_first_name, ''), ' ', IFNULL(seller.lead_last_name, '')) as seller_name,
+
+                                CONCAT(IFNULL(agent.user_title, ''), ' ', IFNULL(agent.first_name, ''), ' ', IFNULL(agent.last_name, '')) as agent_name
+                            ";
+        $join =     [   
+                        'tbl_leads as seller', "seller.lead_id = JSON_UNQUOTE(JSON_EXTRACT(booking.booking_basic_details, '$.seller_id'))", # Seller
+                        'tbl_users as agent', "agent.user_id = booking.user_id", # Agent
+                        'tbl_products as project', "project.product_id = booking.project_id", # Project
+                        'tbl_inventory as inventory', "inventory.inventory_id = booking.inventory_id" # Inventory
+                    ];
+        $where = '';
+
+        $data = $this->Action_model->ajaxDatatableLeft($postData, $searchQuery, 'tbl_bookings as booking', $where, $select, $join);
+
+        $aaData = $data['aaData'];
+        
+        
+        # Datatable Data
+        foreach ($aaData as $item):
+            
+            $booking_basic_details  =   $item->booking_basic_details ?  json_decode($item->booking_basic_details) : null;
+
+            $item->booking_date             = date('d F, Y', strtotime($item->booking_date));
+            $item->buyer_name               = $booking_basic_details->buyer_name;
+            $item->seller_name              = $item->seller_name;
+            $item->agent_name               = $item->agent_name;
+            $item->project_name             = $item->project_name;
+            $item->unit_refernce_number     =  $item->unit_refernce_number;
+            // $item->agent_name = ($item->is_individual ?? 0) ? (ucwords(($item->a_first_name ?? '')  . ' ' . ( $item->a_last_name ?? ''))) : $item->a_firm_name;
+
+        endforeach;
+        # Datatable Data
         $data['aaData'] = $aaData;
 
         echo json_encode($data);
