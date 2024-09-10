@@ -6,7 +6,7 @@
             <div class="form-group">
                 <label for="project_component_id">Components</label>
 
-                <select name="project_component[1][id]" id="" class="project_component_id form-control set_propety_components" onchange="calculatePCTotalAmount(this)">
+                <select name="project_component[1][id]" id="" class="project_component_id form-control set_propety_components">
                     <option value="">Choose...</option>
                 </select>
 
@@ -25,9 +25,9 @@
         </div>
         <!-- End Project Components Amount -->
 
-        <div class="col d-none">
+        <div class="col">
             <label for="">Calculate on</label>
-            <select class="form-control calculate_on_size_unit" id="" name="project_components[calculate_on_size_unit]">
+            <select class="form-control calculate_on_size_unit" id="" name="project_components[calculate_on_size_unit]" onchange="calculatePCTotalAmount(this)">
                 <option value="" disabled selected>Choose...</option>
                 <?php foreach (sizeUnits() ?? []  as $item) : ?>
                     <option value="<?= $item->unit_id ?>"><?= $item->unit_name ?></option>

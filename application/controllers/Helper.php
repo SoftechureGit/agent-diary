@@ -552,16 +552,10 @@ class Helper extends CI_Controller
         $options                =   "<option value='' disabled selected>Choose...</option>";
 
         foreach ($records->all_components ?? [] as $record) :
-            $price              = $record->price ?? 0;
-            $unit_type_id       = $record->unit_type_id ?? 0;
             $unit_type          = $record->unit_type ?? 0;
 
-            if($price && $unit_type_id){
-                $options            .=   "<option value='$record->id' data-price='$price' data-type='$record->type' data-unit-type-id='$unit_type_id' data-unit-type='$unit_type'>$record->name</option>";
-            }else{
-                $options            .=   "<option value='$record->id' disabled><del>$record->name</del></option>";
-            }
-        endforeach;
+                $options            .=   "<option value='$record->id' data-type='$record->type' data-unit-type='$unit_type'>$record->name</option>";
+           endforeach;
 
         echo json_encode(['status' => true, 'message' => 'Successfully data fetched', 'data' => $records, 'view' => $options]); 
         }

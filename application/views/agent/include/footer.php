@@ -882,8 +882,6 @@
 
          get_inventory_details(id);
 
-
-
        })
 
        /** Get Inventory Details */
@@ -1445,88 +1443,35 @@
         * Calculate Project Component Total Amount
         ************************************************************************/
 
-       $(document).on('change', '.clone-template .project_component_id', function() {
-
-         id = this.value
-
-
-         parent = $(this).parents('.clone-template');
-
-         price = $(this).find('option:checked').data('price')
-         parent.find('.rate').val(price)
-
-         if (!id) {
-           parent.find('.component-measure-msg').val('')
-         }
-
-         calculatePCTotalAmount(this)
-       })
 
        function calculatePCTotalAmount(e) {
          parent = $(e).parents('.clone-template');
 
-         component = parent.find('.project_component_id')
-         id = component.val()
-         price = component.find('option:checked').data('price')
-         type = component.find('option:checked').data('type')
+         calculate_on_size_unit = parent.find('.calculate_on_size_unit')
+         calculate_on_size_unit_id = calculate_on_size_unit.val()
 
-         unit_type = component.find('option:checked').data('unit-type')
-         unit_type_id = component.find('option:checked').data('unit-type-id')
-
-
-         manually_amount = parent.find('.rate').val()
-
-         manually_amount = manually_amount ? manually_amount : 0;
-
+         rate = parent.find('.rate').val()
 
          plot_or_unit_size = $('.plot_or_unit_size').val()
-         plot_or_unit_size = plot_or_unit_size ? plot_or_unit_size : 0;
 
+         total_amount = parseFloat(plot_or_unit_size) * parseFloat(rate);
 
-         /** Measure Message */
-         if (price != undefined && unit_type != undefined) {
-           component_measure_msg = `${price} / ${unit_type}`;
-           parent.find('.component-measure-msg').text(component_measure_msg);
+         if (calculate_on_size_unit_id == 5) { // Unit Type : Fix 
+           total_amount = parseFloat(rate).toFixed(2)
+          } else if (calculate_on_size_unit_id == 6) { // Unit Type : % of BSP
+            basic_selling_price = $('[data-type="basic_component"]').parents('.clone-template').find('.total_amount').val()
+            basic_selling_price = basic_selling_price ? basic_selling_price : 0
+
+            if(basic_selling_price){
+              total_amount      = ( basic_selling_price / 100 ) * rate;
+            }
          }
-         /** Measure Message */
 
-
-         total_amount = parseFloat(plot_or_unit_size) * parseFloat(manually_amount);
-
-         console.log(total_amount)
-         if (unit_type_id == 5) { // Unit Type : Fix 
-           total_amount = parseFloat(manually_amount).toFixed(2)
-         } else if (unit_type_id == 6) { // Unit Type : % of BSP
-
-
-            basic_component_manual_price           = $('[data-type="basic_component"]:checked').parents('.clone-template').find('.rate').val()
-            basic_component_price           = $('[data-type="basic_component"]').data('price')
-            basic_component_unit_type_id    = $('[data-type="basic_component"]').data('unit-type-id')
-
-            basic_component_price     = basic_component_manual_price ? basic_component_manual_price : basic_component_price
-
-              if(basic_component_unit_type_id == 5){
-                manually_amount_percentage          = manually_amount ? manually_amount : basic_component_price
-                total_amount                  = (( basic_component_price / 100) * manually_amount_percentage ) // percentage amount\
-              }else{
-                basic_component_total         = ( parseFloat(plot_or_unit_size) * parseFloat(basic_component_price))  // size * price
-                total_amount                  = (( basic_component_total / 100) * manually_amount ) // percentage amount\
-              }
-            } 
-            
 
           total_amount = parseFloat(total_amount).toFixed(2)
-          
-          console.log(total_amount)
-         parent.find('.type').val(type)
+
 
          parent.find('.total_amount').val(total_amount)
-
-         /** Size */
-         parent.find('.calculate_on_size_unit').val(unit_type_id).trigger('change');
-         /** Size */
-
-
 
        }
        /***********************************************************************
