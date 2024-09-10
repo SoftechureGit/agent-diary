@@ -554,7 +554,7 @@ class Helper extends CI_Controller
         foreach ($records->all_components ?? [] as $record) :
             $unit_type          = $record->unit_type ?? 0;
 
-                $options            .=   "<option value='$record->id' data-type='$record->type' data-unit-type='$unit_type'>$record->name</option>";
+                $options            .=   "<option value='$record->id' data-type='$record->type' data-price='$record->price' data-unit-type='$unit_type'>$record->name</option>";
            endforeach;
 
         echo json_encode(['status' => true, 'message' => 'Successfully data fetched', 'data' => $records, 'view' => $options]); 

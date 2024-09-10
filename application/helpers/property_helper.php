@@ -1020,16 +1020,9 @@ function property_components($param)
     endif;
 
         db_instance()->select('property_unit.basic_cost as basic_selling_price, 
-                                property_unit.charges as club_cost, 
-                                property.b_cost_unit as basic_cost_unit_type_id, 
-                                property.club_cost_unit as club_cost_unit_type_id,
-                                basic_unit.unit_name as basic_unit_type_name,
-                                club_unit.unit_name as club_unit_type_name,
+                                property_unit.charges as club_cost
                             ');
         db_instance()->from('tbl_product_unit_details as property_unit');
-        db_instance()->join('tbl_products as property', 'property.product_id = property_unit.product_id');
-        db_instance()->join('tbl_units as basic_unit', 'basic_unit.unit_id = property.b_cost_unit');
-        db_instance()->join('tbl_units as club_unit', 'club_unit.unit_id = property.club_cost_unit');
         db_instance()->where($where);
     $property_unit_details  =    db_instance()->get()->row();
 

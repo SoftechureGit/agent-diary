@@ -387,7 +387,7 @@
 
        $(document).on('change', '.get_propety_components', function() {
          var project_id = $('[name="booking_project_id"]').val();
-         var unit_code_id = $('[name="booking_unit_code_id"]').val();
+         var unit_code_id = $('[name="booking_unit_code"]').val();
 
          /** Ajax */
          if (!project_id) return;
@@ -1459,15 +1459,24 @@
          if (calculate_on_size_unit_id == 5) { // Unit Type : Fix 
            total_amount = parseFloat(rate).toFixed(2)
           } else if (calculate_on_size_unit_id == 6) { // Unit Type : % of BSP
-            basic_selling_price = $('[data-type="basic_component"]:checked').parents('.clone-template').find('.total_amount').val()
-            basic_selling_price = basic_selling_price ? basic_selling_price : 0
+            basic_selling_price         = $('[data-type="basic_component"]:checked').parents('.clone-template').find('.total_amount').val()
+            default_basic_selling_price = $('[data-type="basic_component"]').data('price')
 
+            if(default_basic_selling_price){
+              default_basic_selling_price = default_basic_selling_price * plot_or_unit_size
+            }
+
+            basic_selling_price = basic_selling_price ? basic_selling_price : default_basic_selling_price
 
             if(basic_selling_price){
               total_amount      = ( basic_selling_price / 100 ) * rate;
             }else{
-              total_amount      = 0;
-              showToast('danger', 'Please select Basic Cost Component')
+
+                if(!$('.inventory_plot_or_unit_numbers').val()){
+                  showToast('danger', 'Please select plot number / unit number')
+                }else{
+                  showToast('danger', 'Please update Basic Cost price')
+                }
             }
          }
 
