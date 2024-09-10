@@ -114,6 +114,30 @@
                       </div>
                     <?php endif; ?>
                     <!-- End Unit Ref No -->
+
+                    <!-- Status -->
+                     <?php if($lead_unit->status ?? 0): ?>
+                      <div class="col-md-3">
+                        <label for="">Status</label>
+                      </div>
+                      <div class="col-md-9">
+                        <span class="label-value">
+                          <?php
+                            $status     = '';
+                            if($lead_unit->status == 1):
+                              $status     = "<span class='btn btn-sm btn-success badge text-white'>Grant</span>";
+                            endif;
+                            
+                            if($lead_unit->status == 2):
+                              $status     =  "<span class='btn btn-sm btn-warning badge text-white'>Sold</span>";
+                            endif;
+                          ?>
+                          : &nbsp;&nbsp; <?= $status ?>
+                        </span>
+                      </div>
+                      <?php endif; ?>
+                    <!-- End Status -->
+
                       <div class="col align-self-end">
                         <div class="d-flex text-end" style="justify-content: right;">
                           <i class="fa fa-edit px-2  text-success add-edit-new-unit-btn" data-id="<?= $lead_unit->id; ?>" data-lead_id="<?= $lead_unit->lead_id ?>"></i>
