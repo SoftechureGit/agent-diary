@@ -1459,14 +1459,17 @@
          if (calculate_on_size_unit_id == 5) { // Unit Type : Fix 
            total_amount = parseFloat(rate).toFixed(2)
           } else if (calculate_on_size_unit_id == 6) { // Unit Type : % of BSP
-            basic_selling_price = $('[data-type="basic_component"]').parents('.clone-template').find('.total_amount').val()
+            basic_selling_price = $('[data-type="basic_component"]:checked').parents('.clone-template').find('.total_amount').val()
             basic_selling_price = basic_selling_price ? basic_selling_price : 0
+
 
             if(basic_selling_price){
               total_amount      = ( basic_selling_price / 100 ) * rate;
+            }else{
+              total_amount      = 0;
+              showToast('danger', 'Please select Basic Cost Component')
             }
          }
-
 
           total_amount = parseFloat(total_amount).toFixed(2)
 
