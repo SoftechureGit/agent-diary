@@ -3045,7 +3045,7 @@ class Api extends CI_Controller
 
         foreach ($record_data as $key => $item) {
 
-            
+     
             # Primary Mobile Number Country Code
             $primary_country_code                           =   ($item->primary_mobile_number_country_data ?? null) ? (json_decode($item->primary_mobile_number_country_data)->dialCode ?? '') : '';
             $primary_mobile_number_with_country_code             =  ($item->lead_mobile_no ?? null) ? '+' . $primary_country_code . ' ' . $item->lead_mobile_no : null;
@@ -12790,5 +12790,559 @@ class Api extends CI_Controller
     /*************************************************************************************** 
      *  Helper Function
      *************************************************************************************** */
+
+     # Get Lead Product list
+     public function get_lead_product_list(){
+        $array = array();
+        $feedback_list = array();
+
+        $account_id = getAccountIdHash($this->input->request_headers()['Access-Token']);
+
+        if ($account_id && $this->input->post()) {
+
+            $lead_id = $this->input->post('lead_id');
+
+            $sql = "
+                SELECT req.requirement_id,pty.property_id,COALESCE('simple_property') as  type,bgt_min.budget_amount as req_budget_min,bgt_max.budget_amount as req_budget_max,state_name,city_name,location_name,product_type_name,unit_type_name,COALESCE('') as  project_name, pty.property_id as pid FROM tbl_requirements as req 
+                JOIN tbl_property as pty ON pty.product_type_id = req.product_type_id AND pty.unit_type_id = req.unit_type_id AND pty.state_id = req.state_id AND pty.city_id = req.city_id 
+                LEFT JOIN tbl_budgets as bgt_min ON bgt_min.budget_id = req.budget_min 
+                LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max 
+                LEFT JOIN tbl_states ON tbl_states.state_id = pty.state_id 
+                LEFT JOIN tbl_city ON tbl_city.city_id = pty.city_id 
+                LEFT JOIN tbl_locations ON tbl_locations.location_id = pty.location_id  
+                LEFT JOIN tbl_product_types ON tbl_product_types.product_type_id = req.product_type_id 
+                LEFT JOIN tbl_unit_types ON tbl_unit_types.unit_type_id = req.unit_type_id  
+                WHERE lead_id='" . $lead_id . "'
+                UNION ALL
+                SELECT req.requirement_id,pty.product_unit_detail_id,COALESCE('project_property') as  type,bgt_min.budget_amount as req_budget_min,bgt_max.budget_amount as req_budget_max,state_name,city_name,location_name,product_type_name,unit_type_name,COALESCE(pdt.project_name) as  project_name,pdt.product_id as pid FROM tbl_requirements as req
+                JOIN tbl_product_unit_details as pty ON pty.project_type = req.product_type_id AND ((pty.project_type != '3' AND pty.property_type = req.unit_type_id) OR (pty.project_type = '3' AND pty.sub_category = req.unit_type_id))  
+                JOIN tbl_products as pdt ON pdt.product_id = pty.product_id  AND pdt.state_id = req.state_id AND pdt.city_id = req.city_id
+                LEFT JOIN tbl_budgets as bgt_min ON bgt_min.budget_id = req.budget_min 
+                LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max 
+                LEFT JOIN tbl_states ON tbl_states.state_id = pdt.state_id 
+                LEFT JOIN tbl_city ON tbl_city.city_id = pdt.city_id 
+                LEFT JOIN tbl_locations ON tbl_locations.location_id = pdt.location 
+                LEFT JOIN tbl_product_types ON tbl_product_types.product_type_id = req.product_type_id 
+                LEFT JOIN tbl_unit_types ON tbl_unit_types.unit_type_id = req.unit_type_id  
+                WHERE lead_id='" . $lead_id . "'";
+
+
+            $query          = $this->db->query($sql);
+            $property_list  = $query->result();
+
+
+            $items = array();
+            $property_items = array();
+
+            //echo print_r($property_list);
+            foreach ($property_list as $itemRow) {
+                $budget = 0;
+                $b_min = 0;
+                $b_max = 0;
+
+                $req_b_min = $itemRow->req_budget_min;
+                $req_b_max = $itemRow->req_budget_max;
+                if ($itemRow->type == "simple_property") {
+
+                    $budget = 0;
+                    $b_min = 0;
+                    $b_max = 0;
+
+                    $i1 = array(
+                        'requirement_id' => $itemRow->requirement_id,
+                        'property_id' => $itemRow->property_id,
+                        'state_name' => $itemRow->state_name,
+                        'city_name' => $itemRow->city_name,
+                        'location_name' => $itemRow->location_name,
+                        'product_type_name' => $itemRow->product_type_name,
+                        'unit_type_name' => $itemRow->unit_type_name,
+                        'project_name' => $itemRow->project_name,
+                        'type' => $itemRow->type,
+                        'budget' => $budget,
+                        'budget_min' => $b_min,
+                        'budget_max' => $b_max,
+                        'req_budget_min' => $req_b_min,
+                        'req_budget_max' => $req_b_max,
+                        'size' => "",
+                        'accomodation_name' => '',
+                        'pid' => $itemRow->pid
+                    );
+
+                    $items[] = $i1;
+
+                    $rq = $this->Action_model->select_single('tbl_requirements', "requirement_id='" . $itemRow->requirement_id . "'");
+                    //$pt = $this->Action_model->select_single('tbl_property',"property_id='".$itemRow->property_id."'");
+
+                    $this->db->select("*");
+                    $this->db->from('tbl_property');
+                    $this->db->join('tbl_units', 'tbl_units.unit_id = tbl_property.covered_area_unit', 'left');
+                    $this->db->where("property_id='" . $itemRow->property_id . "'");
+                    $query = $this->db->get();
+                    $pt = $query->row();
+
+                    if ($rq && $pt && $rq->size_unit == $pt->covered_area_unit && ($pt->covered_area >= $rq->size_min && $pt->covered_area <= $rq->size_max)) {
+                        // sale
+                        if ($rq->look_for == 1 && $pt->listing_type == 2) {
+
+                            if ($pt->sale_price >= $req_b_min && $pt->sale_price <= $req_b_max) {
+
+                                $budget = "Budget: Rs." . $pt->sale_price;
+                                $b_min = $pt->sale_price;
+                                $b_max = $pt->sale_price;
+
+                                $i1 = array(
+                                    'requirement_id' => $itemRow->requirement_id,
+                                    'property_id' => $itemRow->property_id,
+                                    'state_name' => $itemRow->state_name,
+                                    'city_name' => $itemRow->city_name,
+                                    'location_name' => $itemRow->location_name,
+                                    'product_type_name' => $itemRow->product_type_name,
+                                    'unit_type_name' => $itemRow->unit_type_name,
+                                    'project_name' => $itemRow->project_name,
+                                    'type' => $itemRow->type,
+                                    'budget' => $budget,
+                                    'budget_min' => $b_min,
+                                    'budget_max' => $b_max,
+                                    'req_budget_min' => $req_b_min,
+                                    'req_budget_max' => $req_b_max,
+                                    'size' => $pt->covered_area . " " . $pt->unit_name,
+                                    'accomodation_name' => '',
+                                    'pid' => $itemRow->pid
+                                );
+
+                                $property_items[] = $i1;
+                            }
+                        }
+                        // rent
+                        if ($rq->look_for == 2 && $pt->listing_type == 1) {
+                            if ($pt->rent_price >= $req_b_min && $pt->rent_price <= $req_b_max) {
+
+                                $budget = "Budget: Rs." . $pt->rent_price;
+                                $b_min = $pt->rent_price;
+                                $b_max = $pt->rent_price;
+
+                                $i1 = array(
+                                    'requirement_id' => $itemRow->requirement_id,
+                                    'property_id' => $itemRow->property_id,
+                                    'state_name' => $itemRow->state_name,
+                                    'city_name' => $itemRow->city_name,
+                                    'location_name' => $itemRow->location_name,
+                                    'product_type_name' => $itemRow->product_type_name,
+                                    'unit_type_name' => $itemRow->unit_type_name,
+                                    'project_name' => $itemRow->project_name,
+                                    'type' => $itemRow->type,
+                                    'budget' => $budget,
+                                    'budget_min' => $b_min,
+                                    'budget_max' => $b_max,
+                                    'req_budget_min' => $req_b_min,
+                                    'req_budget_max' => $req_b_max,
+                                    'size' => $pt->covered_area . " " . $pt->unit_name,
+                                    'accomodation_name' => '',
+                                    'pid' => $itemRow->pid
+                                );
+
+                                $property_items[] = $i1;
+                            }
+                        }
+                    }
+                } else if ($itemRow->type == "project_property") {
+
+                    $where = "pud.product_unit_detail_id='" . $itemRow->property_id . "'";
+                    $this->db->select("pud.product_unit_detail_id,tbl_accomodations.accomodation_name,pud.project_type,pud.property_type,pud.sa,pud.plot_size,pud.plot_unit,punit.unit_name as plot_unit_name,sa_unit.unit_name as sa_unit_name,pud.basic_cost,p.b_cost_unit,pud.unit");
+                    $this->db->from('tbl_product_unit_details as pud');
+                    $this->db->join('tbl_products as p', 'p.product_id = pud.product_id', 'left');
+                    $this->db->join('tbl_accomodations', 'tbl_accomodations.accomodation_id = pud.accomodation', 'left');
+                    $this->db->join('tbl_units as punit', 'punit.unit_id = pud.plot_unit', 'left');
+                    $this->db->join('tbl_units as sa_unit', 'sa_unit.unit_id = pud.unit', 'left');
+                    $this->db->where($where);
+                    $query = $this->db->get();
+                    $item = $query->row();
+
+                    $size_value = 0;
+                    $size_unit = "";
+                    $size = "";
+
+                    if ($item->project_type == '2') {
+
+                        if ($item->sa) {
+                            $size_value = $item->sa;
+                            $size_unit = $item->unit;
+
+                            $size = $item->sa;
+                            if ($item->sa_unit_name) {
+                                $size .= ' ' . $item->sa_unit_name;
+                            }
+                        }
+
+                        if ($item->plot_size) {
+                            $size_value = $item->plot_size;
+                            $size_unit = $item->plot_unit;
+
+                            $size = $item->plot_size;
+                            if ($item->plot_unit_name) {
+                                $size .= ' ' . $item->plot_unit_name;
+                            }
+                        }
+                    }
+                    if ($item->project_type == '3') {
+
+                        $size_value = $item->sa;
+                        $size_unit = $item->unit;
+
+                        $size = $item->sa;
+                        if ($item->sa_unit_name) {
+                            $size .= ' ' . $item->sa_unit_name;
+                        }
+                    }
+
+                    $rq = $this->Action_model->select_single('tbl_requirements', "requirement_id='" . $itemRow->requirement_id . "'");
+
+                    if ($rq && $rq->size_unit == $size_unit && ($size_value >= $rq->size_min && $size_value <= $rq->size_max)) {
+
+
+                        $this->db->select('*');
+                        $this->db->from('tbl_inventory');
+                        $this->db->join('tbl_basic_cost', 'tbl_basic_cost.inventory_id = tbl_inventory.inventory_id', 'left');
+                        $this->db->where("unit_code='" . $item->product_unit_detail_id . "'");
+                        $query = $this->db->get();
+                        $item_inv_data = $query->result();
+                        $o = 0;
+
+                        $amount_array = array();
+                        if ($item_inv_data) {
+                            foreach ($item_inv_data as $itemInv) {
+                                $current_rate = 0;
+                                if ($itemInv->basic_cost_id) {
+
+                                    $b_cost_unit = $itemInv->current_rate_unit;
+                                    if ($itemInv->current_rate) {
+                                        //$current_rate += $itemInv->current_rate;
+
+                                        // residencial
+                                        if ($item->project_type == 2) {
+
+                                            // for flat
+                                            if (($item->property_type == 1 || $item->property_type == 7)) {
+                                                //$size = $item->sa;
+                                                //if ($item->sa_unit_name) {
+                                                //    $size .= ' '.$item->sa_unit_name;
+                                                //}
+
+                                                if ($b_cost_unit == '2') { // for Sq.Ft
+                                                    $current_rate = $item->sa * $itemInv->current_rate;
+                                                } else if ($b_cost_unit == '5') { // for Fix
+                                                    $current_rate = $itemInv->current_rate;
+                                                }
+                                            }
+                                            // for plot
+                                            else if (($item->property_type == 2 || $item->property_type == 3)) {
+                                                //$size = $item->plot_size;
+                                                //if ($item->plot_unit_name) {
+                                                //    $size .= ' '.$item->plot_unit_name;
+                                                //}
+                                                if ($b_cost_unit == '1') { // for Sq.Yd
+                                                    $current_rate = $item->plot_size * $itemInv->current_rate;
+                                                } else if ($b_cost_unit == '2') { // for Sq.Ft
+                                                    $current_rate += $item->construction_area * $itemInv->current_rate;
+                                                } else if ($b_cost_unit == '5') { // for Fix
+                                                    $current_rate = $itemInv->current_rate;
+                                                }
+                                            }
+                                        }
+                                        // commercial
+                                        else if ($item->project_type == 3) {
+                                            //$size = $item->sa;
+                                            //if ($item->sa_unit_name) {
+                                            //    $size .= ' '.$item->sa_unit_name;
+                                            //}
+
+                                            if ($b_cost_unit == '2') { // for Sq.Ft
+                                                $current_rate = $item->sa * $itemInv->current_rate;
+                                            } else if ($b_cost_unit == '5') { // for Fix
+                                                $current_rate = $itemInv->current_rate;
+                                            }
+                                        }
+                                    }
+                                } else {
+
+                                    $b_cost_unit = $item->b_cost_unit;
+
+                                    if ($item->basic_cost) {
+
+                                        // residencial
+                                        if ($item->project_type == 2) {
+                                            // for flat
+                                            if (($item->property_type == 1 || $item->property_type == 7)) {
+                                                //$size = $item->sa;
+                                                //if ($item->sa_unit_name) {
+                                                //    $size .= ' '.$item->sa_unit_name;
+                                                //}
+
+                                                if ($b_cost_unit == '2') { // for Sq.Ft
+                                                    $current_rate = $item->sa * $item->basic_cost;
+                                                } else if ($b_cost_unit == '5') { // for Fix
+                                                    $current_rate = $item->basic_cost;
+                                                }
+                                            }
+                                            // for plot
+                                            else if (($item->property_type == 2 || $item->property_type == 3)) {
+                                                //$size = $item->plot_size;
+                                                //if ($item->plot_unit_name) {
+                                                //    $size .= ' '.$item->plot_unit_name;
+                                                //}
+                                                if ($b_cost_unit == '1') { // for Sq.Yd
+                                                    $current_rate = $item->plot_size * $item->basic_cost;
+                                                } else if ($b_cost_unit == '2') { // for Sq.Ft
+                                                    $current_rate = $item->construction_area * $item->basic_cost;
+                                                } else if ($b_cost_unit == '5') { // for Fix
+                                                    $current_rate = $item->basic_cost;
+                                                }
+                                            }
+                                        }
+
+
+                                        // commercial
+                                        else if ($item->project_type == 3) {
+
+                                            //$size = $item->sa;
+                                            //if ($item->sa_unit_name) {
+                                            //    $size .= ' '.$item->sa_unit_name;
+                                            //}
+
+                                            if ($b_cost_unit == '2') { // for Sq.Ft
+                                                $current_rate = $item->sa * $item->basic_cost;
+                                            } else if ($b_cost_unit == '5') { // for Fix
+                                                $current_rate = $item->basic_cost;
+                                            }
+                                        }
+                                        //echo $item->project_type."#";
+                                    }
+                                }
+
+                                if ($current_rate) {
+                                    $amount_array[] = $current_rate;
+                                }
+                            }
+                        } else {
+                            $b_cost_unit = $item->b_cost_unit;
+
+                            if ($item->basic_cost) {
+
+                                // residencial
+                                if ($item->project_type == 2) {
+                                    // for flat
+                                    if (($item->property_type == 1 || $item->property_type == 7)) {
+                                        //$size = $item->sa;
+                                        //if ($item->sa_unit_name) {
+                                        //    $size .= ' '.$item->sa_unit_name;
+                                        //}
+
+                                        if ($b_cost_unit == '2') { // for Sq.Ft
+                                            $current_rate = $item->sa * $item->basic_cost;
+                                        } else if ($b_cost_unit == '5') { // for Fix
+                                            $current_rate = $item->basic_cost;
+                                        }
+                                    }
+                                    // for plot
+                                    else if (($item->property_type == 2 || $item->property_type == 3)) {
+                                        //$size = $item->plot_size;
+                                        //if ($item->plot_unit_name) {
+                                        //    $size .= ' '.$item->plot_unit_name;
+                                        //}
+                                        if ($b_cost_unit == '1') { // for Sq.Yd
+                                            $current_rate = $item->plot_size * $item->basic_cost;
+                                        } else if ($b_cost_unit == '2') { // for Sq.Ft
+                                            $current_rate = $item->construction_area * $item->basic_cost;
+                                        } else if ($b_cost_unit == '5') { // for Fix
+                                            $current_rate = $item->basic_cost;
+                                        }
+                                    }
+                                }
+
+
+                                // commercial
+                                else if ($item->project_type == 3) {
+
+                                    //$size = $item->sa;
+                                    //if ($item->sa_unit_name) {
+                                    //    $size .= ' '.$item->sa_unit_name;
+                                    //}
+
+                                    if ($b_cost_unit == '2') { // for Sq.Ft
+                                        $current_rate = $item->sa * $item->basic_cost;
+                                    } else if ($b_cost_unit == '5') { // for Fix
+                                        $current_rate = $item->basic_cost;
+                                    }
+                                }
+                                //echo $item->project_type."#";
+                            }
+
+                            if ($current_rate) {
+                                $amount_array[] = $current_rate;
+                            }
+                        }
+
+
+                        if (count($amount_array)) {
+                            $b_min = $this->getMin($amount_array);
+                            $b_max = $this->getMax($amount_array);
+
+                            if ($b_min == $b_max) {
+                                $budget = " Budget: Rs." . $b_min;
+                            } else {
+                                $budget = " Budget: Rs." . $b_min . " to Rs." . $b_max . "";
+                            }
+                        }
+
+
+
+                        $i1 = array(
+                            'requirement_id' => $itemRow->requirement_id,
+                            'property_id' => $itemRow->property_id,
+                            'state_name' => $itemRow->state_name,
+                            'city_name' => $itemRow->city_name,
+                            'location_name' => $itemRow->location_name,
+                            'product_type_name' => $itemRow->product_type_name,
+                            'unit_type_name' => $itemRow->unit_type_name,
+                            'project_name' => $itemRow->project_name,
+                            'type' => $itemRow->type,
+                            'budget' => $budget,
+                            'budget_min' => $b_min,
+                            'budget_max' => $b_max,
+                            'req_budget_min' => $req_b_min,
+                            'req_budget_max' => $req_b_max,
+                            'size' => $size,
+                            'accomodation_name' => $item->accomodation_name,
+                            'pid' => $itemRow->pid
+                        );
+
+                        $items[] = $i1;
+
+                        if ($b_min >= $req_b_min && $b_max <= $req_b_max) {
+                            $property_items[] = $i1;
+                        }
+                    }
+                }
+            }
+
+            foreach ($property_items as $itemPrp) {
+                $where = "requirement_id='" . $itemPrp['requirement_id'] . "'";
+
+                $this->db->select('requirement_id,tbl_requirements.created_at,lead_id,user_id,look_for,product_type_name,unit_type_name,accomodation_name,location,size_min,size_max,size_unit,remark,dor,lead_option_name as look_for,requirement_status,state_name,city_name,b_min.budget_name as budget_minimum,b_max.budget_name as budget_maximum,su.unit_name as size_unit_name');
+                $this->db->from('tbl_requirements');
+                $this->db->join('tbl_lead_options', 'tbl_lead_options.lead_option_id = tbl_requirements.look_for', 'left');
+                $this->db->join('tbl_states', 'tbl_states.state_id = tbl_requirements.state_id', 'left');
+                $this->db->join('tbl_city', 'tbl_city.city_id = tbl_requirements.city_id', 'left');
+                $this->db->join('tbl_accomodations', 'tbl_accomodations.accomodation_id = tbl_requirements.accomodation_id', 'left');
+                $this->db->join('tbl_product_types', 'tbl_product_types.product_type_id = tbl_requirements.product_type_id', 'left');
+                $this->db->join('tbl_unit_types', 'tbl_unit_types.unit_type_id = tbl_requirements.unit_type_id', 'left');
+                $this->db->join('tbl_budgets as b_min', 'b_min.budget_id = tbl_requirements.budget_min', 'left');
+                $this->db->join('tbl_budgets as b_max', 'b_max.budget_id = tbl_requirements.budget_max', 'left');
+                $this->db->join('tbl_units as su', 'su.unit_id = tbl_requirements.size_unit', 'left');
+                $this->db->where($where);
+                $query = $this->db->get();
+                $feedback_data = $query->row();
+
+                if ($feedback_data) {
+                    $date_user = ""; //$itemPrp->visit_date." & ".$itemPrp->visit_time." By ".ucwords($itemPrp->first_name." ".$itemPrp->last_name);
+                    $feedback_date = "";
+                    $feedback_time = "";
+
+                    $this->db->select('*');
+                    $this->db->from('tbl_feedbacks');
+                    $this->db->join('tbl_users', 'tbl_users.user_id = tbl_feedbacks.account_id', 'left');
+                    $this->db->where("requirement_id='" . $itemPrp['requirement_id'] . "' AND property_id='" . $itemPrp['property_id'] . "' AND type='" . $itemPrp['type'] . "' AND lead_id='" . $lead_id . "' AND account_id='" . $account_id . "'");
+                    $query = $this->db->get();
+                    $feedback_dd = $query->row();
+
+                    $feedback_id = "";
+                    $comment = "";
+                    $visit_status = "";
+                    if ($feedback_dd) {
+                        $feedback_id = $feedback_dd->feedback_id;
+                        $comment = $feedback_dd->comment;
+                        $visit_status = ($feedback_dd->like_property) ? 'Yes' : 'No';
+                        $date_user = $feedback_dd->visit_date . " & " . $feedback_dd->visit_time . " By " . ucwords($feedback_dd->first_name . " " . $feedback_dd->last_name);
+                        $feedback_date = $feedback_dd->visit_date;
+                        $feedback_time = $feedback_dd->visit_time;
+                    }
+
+
+                    $recordLead = $this->Action_model->select_single('tbl_leads', "lead_id='" . $lead_id . "'");
+                    $lead_mobile = "";
+                    $lead_email = "";
+                    $project_link = "";
+                    if ($recordLead) {
+                        $lead_mobile = $recordLead->lead_mobile_no;
+                        $lead_email = $recordLead->lead_email;
+                    }
+
+                    $where = "product_id='" . $itemPrp['pid'] . "'";
+                    $prod_detail = $this->Action_model->select_single('tbl_products', $where);
+                    if ($prod_detail) {
+                        $project_link = base_url('property/' . $prod_detail->slug . '/' . $account_id . '/');
+                    }
+
+                    $feedback_list[] = array(
+                        'feedback_id' => $feedback_id,
+                        'requirement_id' => $itemPrp['requirement_id'],
+                        'property_id' => $itemPrp['property_id'],
+                        'type' => $itemPrp['type'],
+                        'state_name' => $itemPrp['state_name'],
+                        'city_name' => $itemPrp['city_name'],
+                        'location_name' => $itemPrp['location_name'],
+                        'product_type_name' => $itemPrp['product_type_name'],
+                        'unit_type_name' => $itemPrp['unit_type_name'],
+                        'budget' => $itemPrp['budget'],
+                        "comment" => $comment,
+                        "visit_status" => $visit_status,
+                        "created_at" => $feedback_data->created_at,
+                        "accomodation_name" => ($itemPrp['accomodation_name']) ? $itemPrp['accomodation_name'] : '',
+                        "size_min" => $feedback_data->size_min,
+                        "size_max" => $feedback_data->size_max,
+                        "size_unit" => $feedback_data->size_unit_name,
+                        'project_name' => $itemPrp['project_name'],
+                        "date_user" => $date_user,
+                        "feedback_date" => $feedback_date,
+                        "feedback_time" => $feedback_time,
+                        "customer_offer" => $feedback_dd->customer_offer ?? "",
+                        'size' => $itemPrp['size'],
+                        'pid' => $itemPrp['pid'],
+                        'project_url' => $project_link,
+                        'lead_mobile' => $lead_mobile,
+                        'lead_email' => $lead_email,
+                        'lead_id' => $lead_id,
+                    );
+                }
+            }
+
+            /*$where = "lead_id='".$lead_id."' AND tbl_feedbacks.account_id='".$account_id."' ORDER BY feedback_id DESC";
+
+            $this->db->select('*');
+            $this->db->from('tbl_feedbacks');
+            $this->db->where($where);
+            $this->db->join('tbl_users', 'tbl_users.user_id = tbl_feedbacks.user_id','left');
+            $query = $this->db->get();
+            $feedback_data = $query->result();
+
+            if ($feedback_data) {
+                foreach ($feedback_data as $item) {
+                    $date_user = $item->visit_date." & ".$item->visit_time." By ".ucwords($item->first_name." ".$item->last_name);
+                    $feedback_list[] = array(
+                        "feedback_id"=>$item->feedback_id,
+                        "comment"=>$item->comment,
+                        "created_at"=>$item->created_at,
+                        "date_user"=>$date_user
+                    );
+                }
+            }*/
+            $array['data'] = array('status' => 'true', 'msg' => 'Data Found', 'feedback_list' => $feedback_list);
+        } else {
+            $array['data'] = array('status' => 'false', 'msg' => 'Some error occurred, please try again.');
+        }
+
+        echo json_encode($array);                                
+     }
+     # End get Lead Product list
 
 }
