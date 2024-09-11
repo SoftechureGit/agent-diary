@@ -3792,9 +3792,9 @@ class Api extends CI_Controller
         $account_id = 0;
         $user_id = 0;
 
-        if (isset($_POST['user_hash'])):
+        if (isset($this->input->request_headers()['Access-Token'])):
 
-            $where = "user_hash='" . $this->input->post('user_hash') . "'";
+            $where = "user_hash='" . $this->input->request_headers()['Access-Token'] . "'";
         else:
 
             $where = "user_hash='" . $this->session->userdata('agent_hash') . "'";
@@ -12295,7 +12295,7 @@ class Api extends CI_Controller
 
     public function get_followup_related_data()
     {
-        $where          = "user_hash='" . $this->input->post('user_hash') . "'";
+        $where          = "user_hash='" . $this->input->request_headers()['Access-Token'] . "'";
         $user_detail    = $this->Action_model->select_single('tbl_users', $where);
 
         $account_id     = $user_detail->user_id;
