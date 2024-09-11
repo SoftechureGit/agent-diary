@@ -2874,7 +2874,7 @@ class Agent extends CI_Controller
   
           # Sorting
   
-          $filter_by = $this->input->post('filter_by');
+          $filter_by = $this->input->get('filter_by');
   
           switch ($filter_by):
               case 'due_followup':
@@ -2907,7 +2907,7 @@ class Agent extends CI_Controller
                                       tbl_followup.next_followup_date,
                                       tbl_followup.next_followup_time";  
   
-        $page             = $this->input->post('page') ?? 1 ;
+        $page             = $this->input->get('page') ?? 1 ;
         
         $limit            = 10;  
         
@@ -2926,9 +2926,9 @@ class Agent extends CI_Controller
         $record_data                  =   $record['data'];
   
   
-        $records                      =  array();
+        $records                      =  $record_data;
 
-        echo json_encode($records); die;
+        echo json_encode($record); die;
   
         
 

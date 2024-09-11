@@ -12315,7 +12315,20 @@ class Api extends CI_Controller
 
         # Get Product List
 
-        $where                  = "agent_id='" . $account_id . "' OR share_account_id='" . $account_id . "'";
+        # get agent account id 
+
+            if($user_detail->parent_id==0){
+                $aget_account_id = $user_detail->user_id;
+            }
+            else{
+                $aget_account_id = $user_detail->parent_id;
+            }
+
+        # End get agent account id 
+
+       
+
+        $where                  = "agent_id='" . $aget_account_id  . "' OR share_account_id='" .$aget_account_id . "'";
 
         $this->db->select("product_id as project_id ,project_name");
         $this->db->from('tbl_products');
