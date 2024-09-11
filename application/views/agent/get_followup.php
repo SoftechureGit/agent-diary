@@ -325,6 +325,24 @@ summary {
               <?php endif; ?>
               <!-- Secondary Mobile -->
 
+              <!-- Date of Birth -->
+              <?php if ($record->lead_dob): ?>
+                <tr>
+                  <th>Date of Birth</th>
+                  <td><?= date('d F, Y', strtotime($record->lead_dob)) ?></td>
+                </tr>
+              <?php endif; ?>
+              <!-- End Date of Birth -->
+
+              <!-- DOA -->
+              <?php if ($record->lead_doa): ?>
+                <tr>
+                  <th>DOA</th>
+                  <td><?= date('d F, Y', strtotime($record->lead_doa)) ?></td>
+                </tr>
+              <?php endif; ?>
+              <!-- End DOA -->
+
               <!-- Gender -->
               <?php if ($record->lead_gender): ?>
                 <tr>
