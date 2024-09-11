@@ -793,6 +793,10 @@ public function webPagination($select = '', $page, $limit, $join = '', $where = 
     return ['data' => $data, 'pagination' => $pagination_metadata];
 }
 
+# get all records 
+
+# get all records
+
 
 # api left join pagination 
 // public function apiPaginationLeft($select='',$page,$limit,$join='',$where='',$table){

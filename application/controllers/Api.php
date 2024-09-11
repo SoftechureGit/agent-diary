@@ -242,7 +242,7 @@ class Api extends CI_Controller
               $trial_alert_msg        = "Your plan expires in $trial_remaining_days days";
     
             elseif (!$is_trial && $trial_remaining_days == 0):
-              $trial_alert_msg        = " Your plan has expired. Please update your payment details to reactive it.";
+              $trial_alert_msg        = "Your plan has expired. Please update your payment details to reactive it.";
             endif;
             #
 
@@ -3792,9 +3792,9 @@ class Api extends CI_Controller
         $account_id = 0;
         $user_id = 0;
 
-        if (isset($_POST['user_hash'])):
+        if (isset($this->input->request_headers()['Access-Token'])):
 
-            $where = "user_hash='" . $this->input->post('user_hash') . "'";
+            $where = "user_hash='" . $this->input->request_headers()['Access-Token'] . "'";
         else:
 
             $where = "user_hash='" . $this->session->userdata('agent_hash') . "'";
@@ -12295,7 +12295,7 @@ class Api extends CI_Controller
 
     public function get_followup_related_data()
     {
-        $where          = "user_hash='" . $this->input->post('user_hash') . "'";
+        $where          = "user_hash='" . $this->input->request_headers()['Access-Token'] . "'";
         $user_detail    = $this->Action_model->select_single('tbl_users', $where);
 
         $account_id     = $user_detail->user_id;
@@ -12315,7 +12315,20 @@ class Api extends CI_Controller
 
         # Get Product List
 
-        $where                  = "agent_id='" . $account_id . "' OR share_account_id='" . $account_id . "'";
+        # get agent account id 
+
+            if($user_detail->parent_id==0){
+                $aget_account_id = $user_detail->user_id;
+            }
+            else{
+                $aget_account_id = $user_detail->parent_id;
+            }
+
+        # End get agent account id 
+
+       
+
+        $where                  = "agent_id='" . $aget_account_id  . "' OR share_account_id='" .$aget_account_id . "'";
 
         $this->db->select("product_id as project_id ,project_name");
         $this->db->from('tbl_products');
