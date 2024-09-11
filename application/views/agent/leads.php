@@ -150,6 +150,12 @@
     margin: 5px;
   }
 
+  .lead_history .media.border-bottom-1 {
+    border-radius: 8px;
+    box-shadow: 2px 2px 13px #ababab38;
+    margin: 1rem;
+    padding: 1rem;
+}
 </style>
 <!--  -->
 
