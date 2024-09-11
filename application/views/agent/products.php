@@ -111,7 +111,7 @@
 
                     <input type="text" class="form-control" placeholder="Serach" onkeyup="filterData()" id="serachInput">
                   </div>
-                  <div class="col-md-12" style="height: 82vh;overflow-y: auto;">
+                  <div class="col-md-12" style="height: 78vh;overflow-y: auto;">
 
                     <div class="lead-list"></div>
                     <?php for ($i = 1; $i <= 0; $i++) { ?>
