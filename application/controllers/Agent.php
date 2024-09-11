@@ -1638,7 +1638,7 @@ class Agent extends CI_Controller
         $this->db->where($where);
         $members                            =   $this->db->get()->result();
 
-        # End Team Member
+        # End Team Member 
 
         # Member Ids
                 // Extracting IDs
@@ -1710,8 +1710,9 @@ class Agent extends CI_Controller
 
         # End Followup
 
+        // print_r($followups); die;
 
-        $data['total_new_leads']    = $leads->total_count;
+        $data['total_new_leads']    = $followups->total_initial_count;
         $data['total_followup']     = $followups->total_followup_count;
         $data['today_followup']     = $followups->today_count;
         $data['missed_followup']    = $followups->missed_count;
