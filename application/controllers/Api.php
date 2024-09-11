@@ -12295,7 +12295,7 @@ class Api extends CI_Controller
 
     public function get_followup_related_data()
     {
-        $where          = "user_hash='" . $this->input->request_headers()['Access-Token'] . "'";
+        $where          = "user_hash='" .  $this->input->post('user_hash') . "'";
         $user_detail    = $this->Action_model->select_single('tbl_users', $where);
 
         $account_id     = $user_detail->user_id;
