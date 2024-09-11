@@ -1715,6 +1715,39 @@
                   requirement_status = "<span class='label label-pill label-danger' style='padding: 3px 10px;'>Close</span>";
                 }
 
+                html += "<div style='border-bottom: 1px solid rgba(0, 0, 0, 0.125);padding-bottom: 13px;margin-bottom: 14px;'>" +
+                  "    <div class='row'>" +
+                  "        <div class='col-md-4'>" +
+                  "            <label>Requirement Id:</label> <strong>" + requirement_list[i].requirement_id + "</strong>" +
+                  "        </div>" +
+                  "        <div class='col-md-4'>" +
+                  "            <label>DOR:</label> <strong>" + requirement_list[i].dor + "</strong>" +
+                  "        </div>" +
+                  "        <div class='col-md-4' align='right'>" +
+                  "            <label>Status:</label> <strong>" + requirement_status + "</strong>" +
+                  "        </div>" +
+                  "        <div class='col-md-12'>" +
+                  "            <label>Looking For:</label> <strong>" + requirement_list[i].look_for + "</strong>" +
+                  "        </div>" +
+                  "        <div class='col-md-12'>" +
+                  "            <label>At:</label> <strong>" + requirement_list[i].location + "</strong>" +
+                  "        </div>" +
+                  "        <div class='col-md-12'>" +
+                  "            <label>Budget:</label> <strong>" + requirement_list[i].budget_min + "-" + requirement_list[i].budget_max + "</strong>," +
+                  "            <label>Size:</label> <strong>" + requirement_list[i].size_min + "-" + requirement_list[i].size_max + " " + requirement_list[i].size_unit + "</strong>" +
+                  "        </div>" +
+                  "        <div class='col-md-12'>" +
+                  "            <label>Remarks:</label> <strong>" + requirement_list[i].remark + "</strong>" +
+                  "        </div>" +
+                  "        <div class='col-md-8'>" +
+                  "            <label>Added By:</label> <strong>" + requirement_list[i].added_by + "</strong>" +
+                  "        </div>" +
+                  "        <div class='col-md-4' align='right'>" +
+                  "            <button type='button' class='btn btn-success btn-sm' onclick='reqFormModal(" + requirement_list[i].requirement_id + ",2," + requirement_list[i].lead_id + ")' style='color: white;'><i class='fa fa-edit'></i> Edit</button>" +
+                  "        </div>" +
+                  "    </div>" +
+                  "</div>";
+                /**
                 html +=
                   `<div class='requirement-card'>
                           <div class='row'>
@@ -1800,6 +1833,7 @@
                           </div>
                       </div>
                   </div>`;
+                   */
               }
 
               if (requirement_list.length == 0) {
