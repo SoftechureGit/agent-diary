@@ -242,7 +242,7 @@ class Api extends CI_Controller
               $trial_alert_msg        = "Your plan expires in $trial_remaining_days days";
     
             elseif (!$is_trial && $trial_remaining_days == 0):
-              $trial_alert_msg        = " Your plan has expired. Please update your payment details to reactive it.";
+              $trial_alert_msg        = "Your plan has expired. Please update your payment details to reactive it.";
             endif;
             #
 

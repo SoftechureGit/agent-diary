@@ -2713,32 +2713,32 @@ class Agent extends CI_Controller
         $where = '';
   
         # where codition  search 
-              $search_text        = $this->input->post('search_text');
-              $search_date_from   = $this->input->post('search_date_from');
-              $search_date_to     = $this->input->post('search_date_to');
+              $search_text        = $this->input->get('search_text');
+              $search_date_from   = $this->input->get('search_date_from');
+              $search_date_to     = $this->input->get('search_date_to');
   
               # Lead Filter
-              $lead_from          = $this->input->post('lead_from');
-              $lead_to            = $this->input->post('lead_to');
+              $lead_from          = $this->input->get('lead_from');
+              $lead_to            = $this->input->get('lead_to');
               # End Lead Filter
   
               # Followup Filter
               $followup_from      = $this->input->post('followup_from');
-              $followup_to        = $this->input->post('followup_to');
+              $followup_to        = $this->input->get('followup_to');
               # End Followup Filter
   
-              $search_state_id    = $this->input->post('search_state_id');
-              $search_city_id     = $this->input->post('search_city_id');
-              $search_source_id   = $this->input->post('search_source_id');
-              $search_stage_id    = $this->input->post('search_stage_id');
-              $search_status      = $this->input->post('search_status');
-              $search_location_id = $this->input->post('search_location_id');
-              $search_budget_min  = $this->input->post('search_budget_min');
-              $search_budget_max  = $this->input->post('search_budget_max');
-              $search_size_min    = $this->input->post('search_size_min');
-              $search_size_max    = $this->input->post('search_size_max');
-              $search_size_unit   = $this->input->post('search_size_unit');
-              $search_agent_id    = $this->input->post('search_agent_id'); 
+              $search_state_id    = $this->input->get('search_state_id');
+              $search_city_id     = $this->input->get('search_city_id');
+              $search_source_id   = $this->input->get('search_source_id');
+              $search_stage_id    = $this->input->get('search_stage_id');
+              $search_status      = $this->input->get('search_status');
+              $search_location_id = $this->input->get('search_location_id');
+              $search_budget_min  = $this->input->get('search_budget_min');
+              $search_budget_max  = $this->input->get('search_budget_max');
+              $search_size_min    = $this->input->get('search_size_min');
+              $search_size_max    = $this->input->get('search_size_max');
+              $search_size_unit   = $this->input->get('search_size_unit');
+              $search_agent_id    = $this->input->get('search_agent_id'); 
   
            
               $where_ext = "";
@@ -2927,6 +2927,8 @@ class Agent extends CI_Controller
   
   
         $records                      =  array();
+
+        echo json_encode($records); die;
   
         
 
@@ -2978,31 +2980,31 @@ class Agent extends CI_Controller
                 $o = 2;
                 foreach ($records as $item) {
 
-                    $next_followup = "";
+                    // $next_followup = "";
 
                     $next_followup_time = "";
                     $next_followup_user = "";
 
-                    $where = "lead_id='" . $item->lead_id . "' AND next_followup_date!='' ORDER BY followup_id DESC LIMIT 1";
-                    $this->db->select('au.first_name as au_first_name,au.last_name as au_last_name,next_followup_date,next_followup_time');
-                    $this->db->from('tbl_followup');
-                    $this->db->join('tbl_users as au', 'au.user_id = tbl_followup.assign_user_id', 'left');
-                    $this->db->where($where);
-                    $query = $this->db->get();
-                    $followup_detail = $query->row();
-                    if ($followup_detail) {
-                        $next_followup_time = $followup_detail->next_followup_date . " & " . $followup_detail->next_followup_time;
-                        $next_followup_user = $followup_detail->au_first_name . ' ' . $followup_detail->au_last_name;
+                    // $where = "lead_id='" . $item->lead_id . "' AND next_followup_date!='' ORDER BY followup_id DESC LIMIT 1";
+                    // $this->db->select('au.first_name as au_first_name,au.last_name as au_last_name,next_followup_date,next_followup_time');
+                    // $this->db->from('tbl_followup');
+                    // $this->db->join('tbl_users as au', 'au.user_id = tbl_followup.assign_user_id', 'left');
+                    // $this->db->where($where);
+                    // $query = $this->db->get();
+                    // $followup_detail = $query->row();
+                    // if ($followup_detail) {
+                    //     $next_followup_time = $followup_detail->next_followup_date . " & " . $followup_detail->next_followup_time;
+                    //     $next_followup_user = $followup_detail->au_first_name . ' ' . $followup_detail->au_last_name;
 
-                        $next_followup = $followup_detail->next_followup_date . " & " . $followup_detail->next_followup_time . " " . $followup_detail->au_first_name . ' ' . $followup_detail->au_last_name;
-                    }
+                    //     $next_followup = $followup_detail->next_followup_date . " & " . $followup_detail->next_followup_time . " " . $followup_detail->au_first_name . ' ' . $followup_detail->au_last_name;
+                    // }
 
-                    $next_followup_date = "";
-                    if ($item->next_followup_date) {
-                        $next_followup_date = "$item->next_followup_date";
+                    // $next_followup_date = "";
+                    // if ($item->next_followup_date) {
+                    //     $next_followup_date = "$item->next_followup_date";
 
-                        $next_followup_date = preg_replace("/ /", "<br>", $next_followup_date, 1);
-                    }
+                    //     $next_followup_date = preg_replace("/ /", "<br>", $next_followup_date, 1);
+                    // }
 
                     $objPHPExcel->getActiveSheet()->setCellValue('A' . $o, $item->lead_id);
                     $objPHPExcel->getActiveSheet()->setCellValue('B' . $o, $item->lead_title);
@@ -3012,8 +3014,8 @@ class Agent extends CI_Controller
                     $objPHPExcel->getActiveSheet()->setCellValue('F' . $o, $item->lead_email);
                     $objPHPExcel->getActiveSheet()->setCellValue('G' . $o, $item->lead_stage_name);
                     $objPHPExcel->getActiveSheet()->setCellValue('H' . $o, $item->lead_source_name);
-                    $objPHPExcel->getActiveSheet()->setCellValue('I' . $o, $next_followup_time);
-                    $objPHPExcel->getActiveSheet()->setCellValue('J' . $o, $next_followup_user);
+                    $objPHPExcel->getActiveSheet()->setCellValue('I' . $o, $next_followup_time ?? '');
+                    $objPHPExcel->getActiveSheet()->setCellValue('J' . $o, $next_followup_user ?? '');
                     $o++;
                     $i++;
                 }
