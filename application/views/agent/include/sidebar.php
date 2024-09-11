@@ -75,10 +75,10 @@
                             <li><a class="d-none" href="<?= base_url(AGENT_URL.'update-inventory-status/') ?>">Update Inventory Status</a></li>
                             <?php } ?>
                             <?php if(isset($menu_item_array['product_update_ad_cost']) && $menu_item_array['product_update_ad_cost']['rr_view']) { ?>
-                            <li><a class="" href="<?= base_url(AGENT_URL.'update-additional-cost/') ?>">Update Aditional Charges</a></li>
+                            <li><a class="d-none" href="<?= base_url(AGENT_URL.'update-additional-cost/') ?>">Update Aditional Charges</a></li>
                             <?php } ?>
                             <?php if(isset($menu_item_array['product_update_basic_cost']) && $menu_item_array['product_update_basic_cost']['rr_view']) { ?>
-                            <li><a class="" href="<?= base_url(AGENT_URL.'update-basic-cost/') ?>">Update Baisc Cost</a></li>
+                            <li><a class="" href="<?= base_url(AGENT_URL.'update-basic-cost/') ?>">Budget</a></li>
                             <?php } ?>
 
                         </ul>

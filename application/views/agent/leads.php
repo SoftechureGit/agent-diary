@@ -155,7 +155,15 @@
     box-shadow: 2px 2px 13px #ababab38;
     margin: 1rem;
     padding: 1rem;
-}
+  }
+
+  .requirement-card{
+    font-size: 13px;
+    border-radius: 8px;
+    margin: 1rem 0.5rem;
+    padding: 1rem;
+    box-shadow: 2px 2px 14px #80808033;
+  }
 </style>
 <!--  -->
 
@@ -308,7 +316,7 @@
                               <label for="">Agent</label>
                               <select class="form-control multi-team-members-select2" id="search_agent_id" name="search_agent_id[]" style="height: 38px;border-radius: 6px;margin-top: 10px;" multiple="true">
                                 <option value="">Select Agent</option>
-                                <option value="0" class="default-option" selected >All</option>
+                                <option value="0" class="default-option" selected>All</option>
                                 <?php foreach ($filter_user_list as $item) { ?>
                                   <option value="<?= $item->user_id ?>"><?= ($item->parent_id == 0) ? (($item->is_individual) ? (ucwords($item->user_title . ' ' . $item->first_name . ' ' . $item->last_name)) : $item->firm_name) : $item->first_name . ' ' . $item->last_name . (($item->parent_id) ? ' (Team)' : '') ?></option>
                                 <?php } ?>
@@ -321,7 +329,7 @@
                             <label for="">Source</label>
                             <select class="form-control multi-team-source-select2" id="search_source_id" name="search_source_id[]" style="height: 38px;border-radius: 6px;margin-top: 10px;" multiple="true">
                               <option value="">Select Source</option>
-                              <option value="0" class="default-option" selected >All</option>
+                              <option value="0" class="default-option" selected>All</option>
                               <?php foreach ($lead_source_list as $lead_source) { ?>
                                 <option value="<?= $lead_source->lead_source_id ?>"><?= $lead_source->lead_source_name ?></option>
                               <?php } ?>
@@ -331,8 +339,8 @@
                           <div class="col-md-4">
                             <label for="">Stage</label>
                             <select class="form-control multi-team-stage-select2" id="search_stage_id" name="search_stage_id[]" style="height: 38px;border-radius: 6px;margin-top: 10px;" multiple="true">
-                              <option value="" >Select Stage</option>
-                              <option value="0" class="default-option" selected >All</option>
+                              <option value="">Select Stage</option>
+                              <option value="0" class="default-option" selected>All</option>
                               <?php foreach ($lead_stage_list as $lead_stage) { ?>
                                 <option value="<?= $lead_stage->lead_stage_id ?>"><?= $lead_stage->lead_stage_name ?></option>
                               <?php } ?>
@@ -414,31 +422,31 @@
                       </div>
                     </div>
 
-                
-                  <div class="table-responsive">
 
-                     <table class="text-center table table-bordered">
-                         <tr>
-                            <th>Initial</th>
-                            <th class="text-primary" >Followup</th>
-                            <th >Enquiry</th>
-                            <th>Site Visit</th>
-                            <th>Meeting</th>
-                            <th class="text-danger">Dump</th>
-                            <th class="text-success">Success</th>
-                         </tr>
-                         <tr>
-                            <td class="text-center"><?= $followups->total_initial_count ?? 0 ?></td>
-                            <td class="text-center"><?= $followups->total_followup_count ?? 0 ?></td>
-                            <td class="text-center"><?= $followups->total_enquiry_count ?? 0 ?></td>
-                            <td class="text-center"><?= $followups->total_site_visit_count ?? 0 ?></td>
-                            <td class="text-center"><?= $followups->total_metting_count ?? 0 ?></td>
-                            <td class="text-center"><?= $followups->total_dump_count ?? 0 ?></td>
-                            <td class="text-center"><?= $followups->total_success_count ?? 0 ?></td>
-                         </tr>
-                     </table>                                      
-                  </div>
-              
+                    <div class="table-responsive">
+
+                      <table class="text-center table table-bordered">
+                        <tr>
+                          <th>Initial</th>
+                          <th class="text-primary">Followup</th>
+                          <th>Enquiry</th>
+                          <th>Site Visit</th>
+                          <th>Meeting</th>
+                          <th class="text-danger">Dump</th>
+                          <th class="text-success">Success</th>
+                        </tr>
+                        <tr>
+                          <td class="text-center"><?= $followups->total_initial_count ?? 0 ?></td>
+                          <td class="text-center"><?= $followups->total_followup_count ?? 0 ?></td>
+                          <td class="text-center"><?= $followups->total_enquiry_count ?? 0 ?></td>
+                          <td class="text-center"><?= $followups->total_site_visit_count ?? 0 ?></td>
+                          <td class="text-center"><?= $followups->total_metting_count ?? 0 ?></td>
+                          <td class="text-center"><?= $followups->total_dump_count ?? 0 ?></td>
+                          <td class="text-center"><?= $followups->total_success_count ?? 0 ?></td>
+                        </tr>
+                      </table>
+                    </div>
+
                     <!-- 
                     <div class="followup-chart pt-2">
                       <h4 class="card-title text-center pb-2">Meeting</h4>
@@ -637,7 +645,7 @@
                 <?php } ?>
               </select>
             </div>
-            
+
             <div class="col-md-4 booking_hide" style="margin-top: 10px;">
               <label>Next Action:</label>
               <select class="form-control" id="next_action" name="next_action" onchange="nextAction()">
@@ -1690,38 +1698,91 @@
                   requirement_status = "<span class='label label-pill label-danger' style='padding: 3px 10px;'>Close</span>";
                 }
 
-                html += "<div style='border-bottom: 1px solid rgba(0, 0, 0, 0.125);padding-bottom: 13px;margin-bottom: 14px;'>" +
-                  "    <div class='row'>" +
-                  "        <div class='col-md-4'>" +
-                  "            <label>Requirement Id:</label> <strong>" + requirement_list[i].requirement_id + "</strong>" +
-                  "        </div>" +
-                  "        <div class='col-md-4'>" +
-                  "            <label>DOR:</label> <strong>" + requirement_list[i].dor + "</strong>" +
-                  "        </div>" +
-                  "        <div class='col-md-4' align='right'>" +
-                  "            <label>Status:</label> <strong>" + requirement_status + "</strong>" +
-                  "        </div>" +
-                  "        <div class='col-md-12'>" +
-                  "            <label>Looking For:</label> <strong>" + requirement_list[i].look_for + "</strong>" +
-                  "        </div>" +
-                  "        <div class='col-md-12'>" +
-                  "            <label>At:</label> <strong>" + requirement_list[i].location + "</strong>" +
-                  "        </div>" +
-                  "        <div class='col-md-12'>" +
-                  "            <label>Budget:</label> <strong>" + requirement_list[i].budget_min + "-" + requirement_list[i].budget_max + "</strong>," +
-                  "            <label>Size:</label> <strong>" + requirement_list[i].size_min + "-" + requirement_list[i].size_max + " " + requirement_list[i].size_unit + "</strong>" +
-                  "        </div>" +
-                  "        <div class='col-md-12'>" +
-                  "            <label>Remarks:</label> <strong>" + requirement_list[i].remark + "</strong>" +
-                  "        </div>" +
-                  "        <div class='col-md-8'>" +
-                  "            <label>Added By:</label> <strong>" + requirement_list[i].added_by + "</strong>" +
-                  "        </div>" +
-                  "        <div class='col-md-4' align='right'>" +
-                  "            <button type='button' class='btn btn-success btn-sm' onclick='reqFormModal(" + requirement_list[i].requirement_id + ",2," + requirement_list[i].lead_id + ")' style='color: white;'><i class='fa fa-edit'></i> Edit</button>" +
-                  "        </div>" +
-                  "    </div>" +
-                  "</div>";
+                html +=
+                  `<div class='requirement-card'>
+                          <div class='row'>
+
+                            <div class='col-md-3'>
+                              <label>Requirement Id</label>
+                            </div>
+
+                            <div class='col-md-7'>
+                            <span class='pr-2'>:</span>   ${requirement_list[i].requirement_id}
+                            </div>
+                            
+                            <div class='col-md-2 text-right'>
+                              <i class='fa fa-edit btn btn-sm btn-success btn-primary text-white' onclick='reqFormModal( ${ requirement_list[i].requirement_id } , 2, ${ requirement_list[i].lead_id })'></i>
+                            </div>
+
+                            <div class='col-md-3'>
+                              <label>DOR</label>
+                            </div>
+
+                            <div class='col-md-9'>
+                              <span class='pr-2'>:</span> ${ requirement_list[i].dor }
+                            </div>
+
+                           <div class='col-md-3'>
+                              <label>Looking For</label>
+                            </div>
+
+                          <div class='col-md-9'>
+                              <span class='pr-2'>:</span> ${ requirement_list[i].look_for } 
+                          </div>
+
+                         <div class='col-md-3'>
+                              <label>Location</label>
+                            </div>
+
+                          <div class='col-md-9'>
+                              <span class='pr-2'>:</span> ${ requirement_list[i].location }
+                          </div>
+
+                          <div class='col-md-3'>
+                              <label>Budget</label>
+                            </div>
+
+                          <div class='col-md-9'>
+                               <span class='pr-2'>:</span> ${ requirement_list[i].budget_min } - ${ requirement_list[i].budget_max }
+                          </div>
+
+                            <div class='col-md-3'>
+                              <label>Size</label>
+                            </div>
+
+                            <div class='col-md-9'>
+                              <span class='pr-2'>:</span> ${ requirement_list[i].size_min } - ${ requirement_list[i].size_max } ${ requirement_list[i].size_unit } 
+                          </div>
+
+                          <div class='col-md-3'>
+                              <label>Remarks</label>
+                            </div>
+
+                          <div class='col-md-9'>
+                              <span class='pr-2'>:</span> ${ requirement_list[i].remark } 
+                          </div>
+
+                            <div class='col-md-3'>
+                              <label>Added By</label>
+                            </div>
+
+                          <div class='col-md-9'>
+                              <span class='pr-2'>:</span> ${ requirement_list[i].added_by } 
+                          </div>
+
+                          <div class='col-md-3'>
+                              <label>Status</label>
+                            </div>
+
+                          <div class='col-md-9'>
+                            <span class='pr-2'>:</span> ${ requirement_status }
+                          </div>
+                          
+                          <div class='col-md-12 d-none' align='right'>
+                              <button type='button' class='btn btn-success btn-sm' onclick='reqFormModal( ${ requirement_list[i].requirement_id } , 2, ${ requirement_list[i].lead_id })' style='color: white;'><i class='fa fa-edit'></i> Edit</button>
+                          </div>
+                      </div>
+                  </div>`;
               }
 
               if (requirement_list.length == 0) {
@@ -2135,11 +2196,11 @@
 
       var lead_stage_id = $("#lead_stage_id").val();
 
-      if(lead_stage_id == 6){
+      if (lead_stage_id == 6) {
         // Inventory ID
-        inventory_id   = $('.inventory_plot_or_unit_numbers option:checked').data('inventory-id')
+        inventory_id = $('.inventory_plot_or_unit_numbers option:checked').data('inventory-id')
         fd.append('bk_inventory_id', inventory_id);
-        
+
         console.log(inventory_id)
         console.log(fd)
         // End Inventory ID
@@ -2211,8 +2272,10 @@
     }
   });
 
-  $(document).on('change', '#lead_status_id', function(){
-    if( this.value == 2 && $('#lead_stage_id').val() != 7){ $('#lead_stage_id').val(7).trigger('change') }
+  $(document).on('change', '#lead_status_id', function() {
+    if (this.value == 2 && $('#lead_stage_id').val() != 7) {
+      $('#lead_stage_id').val(7).trigger('change')
+    }
   })
 
   function changeLeadStage() {
@@ -2225,7 +2288,9 @@
       $("#lead_status_id, #next_action, #next_followup_date, #next_followup_time, #task_desc").attr("disabled", true);
       $("#next_action, #fp_assign_to").attr("required", false);
 
-      if($('#lead_status_id').val() != 2){ $('#lead_status_id').val(2).trigger('change') }
+      if ($('#lead_status_id').val() != 2) {
+        $('#lead_status_id').val(2).trigger('change')
+      }
 
     } else if (lead_stage_id == '6') {
       $("#lead_status_id").val('3').trigger('change');
@@ -2277,7 +2342,7 @@
 
               changeLeadStage();
               nextAction();
-             
+
             } else {
               alert(obj.message);
             }
@@ -2960,57 +3025,54 @@
 
   $(document).ready(function() {
 
-        $('#followup_from').on('change', function() {
-            var fromDate = $(this).val();
-            $('#followup_to').attr('min', fromDate);
-        });
-
-        $('#lead_from').on('change', function() {
-            var fromDate = $(this).val();
-            $('#lead_to').attr('min', fromDate);
-        });
+    $('#followup_from').on('change', function() {
+      var fromDate = $(this).val();
+      $('#followup_to').attr('min', fromDate);
     });
 
+    $('#lead_from').on('change', function() {
+      var fromDate = $(this).val();
+      $('#lead_to').attr('min', fromDate);
+    });
+  });
 
-    $('.multi-team-members-select2').on('select2:select', function(e) {
+
+  $('.multi-team-members-select2').on('select2:select', function(e) {
     var data = e.params.data;
     console.log(data.id)
-    if(data.id == 0){
+    if (data.id == 0) {
       $('.multi-team-members-select2 option').prop('selected', false)
       $('.default-option').prop('selected', true)
       $('.multi-team-members-select2').trigger('change')
-    }else{
+    } else {
       $('.default-option').prop('selected', false)
       $('.multi-team-members-select2').trigger('change')
     }
   });
 
-    $('.multi-team-stage-select2').on('select2:select', function(e) {
+  $('.multi-team-stage-select2').on('select2:select', function(e) {
     var data = e.params.data;
     console.log(data.id)
-    if(data.id == 0){
+    if (data.id == 0) {
       $('.multi-team-stage-select2 option').prop('selected', false)
       $('.default-option').prop('selected', true)
       $('.multi-team-stage-select2').trigger('change')
-    }else{
+    } else {
       $('.default-option').prop('selected', false)
       $('.multi-team-stage-select2').trigger('change')
     }
   });
 
-    $('.multi-team-source-select2').on('select2:select', function(e) {
+  $('.multi-team-source-select2').on('select2:select', function(e) {
     var data = e.params.data;
     console.log(data.id)
-    if(data.id == 0){
+    if (data.id == 0) {
       $('.multi-team-source-select2 option').prop('selected', false)
       $('.default-option').prop('selected', true)
       $('.multi-team-source-select2').trigger('change')
-    }else{
+    } else {
       $('.default-option').prop('selected', false)
       $('.multi-team-source-select2').trigger('change')
     }
   });
-
-  
-
 </script>
