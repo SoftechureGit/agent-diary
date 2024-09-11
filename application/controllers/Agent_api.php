@@ -3105,7 +3105,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                     }
 
                     if ($location) {
-                        $location .= "<br>";
+                        $location .= ", ";
                     }
 
                     if ($item->state_name) {
