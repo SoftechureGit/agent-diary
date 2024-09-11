@@ -794,7 +794,32 @@ public function webPagination($select = '', $page, $limit, $join = '', $where = 
 }
 
 # get all records 
+public function getAllData($select = '', $join = '', $where = '', $table){
+    # For pagination  
+  
 
+    $this->db->select($select);
+    if ($where) {
+        $this->db->where($where);
+    }
+
+    if ($join) {
+        $count = count($join);
+        $ct = 0;
+        $ct1 = 0;
+        for ($i = 0; $i < ($count / 2); $i++) {
+            $ct1 = $ct + 1;
+            $this->db->join($join[$ct], $join[$ct1], 'left');
+            $ct = $ct + 2;
+        }
+    }
+
+    $total_records = $this->db->get($table)->result();
+
+   
+
+    return $total_records;
+}
 # get all records
 
 

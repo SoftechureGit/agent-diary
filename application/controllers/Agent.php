@@ -2697,6 +2697,7 @@ class Agent extends CI_Controller
             redirect(AGENT_URL . 'leads');
         }
     }
+    
     public function download_followup()
     {
 
@@ -2917,23 +2918,9 @@ class Agent extends CI_Controller
         
       //   echo json_encode($where); die;
          
-        $record                       =   $this->Action_model->webPagination($select,$page,$limit,$join,$where,'tbl_leads');
+        $records                       =   $this->Action_model->getAllData($select,$join,$where,'tbl_leads');
   
-      //   print_r($record); die;
-  
-        $pagination                   =   $record['pagination'];
-  
-        $record_data                  =   $record['data'];
-  
-  
-        $records                      =  $record_data;
-
-        echo json_encode($record); die;
-  
-        
-
-
-    # end 
+    
 
         $array = array();
 
@@ -2965,7 +2952,7 @@ class Agent extends CI_Controller
                 $objPHPExcel->getActiveSheet()->getColumnDimension('H')->setAutoSize(true);
                 $objPHPExcel->getActiveSheet()->getColumnDimension('I')->setAutoSize(true);
                 $objPHPExcel->getActiveSheet()->getColumnDimension('J')->setAutoSize(true);
-                $objPHPExcel->getActiveSheet()->setCellValue('A1', 'Lead Id');
+                $objPHPExcel->getActiveSheet()->setCellValue('A1', 'S.N.');
                 $objPHPExcel->getActiveSheet()->setCellValue('B1', 'Title');
                 $objPHPExcel->getActiveSheet()->setCellValue('C1', 'First Name');
                 $objPHPExcel->getActiveSheet()->setCellValue('D1', 'Last Name');
@@ -2978,46 +2965,32 @@ class Agent extends CI_Controller
 
                 $i = 0;
                 $o = 2;
+                $count = 1;
                 foreach ($records as $item) {
 
-                    // $next_followup = "";
+                     # get country code
+                
+                     if($item->primary_mobile_number_country_data ):
+                        $code = '+'.((json_decode($item->primary_mobile_number_country_data)->dialCode) ?? '91');
+                    else:
+                            $code  = '+91'; 
+                    endif;         
+                    # end get country code
 
-                    $next_followup_time = "";
-                    $next_followup_user = "";
 
-                    // $where = "lead_id='" . $item->lead_id . "' AND next_followup_date!='' ORDER BY followup_id DESC LIMIT 1";
-                    // $this->db->select('au.first_name as au_first_name,au.last_name as au_last_name,next_followup_date,next_followup_time');
-                    // $this->db->from('tbl_followup');
-                    // $this->db->join('tbl_users as au', 'au.user_id = tbl_followup.assign_user_id', 'left');
-                    // $this->db->where($where);
-                    // $query = $this->db->get();
-                    // $followup_detail = $query->row();
-                    // if ($followup_detail) {
-                    //     $next_followup_time = $followup_detail->next_followup_date . " & " . $followup_detail->next_followup_time;
-                    //     $next_followup_user = $followup_detail->au_first_name . ' ' . $followup_detail->au_last_name;
-
-                    //     $next_followup = $followup_detail->next_followup_date . " & " . $followup_detail->next_followup_time . " " . $followup_detail->au_first_name . ' ' . $followup_detail->au_last_name;
-                    // }
-
-                    // $next_followup_date = "";
-                    // if ($item->next_followup_date) {
-                    //     $next_followup_date = "$item->next_followup_date";
-
-                    //     $next_followup_date = preg_replace("/ /", "<br>", $next_followup_date, 1);
-                    // }
-
-                    $objPHPExcel->getActiveSheet()->setCellValue('A' . $o, $item->lead_id);
+                    $objPHPExcel->getActiveSheet()->setCellValue('A' . $o, $count);
                     $objPHPExcel->getActiveSheet()->setCellValue('B' . $o, $item->lead_title);
                     $objPHPExcel->getActiveSheet()->setCellValue('C' . $o, $item->lead_first_name);
                     $objPHPExcel->getActiveSheet()->setCellValue('D' . $o, $item->lead_last_name);
-                    $objPHPExcel->getActiveSheet()->setCellValue('E' . $o, $item->lead_mobile_no);
+                    $objPHPExcel->getActiveSheet()->setCellValue('E' . $o, ($code ?? '').' '.$item->lead_mobile_no);
                     $objPHPExcel->getActiveSheet()->setCellValue('F' . $o, $item->lead_email);
-                    $objPHPExcel->getActiveSheet()->setCellValue('G' . $o, $item->lead_stage_name);
+                    $objPHPExcel->getActiveSheet()->setCellValue('G' . $o, $item->stage_name);
                     $objPHPExcel->getActiveSheet()->setCellValue('H' . $o, $item->lead_source_name);
-                    $objPHPExcel->getActiveSheet()->setCellValue('I' . $o, $next_followup_time ?? '');
-                    $objPHPExcel->getActiveSheet()->setCellValue('J' . $o, $next_followup_user ?? '');
+                    $objPHPExcel->getActiveSheet()->setCellValue('I' . $o, ($item->next_followup_date ?? 'N/A'.' '.$item->next_followup_time ?? ''));
+                    $objPHPExcel->getActiveSheet()->setCellValue('J' . $o, $item->assgin_user_full_name ?? '');
                     $o++;
                     $i++;
+                    $count++;
                 }
 
                 $objPHPExcel->getActiveSheet()->setTitle('Leads');
