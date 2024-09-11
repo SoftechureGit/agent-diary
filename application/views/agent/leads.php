@@ -380,7 +380,7 @@
                             <div class="card-body" style="padding: 13px 10px 4px 10px !important;">
                               <h3 class="card-title text-white" style="font-size: 14px;margin-bottom: 5px;">Total Followup</h3>
                               <div class="d-inline-block">
-                                <h2 class="text-white" style="font-size: 24px;"><?= $total_followup ?></h2>
+                                <h2 class="text-white" style="font-size: 24px;"><?= $followups->total_initial_count ?? 0 ?></h2>
                               </div>
                             </div>
                           </div>

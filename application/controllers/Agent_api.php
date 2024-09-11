@@ -4184,7 +4184,7 @@ WHERE lead_id='" . $lead_id . "'
 
                                 $buyer_name                                             =   $this->input->post('booking_buyer_name');
                                 $buyer_son_of_daughter_of_wife_of                       =   $this->input->post('booking_buyer_sdw');
-                                $seller_id                                            =   $this->input->post('booking_seller_id');
+                                $seller_id                                              =   $this->input->post('booking_seller_id');
                                 $seller_son_of_daughter_of_wife_of                      =   $this->input->post('booking_seller_sdw');
                                 $state_id                                               =   $this->input->post('booking_state_id');
                                 $city_id                                                =   $this->input->post('booking_city_id');
@@ -4239,15 +4239,15 @@ WHERE lead_id='" . $lead_id . "'
 
                                 foreach($payment_terms ?? [] as $payment_term):
                                     $payment_term          =   (object) $payment_term;
-                                    $booking_title                                  = $payment_term->title;
-                                    $booking_amount                                 = $payment_term->amount;
-                                    $booking_date                                   = $payment_term->date;
+                                    $payment_term_booking_title                                  = $payment_term->title;
+                                    $payment_term_booking_amount                                 = $payment_term->amount;
+                                    $payment_term_booking_date                                   = $payment_term->date;
                                    
                            
                                     $booking_terms_details_arr[]          =   (object) [
-                                                                                'title'                                 => $booking_title,
-                                                                                'amount'                                => $booking_amount,
-                                                                                'date'                                  => $booking_date,
+                                                                                'title'                                 => $payment_term_booking_title,
+                                                                                'amount'                                => $payment_term_booking_amount,
+                                                                                'date'                                  => $payment_term_booking_date,
                                                                             ];
                                 endforeach;
                             # End Payment Terms Details
@@ -4270,6 +4270,31 @@ WHERE lead_id='" . $lead_id . "'
                             $bk_array['created_at'] = time();
 
                             $this->Action_model->insert_data($bk_array, 'tbl_bookings');
+
+                            # Unit Lead
+                                $property_details               =   $this->db->select('product_unit_detail_id as  id, property_type, project_type')->where("product_unit_detail_id = '$unit_code_id'")->from('tbl_product_unit_details')->get()->row();
+                                $inventory_property_details     =   $this->db->select('inventory_id as  id, property_details')->where("inventory_id = '$inventory_id'")->from('tbl_inventory')->get()->row();
+
+                                $unit_lead_data                 =   [
+                                                                        'lead_id'           => $followup_lead_id,
+                                                                        'looking_for'       => 'no_action',
+                                                                        'booking_date'      =>  date('Y-m-d'),
+                                                                        'project_type_id'   =>  $property_details->project_type,
+                                                                        'property_type_id'  =>  $property_details->property_type,
+                                                                        'state_id'          =>  $state_id,
+                                                                        'city_id'           =>  $city_id,
+                                                                        'location_id'       =>  $location_id,
+                                                                        'project_id'        =>  $project_id,
+                                                                        'added_by'          =>  $user_id,
+                                                                        'property_details'  =>  $inventory_property_details->property_details ?? null,
+                                                                        'status'            =>  1,
+                                                                    ];
+
+                                $this->Action_model->insert_data($unit_lead_data, 'tbl_lead_units');
+                                $unit_lead_data['lead_id']               =   $seller_id;
+                                $unit_lead_data['status']                =  2;
+                                $this->Action_model->insert_data($unit_lead_data, 'tbl_lead_units');
+                            # End Unit Lead
 
                             $lead_history_array = array(
                                 'title' => 'Booking',
