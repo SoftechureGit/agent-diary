@@ -1715,7 +1715,7 @@
                   requirement_status = "<span class='label label-pill label-danger' style='padding: 3px 10px;'>Close</span>";
                 }
 
-                html += "<div style='border-bottom: 1px solid rgba(0, 0, 0, 0.125);padding-bottom: 13px;margin-bottom: 14px;'>" +
+                html += "<div class='requirement-card'>" +
                   "    <div class='row'>" +
                   "        <div class='col-md-4'>" +
                   "            <label>Requirement Id:</label> <strong>" + requirement_list[i].requirement_id + "</strong>" +
