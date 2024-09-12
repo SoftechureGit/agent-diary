@@ -13317,8 +13317,8 @@ class Api extends CI_Controller
                         "feedback_date" => $feedback_date,
                         "feedback_time" => $feedback_time,
                         "customer_offer" => $feedback_dd->customer_offer ?? "",
-                        'size' => $itemPrp['size'],
-                        'pid' => $itemPrp['pid'],
+                        'size'          => $itemPrp['size'],
+                        'pid'           => $itemPrp['pid'],
                         'project_url' => $project_link,
                         'lead_mobile' => $lead_mobile,
                         'lead_email' => $lead_email,
@@ -13347,7 +13347,28 @@ class Api extends CI_Controller
                     );
                 }
             }*/
-            $array['data'] = array('status' => 'true', 'msg' => 'Data Found', 'feedback_list' => $feedback_list);
+
+            usort($feedback_list, function($a, $b) {
+                if (empty($a['feedback_id']) && !empty($b['feedback_id'])) {
+                    return -1; 
+                } elseif (!empty($a['feedback_id']) && empty($b['feedback_id'])) {
+                    return 1;  
+                } elseif (empty($a['feedback_id']) && empty($b['feedback_id'])) {
+                    return 0;  
+                }
+                return $a['feedback_id'] <=> $b['feedback_id'];
+            });
+
+
+
+            if(count($feedback_list) > 0 ){
+                $array['data'] = array('status' => 'true', 'msg' => 'Data Found', 'feedback_list' => $feedback_list);
+            }
+            else{
+                $array['data'] = array('status' => 'true', 'msg' => 'Data Not Found', 'feedback_list' => $feedback_list);
+
+            }
+
         } else {
             $array['data'] = array('status' => 'false', 'msg' => 'Some error occurred, please try again.');
         }
