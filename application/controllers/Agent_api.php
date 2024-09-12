@@ -9811,7 +9811,7 @@ WHERE lead_id='" . $lead_id . "'
             $booking_basic_details  =   $item->booking_basic_details ?  json_decode($item->booking_basic_details) : null;
 
             $item->booking_date             = date('d F, Y', strtotime($item->booking_date));
-            $item->buyer_name               = $booking_basic_details->buyer_name;
+            $item->buyer_name               = $booking_basic_details->buyer_name ?? '';
             $item->seller_name              = $item->seller_name;
             $item->agent_name               = $item->agent_name;
             $item->project_name             = $item->project_name;
