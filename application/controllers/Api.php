@@ -13314,6 +13314,8 @@ class Api extends CI_Controller
                         'project_name' => $itemPrp['project_name'],
                         "feedback_user" => $date_user,
                         "feedback_date_and_time" => $feedback_date.' '.$feedback_time,
+                        "feedback_date" => $feedback_date,
+                        "feedback_time" => $feedback_time,
                         "customer_offer" => $feedback_dd->customer_offer ?? "",
                         'size' => $itemPrp['size'],
                         'pid' => $itemPrp['pid'],
