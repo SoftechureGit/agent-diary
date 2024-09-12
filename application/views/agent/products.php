@@ -4,6 +4,7 @@
 <link href="<?php echo base_url('public/admin/') ?>plugins/clockpicker/dist/jquery-clockpicker.min.css" rel="stylesheet">
 <link href="<?php echo base_url('public/admin/') ?>plugins/bootstrap-material-datetimepicker/css/bootstrap-material-datetimepicker.css" rel="stylesheet">
 <style>
+  #main-wrapper{ height: 97vh; }
   @media only screen and (max-width : 576px) {
     .mg-10 {
       margin-top: 10px;
@@ -50,11 +51,13 @@
 
   .customer {
     padding: 7px 10px;
+    border: 1px solid #cdcdcd3d  !important;
   }
 
-  .customer:hover {
-    background-color: #f2f2f8;
+  .customer:hover, .customer.active {
     cursor: pointer;
+    background: #fff;
+    border: 1px solid #ffa96980 !important;
   }
 
   .loader_progress {
@@ -72,18 +75,27 @@
   .inventory-list-container .delete-inventory-record {
     display: none;
   }
+
+  .lead-list .customer {
+    border-radius: 8px;
+    box-shadow: 2px 2px 12px #80808038;
+    margin: 1rem 0.5rem;
+    padding: 0.5rem 1rem;
+}
+
+
 </style>
 <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.10/css/select2.min.css">
 <div class="loader_progress"></div>
 <?php include('include/sidebar.php'); ?>
 
-<div class="content-body">
+<div class="content-body h-100">
 
-  <div class="container-fluid">
-    <div class="row">
-      <div class="col-12">
-        <div class="card">
-          <div class="card-body">
+  <div class="container-fluid  h-100">
+    <div class="row  h-100">
+      <div class="col-12  h-100">
+        <div class="card  h-100">
+          <div class="card-body  h-100">
 
             <div class="row">
 
@@ -99,7 +111,7 @@
 
                     <input type="text" class="form-control" placeholder="Serach" onkeyup="filterData()" id="serachInput">
                   </div>
-                  <div class="col-md-12" style="height: 450px;overflow-y: auto;">
+                  <div class="col-md-12" style="height: 78vh;overflow-y: auto;">
 
                     <div class="lead-list"></div>
                     <?php for ($i = 1; $i <= 0; $i++) { ?>
@@ -624,11 +636,11 @@
                   location += ((location != '') ? ', ' : '') + record.state_name;
                 }
 
-                html += "<div class='customer' style='border-bottom: 1px solid rgba(0, 0, 0, 0.125);' onclick='showCustomer(" + record.product_unit_detail_id + ",0)'>" +
+                html += "<div class='customer' onclick='showCustomer(" + record.product_unit_detail_id + ",0)'>" +
                   "    <div style='padding-top: 8px;margin-bottom: 8px;'>" +
                   "    <div class='row'>" +
                   "    <div class='col-md-12'>" +
-                  "          <small class='text-muted'><i>" + record.project_name + "</i></small>" +
+                  "          <small class='text-warning'><i>" + record.project_name + "</i></small>" +
                   "   </div>" +
                   "    <div class='col-md-12'>" +
                   "          <div class='card-text text-muted'><strong>" + action + "</strong></div>" +
@@ -2021,4 +2033,9 @@
     });
   }
   /** End Site Visit List Via Ajax */
+
+  $(document).on('click', '.lead-list .customer', function(){
+    $('.lead-list .customer').removeClass('active')
+    $(this).addClass('active')
+  })
 </script>

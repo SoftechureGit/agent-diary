@@ -168,12 +168,12 @@
 
             <div class="form-group col-md-4">
                 <label>DOB:</label>
-                <input type="text" class="form-control mydatepicker" data-date-format='dd-mm-yyyy' placeholder="Enter date of birth" id="lead_dob" name="lead_dob" value="<?php if($id) { echo $lead_detail->lead_dob; } ?>">
+                <input type="date" class="form-control" data-date-format='dd-mm-yyyy' placeholder="Enter date of birth" id="lead_dob" name="lead_dob" value="<?php if($id) { echo $lead_detail->lead_dob; } ?>">
             </div>
 
             <div class="form-group col-md-4">
                 <label>DOA:</label>
-                <input type="text" class="form-control mydatepicker" data-date-format='dd-mm-yyyy' placeholder="Enter DOA" id="lead_doa" name="lead_doa" value="<?php if($id) { echo $lead_detail->lead_doa; } ?>">
+                <input type="date" class="form-control" data-date-format='dd-mm-yyyy' placeholder="Enter DOA" id="lead_doa" name="lead_doa" value="<?php if($id) { echo $lead_detail->lead_doa; } ?>">
             </div>
 
           

@@ -257,14 +257,14 @@
 
                   <div class="form-group col-md-4">
                     <label>Date of Birth</label>
-                    <input type="text" class="form-control mydatepicker" data-date-format='dd-mm-yyyy' placeholder="Select..." id="lead_dob" name="lead_dob" value="<?php if ($id) {
+                    <input type="date" class="form-control" data-date-format='dd-mm-yyyy' placeholder="Select..." id="lead_dob" name="lead_dob" value="<?php if ($id) {
                                                                                                                                                                       echo $lead_detail->lead_dob;
                                                                                                                                                                     } ?>">
                   </div>
 
                   <div class="form-group col-md-4">
                     <label>DOA</label>
-                    <input type="text" class="form-control mydatepicker" data-date-format='dd-mm-yyyy' placeholder="" id="lead_doa" name="lead_doa" value="<?php if ($id) {
+                    <input type="date" class="form-control" data-date-format='dd-mm-yyyy' placeholder="" id="lead_doa" name="lead_doa" value="<?php if ($id) {
                                                                                                                                                               echo $lead_detail->lead_doa;
                                                                                                                                                             } ?>">
                   </div>

@@ -157,12 +157,29 @@
     padding: 1rem;
   }
 
-  .requirement-card{
+  .requirement_list .requirement-card{
     font-size: 13px;
     border-radius: 8px;
     margin: 1rem 0.5rem;
     padding: 1rem;
     box-shadow: 2px 2px 14px #80808033;
+  }
+
+  
+  .followup_list  .followup-card {
+    font-size: 14px;
+    border-radius: 8px;
+    box-shadow: 2px 2px 12px #8080802e;
+    margin: 1rem 0.5rem;
+    padding: 1rem;
+  }
+
+  .lead-product-card {
+    font-size: 14px;
+    border-radius: 8px;
+    box-shadow: 2px 2px 12px #8080802e;
+    margin: 1rem 0.5rem;
+    padding: 1rem;
   }
 </style>
 <!--  -->
@@ -1698,6 +1715,39 @@
                   requirement_status = "<span class='label label-pill label-danger' style='padding: 3px 10px;'>Close</span>";
                 }
 
+                html += "<div class='requirement-card'>" +
+                  "    <div class='row'>" +
+                  "        <div class='col-md-4'>" +
+                  "            <label>Requirement Id:</label> <strong>" + requirement_list[i].requirement_id + "</strong>" +
+                  "        </div>" +
+                  "        <div class='col-md-4'>" +
+                  "            <label>DOR:</label> <strong>" + requirement_list[i].dor + "</strong>" +
+                  "        </div>" +
+                  "        <div class='col-md-4' align='right'>" +
+                  "            <label>Status:</label> <strong>" + requirement_status + "</strong>" +
+                  "        </div>" +
+                  "        <div class='col-md-12'>" +
+                  "            <label>Looking For:</label> <strong>" + requirement_list[i].look_for + "</strong>" +
+                  "        </div>" +
+                  "        <div class='col-md-12'>" +
+                  "            <label>At:</label> <strong>" + requirement_list[i].location + "</strong>" +
+                  "        </div>" +
+                  "        <div class='col-md-12'>" +
+                  "            <label>Budget:</label> <strong>" + requirement_list[i].budget_min + "-" + requirement_list[i].budget_max + "</strong>," +
+                  "            <label>Size:</label> <strong>" + requirement_list[i].size_min + "-" + requirement_list[i].size_max + " " + requirement_list[i].size_unit + "</strong>" +
+                  "        </div>" +
+                  "        <div class='col-md-12'>" +
+                  "            <label>Remarks:</label> <strong>" + requirement_list[i].remark + "</strong>" +
+                  "        </div>" +
+                  "        <div class='col-md-8'>" +
+                  "            <label>Added By:</label> <strong>" + requirement_list[i].added_by + "</strong>" +
+                  "        </div>" +
+                  "        <div class='col-md-4' align='right'>" +
+                  "            <button type='button' class='btn btn-success btn-sm' onclick='reqFormModal(" + requirement_list[i].requirement_id + ",2," + requirement_list[i].lead_id + ")' style='color: white;'><i class='fa fa-edit'></i> Edit</button>" +
+                  "        </div>" +
+                  "    </div>" +
+                  "</div>";
+                /**
                 html +=
                   `<div class='requirement-card'>
                           <div class='row'>
@@ -1783,6 +1833,7 @@
                           </div>
                       </div>
                   </div>`;
+                   */
               }
 
               if (requirement_list.length == 0) {
@@ -1987,7 +2038,7 @@
                   visit_status = "<i class='fa fa-thumbs-o-down text-danger' style='font-size:22px;font-weight:bold;'></i>";
                 }
 
-                html += "<div style='border-bottom: 1px solid rgba(0, 0, 0, 0.125);padding-bottom: 13px;margin-bottom: 14px;'> <div class='row'> <div class='col-md-1' align='center'>" + chk + " </div> <div class='col-md-11'> <div class='row'> <div class='col-md-12'> <label>" + feedback_list[i].size + ((feedback_list[i].accomodation_name) ? ", " + feedback_list[i].accomodation_name : '') + ", " + feedback_list[i].product_type_name + ", " + feedback_list[i].unit_type_name + " @ " + ((feedback_list[i].project_name != '') ? feedback_list[i].project_name + ', ' : '') + feedback_list[i].location_name + ", " + feedback_list[i].city_name + ", " + feedback_list[i].state_name + "</label> </div> <div class='col-md-6'> <label>" + feedback_list[i].budget + "</label> </div> <div class='col-md-6'> <label>Requirment Id: " + feedback_list[i].requirement_id + "</label> </div> <div class='col-md-6'> <label>Like Property: <strong>" + visit_status + "</strong></label> </div> <div class='col-md-6'> <label>" + feedback_list[i].date_user + "</label> </div> <div class='col-md-12'> <label>Comment: </label><strong>" + feedback_list[i].comment + "</strong> </div> </div> </div> </div> <div style='text-align:right;'>" + edit + "</div></div>";
+                html += "<div class='lead-product-card'> <div class='row'> <div class='col-md-11'> <div class='row'> <div class='col-md-12'> <label>" + feedback_list[i].size + ((feedback_list[i].accomodation_name) ? ", " + feedback_list[i].accomodation_name : '') + ", " + feedback_list[i].product_type_name + ", " + feedback_list[i].unit_type_name + " @ " + ((feedback_list[i].project_name != '') ? feedback_list[i].project_name + ', ' : '') + feedback_list[i].location_name + ", " + feedback_list[i].city_name + ", " + feedback_list[i].state_name + "</label> </div> <div class='col-md-6'> <label>" + feedback_list[i].budget + "</label> </div> <div class='col-md-6'> <label>Requirment Id: " + feedback_list[i].requirement_id + "</label> </div> <div class='col-md-6'> <label>Like Property: <strong>" + visit_status + "</strong></label> </div> <div class='col-md-6'> <label>" + feedback_list[i].date_user + "</label> </div> <div class='col-md-12'> <label>Comment: </label><strong>" + feedback_list[i].comment + "</strong> </div> </div> </div> <div class='col-md-1' align='center'>" + chk + " </div> </div> <div style='text-align:right;'>" + edit + "</div></div>";
               }
 
 
@@ -2058,20 +2109,19 @@
                   comment = "<div class='col-md-12'><label>Comment:</label> " + followup_list[i].comment + " @ " + followup_list[i].created + " By " + followup_list[i].cu_name + "</div>";
                 }
 
-                html += "<div style='border-bottom: 1px solid rgba(0, 0, 0, 0.125);padding-bottom: 13px;margin-bottom: 14px;'>" +
+                html += "<div class='followup-card'>" +
                   "    <div class='row'>" +
-                  "        <div class='col-md-3'>" + followup_status +
-                  "        </div>" +
-                  "        <div class='col-md-9'>" +
+                  "        <div class='col-md-10'>" +
                   "            <div class='row'>" +
                   "                <div class='col-md-12'>" +
                   "                    <label><strong>" + lead_action_name + "</strong> " + lead_action_name_sep + followup_list[i].next_action + " By " + followup_list[i].au_name + "</label>" +
                   "                </div>" +
                   "                <div class='col-md-12'>" +
-                  "                    <label>Remarks:</label> <strong>" + followup_list[i].task_desc + "</strong>" +
+                  "                    <label> <strong class='pr-2'>Remarks : </strong></label>" + followup_list[i].task_desc + "" +
                   "                </div>" + comment + status_select +
                   "            </div>" +
                   "        </div>" +
+                  "        <div class='col-md-2 align-self-center'>" + followup_status + "</div>" +
                   "    </div>" +
                   "</div>";
               }
