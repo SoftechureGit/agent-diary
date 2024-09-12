@@ -13274,7 +13274,7 @@ class Api extends CI_Controller
                         $feedback_id = $feedback_dd->feedback_id;
                         $comment = $feedback_dd->comment;
                         $visit_status = ($feedback_dd->like_property) ? 'Yes' : 'No';
-                        $date_user = $feedback_dd->visit_date . " & " . $feedback_dd->visit_time . " By " . ucwords($feedback_dd->first_name . " " . $feedback_dd->last_name);
+                        $date_user = ucwords($feedback_dd->first_name . " " . $feedback_dd->last_name);
                         $feedback_date = $feedback_dd->visit_date;
                         $feedback_time = $feedback_dd->visit_time;
                     }
@@ -13312,9 +13312,8 @@ class Api extends CI_Controller
                         "size_max" => $feedback_data->size_max,
                         "size_unit" => $feedback_data->size_unit_name,
                         'project_name' => $itemPrp['project_name'],
-                        "date_user" => $date_user,
-                        "feedback_date" => $feedback_date,
-                        "feedback_time" => $feedback_time,
+                        "feedback_user" => $date_user,
+                        "feedback_date_and_time" => $feedback_date.' '.$feedback_time,
                         "customer_offer" => $feedback_dd->customer_offer ?? "",
                         'size' => $itemPrp['size'],
                         'pid' => $itemPrp['pid'],
