@@ -3222,9 +3222,9 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
 
 
                     $record_array['created_at'] = time();
-                    $record_array['user_id'] = $user_id;
+                    $record_array['user_id']    = $user_id;
                     $record_array['account_id'] = $account_id;
-                    $record_array['lead_id'] = $this->input->post('lead_id');
+                    $record_array['lead_id']    = $this->input->post('lead_id');
 
                     $id = $this->Action_model->insert_data($record_array, 'tbl_feedbacks');
                 }
