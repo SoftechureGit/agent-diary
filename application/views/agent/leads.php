@@ -2111,7 +2111,8 @@
 
                 html += "<div class='followup-card'>" +
                   "    <div class='row'>" +
-                  "        <div class='col-md-10'>" +
+                  "        <div class='col-md-3 align-self-center'>" + followup_status + "</div>" +
+                  "        <div class='col-md-9'>" +
                   "            <div class='row'>" +
                   "                <div class='col-md-12'>" +
                   "                    <label><strong>" + lead_action_name + "</strong> " + lead_action_name_sep + followup_list[i].next_action + " By " + followup_list[i].au_name + "</label>" +
@@ -2121,7 +2122,6 @@
                   "                </div>" + comment + status_select +
                   "            </div>" +
                   "        </div>" +
-                  "        <div class='col-md-2 align-self-center'>" + followup_status + "</div>" +
                   "    </div>" +
                   "</div>";
               }
