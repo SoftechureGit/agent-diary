@@ -83,8 +83,12 @@
              dropdownParent: $(this).parent(),
            });
            //  }
+
+           /** Dropdown UI issue */
+           $('select#builder_id, select#product_id').select2()
+           /** Dropdown UI issue */
          });
-       }
+       }  
 
        convertToSelect2()
 

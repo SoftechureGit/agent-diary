@@ -3432,6 +3432,7 @@ class Agent extends CI_Controller
 
         # Db Data
         $data                                   =   [
+            'inventory_id'      => $inventory_id,
             'lead_id'           => $lead_id,
             'added_by'          => $agent_id,
             'looking_for'       => $looking_for,

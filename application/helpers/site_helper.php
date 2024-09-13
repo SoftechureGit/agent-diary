@@ -356,7 +356,7 @@ if (!function_exists('getAccountId')) {
     # End Get Locations
 
     # Lead Units
-    function lead_units($lead_id,$user_detail =[])
+    function lead_units($lead_id, $user_detail = null)
     
     {
         if (!$lead_id) :
@@ -368,12 +368,12 @@ if (!function_exists('getAccountId')) {
 
         if($user_detail->role_id < 3 ){
 
-            $where =  "lead_unit.lead_id = $lead_id" ;
+            $where =  "( lead_unit.lead_id = $lead_id or lead_unit.buyer_id = $lead_id )" ;
 
         }
         else{
     
-            $where =  "added_by=$account_id AND  lead_unit.lead_id = $lead_id" ;
+            $where =  "added_by=$account_id AND  ( lead_unit.lead_id = $lead_id or lead_unit.buyer_id = $lead_id )" ;
         }
       
 

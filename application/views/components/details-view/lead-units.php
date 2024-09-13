@@ -12,7 +12,6 @@
           ?>
 
           <?php
-
            foreach (lead_units($lead_id ?? 0 , $user_detail ) as $key => $lead_unit) : ?>
             <!-- Unit Card -->
             <div class="col-md-12">
@@ -124,11 +123,11 @@
                         <span class="label-value">
                           <?php
                             $status     = '';
-                            if($lead_unit->status == 1):
+                            if($lead_unit->buyer_status == 1 && $lead_unit->buyer_id == $lead_id):
                               $status     = "<span class='btn btn-sm btn-success badge text-white'>Grant</span>";
                             endif;
                             
-                            if($lead_unit->status == 2):
+                            if($lead_unit->status == 1 && $lead_unit->lead_id == $lead_id):
                               $status     =  "<span class='btn btn-sm btn-warning badge text-white'>Sold</span>";
                             endif;
                           ?>
