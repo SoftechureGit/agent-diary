@@ -525,14 +525,17 @@ class Helper extends CI_Controller
             $options                =   "<option value='' disabled selected>Choose...</option>";
             
             foreach ($records ?? [] as $record) :
+                $is_sold                =   $record->inventory_status != 1 ? 'disabled' : '';
+                $is_sold_label                =   $record->inventory_status != 1 ? '( Sold )' : '';
+
                 if($record->plot_number):
                     $selected            =  $selected_id == $record->plot_number ? 'selected' : '';
-                    $options            .=  "<option value='$record->plot_number' $selected data-inventory-id='$record->inventory_id'>$record->plot_number</option>";
+                    $options            .=  "<option value='$record->plot_number' $selected $is_sold data-inventory-id='$record->inventory_id'>$record->plot_number $is_sold_label</option>";
                 endif;
 
                 if($record->unit_number):
                     $selected            =  $selected_id == $record->unit_number ? 'selected' : '';
-                    $options            .=  "<option value='$record->unit_number' $selected data-inventory-id='$record->inventory_id'>$record->unit_number</option>";
+                    $options            .=  "<option value='$record->unit_number' $selected $is_sold data-inventory-id='$record->inventory_id'>$record->unit_number $is_sold_label</option>";
                 endif;
             endforeach;
         endif;

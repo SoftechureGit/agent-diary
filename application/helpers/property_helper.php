@@ -694,6 +694,7 @@ if (!function_exists('inventory_plot_or_unit_numbers')):
                                 inventory_id, 
                                 JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.plot_number')) as plot_number, 
                                 JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.unit_no')) as unit_number,
+                                inventory_status
                                 ");
         db_instance()->where($where);
         db_instance()->from('tbl_inventory as inventory');
