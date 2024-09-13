@@ -4356,16 +4356,24 @@ class Api extends CI_Controller
                 if ($this->input->post("next_followup_date")) {
                     $next_followup_date = $this->input->post("next_followup_date");
                 }
+
                 if ($this->input->post("next_followup_time")) {
                     // $next_followup_time = $this->input->post("next_followup_time");
                     $next_followup_time = str_replace(['am', 'pm'], ['', ''], $this->input->post('next_followup_time'));
                 }
+
                 if ($this->input->post("project_id")) {
-                    $project_id = $this->input->post("project_id");
+
+                    $project_id = json_encode($this->input->post("project_id"));
+
+                    // print_r($project_id) ; die;
+
                 }
+
                 if ($this->input->post("next_action")) {
                     $next_action = $this->input->post("next_action");
                 }
+
                 if ($this->input->post("task_desc")) {
                     $task_desc = $this->input->post("task_desc");
                 }
@@ -4399,6 +4407,7 @@ class Api extends CI_Controller
                     $this->db->where($where);
                     $query = $this->db->get();
                     $followup_detail = $query->row();
+
                     if ($followup_detail && $followup_detail->next_followup_date) {
                         $next_followup = "<i class='fa fa-clock-o'></i> " . $followup_detail->next_followup_date . " & " . $followup_detail->next_followup_time . " &nbsp; <i class='fa fa-bookmark'></i> " . $followup_detail->au_first_name . ' ' . $followup_detail->au_last_name;
                         $next_followup_date = $followup_detail->next_followup_date . " " . $followup_detail->next_followup_time;
@@ -12300,6 +12309,20 @@ class Api extends CI_Controller
 
     public function get_followup_related_data()
     {
+
+        $followup_data  = '';
+
+        if($this->input->post('id')){
+                
+            $where              =   "followup_id='" . $this->input->post('id') . "'";
+            $followup_data      =   $this->db->select('lead_stage_id,lead_status_id')->where($where)->get('tbl_followup')->row();
+            
+        }
+
+        $data['followup_data'] = $followup_data;
+
+      
+
         $where          = "user_hash='" .  $this->input->post('user_hash') . "'";
         $user_detail    = $this->Action_model->select_single('tbl_users', $where);
 
