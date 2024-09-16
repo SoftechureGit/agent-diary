@@ -1756,7 +1756,7 @@ class Agent extends CI_Controller
         # total 
 
 
-        $data['total_new_leads']    = $leads->today_count ?? 0;
+        $data['total_new_leads']    = $leads->total_count ?? 0;
         $data['total_followup']     = $total_followups ?? 0;
         $data['today_followup']     = $today_followups ?? 0;
         $data['missed_followup']    = $missed_followups ?? 0;
