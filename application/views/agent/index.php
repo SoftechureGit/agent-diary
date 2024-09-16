@@ -134,7 +134,7 @@
               <div class="card-body">
                 <h3 class="card-title text-white">Today's Followup</h3>
                 <div class="d-inline-block">
-                  <h2 class="text-white"><?= $followups->today_count ?? 0 ?></h2>
+                  <h2 class="text-white"><?= $today_fullowups ?? 0 ?></h2>
                 </div>
                 <span class="float-right display-5 opacity-5"><i class="fa fa-bullseye" aria-hidden="true"></i></span>
               </div>
@@ -163,7 +163,7 @@
               <div class="card-body">
                 <h3 class="card-title text-white">Missed Followup</h3>
                 <div class="d-inline-block">
-                  <h2 class="text-white"><?= $followups->missed_count ?? 0 ?></h2>
+                  <h2 class="text-white"><?= $missed_followups?? 0 ?></h2>
                 </div>
                 <span class="float-right display-5 opacity-5"><i class="fa fa-users" aria-hidden="true"></i></span>
               </div>
@@ -194,7 +194,7 @@
 
                         <tr>
                           <td>Initial</td>
-                          <td class="text-center"><?= ($leads->today_count ?? 0 ) + ( $followups->total_initial_count ?? 0 ) ?></td>
+                          <td class="text-center"><?=( $followups->total_initial_count ?? 0 ) ?></td>
                         </tr>
                         <tr class="text-primary">
                           <td>Followup</td>

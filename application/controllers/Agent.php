@@ -159,6 +159,8 @@ class Agent extends CI_Controller
         $expire_today                       =   0;
         # End Init
 
+
+
         # Trial Plan
 
             # Magical Function
@@ -252,8 +254,6 @@ class Agent extends CI_Controller
 
         $followup_select_query                  =   "
                                                         count(*) as total_count,
-                                                        SUM(CASE WHEN ( STR_TO_DATE(next_followup_date, '%d-%m-%Y')  = CURDATE() AND followup_status = '1' AND lead_status_id = 1 ) THEN 1 ELSE 0 END) as today_count,
-                                                        SUM(CASE WHEN ( STR_TO_DATE(next_followup_date, '%d-%m-%Y')  < CURDATE() AND followup_status = '1' AND lead_status_id = 1 ) THEN 1 ELSE 0 END) as missed_count,
                                                         SUM(CASE WHEN lead_stage_id = '1' THEN 1 ELSE 0 END) as total_initial_count,
                                                         SUM(CASE WHEN lead_stage_id = '2' THEN 1 ELSE 0 END) as total_followup_count,
                                                         SUM(CASE WHEN lead_stage_id = '3' THEN 1 ELSE 0 END) as total_enquiry_count,
@@ -265,12 +265,39 @@ class Agent extends CI_Controller
 
         $this->db->select($followup_select_query);
         $this->db->where($where);
-        $this->db->from('tbl_followup as followup');
+        $this->db->from('tbl_leads as followup');
         $this->db->join('tbl_users  as user', 'user.user_id = followup.user_id', 'left');
         $followups                          =   $this->db->get()->row();
 
+        // print_r($followups); die;
+
         # End Followup
 
+
+          # Today Followup 
+          $today_date                 = date('Y-m-d');
+          $today_date_n                   = date('d-m-Y');
+          $today_followups                = $this->db->where("($where and  lead_stage_id !='1' and  lead_stage_id != '6' and  lead_stage_id != '7' ) and  next_followup_date= '$today_date_n'")
+          ->join('tbl_users  as user', 'user.user_id = followup.user_id', 'left')
+          ->get('tbl_followup as followup')->num_rows();
+          # Today Followup 
+          $data['today_fullowups'] = $today_followups;
+
+          # Total Followup 
+          $today_date_n                   = date('d-m-Y');
+          $total_followups                = $this->db->where("($where and  lead_stage_id !='1' and  lead_stage_id != '6' and  lead_stage_id != '7' ) and  added_to_followup = 1")
+          ->join('tbl_users  as user', 'user.user_id = followup.user_id', 'left')
+          ->get('tbl_leads as followup')->num_rows();
+          # Total Followup 
+
+          
+        # Missed Followup 
+            $missed_followups            =  $this->db->where("$where and DATE(STR_TO_DATE(`next_followup_date`, '%d-%m-%Y')) < '$today_date'") ->join('tbl_users  as user', 'user.user_id = followup.user_id', 'left')->get('tbl_followup as followup')->num_rows();
+            $data['missed_followups']   = $missed_followups;
+        # Missed Followup 
+        // print_r($missed_followups); die;
+
+        $data['total_fullowups'] = $total_followups;
 
         # End Leads & Followup Query
 
@@ -1543,9 +1570,9 @@ class Agent extends CI_Controller
 
         # end stage 
 
-        $total_followup = 0;
-        $today_followup = 0;
-        $missed_followup = 0;
+        $total_followup     = 0;
+        $today_followup     = 0;
+        $missed_followup    = 0;
 
         # user data
             $where_user                 = "user_hash='" . $this->session->userdata('agent_hash') . "'";
@@ -1572,40 +1599,48 @@ class Agent extends CI_Controller
 
         // print_r($where_role); die;
 
+        # total followup count
+        
+            
+
+        # end total followup count
+
 
 
         $where      = $where_role;
         $tb_data    = $this->Action_model->select_single('tbl_leads', $where, "COUNT(CASE WHEN added_to_followup = 1 THEN lead_id END) as total_followup,COUNT(CASE WHEN followup_date = '" . date('d-m-Y') . "' THEN lead_id END) as today_followup,COUNT(CASE WHEN added_to_followup = 0 THEN lead_id END) as missed_followup");
 
-        $today_date                 = date('Y-m-d');
         # Total New Leads
-        $total_new_leads            = $this->db->where("$where_role and lead_stage_id = '1' AND added_to_followup = '0' ")->get('tbl_leads')->num_rows();
-
-        
-
-        $total_new_leads_2          = $this->db->where("$where_f and lead_stage_id = '1' AND followup_status= '1' ")->get('tbl_followup as followup')->num_rows();
-
-        // print_r($total_new_leads_2); die;
-
-        $total_new_leads            = $total_new_leads + $total_new_leads_2;
-
+        $today_date                 = date('Y-m-d');
+        $total_leads            = $this->db->where("$where_role and lead_stage_id = '1'")->get('tbl_leads')->num_rows();
         # End Total New Leads
 
+
+
+        // print_r($total_leads); die;
         
         # Today Followup 
-        $today_followups            = $this->db->where("$where_role and ( lead_stage_id != '6' or lead_stage_id != '7' )  and DATE(STR_TO_DATE(`followup_date`, '%Y-%m-%d')) = '$today_date'")->get('tbl_leads')->num_rows();
+        $today_date_n                   = date('d-m-Y');
+        $today_followups                = $this->db->where("($where_f and  lead_stage_id !='1' and  lead_stage_id != '6' and  lead_stage_id != '7' ) and  next_followup_date= '$today_date_n'")
+        // ->join('tbl_followup ', 'tbl_followup.lead_id = tbl_leads.lead_id', 'left')
+        ->get('tbl_followup')->num_rows();
         # Today Followup 
+
+        // print_r($today_followups); die;
+
         // print_r($this->db->last_query()); die;
 
         # Total Followup 
-        $total_followups            = $this->db->where("$where_role and ( lead_stage_id = '2' or lead_stage_id = '3' or lead_stage_id = '4' or lead_stage_id = '5'  )  and followup_date IS NOT NULL ")->get('tbl_leads')->num_rows();
+            $total_followups            = $this->db->where("( $where_role and lead_stage_id !='1' and  lead_stage_id != '6' and  lead_stage_id != '7' )  and added_to_followup=1 ")->get('tbl_leads')->num_rows();
         # Total Followup 
 
+        // print_r($total_followups); die;
+
         # Missed Followup 
-        $missed_followups            =  $this->db->where("$where_role and DATE(STR_TO_DATE(`followup_date`, '%d-%m-%Y')) < '$today_date'")->get('tbl_leads')->num_rows();
+            $missed_followups            =  $this->db->where("$where_f and DATE(STR_TO_DATE(`next_followup_date`, '%d-%m-%Y')) < '$today_date'")->get('tbl_followup')->num_rows();
         # Missed Followup 
 
-        // print_r($total_new_leads); die;
+        // print_r($missed_followups); die;
           
         # lead  count
         
@@ -1654,13 +1689,15 @@ class Agent extends CI_Controller
         # Leads & Followup Query
         
 
-        $where                              =   "(user.role_id in ($user_detail->permission_roles) or user.user_id = '$user_detail->user_id')";
+        $where                              =   "(user.role_id in ($user_detail->permission_roles) or user.user_id = '$user_detail->user_id') AND lead_stage_id=1";
         
         if(!$selected_member_ids):
             $where                          .=   " and lead.user_id in ($members_ids) ";
         else:
             $where                          .=   " and lead.user_id in ($selected_member_ids) ";
         endif;
+
+
 
         $lead_select_query                  =   "
                                                     count(*) as total_count,
@@ -1672,6 +1709,9 @@ class Agent extends CI_Controller
         $this->db->from('tbl_leads as lead');
         $this->db->join('tbl_users  as user', 'user.user_id = lead.user_id', 'left');
         $leads                          =   $this->db->get()->row();
+
+
+        // print_r($leads); die;
 
         
 
@@ -1688,10 +1728,11 @@ class Agent extends CI_Controller
             $where                          .=   " and followup.user_id in ($selected_member_ids) ";
         endif;
 
+        // print_r($where); die;
+
         $followup_select_query                  =   "
                                                         count(*) as total_count,
-                                                        SUM(CASE WHEN ( STR_TO_DATE(next_followup_date, '%d-%m-%Y')  = CURDATE() AND followup_status = '1' AND lead_status_id = 1 ) THEN 1 ELSE 0 END) as today_count,
-                                                        SUM(CASE WHEN ( STR_TO_DATE(next_followup_date, '%d-%m-%Y')  < CURDATE() AND followup_status = '1' AND lead_status_id = 1 ) THEN 1 ELSE 0 END) as missed_count,
+                                                 
                                                         SUM(CASE WHEN lead_stage_id = '1' THEN 1 ELSE 0 END) as total_initial_count,
                                                         SUM(CASE WHEN lead_stage_id = '2' THEN 1 ELSE 0 END) as total_followup_count,
                                                         SUM(CASE WHEN lead_stage_id = '3' THEN 1 ELSE 0 END) as total_enquiry_count,
@@ -1703,7 +1744,7 @@ class Agent extends CI_Controller
 
         $this->db->select($followup_select_query);
         $this->db->where($where);
-        $this->db->from('tbl_followup as followup');
+        $this->db->from('tbl_leads as followup');
         $this->db->join('tbl_users  as user', 'user.user_id = followup.user_id', 'left');
         $followups                          =   $this->db->get()->row();
 
@@ -1712,10 +1753,13 @@ class Agent extends CI_Controller
 
         // print_r($followups); die;
 
-        $data['total_new_leads']    = $followups->total_initial_count;
-        $data['total_followup']     = $followups->total_followup_count;
-        $data['today_followup']     = $followups->today_count;
-        $data['missed_followup']    = $followups->missed_count;
+        # total 
+
+
+        $data['total_new_leads']    = $leads->today_count ?? 0;
+        $data['total_followup']     = $total_followups ?? 0;
+        $data['today_followup']     = $today_followups ?? 0;
+        $data['missed_followup']    = $missed_followups ?? 0;
 
           # Followup
 

@@ -411,7 +411,7 @@
                             <div class="card-body" style="padding: 13px 10px 4px 10px !important;">
                               <h3 class="card-title text-white" style="font-size: 14px;margin-bottom: 5px;">Total Followup</h3>
                               <div class="d-inline-block">
-                                <h2 class="text-white" style="font-size: 24px;"><?= $followups->total_followup_count ?? 0 ?></h2>
+                                <h2 class="text-white" style="font-size: 24px;"><?= $total_followup ?? 0 ?></h2>
                               </div>
                             </div>
                           </div>
@@ -454,7 +454,7 @@
                         </tr>
                         <tr>
                           <td class="text-center"><?= $followups->total_initial_count ?? 0 ?></td>
-                          <td class="text-center"><?= $followups->total_followup_count ?? 0 ?></td>
+                          <td class="text-center"><?= $total_followup ?? 0 ?></td>
                           <td class="text-center"><?= $followups->total_enquiry_count ?? 0 ?></td>
                           <td class="text-center"><?= $followups->total_site_visit_count ?? 0 ?></td>
                           <td class="text-center"><?= $followups->total_metting_count ?? 0 ?></td>
