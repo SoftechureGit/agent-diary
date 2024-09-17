@@ -3013,6 +3013,7 @@ class Api extends CI_Controller
                                         lead_status.lead_type_name as lead_status,
                                         state.state_name,
                                         city.city_name,
+                                        location.location_name,
                                         occupation.occupation_name,
                                         designation.designation_name";  
 
@@ -3029,10 +3030,12 @@ class Api extends CI_Controller
             '(SELECT * FROM tbl_followup WHERE followup_id IN (SELECT MAX(followup_id) FROM tbl_followup GROUP BY lead_id)) as tbl_followup', 'tbl_followup.lead_id = tbl_leads.lead_id',
             'tbl_states as state', 'state.state_id = tbl_leads.lead_state_id',
             'tbl_city as city', 'city.city_id = tbl_leads.lead_city_id', 
+            'tbl_locations as location', 'location.location_id = tbl_leads.location_id',
             'tbl_occupations as occupation', 'occupation.occupation_id = tbl_leads.lead_occupation_id',
             'tbl_lead_types as lead_status', 'lead_status.lead_type_id = tbl_leads.lead_status',
             'tbl_designations as designation', 'designation.designation_id = tbl_leads.lead_designation'
         );  
+
       # end join data 
       
     //   echo json_encode($where); die;
@@ -3097,6 +3100,7 @@ class Api extends CI_Controller
                 $records[$key]['address']                         =  $item->lead_address;
                 $records[$key]['state']                           =  $item->state_name;
                 $records[$key]['city']                            =  $item->city_name;
+                $records[$key]['location']                        =  $item->location_name;
                 $records[$key]['gender']                          =  $item->lead_gender;
                 $records[$key]['marital_status']                  =  $item->lead_marital_status;
                 $records[$key]['occupation']                      =  $item->occupation_name;
