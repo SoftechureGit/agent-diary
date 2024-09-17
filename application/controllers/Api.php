@@ -4249,25 +4249,30 @@ class Api extends CI_Controller
     public function followup_save()
     {
 
+        if($this->input->post('lead_stage_id') < 7 ){
 
-        $this->form_validation->set_rules('followup_id', 'Followup Id', 'required');
-        $this->form_validation->set_rules('lead_stage_id', 'Stage', 'required');
-        $this->form_validation->set_rules('lead_status_id', 'Status', 'required');
-        $this->form_validation->set_rules('next_action', 'Next Action', 'required');
-        $this->form_validation->set_rules('next_followup_date', 'Date', 'required');
-        $this->form_validation->set_rules('next_followup_time', 'Time', 'required');
-        $this->form_validation->set_rules('fp_assign_to', 'Assign To ', 'required');
+            $this->form_validation->set_rules('followup_id', 'Followup Id', 'required');
+            $this->form_validation->set_rules('lead_stage_id', 'Stage', 'required');
+            $this->form_validation->set_rules('lead_status_id', 'Status', 'required');
+            $this->form_validation->set_rules('next_action', 'Next Action', 'required');
+            $this->form_validation->set_rules('next_followup_date', 'Date', 'required');
+            $this->form_validation->set_rules('next_followup_time', 'Time', 'required');
+            $this->form_validation->set_rules('fp_assign_to', 'Assign To ', 'required');
+            
+                    if ($this->form_validation->run() == FALSE):
+                        // Validation failed
+                        $response = array(
+                            'status' => 'error',
+                            'msg'   => validation_errors('<div style="color:red;">', '</div>')
+                        );
+                        echo json_encode($response);
+                        exit;
+                    endif;
+
+        }
 
 
-        if ($this->form_validation->run() == FALSE):
-            // Validation failed
-            $response = array(
-                'status' => 'error',
-                'msg'   => validation_errors('<div style="color:red;">', '</div>')
-            );
-            echo json_encode($response);
-            exit;
-        endif;
+
 
 
         $array = array();
