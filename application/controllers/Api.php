@@ -1793,10 +1793,12 @@ class Api extends CI_Controller
 
             $where = "lead_id='" . $id . "' AND account_id='" . $account_id . "'";
 
-            $this->db->select("tbl_users.username as added_by_name, tbl_leads.*, tbl_states.*, tbl_city.*, tbl_occupations.*, tbl_lead_types.*, tbl_lead_stages.*, tbl_lead_sources.*, tbl_designations.*");
+            $this->db->select("tbl_users.username as added_by_name, tbl_leads.*, tbl_states.*, tbl_city.*, tbl_occupations.*, tbl_lead_types.*, tbl_lead_stages.*, tbl_lead_sources.*, tbl_designations.*,
+            location.location_name");
             $this->db->from('tbl_leads');
             $this->db->join('tbl_states', 'tbl_states.state_id = tbl_leads.lead_state_id', 'left');
             $this->db->join('tbl_city', 'tbl_city.city_id = tbl_leads.lead_city_id', 'left');
+            $this->db->join('tbl_locations as location', 'location.location_id = tbl_leads.location_id', 'left');
             $this->db->join('tbl_occupations', 'tbl_occupations.occupation_id = tbl_leads.lead_occupation_id', 'left');
             $this->db->join('tbl_lead_types', 'tbl_lead_types.lead_type_id = tbl_leads.lead_status', 'left');
             $this->db->join('tbl_lead_stages', 'tbl_lead_stages.lead_stage_id = tbl_leads.lead_stage_id', 'left');
