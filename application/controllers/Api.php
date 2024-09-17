@@ -1793,10 +1793,12 @@ class Api extends CI_Controller
 
             $where = "lead_id='" . $id . "' AND account_id='" . $account_id . "'";
 
-            $this->db->select("tbl_users.username as added_by_name, tbl_leads.*, tbl_states.*, tbl_city.*, tbl_occupations.*, tbl_lead_types.*, tbl_lead_stages.*, tbl_lead_sources.*, tbl_designations.*");
+            $this->db->select("tbl_users.username as added_by_name, tbl_leads.*, tbl_states.*, tbl_city.*, tbl_occupations.*, tbl_lead_types.*, tbl_lead_stages.*, tbl_lead_sources.*, tbl_designations.*,
+            location.location_name");
             $this->db->from('tbl_leads');
             $this->db->join('tbl_states', 'tbl_states.state_id = tbl_leads.lead_state_id', 'left');
             $this->db->join('tbl_city', 'tbl_city.city_id = tbl_leads.lead_city_id', 'left');
+            $this->db->join('tbl_locations as location', 'location.location_id = tbl_leads.location_id', 'left');
             $this->db->join('tbl_occupations', 'tbl_occupations.occupation_id = tbl_leads.lead_occupation_id', 'left');
             $this->db->join('tbl_lead_types', 'tbl_lead_types.lead_type_id = tbl_leads.lead_status', 'left');
             $this->db->join('tbl_lead_stages', 'tbl_lead_stages.lead_stage_id = tbl_leads.lead_stage_id', 'left');
@@ -2069,6 +2071,12 @@ class Api extends CI_Controller
             $email                                  =   $this->input->post('lead_email');
             # End Init
 
+
+            #
+            $lead_dob                                   =   $this->input->post('lead_dob'); 
+            $lead_doa                                   =   $this->input->post('lead_doa'); 
+            #
+
             $record_array                           = array(
                 'lead_date'                                 =>  $this->input->post('lead_date'),
                 'lead_time'                                 =>  $this->input->post('lead_time'),
@@ -2093,8 +2101,8 @@ class Api extends CI_Controller
                 'lead_city_id'                              =>  $this->input->post('lead_city_id'),
                 'location_id'                               =>  $this->input->post('location_id'),
 
-                'lead_dob'                                  =>  $this->input->post('lead_dob'),
-                'lead_doa'                                  =>  $this->input->post('lead_doa'),
+                'lead_dob'                                  =>  $lead_dob ? date('Y-m-d', strtotime($lead_dob)) : null,
+                'lead_doa'                                  =>  $lead_doa ? date('Y-m-d', strtotime($lead_doa)) : null,
                 'user_id'                                   =>  $user_id,
                 'added_by'                                  =>  $user_id,
                 'account_id'                                =>  $account_id,
@@ -3005,6 +3013,7 @@ class Api extends CI_Controller
                                         lead_status.lead_type_name as lead_status,
                                         state.state_name,
                                         city.city_name,
+                                        location.location_name,
                                         occupation.occupation_name,
                                         designation.designation_name";  
 
@@ -3021,10 +3030,12 @@ class Api extends CI_Controller
             '(SELECT * FROM tbl_followup WHERE followup_id IN (SELECT MAX(followup_id) FROM tbl_followup GROUP BY lead_id)) as tbl_followup', 'tbl_followup.lead_id = tbl_leads.lead_id',
             'tbl_states as state', 'state.state_id = tbl_leads.lead_state_id',
             'tbl_city as city', 'city.city_id = tbl_leads.lead_city_id', 
+            'tbl_locations as location', 'location.location_id = tbl_leads.location_id',
             'tbl_occupations as occupation', 'occupation.occupation_id = tbl_leads.lead_occupation_id',
             'tbl_lead_types as lead_status', 'lead_status.lead_type_id = tbl_leads.lead_status',
             'tbl_designations as designation', 'designation.designation_id = tbl_leads.lead_designation'
         );  
+
       # end join data 
       
     //   echo json_encode($where); die;
@@ -3089,6 +3100,7 @@ class Api extends CI_Controller
                 $records[$key]['address']                         =  $item->lead_address;
                 $records[$key]['state']                           =  $item->state_name;
                 $records[$key]['city']                            =  $item->city_name;
+                $records[$key]['location']                        =  $item->location_name;
                 $records[$key]['gender']                          =  $item->lead_gender;
                 $records[$key]['marital_status']                  =  $item->lead_marital_status;
                 $records[$key]['occupation']                      =  $item->occupation_name;
