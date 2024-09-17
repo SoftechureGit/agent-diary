@@ -2071,6 +2071,12 @@ class Api extends CI_Controller
             $email                                  =   $this->input->post('lead_email');
             # End Init
 
+
+            #
+            $lead_dob                                   =   $this->input->post('lead_dob'); 
+            $lead_doa                                   =   $this->input->post('lead_doa'); 
+            #
+
             $record_array                           = array(
                 'lead_date'                                 =>  $this->input->post('lead_date'),
                 'lead_time'                                 =>  $this->input->post('lead_time'),
@@ -2095,8 +2101,8 @@ class Api extends CI_Controller
                 'lead_city_id'                              =>  $this->input->post('lead_city_id'),
                 'location_id'                               =>  $this->input->post('location_id'),
 
-                'lead_dob'                                  =>  $this->input->post('lead_dob'),
-                'lead_doa'                                  =>  $this->input->post('lead_doa'),
+                'lead_dob'                                  =>  $lead_dob ? date('Y-m-d', strtotime($lead_dob)) : null,
+                'lead_doa'                                  =>  $lead_doa ? date('Y-m-d', strtotime($lead_doa)) : null,
                 'user_id'                                   =>  $user_id,
                 'added_by'                                  =>  $user_id,
                 'account_id'                                =>  $account_id,
