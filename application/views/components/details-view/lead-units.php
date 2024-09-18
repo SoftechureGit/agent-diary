@@ -139,7 +139,9 @@
 
                       <div class="col align-self-end">
                         <div class="d-flex text-end" style="justify-content: right;">
+                        <?php if(!$lead_unit->buyer_id): ?>
                           <i class="fa fa-edit px-2  text-success add-edit-new-unit-btn" data-id="<?= $lead_unit->id; ?>" data-lead_id="<?= $lead_unit->lead_id ?>"></i>
+                          <?php endif; ?>
                           <i class="fa fa-eye px-2 text-primary view-unit-details" data-id="<?= $lead_unit->id; ?>"></i>
                         </div>
                       </div>

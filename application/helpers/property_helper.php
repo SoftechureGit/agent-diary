@@ -705,6 +705,7 @@ if (!function_exists('inventory_plot_or_unit_numbers')):
 
         # End Conditions
 
+        db_instance()->distinct("JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.plot_number')) as plot_number, JSON_UNQUOTE(JSON_EXTRACT(inventory.property_details, '$.unit_no')) as unit_number");
         db_instance()->select("
                                 inventory.inventory_id, 
                                 JSON_UNQUOTE(JSON_EXTRACT(inventory.property_details, '$.plot_number')) as plot_number, 
