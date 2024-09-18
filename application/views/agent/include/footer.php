@@ -294,6 +294,23 @@
 
        /*  Get Cities */
        $(document).on('change', '.get_cities', function() {
+
+          /******************************************************
+              *  Booking Form : Fields Reset
+              ********************************************************/
+              booking_form       =   $('#followup-form-modal .booking_form')
+
+          booking_form.find('[name="booking_location_id"]').html('')
+          booking_form.find('[name="booking_project_id"]').html('')
+          booking_form.find('[name="booking_unit_code"]').html('')
+          booking_form.find('[name="booking_inventory_plot_or_unit_number"]').html('')
+          booking_form.find('.project_component_id').html('')
+          booking_form.find('.plot-unit-number-measure-msg').html('')
+
+          /******************************************************** 
+          * End Booking Form : Fields Reset
+          ********************************************************/
+
          var state_id = $(this).val();
          var selected_id = $('#lead-unit-form [name="city_id"]').data('selected_id');
          get_and_set_cities(state_id, selected_id);
@@ -331,6 +348,21 @@
 
        /*  Get Locations */
        $(document).on('change', '.get_locations', function() {
+            /******************************************************
+              *  Booking Form : Fields Reset
+              ********************************************************/
+              booking_form       =   $('#followup-form-modal .booking_form')
+
+              booking_form.find('[name="booking_project_id"]').html('')
+              booking_form.find('[name="booking_unit_code"]').html('')
+              booking_form.find('[name="booking_inventory_plot_or_unit_number"]').html('')
+              booking_form.find('.plot-unit-number-measure-msg').html('')
+              booking_form.find('.project_component_id').html('')
+
+              /******************************************************** 
+              * End Booking Form : Fields Reset
+              ********************************************************/
+
          var city_id = $(this).val();
          var selected_id = $('.set_locations').data('selected_id');
          get_and_set_locations(city_id, selected_id);
@@ -354,6 +386,8 @@
              if (res.status) {
                $('.set_locations').html(res.view)
                $('[name="location_id"]').trigger('change')
+
+               
              }
            }
          })
@@ -363,6 +397,21 @@
        /** Get Properties via location */
 
        $(document).on('change', '.get_properties_via_location', function() {
+
+          /******************************************************
+              *  Booking Form : Fields Reset
+              ********************************************************/
+              booking_form       =   $('#followup-form-modal .booking_form')
+
+              booking_form.find('[name="booking_unit_code"]').html('')
+              booking_form.find('[name="booking_inventory_plot_or_unit_number"]').html('')
+              booking_form.find('.plot-unit-number-measure-msg').html('')
+              booking_form.find('.project_component_id').html('')
+
+              /******************************************************** 
+              * End Booking Form : Fields Reset
+              ********************************************************/
+
          var location_id = $(this).val();
 
          /** Ajax */
@@ -380,6 +429,7 @@
            success: (res) => {
              if (res.status) {
                $('.set_properties_via_location').html(res.view)
+
              }
            }
          })
@@ -419,6 +469,20 @@
        /** Get property unit codes */
 
        $(document).on('change', '.get_property_unit_codes', function() {
+
+          /******************************************************
+              *  Booking Form : Fields Reset
+              ********************************************************/
+              booking_form       =   $('#followup-form-modal .booking_form')
+
+              booking_form.find('[name="booking_inventory_plot_or_unit_number"]').html('')
+              booking_form.find('.project_component_id').html('')
+              booking_form.find('.plot-unit-number-measure-msg').html('')
+
+              /******************************************************** 
+              * End Booking Form : Fields Reset
+              ********************************************************/
+
          var property_id = $(this).val();
 
          /** Ajax */
@@ -436,6 +500,8 @@
            success: (res) => {
              if (res.status) {
                $('.set_property_unit_codes').html(res.view)
+
+              
              }
            }
          })
