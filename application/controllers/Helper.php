@@ -545,7 +545,7 @@ class Helper extends CI_Controller
     }
     # End Inventory Plot Or Unit Numbers
 
-      # Get Inventory Details
+      # Get Unit Inventory Details
       public function get_unit_inventory_details()
       {
           $lead_id                 =   $this->input->get('lead_id');
@@ -592,7 +592,7 @@ class Helper extends CI_Controller
   
           echo json_encode($res_arr);
       }
-      # End Get Inventory Details
+      # End Get Unit  Inventory Details
 
     # Components
     public function property_components()

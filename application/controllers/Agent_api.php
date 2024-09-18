@@ -9344,7 +9344,7 @@ WHERE lead_id='" . $lead_id . "'
                                                         lead_mobile_no
                                                     ) AS mobile
                                                 ";
-                $leads_where_query           =   "( lead_id != $lead_id and lead_status = '1' )";
+                $leads_where_query           =   "( lead_id != $lead_id and lead_status = '1' and added_to_followup = '1' )";
 
                 
                 $leads_data                  =   leads(['select' => $leads_select_query, 'where' => $leads_where_query]);

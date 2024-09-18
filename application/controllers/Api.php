@@ -13436,9 +13436,34 @@ class Api extends CI_Controller
         endif;
         # End Init
 
-        $lead_select_query      =   "lead_id as id, CONCAT(IFNULL(lead_title, ''), ' ',IFNULL(lead_first_name, ''), ' ', IFNULL(lead_last_name, '')) as full_name";
+        # Buyer Details
+        $lead_select_query      =   "lead_id as id, 
+                                    CONCAT(IFNULL(lead_title, ''), ' ',IFNULL(lead_first_name, ''), ' ', IFNULL(lead_last_name, '')) as full_name,
+                                    added_to_followup,
+                                    lead_status,
+                                    lead_stage_id
+                                    ";
         $buyer                  =   leads(['id' => $lead_id, 'select' => $lead_select_query]);
+        # End Buyer Details
 
+        # Validation
+            if(!$buyer):
+                echo json_encode(['status' => false, 'message' => 'Buyer not found']);
+                exit;
+            endif;
+
+            if(!$buyer->added_to_followup):
+                echo json_encode(['status' => false, 'message' => 'Buyer not in followup']);
+                exit;
+            endif;
+
+            if($buyer->lead_status != 1 && ( $buyer->lead_stage_id == 6 || $buyer->lead_stage_id == 7 )):
+                echo json_encode(['status' => false, 'message' => 'Buyer not able to perfom booking process']);
+                exit;
+            endif;
+
+        # End Validation
+        
         # All Leads
         $leads_select_query          =  "   lead_id as id, 
                                             CONCAT(IFNULL(lead_title, ''), ' ',IFNULL(lead_first_name, ''), ' ', IFNULL(lead_last_name, '')) as full_name, 
@@ -13452,7 +13477,7 @@ class Api extends CI_Controller
                                                 lead_mobile_no
                                             ) AS mobile
                                         ";
-        $leads_where_query           =   "( lead_id != $lead_id and lead_status = '1' )";
+        $leads_where_query           =   "( lead_id != $lead_id and lead_status = '1' and added_to_followup = '1')";
 
         $sellers                =   leads(['select' => $leads_select_query, 'where' => $leads_where_query]);
         # End All Leads
@@ -13652,6 +13677,75 @@ class Api extends CI_Controller
     }
     # End Get Inventory Details
 
+          # Get Unit Inventory
+          public function unit_inventory()
+          {
+              $arr                          =   [];
+              $id                           =   request()->id ?? 0;
+              $lead_id                      =   request()->lead_id ?? 0;
+              $inventory_id                 =   request()->inventory_id ?? 0;
+
+              $where                        =   " 1 = 1 ";
+              
+                # Id
+                if($id):
+                    $where                        .=   " and id = '$id' ";
+                endif;
+                # End Id
+              
+                # Lead Id
+                if($lead_id):
+                    $where                        .=   " and lead_id = '$lead_id' ";
+                endif;
+                # End Lead Id
+              
+                # Inventory Id
+                if($inventory_id):
+                    $where                        .=   " and inventory_id = '$inventory_id' ";
+                endif;
+                # End Inventory Id
+      
+              $data               =   $this->db->where($where)->get('tbl_lead_units')->row();
+      
+              if ($data->property_details ?? 0) :
+      
+                  # Decode
+                  $data->property_details = json_decode($data->property_details);
+      
+                  if(( $data->property_details->size_unit ?? 0 ) || ( $data->property_details->sa_size_unit ?? 0 )):
+                      $size_unit      =   '';
+                      $size_unit = ( ( $data->property_details->size_unit ?? 0 ) ? $data->property_details->size_unit : ($data->property_details->sa_size_unit ?? '')) ;
+      
+                      $plot_or_unit_size                          =   ( $data->property_details->plot_size ?? 0 ) ? $data->property_details->plot_size : ($data->property_detail->sa ?? '');
+      
+                      $data->property_details->size_unit_name   = $size_unit ? sizeUnits($size_unit)->unit_name : 'N/A';
+                      $data->property_details->measure_msg     =  $plot_or_unit_size." / ".$data->property_details->size_unit_name;
+                      $data->property_details->plot_or_unit_size     =  $plot_or_unit_size;
+                  endif;
+                  # End Decode
+      
+      
+                  $property_id = $property_details->product_id ?? 0;
+                  $unit_code = $property_details->unit_code ?? 0;
+      
+                  if ($property_id) :
+                      $property  = property($property_id);
+                      $property_accomodation  = getPropertyAccomodations($property->project_type_id ?? 0, $property->property_type_id ?? 0, $property_id, $property_details->unit_code);
+                      $data->unit_code_name  = $property_accomodation->unit_code_with_accomodation_name ?? $property_accomodation->inventory_unit_code ?? '';
+                  endif;
+      
+              endif;
+      
+              if ($data) :
+                  $res_arr        =  ['status' => true, 'message' => 'Data fetched', 'data' =>  $data];
+              else :
+                  $res_arr        =  ['status' => false, 'message' => 'Data not found'];
+              endif;
+      
+      
+              echo json_encode($res_arr);
+          }
+          # End Get Unit Inventory 
     # End Followup : Booking Form Data
 
 }
