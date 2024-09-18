@@ -513,13 +513,14 @@ class Helper extends CI_Controller
     # Inventory Plot Or Unit Numbers
     public function inventory_plot_or_unit_numbers()
     {
+        $lead_id                  =    $this->input->get('lead_id');
         $property_id                =    $this->input->get('property_id');
         $unit_code                  =    $this->input->get('unit_code');
         $selected_id                =    $this->input->get('selected_id');
         $view                       =    $this->input->get('view');
         $options                    =    "";
 
-        $records                 = inventory_plot_or_unit_numbers((object) ['property_id' => $property_id,  'unit_code' => $unit_code]);
+        $records                 = inventory_plot_or_unit_numbers((object) ['property_id' => $property_id,  'unit_code' => $unit_code, 'lead_id' => ( $lead_id ?? 0 )]);
 
         if ($view):
             $options                =   "<option value='' disabled selected>Choose...</option>";
@@ -543,6 +544,55 @@ class Helper extends CI_Controller
         echo json_encode(['status' => true, 'message' => 'Successfully data fetched', 'data' => $records, 'options_view' => $options]);
     }
     # End Inventory Plot Or Unit Numbers
+
+      # Get Inventory Details
+      public function get_unit_inventory_details()
+      {
+          $lead_id                 =   $this->input->get('lead_id');
+          $inventory_id                 =   $this->input->get('inventory_id');
+          $arr                =   [];
+  
+          $data               =   $this->db->where("lead_id = '$lead_id' && inventory_id = '$inventory_id'")->get('tbl_lead_units')->row();
+  
+          if ($data->property_details ?? 0) :
+  
+              # Decode
+              $data->property_details = json_decode($data->property_details);
+  
+              if(( $data->property_details->size_unit ?? 0 ) || ( $data->property_details->sa_size_unit ?? 0 )):
+                  $size_unit      =   '';
+                  $size_unit = ( ( $data->property_details->size_unit ?? 0 ) ? $data->property_details->size_unit : ($data->property_details->sa_size_unit ?? '')) ;
+  
+                  $plot_or_unit_size                          =   ( $data->property_details->plot_size ?? 0 ) ? $data->property_details->plot_size : ($data->property_detail->sa ?? '');
+  
+                  $data->property_details->size_unit_name   = $size_unit ? sizeUnits($size_unit)->unit_name : 'N/A';
+                  $data->property_details->measure_msg     =  $plot_or_unit_size." / ".$data->property_details->size_unit_name;
+                  $data->property_details->plot_or_unit_size     =  $plot_or_unit_size;
+              endif;
+              # End Decode
+  
+  
+              $property_id = $property_details->product_id ?? 0;
+              $unit_code = $property_details->unit_code ?? 0;
+  
+              if ($property_id) :
+                  $property  = property($property_id);
+                  $property_accomodation  = getPropertyAccomodations($property->project_type_id ?? 0, $property->property_type_id ?? 0, $property_id, $property_details->unit_code);
+                  $data->unit_code_name  = $property_accomodation->unit_code_with_accomodation_name ?? $property_accomodation->inventory_unit_code ?? '';
+              endif;
+  
+          endif;
+  
+          if ($data) :
+              $res_arr        =  ['status' => true, 'message' => 'Data fetched', 'data' =>  $data];
+          else :
+              $res_arr        =  ['status' => false, 'message' => 'Data not found'];
+          endif;
+  
+  
+          echo json_encode($res_arr);
+      }
+      # End Get Inventory Details
 
     # Components
     public function property_components()

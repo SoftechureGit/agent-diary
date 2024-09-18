@@ -685,6 +685,7 @@ if (!function_exists('inventory_plot_or_unit_numbers')):
         # Data 
         $property_id    = $data->property_id ?? 0;
         $unit_code      = $data->unit_code ?? 0;
+        $lead_id        = $data->lead_id ?? 0;
         # End Data 
 
         # Conditions
@@ -695,21 +696,30 @@ if (!function_exists('inventory_plot_or_unit_numbers')):
         endif;
 
         if ($unit_code):
-            $where          .=   " and JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.unit_code')) = '$unit_code'";
+            $where          .=   " and JSON_UNQUOTE(JSON_EXTRACT(inventory.property_details, '$.unit_code')) = '$unit_code'";
         endif;
+
+        if ($lead_id):
+            $where          .=   " and unit_invenotry.lead_id = '$lead_id'";
+        endif;
+
         # End Conditions
 
         db_instance()->select("
-                                inventory_id, 
-                                JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.plot_number')) as plot_number, 
-                                JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.unit_no')) as unit_number,
+                                inventory.inventory_id, 
+                                JSON_UNQUOTE(JSON_EXTRACT(inventory.property_details, '$.plot_number')) as plot_number, 
+                                JSON_UNQUOTE(JSON_EXTRACT(inventory.property_details, '$.unit_no')) as unit_number,
                                 inventory_status,
                                 inventory_status.inventory_status_name
                                 ");
+                                
         db_instance()->where($where);
+        
         db_instance()->join('tbl_inventory_status as inventory_status', 'inventory_status.inventory_status_id = inventory.inventory_status', 'left');
+        
+        db_instance()->join('tbl_lead_units as unit_invenotry', 'unit_invenotry.inventory_id = inventory.inventory_id', 'left');
+        
         db_instance()->from('tbl_inventory as inventory');
-
         $records = db_instance()->get()->result();
 
         return $records;

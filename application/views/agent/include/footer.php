@@ -950,11 +950,59 @@
 
        // 
        $(document).on('change', '.inventory_plot_or_unit_numbers', function() {
-         var id = $(this).find('option:checked').data('inventory-id')
+         var inventory_id = $(this).find('option:checked').data('inventory-id')
+         seller_id = $('[name="booking_seller_id"]').val()
 
-         get_inventory_details(id);
+         get_unit_inventory_details({
+           'inventory_id': inventory_id,
+           'lead_id': seller_id,
+         });
 
        })
+
+       /** Get Inventory Details */
+       function get_unit_inventory_details({
+        inventory_id = 0,
+         lead_id = 0,
+       }) {
+
+         if (!inventory_id && !lead_id) return
+
+         // Fetch Data
+         $.ajax({
+           type: "GET",
+           url: "<?= base_url('helper/get_unit_inventory_details'); ?>",
+           data: {
+              inventory_id: inventory_id,
+              lead_id: lead_id,
+           },
+           dataType: 'json',
+           beforeSend: function(data) {
+             $(".loader_progress").show();
+           },
+           success: function(res) {
+             if (res.status) {
+           
+               $('.plot-unit-number-measure-msg').text(res.data.property_details.measure_msg)
+
+               $('input.plot_or_unit_size').val(res.data.property_details.plot_or_unit_size)
+               $('.booking-deal-amount-container .rate').trigger('input')
+
+             } else {
+               showToast(res.message);
+             }
+
+             $(".loader_progress").hide();
+           },
+           error: function() {
+             $(".loader_progress").hide();
+
+           }
+
+         });
+         // End Fetch Data
+       }
+       /** End Get Inventory Details */
 
        /** Get Inventory Details */
        function get_inventory_details(id) {
@@ -975,10 +1023,10 @@
              if (res.status) {
                $('#view-inventory-details-Modal .inventory-details-container').html(res.detail_view)
 
-               $('.plot-unit-number-measure-msg').text(res.data.property_detail.measure_msg)
+              //  $('.plot-unit-number-measure-msg').text(res.data.property_detail.measure_msg)
 
-               $('input.plot_or_unit_size').val(res.data.property_detail.plot_or_unit_size)
-               $('.booking-deal-amount-container .rate').trigger('input')
+              //  $('input.plot_or_unit_size').val(res.data.property_detail.plot_or_unit_size)
+              //  $('.booking-deal-amount-container .rate').trigger('input')
 
              } else {
                showToast(res.message);
@@ -1218,10 +1266,12 @@
        $(document).on('change', '.get_inventory_plot_or_unit_numbers', function() {
          property_id = $('.booking_project_id').val()
          unit_code = this.value
+         seller_id = $('[name="booking_seller_id"]').val()
 
          get_set_inventory_plot_numbers({
            'property_id': property_id,
-           'unit_code': unit_code
+           'unit_code': unit_code,
+           'lead_id': seller_id
          })
        })
        /** End Followup Success Booking Form */
@@ -1229,7 +1279,8 @@
        /** get_set_inventory_plot_numbers */
        function get_set_inventory_plot_numbers({
          property_id = 0,
-         unit_code = 0
+         unit_code = 0,
+         lead_id = 0
        }) {
 
          if (!unit_code || !property_id) {
@@ -1247,6 +1298,7 @@
              data: {
                property_id: property_id,
                unit_code: unit_code,
+               lead_id: lead_id,
                selected_id: selected_id,
                view: true,
              },
