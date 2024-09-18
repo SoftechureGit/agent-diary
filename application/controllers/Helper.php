@@ -85,13 +85,13 @@ class Helper extends CI_Controller
         $property_id                =   $this->input->get('property_id');
         $is_view                    =   $this->input->get('view');
 
-        if($property_id):
-            $where                      =   "product_id = $property_id";    
+        if ($property_id):
+            $where                      =   "product_id = $property_id";
         endif;
 
         $unit_codes_query_data       =   (object)[
-                                                    'where' => $where
-                                                ];
+            'where' => $where
+        ];
 
         $records                =   unit_codes($unit_codes_query_data);
 
@@ -109,7 +109,8 @@ class Helper extends CI_Controller
     # End Unit Codes
 
     # Get Inventory Details
-    public function get_inventory_details(){
+    public function get_inventory_details()
+    {
         $arr                        =   [];
         $id                         =   $this->input->get('id');
         $plot_or_unit_number                         =   $this->input->get('plot_or_unit_number');
@@ -119,10 +120,10 @@ class Helper extends CI_Controller
         $property_layout_url        =  ($inventory->property_layout ?? 0) ? base_url("/uploads/images/property/unit/$inventory->property_layout") : null;;
         $property_details           =  ($inventory->property_details ?? 0) ? json_decode($inventory->property_details ?? []) : $inventory;
 
-        if($inventory):
-            $arr                    =   [ 'status' => true, 'message' => 'Successfully data fetched', 'data' => $property_details ];
+        if ($inventory):
+            $arr                    =   ['status' => true, 'message' => 'Successfully data fetched', 'data' => $property_details];
         else:
-            $arr                    =   [ 'status' => true, 'message' => 'Inventory data not fetched'];
+            $arr                    =   ['status' => true, 'message' => 'Inventory data not fetched'];
         endif;
         echo json_encode($arr);
     }
@@ -147,41 +148,41 @@ class Helper extends CI_Controller
         switch ($form_request_for):
             case 'inventory':
                 $inventory               =  getInventory($lead_or_inventory_id);
-                
+
                 $property_layout            =  $inventory->property_layout ?? null;
                 $property_layout_url     =  ($inventory->property_layout ?? 0) ? base_url("/uploads/images/property/unit/$inventory->property_layout") : null;;
                 $property_details        =  ($inventory->property_details ?? 0) ? json_decode($inventory->property_details ?? []) : $inventory;
-                
+
                 break;
-                
-                case 'unit-inventory':
-                    
-                    if($lead_or_inventory_id):
 
-                        
-                        $inventory               =  lead_unit_details($lead_or_inventory_id);
+            case 'unit-inventory':
 
-                        if(!$inventory):
-                            $inventory               =  getInventory($lead_or_inventory_id);
-                            
-                            $inventory->property_details = ($inventory->property_details ?? 0) ? json_decode($inventory->property_details ?? 0 ) : $inventory;
-                        endif;
-                        
-                        $property_layout         =  $inventory->property_layout ?? null;
-                        $property_layout_url     =  ($inventory->property_layout ?? 0) ? base_url("/uploads/images/property/unit/$inventory->property_layout") : null;;
-                        $property_details        =  ($inventory->property_details ?? 0) ? $inventory->property_details : $inventory;
-                        
+                if ($lead_or_inventory_id):
+
+
+                    $inventory               =  lead_unit_details($lead_or_inventory_id);
+
+                    if (!$inventory):
+                        $inventory               =  getInventory($lead_or_inventory_id);
+
+                        $inventory->property_details = ($inventory->property_details ?? 0) ? json_decode($inventory->property_details ?? 0) : $inventory;
                     endif;
+
+                    $property_layout         =  $inventory->property_layout ?? null;
+                    $property_layout_url     =  ($inventory->property_layout ?? 0) ? base_url("/uploads/images/property/unit/$inventory->property_layout") : null;;
+                    $property_details        =  ($inventory->property_details ?? 0) ? $inventory->property_details : $inventory;
+
+                endif;
                 break;
 
-            // default:
-            //     if ($property_id && $selected_property_id != $property_id) :
-            //         $property_details               =   project_property_details($property_type_id, $property_id);
-            //     elseif ($lead_or_inventory_id) :
-            //         $lead_unit_details               = lead_unit_details($lead_or_inventory_id);
-            //         $property_details                = $lead_unit_details->property_details ?? null;
-            //     endif;
-            //     break;
+        // default:
+        //     if ($property_id && $selected_property_id != $property_id) :
+        //         $property_details               =   project_property_details($property_type_id, $property_id);
+        //     elseif ($lead_or_inventory_id) :
+        //         $lead_unit_details               = lead_unit_details($lead_or_inventory_id);
+        //         $property_details                = $lead_unit_details->property_details ?? null;
+        //     endif;
+        //     break;
         endswitch;
 
         # Additional
@@ -216,18 +217,18 @@ class Helper extends CI_Controller
         # Additional
 
 
-        if(!isset($property_details)):
-            $property_details  = ( object ) [];
+        if (!isset($property_details)):
+            $property_details  = (object) [];
             $property_details->form_request_for    = $form_request_for;
         else:
-            if(is_array($property_details)):
+            if (is_array($property_details)):
                 $property_details['form_request_for']    = $form_request_for;
             endif;
-            if(is_object($property_details)):
+            if (is_object($property_details)):
                 $property_details->form_request_for    = $form_request_for;
             endif;
         endif;
-        
+
         $form_view                      =   property_form($property_type_id, $property_details ?? null);
 
         echo json_encode(['status' => true, 'message' => 'Successfully data fetched', 'form_view' => $form_view, 'property_layout_url' => $property_layout_url, 'property_layout' => $property_layout]);
@@ -258,7 +259,6 @@ class Helper extends CI_Controller
     # Get Lead Units
     public function projects()
     {
-
         # Init
         $project_type_id                    =   $this->input->get('project_type_id');
         $property_type_id                   =   $this->input->get('property_type_id');
@@ -301,8 +301,7 @@ class Helper extends CI_Controller
         endif;
 
 
-        $records        =   $records->get('tbl_products as project')
-            ->result();
+        $records        =   $records->get('tbl_products as project')->result();
 
         if ($is_view) :
             $view                   =   "<option value='' selected>Choose...</option>";
@@ -476,14 +475,15 @@ class Helper extends CI_Controller
     # End Delete Lead
 
     # Get Property Unit Details
-    public function get_property_unit_details(){
+    public function get_property_unit_details()
+    {
         $arr        =   [];
         $id         = $this->input->get('id');
-        
- 
+
+
 
         $data           =   get_property_unit_details($id);
-        if($id):
+        if ($id):
             $arr        =   ['status' => true, 'message' => 'Data Fetched successfully', 'data' => $data];
         else:
             $arr        =   ['status' => false, 'message' => 'Some error occured'];
@@ -493,47 +493,47 @@ class Helper extends CI_Controller
     }
     # End Get Property Unit Details
     # get invetory file sample 
-        public function get_invetory_sample_file(){
+    public function get_invetory_sample_file()
+    {
 
-            # post data
-                $property_id                    = $this->input->get('property_id');
-           # end post data
+        # post data
+        $property_id                    = $this->input->get('property_id');
+        # end post data
 
-        
-          $excel =   property_excel($property_id);
 
-          if($excel==false){
-                redirect('agent/manage-inventory/', 'refresh');      
-          }
-        
+        $excel =   property_excel($property_id);
 
+        if ($excel == false) {
+            redirect('agent/manage-inventory/', 'refresh');
         }
+    }
     # end  get invetory file sample 
 
 
     # Inventory Plot Or Unit Numbers
-    public function inventory_plot_or_unit_numbers(){
+    public function inventory_plot_or_unit_numbers()
+    {
         $property_id                =    $this->input->get('property_id');
         $unit_code                  =    $this->input->get('unit_code');
         $selected_id                =    $this->input->get('selected_id');
         $view                       =    $this->input->get('view');
         $options                    =    "";
 
-        $records                 = inventory_plot_or_unit_numbers((object) [ 'property_id' => $property_id,  'unit_code' => $unit_code ]);
+        $records                 = inventory_plot_or_unit_numbers((object) ['property_id' => $property_id,  'unit_code' => $unit_code]);
 
-        if($view):
+        if ($view):
             $options                =   "<option value='' disabled selected>Choose...</option>";
-            
+
             foreach ($records ?? [] as $record) :
                 $is_sold                =   $record->inventory_status != 1 ? 'disabled' : '';
-                $is_sold_label                =   $record->inventory_status != 1 ? '( Sold )' : '';
+                $is_sold_label                =   ( ( $record->inventory_status != 1 && $record->inventory_status_name ?? 0 ) ) ? "( $record->inventory_status_name )" : '';
 
-                if($record->plot_number):
+                if ($record->plot_number):
                     $selected            =  $selected_id == $record->plot_number ? 'selected' : '';
                     $options            .=  "<option value='$record->plot_number' $selected $is_sold data-inventory-id='$record->inventory_id'>$record->plot_number $is_sold_label</option>";
                 endif;
 
-                if($record->unit_number):
+                if ($record->unit_number):
                     $selected            =  $selected_id == $record->unit_number ? 'selected' : '';
                     $options            .=  "<option value='$record->unit_number' $selected $is_sold data-inventory-id='$record->inventory_id'>$record->unit_number $is_sold_label</option>";
                 endif;
@@ -545,22 +545,23 @@ class Helper extends CI_Controller
     # End Inventory Plot Or Unit Numbers
 
     # Components
-        public function property_components(){
-           
+    public function property_components()
+    {
+
         $property_id            =   $this->input->get('project_id');
         $unit_code_id              =   $this->input->get('unit_code_id');
 
-        $records                =   property_components((object) [ 'property_id' => $property_id, 'unit_code_id' => $unit_code_id ]);
+        $records                =   property_components((object) ['property_id' => $property_id, 'unit_code_id' => $unit_code_id]);
 
         $options                =   "<option value='' disabled selected>Choose...</option>";
 
         foreach ($records->all_components ?? [] as $record) :
             $unit_type          = $record->unit_type ?? 0;
 
-                $options            .=   "<option value='$record->id' data-type='$record->type' data-price='$record->price' data-unit-type='$unit_type'>$record->name</option>";
-           endforeach;
+            $options            .=   "<option value='$record->id' data-type='$record->type' data-price='$record->price' data-unit-type='$unit_type'>$record->name</option>";
+        endforeach;
 
-        echo json_encode(['status' => true, 'message' => 'Successfully data fetched', 'data' => $records, 'view' => $options]); 
-        }
+        echo json_encode(['status' => true, 'message' => 'Successfully data fetched', 'data' => $records, 'view' => $options]);
+    }
     # Components
 }

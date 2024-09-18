@@ -9859,6 +9859,7 @@ class Api extends CI_Controller
 
             $city_list = array();
             if ($id) {
+                $this->db->select('city_id, city_name');
                 $where = "state_id='" . $id . "' order by city_name asc ";
                 $city_list = $this->Action_model->detail_result('tbl_city', $where);
             }
@@ -13465,6 +13466,192 @@ class Api extends CI_Controller
                                     ];
         echo json_encode($arr);
     }
+
+    # Projects
+    public function projects()
+    {
+        # Init
+        $project_type_id                    =   request()->project_type_id ?? 0;
+        $property_type_id                   =   request()->property_type_id ?? 0;
+        $state_id                           =   request()->state_id ?? 0;
+        $city_id                            =   request()->city_id ?? 0;
+        $location_id                        =   request()->location_id ?? 0;
+        # End Init
+
+        $account_id                         = getAccountId();
+
+        $records    =   $this->db
+            ->select('project.product_id as id, project.project_name as name, product_type.product_type_name as project_type_name, unit_type.unit_type_name as property_type_name, state.state_name, city.city_name,
+                location.location_name
+            ')
+            ->join('tbl_product_types as product_type', 'product_type.product_type_id = project.project_type', 'left')
+            ->join('tbl_unit_types as unit_type', 'unit_type.unit_type_id = project.property_type', 'left')
+            ->join('tbl_states as state', 'state.state_id = project.state_id', 'left')
+            ->join('tbl_city as city', 'city.city_id = project.city_id', 'left')
+            ->join('tbl_locations as location', 'location.location_id = project.location', 'left')
+            ->order_by("project.product_id", "desc")
+            ->where("project.agent_id = '$account_id' and project.product_status = '1'");
+
+        if ($project_type_id) :
+            $records->where("project.project_type = $project_type_id");
+        endif;
+
+        if ($property_type_id) :
+            $records->where("project.property_type = $property_type_id");
+        endif;
+
+        if ($state_id) :
+            $records->where("project.state_id = $state_id");
+        endif;
+
+        if ($city_id) :
+            $records->where("project.city_id = $city_id");
+        endif;
+
+        if ($location_id) :
+            $records->where("project.location = $location_id");
+        endif;
+
+        $records        =   $records->get('tbl_products as project')->result();
+
+        echo json_encode(['status' => true, 'message' => 'Successfully data fetched', 'data' => $records]);
+    }
+    # End Projects
+
+    # Unit Codes
+    public function unit_codes()
+    {
+        $project                =   request()->project_id;
+      
+        $where                      =   " 1 = 1 ";
+        
+        if ($project):
+            $where                   .=   " and product_id = '$project'";
+        endif;
+
+        $unit_codes_query_data       =   (object)[
+                                                        'where' => $where
+                                                    ];
+
+        $records                =   unit_codes($unit_codes_query_data);
+
+        echo json_encode(['status' => true, 'message' => 'Successfully data fetched', 'data' => $records]);
+    }
+    # End Unit Codes
+
+     # Inventory Plot Or Unit Numbers
+     public function inventory_plot_or_unit_numbers()
+     {
+        $property_id                =    request()->project_id ?? 0;
+        $unit_code                  =    request()->unit_code ?? 0;
+        
+        # Validation
+        if(!$property_id && !$unit_code):
+            $message = "";
+
+            if(!$property_id):
+                $message = "Property id required";
+            endif;
+
+            if(!$unit_code):
+                $message = "Unit Code required";
+            endif;
+            
+            echo json_encode(['status' => false, 'message' => $message]);
+            exit;
+        endif;
+        # Validation
+
+        $records                   =   inventory_plot_or_unit_numbers((object) ['property_id' => $property_id,  'unit_code' => $unit_code]);
+ 
+        echo json_encode(['status' => true, 'message' => 'Successfully data fetched', 'data' => $records]);
+     }
+     # End Inventory Plot Or Unit Numbers
+
+     # Components
+    public function project_components()
+    {
+        $property_id            =   request()->project_id ?? 0;
+        $unit_code_id           =   request()->unit_code_id ?? 0;
+
+        # Validation
+        if(!$property_id && !$unit_code_id):
+            $message = "";
+
+            if(!$property_id):
+                $message = "Property id required";
+            endif;
+
+            if(!$unit_code):
+                $message = "Unit Code required";
+            endif;
+            
+            echo json_encode(['status' => false, 'message' => $message]);
+            exit;
+        endif;
+        # Validation
+
+        $records                =   property_components((object) ['property_id' => $property_id, 'unit_code_id' => $unit_code_id]);
+
+        unset($records->plc_components); 
+        unset($records->additional_components); 
+
+        echo json_encode($records);
+    }
+    # Components
+
+    # Get Inventory Details
+    public function inventory()
+    {
+        $id                 =   request()->inventory_id;
+        $arr                =   [];
+
+        $this->db->select('inventory_id as id, product_id, builder_id, unit_code, inventory_status, property_details, property_layout');
+        $data               =   $this->db->where("inventory_id = $id")->get('tbl_inventory')->row();
+
+        if ($data->property_details ?? 0) :
+
+            # Decode
+            $data->property_details = json_decode($data->property_details);
+
+            if(( $data->property_details->size_unit ?? 0 ) || ( $data->property_details->sa_size_unit ?? 0 )):
+                $size_unit      =   '';
+                $size_unit = ( ( $data->property_detail->size_unit ?? 0 ) ? $data->property_details->size_unit : ($data->property_details->sa_size_unit ?? '')) ;
+
+                $plot_or_unit_size                          =   ( $data->property_details->plot_size ?? 0 ) ? $data->property_details->plot_size : ($data->property_detail->sa ?? '');
+
+                $data->property_details->size_unit_name   = $size_unit ? sizeUnits($size_unit)->unit_name : 'N/A';
+                $data->property_details->measure_msg     =  $plot_or_unit_size." / ".$data->property_details->size_unit_name;
+                $data->property_details->plot_or_unit_size     =  $plot_or_unit_size;
+            endif;
+            # End Decode
+
+
+            $property_id = $property_details->product_id ?? 0;
+            $unit_code = $property_details->unit_code ?? 0;
+
+            if ($property_id) :
+                $property  = property($property_id);
+                $property_accomodation  = getPropertyAccomodations($property->project_type_id ?? 0, $property->property_type_id ?? 0, $property_id, $property_details->unit_code);
+                $data->unit_code_name  = $property_accomodation->unit_code_with_accomodation_name ?? $property_accomodation->inventory_unit_code ?? '';
+            endif;
+
+            
+
+        endif;
+
+       
+        if ($data) :
+            $res_arr        =  ['status' => true, 'message' => 'Data fetched','data' =>  $data];
+        else :
+            $res_arr        =  ['status' => false, 'message' => 'Data not found'];
+        endif;
+
+
+        echo json_encode($res_arr);
+    }
+    # End Get Inventory Details
+
     # End Followup : Booking Form Data
 
 }
