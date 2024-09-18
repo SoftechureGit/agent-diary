@@ -241,7 +241,15 @@ if (!function_exists('getAccountId')) {
         $CI    =    get_instance();
         $CI->load->database();
 
-        $where = "user_hash='" . $CI->session->userdata('agent_hash') . "'";
+        $user_hash = $CI->input->request_headers()['Access-Token'] ?? null;
+
+        if($user_hash):
+            $where = "user_hash='" . $user_hash . "'";
+        else:
+            $where = "user_hash='" . $CI->session->userdata('agent_hash') . "'";
+        endif;
+
+        
         $CI->db->where($where);
         $query = $CI->db->get('tbl_users');
         $user_detail = $query->row();
@@ -1307,4 +1315,84 @@ if (!function_exists('getAccountId')) {
    
     # end  create excel with multiple sheet  
 
+    # Account Helper
+    if(!function_exists('getAgent')){
+    function getAgent()
+    {
+        $user_hash = CI()->input->request_headers()['Access-Token'] ?? null;
+
+        if($user_hash):
+            $where = "user_hash='" . $user_hash . "'";
+        else:
+            $where = "user_hash='" . CI()->session->userdata('agent_hash') . "'";
+        endif;
+
+        $user_detail = CI()->Action_model->select_single('tbl_users', $where);
+        return $user_detail;
+    }
+}
+    
+    if(!function_exists('get_level_user_ids')){
+        function get_level_user_ids()
+        {
+            $agent = getAgent();
+            $user_role_id = $agent->role_id;
+
+            $user_ids = array();
+            if ($user_role_id == 5) {
+                $user_ids[] = $agent->user_id;
+
+                $w1 = "role_id='4' AND report_to='" . $agent->user_id . "'";
+                $d1 = $this->Action_model->detail_result('tbl_users', $w1);
+                if ($d1) {
+                    foreach ($d1 as $item1) {
+
+                        $user_ids[] = $item1->user_id;
+
+                        $w2 = "role_id='3' AND report_to='" . $item1->user_id . "'";
+                        $d2 = $this->Action_model->detail_result('tbl_users', $w2);
+                        if ($d2) {
+                            foreach ($d2 as $item2) {
+
+                                $user_ids[] = $item2->user_id;
+                            }
+                        }
+                    }
+                }
+            } else if ($user_role_id == 4) {
+                $user_ids[] = $agent->user_id;
+
+                $w1 = "role_id='3' AND report_to='" . $agent->user_id . "'";
+                $d1 = $this->Action_model->detail_result('tbl_users', $w1);
+                if ($d1) {
+                    foreach ($d1 as $item1) {
+
+                        $user_ids[] = $item1->user_id;
+                    }
+                }
+            } else if ($user_role_id == 3) {
+                $user_ids[] = $agent->user_id;
+            }
+
+            return $user_ids;
+        }
+    }
+
+    # End Account Helper
+
+    # Request
+
+    if(!function_exists('request')){
+
+    function request(){
+            if(CI()->input->post()):
+                return (object) CI()->input->post();
+            endif;
+
+            if(CI()->input->get()):
+                return (object) CI()->input->get();
+            endif;
+        }
+    }
+    # Request
 }

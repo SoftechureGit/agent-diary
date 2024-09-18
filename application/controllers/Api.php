@@ -44,7 +44,7 @@ class Api extends CI_Controller
                 if ($this->checkApiKey()):
 
                     $endpoint = $this->uri->segment(2);
-                
+
                     # Check is User Login
                     if ($endpoint != 'agent_signin' && !$this->isUserLogin()):
                         $result['data']         =   [
@@ -55,7 +55,7 @@ class Api extends CI_Controller
                         echo $someJSON;
                         exit;
                     endif;
-                    # Check is User Login
+                # Check is User Login
 
                 else:
                     $result['data']             =   [
@@ -119,7 +119,15 @@ class Api extends CI_Controller
             // $where          =   "user_hash = '$access_token' and role_id = '2'";
             $where          =   "user_hash = '$access_token'";
             // $this->user     =   $this->Action_model->select_single('tbl_users', $where, "tbl_users.*, CONCAT(first_name,' ',last_name) as name");
-            $this->db->select('user.*,  role.role_name');
+            $this->db->select("user.*,  
+                                        CONCAT(
+                                                IFNULL(user.user_title, ''), 
+                                                ' ',
+                                                IFNULL(user.first_name, ''), 
+                                                ' ',
+                                                IFNULL(user.last_name, '')
+                                                ) as full_name, 
+                                        role.role_name");
             $this->db->where($where);
             $this->db->from('tbl_users as user');
             $this->db->join('tbl_roles  as role', 'user.role_id = role.role_id', 'left');
@@ -127,27 +135,27 @@ class Api extends CI_Controller
 
             # Permission Roles
             $permission_roles                       =   [];
-            
+
             # For Agent 
-            if($user->role_id == 2):
-                $permission_roles                       =   [3,4,5];
+            if ($user->role_id == 2):
+                $permission_roles                       =   [3, 4, 5];
             endif;
             # End For Agent 
 
             # Level 1
-            if($user->role_id == 3):
+            if ($user->role_id == 3):
                 $permission_roles                       =   [0];
             endif;
             # End Level 1
 
             # Level 2
-            if($user->role_id == 4):
+            if ($user->role_id == 4):
                 $permission_roles                       =   [3];
             endif;
             # End Level 2
 
             # Level 3
-            if($user->role_id == 5):
+            if ($user->role_id == 5):
                 $permission_roles                       =   [3, 4];
             endif;
             # End Level 3
@@ -174,7 +182,8 @@ class Api extends CI_Controller
     # Check Is User Login
 
 
-    public function user(){
+    public function user()
+    {
         return $this->user;
     }
 
@@ -203,7 +212,7 @@ class Api extends CI_Controller
         $selected_member_ids                =  $this->input->get('member');
 
         # End Member Ids
-         $user_detail                        =   $this->user();
+        $user_detail                        =   $this->user();
 
 
         $account_id                         =   $user_detail->account_id;
@@ -219,38 +228,38 @@ class Api extends CI_Controller
 
         # Trial Plan
 
-            # Magical Function
-            $this->trial_plan($is_trial, $trial_expired, $trial_remaining_days, $expire_today);
-            # End Magical Function
+        # Magical Function
+        $this->trial_plan($is_trial, $trial_expired, $trial_remaining_days, $expire_today);
+        # End Magical Function
 
-            #
-            $trial_alert_msg        = '';
+        #
+        $trial_alert_msg        = '';
 
-            if ($is_trial && $trial_expired):
-              $trial_alert_msg        = 'Your trial has ended.';
-    
-            elseif ($is_trial && $expire_today):
-              $trial_alert_msg        = 'Your trial expires today 11:59:00 PM';
-    
-            elseif ($is_trial && !$trial_expired):
-              $trial_alert_msg        = "Your trial expires in $trial_remaining_days days";
-    
-            elseif (!$is_trial && $expire_today):
-              $trial_alert_msg        = "Your plan expires today 11:59:00 PM";
-    
-            elseif (!$is_trial && $trial_remaining_days && $trial_remaining_days <= 10):
-              $trial_alert_msg        = "Your plan expires in $trial_remaining_days days";
-    
-            elseif (!$is_trial && $trial_remaining_days == 0):
-              $trial_alert_msg        = "Your plan has expired. Please update your payment details to reactive it.";
-            endif;
-            #
+        if ($is_trial && $trial_expired):
+            $trial_alert_msg        = 'Your trial has ended.';
 
-            $tiral_data             =   (object) [
-                                                            'is_trial'      => $is_trial,
-                                                            'message'       => $trial_alert_msg,
-                                                            'pay_url'       => base_url(AGENT_URL . 'pay')
-                                                        ];
+        elseif ($is_trial && $expire_today):
+            $trial_alert_msg        = 'Your trial expires today 11:59:00 PM';
+
+        elseif ($is_trial && !$trial_expired):
+            $trial_alert_msg        = "Your trial expires in $trial_remaining_days days";
+
+        elseif (!$is_trial && $expire_today):
+            $trial_alert_msg        = "Your plan expires today 11:59:00 PM";
+
+        elseif (!$is_trial && $trial_remaining_days && $trial_remaining_days <= 10):
+            $trial_alert_msg        = "Your plan expires in $trial_remaining_days days";
+
+        elseif (!$is_trial && $trial_remaining_days == 0):
+            $trial_alert_msg        = "Your plan has expired. Please update your payment details to reactive it.";
+        endif;
+        #
+
+        $tiral_data             =   (object) [
+            'is_trial'      => $is_trial,
+            'message'       => $trial_alert_msg,
+            'pay_url'       => base_url(AGENT_URL . 'pay')
+        ];
         # End Trial Plan
 
         # Teams Member
@@ -264,22 +273,22 @@ class Api extends CI_Controller
         # End Team Member
 
         # Member Ids
-                // Extracting IDs
-                $members_ids_arr                    =  null;
-                if(!$selected_member_ids):
-                    $members_ids_arr                =   array_map(function($member) {
-                                                                        return $member->id;
-                                                                    }, $members);
-                    
-                    $members_ids                    =   implode(",", $members_ids_arr);
-                endif;
+        // Extracting IDs
+        $members_ids_arr                    =  null;
+        if (!$selected_member_ids):
+            $members_ids_arr                =   array_map(function ($member) {
+                return $member->id;
+            }, $members);
+
+            $members_ids                    =   implode(",", $members_ids_arr);
+        endif;
         # End Member Ids
         # Leads & Followup Query
-        
+
 
         $where                              =   "(user.role_id in ($user_detail->permission_roles) or user.user_id = '$user_detail->user_id')";
-        
-        if(!$selected_member_ids):
+
+        if (!$selected_member_ids):
             $where                          .=   " and lead.user_id in ($members_ids) ";
         else:
             $where                          .=   " and lead.user_id in ($selected_member_ids) ";
@@ -289,20 +298,20 @@ class Api extends CI_Controller
                                                     count(*) as total_count,
                                                     SUM(CASE WHEN STR_TO_DATE(lead_date, '%d-%m-%Y')  = CURDATE() THEN 1 ELSE 0 END) as today_count
                                                 ";
-                                               
+
         $this->db->select($lead_select_query);
         $this->db->where($where);
         $this->db->from('tbl_leads as lead');
         $this->db->join('tbl_users  as user', 'user.user_id = lead.user_id', 'left');
         $leads                          =   $this->db->get()->row();
-       # End Leads
+        # End Leads
 
 
         # Followup
         $where                              =   "(user.role_id in ($user_detail->permission_roles) or user.user_id = '$user_detail->user_id') and followup.account_id='$account_id'";
-        
-        
-        if(!$selected_member_ids):
+
+
+        if (!$selected_member_ids):
             $where                          .=   " and followup.user_id in ($members_ids) ";
         else:
             $where                          .=   " and followup.user_id in ($selected_member_ids) ";
@@ -727,7 +736,8 @@ class Api extends CI_Controller
         echo json_encode($array);
     }
 
-    public function profile(){
+    public function profile()
+    {
         $array = array('status' => true, 'msg' => 'data fetched.', 'data' => $this->user);
         echo json_encode($array);
     }
@@ -1182,7 +1192,7 @@ class Api extends CI_Controller
     /* role end */
 
     /* team start */
-  
+
     public function get_team()
     {
         $array = array();
@@ -1998,7 +2008,7 @@ class Api extends CI_Controller
         $request_type                                   =   $this->input->post('request_type');
         # End Lead Id
 
-        if(($request_type ?? '' ) == 'only_update_profile'):
+        if (($request_type ?? '') == 'only_update_profile'):
             # Profile
             if (!empty($_FILES['profile']['name'])):
                 $profile                                =   upload_file('profile', 'profile', time());
@@ -2007,7 +2017,7 @@ class Api extends CI_Controller
             # End Profile
 
             # Update Lead
-            if(count($record_array ?? [])):
+            if (count($record_array ?? [])):
                 $this->Action_model->update_data($record_array, 'tbl_leads', "lead_id='$id'");
                 $array                  =  array('status' => 'true', 'msg' => 'Profile updated');
             else:
@@ -2018,7 +2028,7 @@ class Api extends CI_Controller
             echo json_encode($array);
             exit;
         endif;
-        
+
         $this->form_validation->set_rules('lead_date', 'Date', 'required');
         $this->form_validation->set_rules('lead_time', 'Time', 'required');
         $this->form_validation->set_rules('lead_source_id', 'Source', 'required');
@@ -2073,8 +2083,8 @@ class Api extends CI_Controller
 
 
             #
-            $lead_dob                                   =   $this->input->post('lead_dob'); 
-            $lead_doa                                   =   $this->input->post('lead_doa'); 
+            $lead_dob                                   =   $this->input->post('lead_dob');
+            $lead_doa                                   =   $this->input->post('lead_doa');
             #
 
             $record_array                           = array(
@@ -2418,16 +2428,16 @@ class Api extends CI_Controller
 
         if ($this->input->post()) {
             # Is Details View
-                $is_detail_view                 =   $this->input->post('is_detail_view');
+            $is_detail_view                 =   $this->input->post('is_detail_view');
             # End Is Details View
 
             # agnet information 
-                $account_id      = getAccountId();
-                $agent           = $this->getAgent();
-                $user_id         = $agent->user_id ?? 0;
-                $where           = "user_hash='" . $this->input->post('user_hash') . "'";
-                $user_detail     = $this->Action_model->select_single('tbl_users', $where);
-                $account_id      = $user_detail->user_id;  
+            $account_id      = getAccountId();
+            $agent           = $this->getAgent();
+            $user_id         = $agent->user_id ?? 0;
+            $where           = "user_hash='" . $this->input->post('user_hash') . "'";
+            $user_detail     = $this->Action_model->select_single('tbl_users', $where);
+            $account_id      = $user_detail->user_id;
             # end agent infromation   
 
             if ($account_id) {
@@ -2774,18 +2784,18 @@ class Api extends CI_Controller
         echo json_encode($array);
     }
 
-    public function get_lead_list() 
-    {   
+    public function get_lead_list()
+    {
 
         $data['json_data']  = json_encode($this->input->post());
 
         $this->db->insert('tbl_get_all_data_json', $data);
 
         # Is Details View
-            $is_detail_view                 =   $this->input->post('is_detail_view');
+        $is_detail_view                 =   $this->input->post('is_detail_view');
         # End Is Details View
 
-      # user details   
+        # user details   
         // $agent          = $this->getAgent();
         $user_id        = $agent->user_id ?? 0;
 
@@ -2795,131 +2805,131 @@ class Api extends CI_Controller
         // print_r($user_detail); die;
 
         $account_id     = $user_detail->user_id;
-      # end user details 
+        # end user details 
 
-      $where = '';
+        $where = '';
 
-      # where codition  search 
-            $search_text        = $this->input->post('search_text');
-            $search_date_from   = $this->input->post('search_date_from');
-            $search_date_to     = $this->input->post('search_date_to');
+        # where codition  search 
+        $search_text        = $this->input->post('search_text');
+        $search_date_from   = $this->input->post('search_date_from');
+        $search_date_to     = $this->input->post('search_date_to');
 
-            # Lead Filter
-            $lead_from          = $this->input->post('lead_from');
-            $lead_to            = $this->input->post('lead_to');
-            # End Lead Filter
+        # Lead Filter
+        $lead_from          = $this->input->post('lead_from');
+        $lead_to            = $this->input->post('lead_to');
+        # End Lead Filter
 
-            # Followup Filter
-            $followup_from      = $this->input->post('followup_from');
-            $followup_to        = $this->input->post('followup_to');
-            # End Followup Filter
+        # Followup Filter
+        $followup_from      = $this->input->post('followup_from');
+        $followup_to        = $this->input->post('followup_to');
+        # End Followup Filter
 
-            $search_state_id    = $this->input->post('search_state_id');
-            $search_city_id     = $this->input->post('search_city_id');
-            $search_source_id   = $this->input->post('search_source_id');
-            $search_stage_id    = $this->input->post('search_stage_id');
-            $search_status      = $this->input->post('search_status');
-            $search_location_id = $this->input->post('search_location_id');
-            $search_budget_min  = $this->input->post('search_budget_min');
-            $search_budget_max  = $this->input->post('search_budget_max');
-            $search_size_min    = $this->input->post('search_size_min');
-            $search_size_max    = $this->input->post('search_size_max');
-            $search_size_unit   = $this->input->post('search_size_unit');
-            $search_agent_id    = $this->input->post('search_agent_id'); 
+        $search_state_id    = $this->input->post('search_state_id');
+        $search_city_id     = $this->input->post('search_city_id');
+        $search_source_id   = $this->input->post('search_source_id');
+        $search_stage_id    = $this->input->post('search_stage_id');
+        $search_status      = $this->input->post('search_status');
+        $search_location_id = $this->input->post('search_location_id');
+        $search_budget_min  = $this->input->post('search_budget_min');
+        $search_budget_max  = $this->input->post('search_budget_max');
+        $search_size_min    = $this->input->post('search_size_min');
+        $search_size_max    = $this->input->post('search_size_max');
+        $search_size_unit   = $this->input->post('search_size_unit');
+        $search_agent_id    = $this->input->post('search_agent_id');
 
-         
-            $where_ext = "";
 
-            if ($search_text) {
-                $where_ext .= " AND (lead_mobile_no LIKE '%" . $search_text . "%' OR lead_email LIKE '%" . $search_text . "%' OR CONCAT(lead_title, ' ', lead_first_name, ' ', lead_last_name) LIKE '%" . $search_text . "%')";
+        $where_ext = "";
+
+        if ($search_text) {
+            $where_ext .= " AND (lead_mobile_no LIKE '%" . $search_text . "%' OR lead_email LIKE '%" . $search_text . "%' OR CONCAT(lead_title, ' ', lead_first_name, ' ', lead_last_name) LIKE '%" . $search_text . "%')";
+        }
+
+        if ($lead_from && !$lead_to) {
+            $where_ext .= " AND DATE(STR_TO_DATE(tbl_leads.lead_date, '%d-%m-%Y')) >= '$lead_from'";
+        }
+
+        if ($lead_from && $lead_to) {
+            $where_ext .= " AND DATE(STR_TO_DATE(tbl_leads.lead_date, '%d-%m-%Y')) BETWEEN '$lead_from' AND '$lead_to'";
+        }
+
+
+        if ($followup_from && !$followup_to) {
+            $where_ext .= " AND DATE(STR_TO_DATE(tbl_followup.next_followup_date, '%d-%m-%Y')) >= '$followup_from'";
+        }
+
+        if ($followup_from && $followup_to) {
+
+            $where_ext .= " AND DATE(STR_TO_DATE(tbl_followup.next_followup_date, '%d-%m-%Y')) BETWEEN '$followup_from' AND '$followup_to'";
+        }
+
+
+        if ($search_state_id) {
+            $where_ext .= " AND lead_state_id='" . $search_state_id . "'";
+        }
+
+        if ($search_city_id) {
+            $where_ext .= " AND lead_city_id='" . $search_city_id . "'";
+        }
+
+        # source  
+        if ($search_source_id) {
+            $where_ext_s = '';
+            $search_source_id = explode(',', $search_source_id);
+            $conditions_s = [];
+            foreach ($search_source_id as $search_source_id_row) {
+                $conditions_s[] = "tbl_leads.lead_source_id = '" . $search_source_id_row . "'";
             }
-
-            if ($lead_from && !$lead_to) {
-                $where_ext .= " AND DATE(STR_TO_DATE(tbl_leads.lead_date, '%d-%m-%Y')) >= '$lead_from'";
+            if (!empty($conditions_s)) {
+                $where_ext_s .= " AND (" . implode(' OR ', $conditions_s) . ")";
             }
+            $where_ext .= $where_ext_s;
+        }
+        # end source 
 
-            if ($lead_from && $lead_to) {
-                $where_ext .= " AND DATE(STR_TO_DATE(tbl_leads.lead_date, '%d-%m-%Y')) BETWEEN '$lead_from' AND '$lead_to'";
+        # stage   
+        if ($search_stage_id) {
+            $search_stage_id = explode(',', $search_stage_id);
+            $conditions_ss = [];
+            foreach ($search_stage_id as $search_stage_id_row) {
+                $conditions_ss[] = " tbl_leads.lead_stage_id = '" . $search_stage_id_row . "'";
             }
-
-          
-            if ($followup_from && !$followup_to) {
-                $where_ext .= " AND DATE(STR_TO_DATE(tbl_followup.next_followup_date, '%d-%m-%Y')) >= '$followup_from'";
+            if (!empty($conditions_ss)) {
+                $where_ext .= " AND (" . implode(' OR ', $conditions_ss) . ")";
             }
-
-            if ($followup_from && $followup_to) {
-
-                $where_ext .= " AND DATE(STR_TO_DATE(tbl_followup.next_followup_date, '%d-%m-%Y')) BETWEEN '$followup_from' AND '$followup_to'";
-            }
+        }
+        # end stage 
 
 
-            if ($search_state_id) {
-                $where_ext .= " AND lead_state_id='" . $search_state_id . "'";
-            }
+        if ($search_status) {
+            $where_ext .= " AND tbl_leads.lead_status='" . $search_status . "'";
+        }
 
-            if ($search_city_id) {
-                $where_ext .= " AND lead_city_id='" . $search_city_id . "'";
-            }
+        if ($search_location_id) {
+            $where_ext .= " AND tbl_leads.location_id='" . $search_location_id . "'";
+            // $where_ext .= " AND FIND_IN_SET(" . $search_location_id . ",location)";
+        }
 
-            # source  
-                if ($search_source_id ) { 
-                    $where_ext_s ='';
-                    $search_source_id = explode(',' , $search_source_id);
-                    $conditions_s = [];  
-                    foreach ($search_source_id as $search_source_id_row) { 
-                        $conditions_s[] = "tbl_leads.lead_source_id = '" . $search_source_id_row . "'";  
-                    }
-                    if (!empty($conditions_s)) {  
-                        $where_ext_s .= " AND (" . implode(' OR ', $conditions_s) . ")";  
-                    }
-                    $where_ext .= $where_ext_s;
-                }       
-            # end source 
+        if ($search_budget_min && !$search_budget_max) {
+            $where_ext .= " AND budget_min>='" . $search_budget_min . "'";
+        }
 
-              # stage   
-                if ($search_stage_id) { 
-                    $search_stage_id = explode(',' , $search_stage_id);
-                    $conditions_ss = [];  
-                    foreach ($search_stage_id as $search_stage_id_row) { 
-                        $conditions_ss[] = " tbl_leads.lead_stage_id = '" . $search_stage_id_row . "'";  
-                    }
-                    if (!empty($conditions_ss)) {  
-                        $where_ext .= " AND (" . implode(' OR ', $conditions_ss) . ")";  
-                    }
-                }
-            # end stage 
+        if ($search_budget_min && $search_budget_max) {
+            $where_ext .= " AND (budget_min>='" . $search_budget_min . "' AND budget_max<='" . $search_budget_max . "')";
+        }
 
+        if ($search_size_min && !$search_size_max) {
+            $where_ext .= " AND size_min<='" . $search_size_min . "'";
+        }
+        if ($search_size_min && $search_size_max) {
+            $where_ext .= " AND (size_min<='" . $search_size_min . "' AND size_max>='" . $search_size_max . "')";
+        }
 
-            if ($search_status) {
-                $where_ext .= " AND tbl_leads.lead_status='" . $search_status . "'";
-            }
+        if ($search_size_unit) {
+            $where_ext .= " AND size_unit='" . $search_size_unit . "'";
+        }
+        # end  where condtion search
 
-            if ($search_location_id) {
-                $where_ext .= " AND tbl_leads.location_id='" . $search_location_id . "'";
-                // $where_ext .= " AND FIND_IN_SET(" . $search_location_id . ",location)";
-            }
-
-            if ($search_budget_min && !$search_budget_max) {
-                $where_ext .= " AND budget_min>='" . $search_budget_min . "'";
-            }
-            
-            if ($search_budget_min && $search_budget_max) {
-                $where_ext .= " AND (budget_min>='" . $search_budget_min . "' AND budget_max<='" . $search_budget_max . "')";
-            }
-
-            if ($search_size_min && !$search_size_max) {
-                $where_ext .= " AND size_min<='" . $search_size_min . "'";
-            }
-            if ($search_size_min && $search_size_max) {
-                $where_ext .= " AND (size_min<='" . $search_size_min . "' AND size_max>='" . $search_size_max . "')";
-            }
-
-            if ($search_size_unit) {
-                $where_ext .= " AND size_unit='" . $search_size_unit . "'";
-            }
-      # end  where condtion search
-
-      # where 
+        # where 
         if ($user_detail->role_id < 3 || $user_detail->role_id == 5) {
 
             if ($user_detail->parent_id == 0) {
@@ -2932,32 +2942,32 @@ class Api extends CI_Controller
         }
 
         $where_ids = "";
-        
+
         // $user_ids = $this->get_level_user_ids();
 
         // $where .= $where_ids;
 
         $where .= $where_ext;
 
- 
 
-        if ($search_agent_id) { 
-            $search_agent_id = explode(',' , $search_agent_id);
-            $conditions = [];  
-            foreach ($search_agent_id as $agent_id_row) { 
-                $conditions[] = "tbl_leads.user_id = '" . $agent_id_row . "'";  
+
+        if ($search_agent_id) {
+            $search_agent_id = explode(',', $search_agent_id);
+            $conditions = [];
+            foreach ($search_agent_id as $agent_id_row) {
+                $conditions[] = "tbl_leads.user_id = '" . $agent_id_row . "'";
             }
-            if (!empty($conditions)) {  
-                $where_ids .= " AND (" . implode(' OR ', $conditions) . ")";  
+            if (!empty($conditions)) {
+                $where_ids .= " AND (" . implode(' OR ', $conditions) . ")";
             }
         }
 
         // print_r($where_ids); die;
 
         $where .= $where_ids;
-        
 
-      # end where 
+
+        # end where 
 
 
         # Sorting
@@ -2985,9 +2995,9 @@ class Api extends CI_Controller
         // # End Sorting
 
 
-      $array            = array(); 
+        $array            = array();
 
-      $select           = "tbl_leads.*, 
+        $select           = "tbl_leads.*, 
                                         
                                         CONCAT(
                                                 COALESCE(tbl_leads.lead_title, ''),
@@ -3015,118 +3025,128 @@ class Api extends CI_Controller
                                         city.city_name,
                                         location.location_name,
                                         occupation.occupation_name,
-                                        designation.designation_name";  
+                                        designation.designation_name";
 
-      $page             = $this->input->post('page') ?? 1 ;
-      
-      $limit            = 10;  
-     
-      # join data 
+        $page             = $this->input->post('page') ?? 1;
+
+        $limit            = 10;
+
+        # join data 
         $join             = array(
-            'tbl_lead_sources as lead_source', 'lead_source.lead_source_id = tbl_leads.lead_source_id',
-            'tbl_lead_stages as stages', 'stages.lead_stage_id = tbl_leads.lead_stage_id',
-            'tbl_users as user', 'user.user_id = tbl_leads.user_id',
-            'tbl_users as added_by_user', 'added_by_user.user_id = tbl_leads.added_by',
-            '(SELECT * FROM tbl_followup WHERE followup_id IN (SELECT MAX(followup_id) FROM tbl_followup GROUP BY lead_id)) as tbl_followup', 'tbl_followup.lead_id = tbl_leads.lead_id',
-            'tbl_states as state', 'state.state_id = tbl_leads.lead_state_id',
-            'tbl_city as city', 'city.city_id = tbl_leads.lead_city_id', 
-            'tbl_locations as location', 'location.location_id = tbl_leads.location_id',
-            'tbl_occupations as occupation', 'occupation.occupation_id = tbl_leads.lead_occupation_id',
-            'tbl_lead_types as lead_status', 'lead_status.lead_type_id = tbl_leads.lead_status',
-            'tbl_designations as designation', 'designation.designation_id = tbl_leads.lead_designation'
-        );  
+            'tbl_lead_sources as lead_source',
+            'lead_source.lead_source_id = tbl_leads.lead_source_id',
+            'tbl_lead_stages as stages',
+            'stages.lead_stage_id = tbl_leads.lead_stage_id',
+            'tbl_users as user',
+            'user.user_id = tbl_leads.user_id',
+            'tbl_users as added_by_user',
+            'added_by_user.user_id = tbl_leads.added_by',
+            '(SELECT * FROM tbl_followup WHERE followup_id IN (SELECT MAX(followup_id) FROM tbl_followup GROUP BY lead_id)) as tbl_followup',
+            'tbl_followup.lead_id = tbl_leads.lead_id',
+            'tbl_states as state',
+            'state.state_id = tbl_leads.lead_state_id',
+            'tbl_city as city',
+            'city.city_id = tbl_leads.lead_city_id',
+            'tbl_locations as location',
+            'location.location_id = tbl_leads.location_id',
+            'tbl_occupations as occupation',
+            'occupation.occupation_id = tbl_leads.lead_occupation_id',
+            'tbl_lead_types as lead_status',
+            'lead_status.lead_type_id = tbl_leads.lead_status',
+            'tbl_designations as designation',
+            'designation.designation_id = tbl_leads.lead_designation'
+        );
 
-      # end join data 
-      
-    //   echo json_encode($where); die;
-       
-      $record                       =   $this->Action_model->webPagination($select,$page,$limit,$join,$where,'tbl_leads');
+        # end join data 
 
-    //   print_r($record); die;
+        //   echo json_encode($where); die;
 
-      $pagination                   =   $record['pagination'];
+        $record                       =   $this->Action_model->webPagination($select, $page, $limit, $join, $where, 'tbl_leads');
 
-      $record_data                  =   $record['data'];
+        //   print_r($record); die;
 
-      $profile_base_url             =   base_url('public/other/profile/');
+        $pagination                   =   $record['pagination'];
 
-      $records                      =  array();
+        $record_data                  =   $record['data'];
 
-      if ($record_data) {
+        $profile_base_url             =   base_url('public/other/profile/');
 
-        foreach ($record_data as $key => $item) {
+        $records                      =  array();
 
-     
-            # Primary Mobile Number Country Code
-            $primary_country_code                           =   ($item->primary_mobile_number_country_data ?? null) ? (json_decode($item->primary_mobile_number_country_data)->dialCode ?? '') : '';
-            $primary_mobile_number_with_country_code             =  ($item->lead_mobile_no ?? null) ? '+' . $primary_country_code . ' ' . $item->lead_mobile_no : null;
-            # End Primary Mobile Number Country Code
+        if ($record_data) {
 
-            # Secondary Mobile Number Country Code
-            $secondary_country_code                           =   ($item->secondary_mobile_number_country_data ?? null) ? (json_decode($item->secondary_mobile_number_country_data)->dialCode ?? '') : '';
-            $secondary_mobile_number_with_country_code             =  ($item->lead_mobile_no_2 ?? null) ? '+' . $secondary_country_code . ' ' . $item->lead_mobile_no_2 : null;
-            # End Secondary Mobile Number Country Code
-            #
-
-            $lead_or_next_followp_date                  =   $item->next_followup_date ? date('d-m-Y', strtotime($item->next_followup_date)) : ($item->lead_date ? date('d-m-Y', strtotime($item->lead_date)) : 'N/A');
-            $lead_or_next_followp_time                  =   $item->next_followup_time ? $item->next_followup_time : ($item->lead_time ? date('H:i', strtotime($item->lead_time)) : 'N/A');
-
-            $records[$key] = array(
-                'lead_id'                               => $item->lead_id,
-                'lead_title'                            => $item->lead_title,
-                'lead_first_name'                       => $item->lead_first_name,
-                'lead_last_name'                        => $item->lead_last_name,
-                'lead_full_name'                        => $item->lead_full_name,
-                'lead_mobile_no'                        => $primary_mobile_number_with_country_code,
-                'lead_stage_name'                       => $item->lead_stage_name ?? '',
-                'lead_source_name'                      => $item->lead_source_name ?? 'N/A',
-                'lead_email'                            => $item->lead_email,
-                'is_followup'                           => $item->added_to_followup,
-                'assgin_user_full_name'                 => $item->assgin_user_full_name,
-                'stage_name'                            => $item->stage_name ?? 'N/A',
-                'full_profile_url'                      => $item->full_profile_url ? ($profile_base_url . $item->full_profile_url) : base_url('public/front/user.png'),
-                'lead_or_next_followp_date'             => $lead_or_next_followp_date,
-                'lead_or_next_followp_time'             => $lead_or_next_followp_time,
-                'lead_or_next_followp_date_and_time'    => $lead_or_next_followp_date . ' ( ' . $lead_or_next_followp_time . ' )'
-            );
-
-            # Is Detail View
-            if ($is_detail_view):
-                $records[$key]['status']                          =  $item->lead_status;
-                $records[$key]['date']                            = $item->lead_date;
-                $records[$key]['seondary_mobile_number']          = $secondary_mobile_number_with_country_code;
+            foreach ($record_data as $key => $item) {
 
 
-                $records[$key]['address']                         =  $item->lead_address;
-                $records[$key]['state']                           =  $item->state_name;
-                $records[$key]['city']                            =  $item->city_name;
-                $records[$key]['location']                        =  $item->location_name;
-                $records[$key]['gender']                          =  $item->lead_gender;
-                $records[$key]['marital_status']                  =  $item->lead_marital_status;
-                $records[$key]['occupation']                      =  $item->occupation_name;
-                $records[$key]['designation']                     =  $item->designation_name;
-                $records[$key]['company_name']                    =  $item->lead_company;
-                $records[$key]['annual_income']                   =  $item->lead_annual_income;
-                $records[$key]['pan_card_number']                 =  $item->lead_pan_no;
-                $records[$key]['aadhar_card_number']              =  $item->lead_adhar_no;
-                $records[$key]['voter_id']                        =  $item->lead_voter_id;
-                $records[$key]['passport_number']                 =  $item->lead_passport_no;
-                $records[$key]['added_by']                        =  $item->added_by_user_full_name;
-            endif;
-            # End Is Detail View
+                # Primary Mobile Number Country Code
+                $primary_country_code                           =   ($item->primary_mobile_number_country_data ?? null) ? (json_decode($item->primary_mobile_number_country_data)->dialCode ?? '') : '';
+                $primary_mobile_number_with_country_code             =  ($item->lead_mobile_no ?? null) ? '+' . $primary_country_code . ' ' . $item->lead_mobile_no : null;
+                # End Primary Mobile Number Country Code
+
+                # Secondary Mobile Number Country Code
+                $secondary_country_code                           =   ($item->secondary_mobile_number_country_data ?? null) ? (json_decode($item->secondary_mobile_number_country_data)->dialCode ?? '') : '';
+                $secondary_mobile_number_with_country_code             =  ($item->lead_mobile_no_2 ?? null) ? '+' . $secondary_country_code . ' ' . $item->lead_mobile_no_2 : null;
+                # End Secondary Mobile Number Country Code
+                #
+
+                $lead_or_next_followp_date                  =   $item->next_followup_date ? date('d-m-Y', strtotime($item->next_followup_date)) : ($item->lead_date ? date('d-m-Y', strtotime($item->lead_date)) : 'N/A');
+                $lead_or_next_followp_time                  =   $item->next_followup_time ? $item->next_followup_time : ($item->lead_time ? date('H:i', strtotime($item->lead_time)) : 'N/A');
+
+                $records[$key] = array(
+                    'lead_id'                               => $item->lead_id,
+                    'lead_title'                            => $item->lead_title,
+                    'lead_first_name'                       => $item->lead_first_name,
+                    'lead_last_name'                        => $item->lead_last_name,
+                    'lead_full_name'                        => $item->lead_full_name,
+                    'lead_mobile_no'                        => $primary_mobile_number_with_country_code,
+                    'lead_stage_name'                       => $item->lead_stage_name ?? '',
+                    'lead_source_name'                      => $item->lead_source_name ?? 'N/A',
+                    'lead_email'                            => $item->lead_email,
+                    'is_followup'                           => $item->added_to_followup,
+                    'assgin_user_full_name'                 => $item->assgin_user_full_name,
+                    'stage_name'                            => $item->stage_name ?? 'N/A',
+                    'full_profile_url'                      => $item->full_profile_url ? ($profile_base_url . $item->full_profile_url) : base_url('public/front/user.png'),
+                    'lead_or_next_followp_date'             => $lead_or_next_followp_date,
+                    'lead_or_next_followp_time'             => $lead_or_next_followp_time,
+                    'lead_or_next_followp_date_and_time'    => $lead_or_next_followp_date . ' ( ' . $lead_or_next_followp_time . ' )'
+                );
+
+                # Is Detail View
+                if ($is_detail_view):
+                    $records[$key]['status']                          =  $item->lead_status;
+                    $records[$key]['date']                            = $item->lead_date;
+                    $records[$key]['seondary_mobile_number']          = $secondary_mobile_number_with_country_code;
+
+
+                    $records[$key]['address']                         =  $item->lead_address;
+                    $records[$key]['state']                           =  $item->state_name;
+                    $records[$key]['city']                            =  $item->city_name;
+                    $records[$key]['location']                        =  $item->location_name;
+                    $records[$key]['gender']                          =  $item->lead_gender;
+                    $records[$key]['marital_status']                  =  $item->lead_marital_status;
+                    $records[$key]['occupation']                      =  $item->occupation_name;
+                    $records[$key]['designation']                     =  $item->designation_name;
+                    $records[$key]['company_name']                    =  $item->lead_company;
+                    $records[$key]['annual_income']                   =  $item->lead_annual_income;
+                    $records[$key]['pan_card_number']                 =  $item->lead_pan_no;
+                    $records[$key]['aadhar_card_number']              =  $item->lead_adhar_no;
+                    $records[$key]['voter_id']                        =  $item->lead_voter_id;
+                    $records[$key]['passport_number']                 =  $item->lead_passport_no;
+                    $records[$key]['added_by']                        =  $item->added_by_user_full_name;
+                endif;
+                # End Is Detail View
+            }
         }
-    }
 
-      if(count($records) > 0){
-          $array = array('status' => true, 'message' => 'Lead Found', 'records' =>  $records, 'total_records' =>$pagination['total_records'], 'total_pages' => $pagination['total_pages'], 'next_page' => $pagination['next_page']);
+        if (count($records) > 0) {
+            $array = array('status' => true, 'message' => 'Lead Found', 'records' =>  $records, 'total_records' => $pagination['total_records'], 'total_pages' => $pagination['total_pages'], 'next_page' => $pagination['next_page']);
+        } else {
+            $array = array('status' => false, 'message' => 'Lead Not Found',);
         }
-        else{
-          $array = array('status' => false, 'message' => 'Lead Not Found', );
 
-      }
-      
-      
-      echo json_encode($array); die;
+
+        echo json_encode($array);
+        die;
     }
 
     # end new load data
@@ -3536,13 +3556,11 @@ class Api extends CI_Controller
                 $location_list = $location_data;
             }
 
-            if(count($location_list) > 0 ) {
+            if (count($location_list) > 0) {
                 $array = array('status' => 'true', 'msg' => 'Data Found', 'location_list' => $location_list);
-            }
-            else{
+            } else {
                 $array = array('status' => 'false', 'msg' => 'Data Not  Found', 'location_list' => $location_list);
             }
-
         } else {
             $array = array('status' => 'false', 'msg' => 'Some error occurred, please try again.');
         }
@@ -3559,18 +3577,16 @@ class Api extends CI_Controller
             $product_type_id = $this->input->post('product_type_id');
             $where = "product_type_id='" . $product_type_id . "' AND unit_type_status='1'";
             $unit_type_data = $this->Action_model->detail_result('tbl_unit_types', $where, 'unit_type_id,unit_type_name');
-           
+
             if ($unit_type_data) {
                 $unit_type_list = $unit_type_data;
             }
 
-            if(count($unit_type_list) > 0 ){
+            if (count($unit_type_list) > 0) {
                 $array = array('status' => 'true', 'msg' => 'Data Found', 'unit_type_list' => $unit_type_list);
-            }
-            else{
+            } else {
                 $array = array('status' => 'false', 'msg' => 'Data Not  Found', 'unit_type_list' => $unit_type_list);
             }
-
         } else {
             $array = array('status' => 'false', 'msg' => 'Some error occurred, please try again.');
         }
@@ -3608,9 +3624,9 @@ class Api extends CI_Controller
             $id         = $this->input->post('id');
             $record     = $this->Action_model->select_single('tbl_requirements', "requirement_id='" . $id . "' AND account_id='" . $account_id . "'");
             $location   = $this->input->post('location');
-            
-            
-            
+
+
+
             // if ($location) {
             //     $location = explode(",",$location);
             // }
@@ -3714,25 +3730,26 @@ class Api extends CI_Controller
     }
 
     # get edit or add view details
-    public function requirement_add_or_edit_view_data(){
+    public function requirement_add_or_edit_view_data()
+    {
 
-        
+
         $arr = array();
 
-        $account_id = getAccountIdHash($this->input->request_headers()['Access-Token'] );
-  
+        $account_id = getAccountIdHash($this->input->request_headers()['Access-Token']);
+
         $id = $this->input->post('id');
         $record = $this->Action_model->select_single('tbl_requirements', "requirement_id='" . $id . "' AND account_id='" . $account_id . "'");
-        
-    
-        if($record):
+
+
+        if ($record):
             $requirement = $record;
         else:
             $requirement = [];
-        endif;        
+        endif;
 
         $all_unit_type_list = $this->Action_model->detail_result('tbl_unit_types', "unit_type_status='1'", 'unit_type_id,unit_type_name,requirement_accomodation');
-   
+
 
         # get state list
         $where = "country_id='1' AND state_status=1";
@@ -3743,45 +3760,45 @@ class Api extends CI_Controller
         # product list
         $where = "product_type_status='1'";
         $project_type_list = $this->Action_model->detail_result('tbl_product_types', $where, 'product_type_id,product_type_name');
-       
+
         # end product list
 
         # lead option
         $where = "lead_option_status='1' and lead_option_id != 1";
         $lead_option_list = $this->Action_model->detail_result('tbl_lead_options', $where, 'lead_option_id,lead_option_name');
-     
+
         # end lead option
 
         # get  budget list
         $where = "budget_status='1'";
         $budget_list = $this->Action_model->detail_result('tbl_budgets', $where, 'budget_id,budget_name');
-  
+
         # end get budget list
 
         # unit size list 
         $where = "unit_status='1'";
         $unit_list = $this->Action_model->detail_result('tbl_units', $where, 'unit_id,unit_name');
-     
+
         # end unit size list
 
         # requirment status list
 
-       $status_list = array(
-        array(
-            'id' => '0' , 
-            'name' => 'Close'
-        ),
-         array(
-            'id'   => '1',
-            'name' => 'Open'
-         )
-         );
+        $status_list = array(
+            array(
+                'id' => '0',
+                'name' => 'Close'
+            ),
+            array(
+                'id'   => '1',
+                'name' => 'Open'
+            )
+        );
 
         # end requirement status list
 
         $arr = array(
-            'status'            => true ,
-            'message'           => 'Related Data Found' ,
+            'status'            => true,
+            'message'           => 'Related Data Found',
             'requirement'       => $requirement,
             'state_list'        => $state_list,
             'project_type_list' => $project_type_list,
@@ -3793,7 +3810,6 @@ class Api extends CI_Controller
         );
 
         echo json_encode($arr);
-
     }
     # end get edit or add view details
 
@@ -4261,7 +4277,7 @@ class Api extends CI_Controller
     public function followup_save()
     {
 
-        if($this->input->post('lead_stage_id') < 7 ){
+        if ($this->input->post('lead_stage_id') < 7) {
 
             $this->form_validation->set_rules('followup_id', 'Followup Id', 'required');
             $this->form_validation->set_rules('lead_stage_id', 'Stage', 'required');
@@ -4270,17 +4286,16 @@ class Api extends CI_Controller
             $this->form_validation->set_rules('next_followup_date', 'Date', 'required');
             $this->form_validation->set_rules('next_followup_time', 'Time', 'required');
             $this->form_validation->set_rules('fp_assign_to', 'Assign To ', 'required');
-            
-                    if ($this->form_validation->run() == FALSE):
-                        // Validation failed
-                        $response = array(
-                            'status' => 'error',
-                            'msg'   => validation_errors('<div style="color:red;">', '</div>')
-                        );
-                        echo json_encode($response);
-                        exit;
-                    endif;
 
+            if ($this->form_validation->run() == FALSE):
+                // Validation failed
+                $response = array(
+                    'status' => 'error',
+                    'msg'   => validation_errors('<div style="color:red;">', '</div>')
+                );
+                echo json_encode($response);
+                exit;
+            endif;
         }
 
 
@@ -4563,7 +4578,8 @@ class Api extends CI_Controller
 
                     if ($inv_data) {
                         $data_array = array(
-                            'inventory_status' => '2', 'last_update' => time()
+                            'inventory_status' => '2',
+                            'last_update' => time()
                         );
                         $this->Action_model->update_data($data_array, 'tbl_inventory', $where);
 
@@ -9847,14 +9863,11 @@ class Api extends CI_Controller
                 $city_list = $this->Action_model->detail_result('tbl_city', $where);
             }
 
-            if(count($city_list) > 0 ){
+            if (count($city_list) > 0) {
                 $array['data'] = array('status' => 'true', 'msg' => 'City Found', 'city_list' => $city_list);
-            }
-            else{
+            } else {
                 $array['data'] = array('status' => 'false', 'msg' => 'City Not  Found', 'city_list' => $city_list);
             }
-
-
         } else {
             $array['data'] = array('status' => 'false', 'msg' => 'Some error occurred, please try again.');
         }
@@ -10105,14 +10118,14 @@ class Api extends CI_Controller
 
                     $followup_list[] = array(
                         "lead_id" => $item->lead_id,
-                        "followup_id" => $item->followup_id ,
-                        'label' => $item->lead_action_name . '@ '.$next_action. 'By '.(($item->cu_parent_id == 0) ? (($item->cu_is_individual) ? ucwords($item->cu_user_title . ' ' . $item->cu_first_name . ' ' . $item->cu_last_name) : $item->cu_firm_name) : ucwords($item->cu_user_title . ' ' . $item->cu_first_name . ' ' . $item->cu_last_name)) ,
+                        "followup_id" => $item->followup_id,
+                        'label' => $item->lead_action_name . '@ ' . $next_action . 'By ' . (($item->cu_parent_id == 0) ? (($item->cu_is_individual) ? ucwords($item->cu_user_title . ' ' . $item->cu_first_name . ' ' . $item->cu_last_name) : $item->cu_firm_name) : ucwords($item->cu_user_title . ' ' . $item->cu_first_name . ' ' . $item->cu_last_name)),
                         'remark'  => $item->task_desc,
-                        'comment' => $item->comment ? ( $item->comment.' @ '.date("d-m-Y & h:i A", $item->created_at).' '.(($item->au_parent_id == 0) ? (($item->au_is_individual) ? ucwords($item->au_user_title . ' ' . $item->au_first_name . ' ' . $item->au_last_name) : $item->au_firm_name) : ucwords($item->au_user_title . ' ' . $item->au_first_name . ' ' . $item->au_last_name))) : '',
-                        "followup_status" => ($item->followup_status == 1) ? 'Pending' : ( ($item->followup_status == 2) ? 'Complete' : 'Cancel'),
+                        'comment' => $item->comment ? ($item->comment . ' @ ' . date("d-m-Y & h:i A", $item->created_at) . ' ' . (($item->au_parent_id == 0) ? (($item->au_is_individual) ? ucwords($item->au_user_title . ' ' . $item->au_first_name . ' ' . $item->au_last_name) : $item->au_firm_name) : ucwords($item->au_user_title . ' ' . $item->au_first_name . ' ' . $item->au_last_name))) : '',
+                        "followup_status" => ($item->followup_status == 1) ? 'Pending' : (($item->followup_status == 2) ? 'Complete' : 'Cancel'),
                         // "followup_status" => ($item->followup_status == 1) ? '<span class="" style="padding: 3px 10px;color:#fff;background-color: #f29d56;border-radius: 10rem;line-height: 15px;font-weight: 600;font-size: 85%;">Pending</span>' : ( ($item->followup_status == 2) ? '<span class="" style="padding: 3px 10px;color:#fff;background-color: #6fd96f;border-radius: 10rem;line-height: 15px;font-weight: 600;font-size: 85%;">Complete</span>' : '<span class="" style="padding: 3px 10px;color:#fff;background-color: #ff5e5e;border-radius: 10rem;line-height: 15px;font-weight: 600;font-size: 85%;">Cancel</span>'),
-                        "followup_status_id" =>  $item->followup_status ,
-                       
+                        "followup_status_id" =>  $item->followup_status,
+
                         // // "followup_status" => $item->followup_status,
                         // "comment" => $item->comment,
                         // "task_desc" => $item->task_desc,
@@ -10133,25 +10146,24 @@ class Api extends CI_Controller
 
             $status_option = array(
                 array(
-                    'id'   => 1 ,
-                    'name' => 'Pending' 
+                    'id'   => 1,
+                    'name' => 'Pending'
                 ),
                 array(
-                    'id'   => 2 ,
-                    'name' => 'Complete' 
+                    'id'   => 2,
+                    'name' => 'Complete'
                 ),
                 array(
-                    'id'   => 3 ,
-                    'name' => 'Cancel' 
+                    'id'   => 3,
+                    'name' => 'Cancel'
                 )
-                );
-            
-            if(count($followup_list) > 0 ):
-                $array['data'] = array('status' => 'true', 'msg' => 'Data Found', 'followup_list' => $followup_list , 'followup_status_list' => $status_option);
-            else:
-                $array['data'] = array('status' => 'false', 'msg' => 'Data Not  Found', 'followup_list' => $followup_list , 'followup_status_list' => $status_option);
-            endif;       
+            );
 
+            if (count($followup_list) > 0):
+                $array['data'] = array('status' => 'true', 'msg' => 'Data Found', 'followup_list' => $followup_list, 'followup_status_list' => $status_option);
+            else:
+                $array['data'] = array('status' => 'false', 'msg' => 'Data Not  Found', 'followup_list' => $followup_list, 'followup_status_list' => $status_option);
+            endif;
         } else {
             $array['data'] = array('status' => 'false', 'msg' => 'Some error occurred, please try again.');
         }
@@ -10164,7 +10176,7 @@ class Api extends CI_Controller
         $array = array();
         $requirement_list = array();
 
-        $account_id = getAccountIdHash($this->input->request_headers()['Access-Token'] );
+        $account_id = getAccountIdHash($this->input->request_headers()['Access-Token']);
 
 
         if ($account_id && $this->input->post()) {
@@ -10172,7 +10184,7 @@ class Api extends CI_Controller
             $lead_id        = $this->input->post('lead_id');
             $where          = "lead_id='" . $lead_id . "' AND tbl_requirements.account_id='" . $account_id . "'";
             $where_ids      = "";
-            $user_ids       = $this->get_level_user_ids($this->input->request_headers()['Access-Token'] );
+            $user_ids       = $this->get_level_user_ids($this->input->request_headers()['Access-Token']);
 
             $where .= $where_ids;
             $where .= " ORDER BY requirement_id DESC";
@@ -10194,7 +10206,7 @@ class Api extends CI_Controller
             $requirement_data = $query->result();
 
 
-            if (count($requirement_data) > 0 ) {
+            if (count($requirement_data) > 0) {
                 foreach ($requirement_data as $item) {
                     $location = "";
                     if ($item->location) {
@@ -10241,8 +10253,8 @@ class Api extends CI_Controller
                         "requirement_id"        => $item->requirement_id,
                         "lead_id"               => $item->lead_id,
                         "look_for"              => $item->look_for,
-                        "budget"                => (($item->budget_minimum) ? $item->budget_minimum : '' ).' - '.(($item->budget_maximum) ? $item->budget_maximum : ''),
-                        "size"              => $item->size_min.'-'.$item->size_max.' '.$item->size_unit_name,
+                        "budget"                => (($item->budget_minimum) ? $item->budget_minimum : '') . ' - ' . (($item->budget_maximum) ? $item->budget_maximum : ''),
+                        "size"              => $item->size_min . '-' . $item->size_max . ' ' . $item->size_unit_name,
                         "remark"                => $item->remark,
                         "dor"                   => $item->dor,
                         "state_id"              => $item->state_id,
@@ -10251,13 +10263,12 @@ class Api extends CI_Controller
                         "product_unit_id"       => $item->unit_type_id,
                         "lead_option_id"        => $item->lead_option_id,
                         "location"              => $location,
-                        "requirement_status"    => $item->requirement_status == 1 ? 'Open' : 'Close' ,
+                        "requirement_status"    => $item->requirement_status == 1 ? 'Open' : 'Close',
                         "added_by"              => (($item->au_parent_id == 0) ? (($item->au_is_individual) ? ucwords($item->au_user_title . ' ' . $item->au_first_name . ' ' . $item->au_last_name) : $item->au_firm_name) : ucwords($item->au_user_title . ' ' . $item->au_first_name . ' ' . $item->au_last_name))
                     );
                 }
                 $array['data'] = array('status' => 'true', 'msg' => 'Data Found', 'requirement_list' => $requirement_list);
-            }
-            else{
+            } else {
                 $array['data'] = array('status' => 'false', 'msg' => 'Data not found');
             }
         } else {
@@ -11524,7 +11535,7 @@ class Api extends CI_Controller
             $where          = "template_status='1' AND user_id='" . $account_id . "' AND template_type='" . $type . "'";
             $template_data  = $this->Action_model->detail_result('tbl_templates', $where);
 
-            $template_one = array( 
+            $template_one = array(
                 "template_id" => "0",
                 "template_name" => "Custom Message",
                 "template_message" => "",
@@ -11536,16 +11547,15 @@ class Api extends CI_Controller
                 "disable_delete" => "0",
                 "user_id" => $account_id
             );
-            
+
             if (is_array($template_data)) {
                 array_unshift($template_data, $template_one);
                 $template_list = $template_data;
             } else {
                 $template_list = array($template_one);
             }
-            
-            $array = array('status' => true, 'message' => 'Data found', 'template_list' => $template_list);
 
+            $array = array('status' => true, 'message' => 'Data found', 'template_list' => $template_list);
         } else {
             $array = array('status' => false, 'message' => 'Some error occurred, please try again.');
         }
@@ -11576,8 +11586,7 @@ class Api extends CI_Controller
                 $message = str_replace("[customer_email]", $user_detail->lead_email, $message);
                 $message = str_replace("[customer_mobile]", $user_detail->lead_mobile_no, $message);
             }
-        } 
-        else if ($send_type == "agent") {
+        } else if ($send_type == "agent") {
 
             $where          = "user_id='" . $user_id . "'";
             $user_detail    = $this->Action_model->select_single('tbl_users', $where);
@@ -11588,9 +11597,7 @@ class Api extends CI_Controller
                 $message = str_replace("[mobile]", $user_detail->mobile, $message);
                 $message = str_replace("[expire_date]", $user_detail->next_due_date, $message);
             }
-
-        } 
-        else {
+        } else {
 
             $where          = "user_id='" . $user_id . "'";
             $user_detail    = $this->Action_model->select_single('tbl_users', $where);
@@ -11630,7 +11637,7 @@ class Api extends CI_Controller
                     $sms_response   = $this->Action_model->sendMobileSMS($s_mobile, $s_message, true);
 
                     if ($sms_response) {
-    
+
                         $sms_response_array = json_decode($sms_response);
 
                         if ($sms_response_array && isset($sms_response_array->status) && $sms_response_array->status == "success") {
@@ -11669,9 +11676,9 @@ class Api extends CI_Controller
                 } else {
                     $array = array('status' => false, 'msg' => "Please purchase sms and try again.");
                 }
-            } 
-        # Email    
-        else if ($type == "2") {
+            }
+            # Email    
+            else if ($type == "2") {
                 $msg            = "Email Sent Successfully";
                 $result_status  = $this->Action_model->sendEmailFromAgent($send_to, $subject, $message, $user_id);
 
@@ -11682,9 +11689,9 @@ class Api extends CI_Controller
                 } else {
                     $array = array('status' => false, 'msg' => "Error in sending email, Please Try Again");
                 }
-            } 
-        # Whatsapp    
-        else if ($type == "3") {
+            }
+            # Whatsapp    
+            else if ($type == "3") {
                 $msg            = "Whatsapp Message Sent Successfully";
                 $result_status  = $this->Action_model->sendWhatsappMessageFromAgent($send_to, $message, $user_id);
                 if ($result_status == 1) {
@@ -11715,48 +11722,47 @@ class Api extends CI_Controller
 
             $transfer_lead_ids = explode(',', $transfer_lead_ids);
 
-            foreach($transfer_lead_ids as  $transfer_lead_id){
-                
-                            $transfer_to = $this->input->post('transfer_to');
-                
-                            $record = $this->Action_model->select_single('tbl_leads', "lead_id='" . $transfer_lead_id . "' AND account_id='" . $account_id . "'");
-                
-                            if ($record) {
-                
-                                $record_array = array(
-                                    'user_id' => $transfer_to
-                                );
-                
-                                $this->Action_model->update_data($record_array, 'tbl_leads', "lead_id='" . $transfer_lead_id . "' AND account_id='" . $account_id . "'");
-                
-                                $this->Action_model->update_data($record_array, 'tbl_followup', "lead_id='" . $transfer_lead_id . "' AND user_id='" . $record->user_id . "'");
-                                $this->Action_model->update_data($record_array, 'tbl_requirements', "lead_id='" . $transfer_lead_id . "' AND user_id='" . $record->user_id . "'");
-                                $this->Action_model->update_data($record_array, 'tbl_site_visit', "lead_id='" . $transfer_lead_id . "' AND user_id='" . $record->user_id . "'");
-                
-                                $record_array = array(
-                                    'lead_id' => $transfer_lead_id,
-                                    'transfer_from' => $record->user_id,
-                                    'transfer_to' => $transfer_to,
-                                    'transfer_by' => $user_id,
-                                    'created_at' => time()
-                                );
-                
-                                $this->Action_model->insert_data($record_array, 'tbl_lead_transfer');
-                
-                                $lead_history_array = array(
-                                    'title' => 'Transfer Lead',
-                                    'description' => 'Lead transfer to ' . $this->Action_model->get_name($transfer_to) . ' by ' . $this->Action_model->get_name($user_id),
-                                    'lead_id' => $transfer_lead_id,
-                                    'created_at' => time(),
-                                    "account_id" => $account_id,
-                                    "user_id" => $user_id
-                                );
-                                $this->Action_model->insert_data($lead_history_array, 'tbl_lead_history');
-                
-                            }     
-                        }
+            foreach ($transfer_lead_ids as  $transfer_lead_id) {
 
-                        $array = array('status' => "true", 'msg' => 'Lead Transfered Successfully!!');
+                $transfer_to = $this->input->post('transfer_to');
+
+                $record = $this->Action_model->select_single('tbl_leads', "lead_id='" . $transfer_lead_id . "' AND account_id='" . $account_id . "'");
+
+                if ($record) {
+
+                    $record_array = array(
+                        'user_id' => $transfer_to
+                    );
+
+                    $this->Action_model->update_data($record_array, 'tbl_leads', "lead_id='" . $transfer_lead_id . "' AND account_id='" . $account_id . "'");
+
+                    $this->Action_model->update_data($record_array, 'tbl_followup', "lead_id='" . $transfer_lead_id . "' AND user_id='" . $record->user_id . "'");
+                    $this->Action_model->update_data($record_array, 'tbl_requirements', "lead_id='" . $transfer_lead_id . "' AND user_id='" . $record->user_id . "'");
+                    $this->Action_model->update_data($record_array, 'tbl_site_visit', "lead_id='" . $transfer_lead_id . "' AND user_id='" . $record->user_id . "'");
+
+                    $record_array = array(
+                        'lead_id' => $transfer_lead_id,
+                        'transfer_from' => $record->user_id,
+                        'transfer_to' => $transfer_to,
+                        'transfer_by' => $user_id,
+                        'created_at' => time()
+                    );
+
+                    $this->Action_model->insert_data($record_array, 'tbl_lead_transfer');
+
+                    $lead_history_array = array(
+                        'title' => 'Transfer Lead',
+                        'description' => 'Lead transfer to ' . $this->Action_model->get_name($transfer_to) . ' by ' . $this->Action_model->get_name($user_id),
+                        'lead_id' => $transfer_lead_id,
+                        'created_at' => time(),
+                        "account_id" => $account_id,
+                        "user_id" => $user_id
+                    );
+                    $this->Action_model->insert_data($lead_history_array, 'tbl_lead_history');
+                }
+            }
+
+            $array = array('status' => "true", 'msg' => 'Lead Transfered Successfully!!');
         } else {
             $array = array('status' => "false", 'msg' => 'Some error occurred, please try again.');
         }
@@ -12329,16 +12335,15 @@ class Api extends CI_Controller
 
         $followup_data  = '';
 
-        if($this->input->post('id')){
-                
+        if ($this->input->post('id')) {
+
             $where              =   "followup_id='" . $this->input->post('id') . "'";
             $followup_data      =   $this->db->select('lead_stage_id,lead_status_id')->where($where)->get('tbl_followup')->row();
-            
         }
 
         $data['followup_data'] = $followup_data;
 
-      
+
 
         $where          = "user_hash='" .  $this->input->post('user_hash') . "'";
         $user_detail    = $this->Action_model->select_single('tbl_users', $where);
@@ -12362,18 +12367,17 @@ class Api extends CI_Controller
 
         # get agent account id 
 
-            if($user_detail->parent_id==0){
-                $aget_account_id = $user_detail->user_id;
-            }
-            else{
-                $aget_account_id = $user_detail->parent_id;
-            }
+        if ($user_detail->parent_id == 0) {
+            $aget_account_id = $user_detail->user_id;
+        } else {
+            $aget_account_id = $user_detail->parent_id;
+        }
 
         # End get agent account id 
 
-       
 
-        $where                  = "agent_id='" . $aget_account_id  . "' OR share_account_id='" .$aget_account_id . "'";
+
+        $where                  = "agent_id='" . $aget_account_id  . "' OR share_account_id='" . $aget_account_id . "'";
 
         $this->db->select("product_id as project_id ,project_name");
         $this->db->from('tbl_products');
@@ -12425,8 +12429,8 @@ class Api extends CI_Controller
 
         $searchValue = $this->input->post("search");
 
-        
-      
+
+
         if ($searchValue) {
             $where = "(
                         CONCAT(user_title, ' ',first_name, ' ', last_name) LIKE '%" . $searchValue . "%' OR
@@ -12469,10 +12473,10 @@ class Api extends CI_Controller
         $teams = $this->Action_model->apiPagination($select, $page, $limit, $join, $where, 'tbl_users as user');
 
 
-        if(count($teams['data']) > 0 ):
-            $arr            =   [ 'status' => true, 'message' => 'Successfully data fetched', 'data' => $teams['data'], 'pagination' => $teams['pagination'] ];
+        if (count($teams['data']) > 0):
+            $arr            =   ['status' => true, 'message' => 'Successfully data fetched', 'data' => $teams['data'], 'pagination' => $teams['pagination']];
         else:
-            $arr            =   [ 'status' => false, 'message' => 'No data available', 'pagination' => $teams['pagination']];
+            $arr            =   ['status' => false, 'message' => 'No data available', 'pagination' => $teams['pagination']];
         endif;
         # End Parent Id
 
@@ -12482,7 +12486,8 @@ class Api extends CI_Controller
 
     # Team Data Store
 
-    public  function team_data_store(){
+    public  function team_data_store()
+    {
 
         $array = array();
 
@@ -12546,7 +12551,6 @@ class Api extends CI_Controller
         }
 
         echo json_encode($array);
-
     }
 
     # End Team Data Store
@@ -12554,123 +12558,120 @@ class Api extends CI_Controller
 
     # Team Add or Edit View Data
 
-    public function team_add_or_edit_view_data(){
+    public function team_add_or_edit_view_data()
+    {
 
-            $arr = array(); 
+        $arr = array();
 
-            # Team List 
+        # Team List 
 
-                $id = $this->input->post('id');
-                if($id):
-                    $where          =   "user_id='$id'";
-                    $select         =   "user_id , role_id , username,user_title,first_name,last_name,mobile,whatsapp_no,email,user_status,date_register,report_to";
-                    $team_details   =   $this->Action_model->select_single('tbl_users', $where , $select );
-                else:
-                    $team_details   =  null ;
-                endif; 
+        $id = $this->input->post('id');
+        if ($id):
+            $where          =   "user_id='$id'";
+            $select         =   "user_id , role_id , username,user_title,first_name,last_name,mobile,whatsapp_no,email,user_status,date_register,report_to";
+            $team_details   =   $this->Action_model->select_single('tbl_users', $where, $select);
+        else:
+            $team_details   =  null;
+        endif;
 
-            # End Team List 
+        # End Team List 
 
-            # Role Level
-                $where = "is_agent_member='1'";
-                $role_list = $this->Action_model->detail_result('tbl_roles', $where);                      
-            # End Role Level    
+        # Role Level
+        $where = "is_agent_member='1'";
+        $role_list = $this->Action_model->detail_result('tbl_roles', $where);
+        # End Role Level    
 
-            if($team_details && count($role_list) > 0 ){  
-                $arr = ['status' => 'true' , 'messages' => 'Team details found' , 'team_details' => $team_details  , 'role_list' => $role_list ];
-            }
-            elseif(count($role_list) > 0){
-                $arr = ['status' => 'true' , 'messages' => 'Team details not found' ,'team_details' => $team_details  , 'role_list' => $role_list ] ;
-            }
-            else{
-                $arr = ['status' => 'false' , 'messages' => 'No data found' ,'team_details' => $team_details  , 'role_list' => $role_list ] ;
-            }
+        if ($team_details && count($role_list) > 0) {
+            $arr = ['status' => 'true', 'messages' => 'Team details found', 'team_details' => $team_details, 'role_list' => $role_list];
+        } elseif (count($role_list) > 0) {
+            $arr = ['status' => 'true', 'messages' => 'Team details not found', 'team_details' => $team_details, 'role_list' => $role_list];
+        } else {
+            $arr = ['status' => 'false', 'messages' => 'No data found', 'team_details' => $team_details, 'role_list' => $role_list];
+        }
 
-            echo   json_encode($arr);
-
+        echo   json_encode($arr);
     }
 
     # Get report to list
 
-        public function get_report_to_list(){
+    public function get_report_to_list()
+    {
 
-             # agnet information 
-                $account_id      = getAccountId();
-                $agent           = $this->getAgent();
-                $user_id         = $agent->user_id ?? 0;
-                $where           = "user_hash='" . $this->input->request_headers()['Access-Token'] . "'";
-                $user_detail     = $this->Action_model->select_single('tbl_users', $where);
-                $account_id      = $user_detail->user_id;
-             # end agent infromation  
-             
-            $array      = array();
-            $user_list  = array();
-    
-            if ($this->input->post()) {
-                $user_role_id = $this->input->post('id');
-                // $account_id = getAccountId();
-    
-                $where = "";
-                if ($user_role_id == 5) {
-                    $where = "user_id='" . $account_id . "'";
-                } else if ($user_role_id == 4) {
-                    $where = "(role_id='5' AND parent_id='" . $account_id . "') OR user_id='" . $account_id . "'";
-                } else if ($user_role_id == 3) {
-                    $where = "((role_id='4' OR role_id='5') AND parent_id='" . $account_id . "') OR user_id='" . $account_id . "'";
-                }
-    
-                if ($where) {
-                    $user_data = $this->Action_model->detail_result('tbl_users', $where);
-                    if ($user_data) {
-                        foreach ($user_data as $item) {
-                            if ($item->parent_id == 0) {
-                                $name = ($item->is_individual) ? (ucwords($item->user_title . ' ' . $item->first_name . ' ' . $item->last_name)) : $item->firm_name;
-                            } else {
-                                $name = ucwords($item->user_title . ' ' . $item->first_name . ' ' . $item->last_name);
-                            }
-    
-                            $user_list[] = array('name' => $name, 'id' => $item->user_id);
+        # agnet information 
+        $account_id      = getAccountId();
+        $agent           = $this->getAgent();
+        $user_id         = $agent->user_id ?? 0;
+        $where           = "user_hash='" . $this->input->request_headers()['Access-Token'] . "'";
+        $user_detail     = $this->Action_model->select_single('tbl_users', $where);
+        $account_id      = $user_detail->user_id;
+        # end agent infromation  
+
+        $array      = array();
+        $user_list  = array();
+
+        if ($this->input->post()) {
+            $user_role_id = $this->input->post('id');
+            // $account_id = getAccountId();
+
+            $where = "";
+            if ($user_role_id == 5) {
+                $where = "user_id='" . $account_id . "'";
+            } else if ($user_role_id == 4) {
+                $where = "(role_id='5' AND parent_id='" . $account_id . "') OR user_id='" . $account_id . "'";
+            } else if ($user_role_id == 3) {
+                $where = "((role_id='4' OR role_id='5') AND parent_id='" . $account_id . "') OR user_id='" . $account_id . "'";
+            }
+
+            if ($where) {
+                $user_data = $this->Action_model->detail_result('tbl_users', $where);
+                if ($user_data) {
+                    foreach ($user_data as $item) {
+                        if ($item->parent_id == 0) {
+                            $name = ($item->is_individual) ? (ucwords($item->user_title . ' ' . $item->first_name . ' ' . $item->last_name)) : $item->firm_name;
+                        } else {
+                            $name = ucwords($item->user_title . ' ' . $item->first_name . ' ' . $item->last_name);
                         }
+
+                        $user_list[] = array('name' => $name, 'id' => $item->user_id);
                     }
                 }
-                $array = array('status' => 'true', 'message' => 'Data Found', 'user_list' => $user_list);
-            } else {
-                $array = array('status' => 'false', 'message' => 'Some error occurred, please try again.');
             }
-    
-            echo json_encode($array);
-
+            $array = array('status' => 'true', 'message' => 'Data Found', 'user_list' => $user_list);
+        } else {
+            $array = array('status' => 'false', 'message' => 'Some error occurred, please try again.');
         }
 
-        public function get_user_list(){
+        echo json_encode($array);
+    }
 
-            $where           = "user_hash='" . $this->input->request_headers()['Access-Token'] . "'";
-            $user_detail     = $this->Action_model->select_single('tbl_users', $where);
+    public function get_user_list()
+    {
 
-            $account_id      = $user_detail->user_id ; 
+        $where           = "user_hash='" . $this->input->request_headers()['Access-Token'] . "'";
+        $user_detail     = $this->Action_model->select_single('tbl_users', $where);
 
-            $where      = "user_status='1' AND ((parent_id='" . $account_id . "') OR (user_id='" . $account_id . "' AND role_id='2'))";
-            $where_ids  = "";
-            $user_ids   = $this->get_level_user_ids($this->input->request_headers()['Access-Token']);
+        $account_id      = $user_detail->user_id;
 
-            if (count($user_ids)) {
-                $where_ids .= " AND (tbl_users.user_id='" . implode("' OR tbl_users.user_id='", $user_ids) . "')";
-            }
+        $where      = "user_status='1' AND ((parent_id='" . $account_id . "') OR (user_id='" . $account_id . "' AND role_id='2'))";
+        $where_ids  = "";
+        $user_ids   = $this->get_level_user_ids($this->input->request_headers()['Access-Token']);
 
-            $where .= $where_ids;
-
-            $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,user_title,first_name,last_name,parent_id,is_individual,firm_name');
-
-             if($user_list):
-                $arr = array('status' => 'true' , 'message' => 'User list found' , 'user_list' =>$user_list);   
-             else:
-                $arr = array('status' => 'false' , 'message' => 'User list not found' , 'user_list' =>$user_list); 
-             endif; 
-
-             echo  json_encode($arr);
-
-
+        if (count($user_ids)) {
+            $where_ids .= " AND (tbl_users.user_id='" . implode("' OR tbl_users.user_id='", $user_ids) . "')";
         }
+
+        $where .= $where_ids;
+
+        $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,user_title,first_name,last_name,parent_id,is_individual,firm_name');
+
+        if ($user_list):
+            $arr = array('status' => 'true', 'message' => 'User list found', 'user_list' => $user_list);
+        else:
+            $arr = array('status' => 'false', 'message' => 'User list not found', 'user_list' => $user_list);
+        endif;
+
+        echo  json_encode($arr);
+    }
 
     # End get report to list 
 
@@ -12681,73 +12682,72 @@ class Api extends CI_Controller
      ******************************/
 
 
-     # lead unit 
-        # list
-        public function unit_list(){
-            $lead_id            = $this->input->post('lead_id');
+    # lead unit 
+    # list
+    public function unit_list()
+    {
+        $lead_id            = $this->input->post('lead_id');
 
-            if (!$lead_id) :
-                echo json_encode(['status' => false, 'message' => 'Please select lead']);
-                exit;
-            endif;
-    
-            $where          =   "user_hash='" . $this->input->request_headers()['Access-Token'] . "'";
-            $user_detail    =   $this->db->where($where)->get('tbl_users')->row();
-            
-            $unit_list      =   lead_units($lead_id ?? 0 , $user_detail );
+        if (!$lead_id) :
+            echo json_encode(['status' => false, 'message' => 'Please select lead']);
+            exit;
+        endif;
 
-            if(count($unit_list) > 0 ){
+        $where          =   "user_hash='" . $this->input->request_headers()['Access-Token'] . "'";
+        $user_detail    =   $this->db->where($where)->get('tbl_users')->row();
 
-                $unit_limited_arr = array();
+        $unit_list      =   lead_units($lead_id ?? 0, $user_detail);
 
-                foreach($unit_list as $unit_row):
-                    $unit_limited_arr[]= array(
-                        'id'                    => $unit_row->id, 
-                        'lead_id'               => $unit_row->lead_id ,
-                        'project_type_name'     => $unit_row->project_type_name, 
-                        'property_type_name'    => $unit_row->property_type_name, 
-                        'location'              => $unit_row->location_name.','. $unit_row->city_name .','. $unit_row->state_name , 
-                        'plot_size'             => $unit_row->property_details->plot_size, 
-                        'booking_date'          => $unit_row->booking_date, 
-                        'referance_number'      => $unit_row->property_details->referance_number, 
-                        
-                    );
-                endforeach;    
+        if (count($unit_list) > 0) {
 
-                echo json_encode(['status' => true, 'message' => 'Successfully data fetched' , 'unit_list' => $unit_limited_arr ]);
+            $unit_limited_arr = array();
 
-            }
-            else{
+            foreach ($unit_list as $unit_row):
+                $unit_limited_arr[] = array(
+                    'id'                    => $unit_row->id,
+                    'lead_id'               => $unit_row->lead_id,
+                    'project_type_name'     => $unit_row->project_type_name,
+                    'property_type_name'    => $unit_row->property_type_name,
+                    'location'              => $unit_row->location_name . ',' . $unit_row->city_name . ',' . $unit_row->state_name,
+                    'plot_size'             => $unit_row->property_details->plot_size,
+                    'booking_date'          => $unit_row->booking_date,
+                    'referance_number'      => $unit_row->property_details->referance_number,
 
-                echo json_encode(['status' => false, 'message' => 'Data not found']);
-            }
+                );
+            endforeach;
 
+            echo json_encode(['status' => true, 'message' => 'Successfully data fetched', 'unit_list' => $unit_limited_arr]);
+        } else {
+
+            echo json_encode(['status' => false, 'message' => 'Data not found']);
         }
+    }
 
-        # details
-        public function lead_unit_details()
-        {
+    # details
+    public function lead_unit_details()
+    {
 
-            $id                 =  $this->input->post('id');
-            $is_view            =    $this->input->get('view') == 'true' ? true : false;
-    
-            if (!$id) :
-                echo json_encode(['status' => false, 'message' => 'Invalid Record']);
-            endif;
-    
-            $record             =    lead_unit_details($id);
-        
-            if ($record) :
-                echo json_encode(['status' => true, 'message' => 'Record successfully fetched', 'data' => $record]);
-            else :
-                echo json_encode(['status' => false, 'message' => 'Invalid Record']);
-            endif;
-        }
-        
-     # end leadd unit
+        $id                 =  $this->input->post('id');
+        $is_view            =    $this->input->get('view') == 'true' ? true : false;
+
+        if (!$id) :
+            echo json_encode(['status' => false, 'message' => 'Invalid Record']);
+        endif;
+
+        $record             =    lead_unit_details($id);
+
+        if ($record) :
+            echo json_encode(['status' => true, 'message' => 'Record successfully fetched', 'data' => $record]);
+        else :
+            echo json_encode(['status' => false, 'message' => 'Invalid Record']);
+        endif;
+    }
+
+    # end leadd unit
 
 
-     public function lead_search_view_data(){
+    public function lead_search_view_data()
+    {
 
         $array = array();
 
@@ -12755,12 +12755,12 @@ class Api extends CI_Controller
         $user_detail    = $this->Action_model->select_single('tbl_users', $where);
         $account_id     = $user_detail->user_id;
 
-      
+
         $where = "country_id='1' AND state_status=1";
         $state_list = $this->Action_model->detail_result('tbl_states', $where = "country_id='1'", 'state_id,state_name');
         $data['state_list'] = $state_list;
 
-    
+
         $where = "lead_source_status='1'";
         $lead_source_list = $this->Action_model->detail_result('tbl_lead_sources', $where);
         $data['lead_source_list'] = $lead_source_list;
@@ -12784,22 +12784,22 @@ class Api extends CI_Controller
         }
 
         $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,CONCAT(user_title," ",first_name," ",last_name) as user_full_name');
-     
- 
-            $array['data'] = array(
-                'status' => 'true',
-                'msg' => 'Found',
-                'state_list' => $state_list,
-                'lead_source_list' => $lead_source_list,
-                'lead_stage_list' => $lead_stage_list,
-                'user_list' => $user_list ?? [],  
-                'lead_type_list' => $lead_type_list  
-            );
-     
-        echo json_encode($array);
-     }
 
-     /*************************************************************************************** 
+
+        $array['data'] = array(
+            'status' => 'true',
+            'msg' => 'Found',
+            'state_list' => $state_list,
+            'lead_source_list' => $lead_source_list,
+            'lead_stage_list' => $lead_stage_list,
+            'user_list' => $user_list ?? [],
+            'lead_type_list' => $lead_type_list
+        );
+
+        echo json_encode($array);
+    }
+
+    /*************************************************************************************** 
      * Helper Function
      ****************************************************************************************/
 
@@ -12848,8 +12848,9 @@ class Api extends CI_Controller
      *  Helper Function
      *************************************************************************************** */
 
-     # Get Lead Product list
-     public function get_lead_product_list(){
+    # Get Lead Product list
+    public function get_lead_product_list()
+    {
         $array = array();
         $feedback_list = array();
 
@@ -13345,7 +13346,7 @@ class Api extends CI_Controller
                         'requirement_id' => $itemPrp['requirement_id'],
                         'property_id' => $itemPrp['property_id'],
                         'type' => $itemPrp['type'],
-                        'full_address' => $itemPrp['location_name'].','.$itemPrp['city_name'].','.$itemPrp['state_name'],
+                        'full_address' => $itemPrp['location_name'] . ',' . $itemPrp['city_name'] . ',' . $itemPrp['state_name'],
                         'product_type_name' => $itemPrp['product_type_name'],
                         'unit_type_name' => $itemPrp['unit_type_name'],
                         'budget' => $itemPrp['budget'],
@@ -13358,7 +13359,7 @@ class Api extends CI_Controller
                         "size_unit" => $feedback_data->size_unit_name,
                         'project_name' => $itemPrp['project_name'],
                         "feedback_user" => $date_user,
-                        "feedback_date_and_time" => $feedback_date.' '.$feedback_time,
+                        "feedback_date_and_time" => $feedback_date . ' ' . $feedback_time,
                         "feedback_date" => $feedback_date,
                         "feedback_time" => $feedback_time,
                         "customer_offer" => $feedback_dd->customer_offer ?? "",
@@ -13393,33 +13394,77 @@ class Api extends CI_Controller
                 }
             }*/
 
-            usort($feedback_list, function($a, $b) {
+            usort($feedback_list, function ($a, $b) {
                 if (empty($a['feedback_id']) && !empty($b['feedback_id'])) {
-                    return -1; 
+                    return -1;
                 } elseif (!empty($a['feedback_id']) && empty($b['feedback_id'])) {
-                    return 1;  
+                    return 1;
                 } elseif (empty($a['feedback_id']) && empty($b['feedback_id'])) {
-                    return 0;  
+                    return 0;
                 }
                 return $a['feedback_id'] <=> $b['feedback_id'];
             });
 
 
 
-            if(count($feedback_list) > 0 ){
+            if (count($feedback_list) > 0) {
                 $array['data'] = array('status' => 'true', 'msg' => 'Data Found', 'feedback_list' => $feedback_list);
-            }
-            else{
+            } else {
                 $array['data'] = array('status' => 'true', 'msg' => 'Data Not Found', 'feedback_list' => $feedback_list);
-
             }
-
         } else {
             $array['data'] = array('status' => 'false', 'msg' => 'Some error occurred, please try again.');
         }
 
-        echo json_encode($array);                                
-     }
-     # End get Lead Product list
+        echo json_encode($array);
+    }
+    # End get Lead Product list
+
+
+    # Followup : Booking Form Data
+    public function booking_form_data()
+    {
+
+        # Init
+        $arr                    =   [];
+        $lead_id                =   request()->lead_id;
+
+        if (!$lead_id):
+            echo json_encode(['status' => false, 'message' => 'Lead id required']);
+            exit;
+        endif;
+        # End Init
+
+        $lead_select_query      =   "lead_id as id, CONCAT(IFNULL(lead_title, ''), ' ',IFNULL(lead_first_name, ''), ' ', IFNULL(lead_last_name, '')) as full_name";
+        $buyer                  =   leads(['id' => $lead_id, 'select' => $lead_select_query]);
+
+        # All Leads
+        $leads_select_query          =  "   lead_id as id, 
+                                            CONCAT(IFNULL(lead_title, ''), ' ',IFNULL(lead_first_name, ''), ' ', IFNULL(lead_last_name, '')) as full_name, 
+                                            CONCAT(
+                                                IF(
+                                                    JSON_UNQUOTE(JSON_EXTRACT(primary_mobile_number_country_data, '$.dialCode')) IS NOT NULL, 
+                                                    CONCAT('+', JSON_UNQUOTE(JSON_EXTRACT(primary_mobile_number_country_data, '$.dialCode'))), 
+                                                    ''
+                                                ),
+                                                ' ',
+                                                lead_mobile_no
+                                            ) AS mobile
+                                        ";
+        $leads_where_query           =   "lead_status = '1'";
+
+        $sellers                =   leads(['select' => $leads_select_query, 'where' => $leads_where_query]);
+        # End All Leads
+
+        $arr                    =   [
+                                        'status'        => true,
+                                        'message'       => 'Data fetched',
+                                        'buyer_name'    => $buyer->full_name ?? '',
+                                        'sellers'       => $sellers,
+                                        'states'        => states()
+                                    ];
+        echo json_encode($arr);
+    }
+    # End Followup : Booking Form Data
 
 }

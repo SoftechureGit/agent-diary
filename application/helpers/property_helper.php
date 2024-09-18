@@ -34,6 +34,7 @@ if (!function_exists('leads')) {
     {
 
         $account_id                 =   getAccountId();
+        $user_ids                   =   get_level_user_ids();
 
         $id                             =   $params['id'] ?? null;;
         $select                         =   $params['select'] ?? null;;
@@ -50,10 +51,18 @@ if (!function_exists('leads')) {
             $where_query                .=   $where;
         endif;
 
+        if (count($user_ids)) {
+            $where_query           .= " AND (user_id='" . implode("' OR user_id='", $user_ids) . "')";
+        }
+
         if ($select):
             $lead_select                = $select;
         else:
             $lead_select                = "*, lead_id as id, CONCAT(IFNULL(lead_title, ''), ' ',IFNULL(lead_first_name, ''), ' ', IFNULL(lead_last_name, '')) as full_name";
+        endif;
+        
+        if (!$id):
+            db_instance()->order_by('id', 'DESC');
         endif;
 
         $query = db_instance()->select($lead_select)->where($where_query)->get('tbl_leads');
