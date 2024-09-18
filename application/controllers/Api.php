@@ -13451,7 +13451,7 @@ class Api extends CI_Controller
                                                 lead_mobile_no
                                             ) AS mobile
                                         ";
-        $leads_where_query           =   "lead_status = '1'";
+        $leads_where_query           =   "( lead_id != $lead_id and lead_status = '1' )";
 
         $sellers                =   leads(['select' => $leads_select_query, 'where' => $leads_where_query]);
         # End All Leads
