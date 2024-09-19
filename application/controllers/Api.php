@@ -314,7 +314,7 @@ class Api extends CI_Controller
                                                                     OR ( followup.lead_stage_id = '1' AND  followup.lead_status_id = '1' AND followup.followup_status = '1') 
                                                                     THEN 1 ELSE 0 END) as total_initial,
 
-                                                    SUM(CASE WHEN ( lead.lead_status = '1' AND lead.lead_stage_id = '2' AND followup.followup_status = '1') THEN 1 ELSE 0 END) as total_followup_count,
+                                                    SUM(CASE WHEN ( lead.lead_status = '1' AND lead.lead_stage_id = '2' AND followup.followup_status = '1') THEN 1 ELSE 0 END) as total_followup,
 
                                                     SUM(CASE WHEN ( ( lead.lead_status = '1' AND lead.lead_stage_id = '3' AND added_to_followup = '0') 
                                                                     OR ( followup.lead_stage_id = '3' AND  followup.lead_status_id = '1' AND followup.followup_status = '1') 
@@ -334,8 +334,8 @@ class Api extends CI_Controller
 
                                                     COUNT(DISTINCT CASE WHEN lead.lead_stage_id = '6' THEN lead.lead_id ELSE NULL END) AS total_success,
                                                     
-                                                    SUM(CASE WHEN ( followup.lead_stage_id = '2' AND  followup.lead_status_id = '1' AND followup.followup_status = '1' AND STR_TO_DATE(followup.next_followup_date, '%d-%m-%Y') = CURDATE() ) THEN 1 ELSE 0 END) as today_followup_count,
-                                                    SUM(CASE WHEN ( followup.lead_stage_id = '2' AND  followup.lead_status_id = '1' AND followup.followup_status = '1' AND STR_TO_DATE(followup.next_followup_date, '%d-%m-%Y') < CURDATE() ) THEN 1 ELSE 0 END) as missed_followup_count,
+                                                    SUM(CASE WHEN ( followup.lead_stage_id = '2' AND  followup.lead_status_id = '1' AND followup.followup_status = '1' AND STR_TO_DATE(followup.next_followup_date, '%d-%m-%Y') = CURDATE() ) THEN 1 ELSE 0 END) as today_followup,
+                                                    SUM(CASE WHEN ( followup.lead_stage_id = '2' AND  followup.lead_status_id = '1' AND followup.followup_status = '1' AND STR_TO_DATE(followup.next_followup_date, '%d-%m-%Y') < CURDATE() ) THEN 1 ELSE 0 END) as missed_followup,
                                                     
                                                 ";
 
