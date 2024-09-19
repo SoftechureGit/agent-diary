@@ -118,9 +118,9 @@
           <div class="col-lg-6 col-sm-6">
             <div class="card gradient-2">
               <div class="card-body">
-                <h3 class="card-title text-white">New Leads</h3>
+                <h3 class="card-title text-white">Today Leads</h3>
                 <div class="d-inline-block">
-                  <h2 class="text-white"><?= ($leads->today_count ?? 0 ) + ( $followups->total_initial_count ?? 0 ) ?></h2>
+                  <h2 class="text-white"><?= ( $leads->today_lead_count ?? 0 )?></h2>
                 </div>
                 <span class="float-right display-5 opacity-5"><i class="icon-chart" aria-hidden="true"></i></span>
               </div>
@@ -134,7 +134,7 @@
               <div class="card-body">
                 <h3 class="card-title text-white">Today's Followup</h3>
                 <div class="d-inline-block">
-                  <h2 class="text-white"><?= $today_fullowups ?? 0 ?></h2>
+                  <h2 class="text-white"><?= $leads->today_followup_count ?? 0 ?></h2>
                 </div>
                 <span class="float-right display-5 opacity-5"><i class="fa fa-bullseye" aria-hidden="true"></i></span>
               </div>
@@ -148,7 +148,7 @@
               <div class="card-body">
                 <h3 class="card-title text-white">Total Leads</h3>
                 <div class="d-inline-block">
-                  <h2 class="text-white"><?= $leads->total_count ?? 0 ?></h2>
+                  <h2 class="text-white"><?= $leads->total_lead_count ?? 0 ?></h2>
                   <!--<p class="text-white mb-0">Jan - March 2019</p>-->
                 </div>
                 <span class="float-right display-5 opacity-5"><i class="fa fa-users" aria-hidden="true"></i></span>
@@ -163,7 +163,7 @@
               <div class="card-body">
                 <h3 class="card-title text-white">Missed Followup</h3>
                 <div class="d-inline-block">
-                  <h2 class="text-white"><?= $missed_followups?? 0 ?></h2>
+                  <h2 class="text-white"><?= $leads->missed_followup_count?? 0 ?></h2>
                 </div>
                 <span class="float-right display-5 opacity-5"><i class="fa fa-users" aria-hidden="true"></i></span>
               </div>
@@ -194,31 +194,31 @@
 
                         <tr>
                           <td>Initial</td>
-                          <td class="text-center"><?=( $followups->total_initial_count ?? 0 ) ?></td>
+                          <td class="text-center"><?=( $leads->total_initial_count ?? 0 ) ?></td>
                         </tr>
                         <tr class="text-primary">
                           <td>Followup</td>
-                          <td class="text-center"><?= $followups->total_followup_count ?? 0 ?></td>
+                          <td class="text-center"><?= $leads->total_followup_count ?? 0 ?></td>
                         </tr>
                         <tr>
                           <td>Enquiry</td>
-                          <td class="text-center"><?= $followups->total_enquiry_count ?? 0 ?></td>
+                          <td class="text-center"><?= $leads->total_enquiry_count ?? 0 ?></td>
                         </tr>
                         <tr>
                           <td>Site Visit</td>
-                          <td class="text-center"><?= $followups->total_site_visit_count ?? 0 ?></td>
+                          <td class="text-center"><?= $leads->total_site_visit_count ?? 0 ?></td>
                         </tr>
                         <tr>
                           <td>Metting</td>
-                          <td class="text-center"><?= $followups->total_metting_count ?? 0 ?></td>
+                          <td class="text-center"><?= $leads->total_metting_count ?? 0 ?></td>
                         </tr>
                         <tr class="text-danger">
                           <td>Dump</td>
-                          <td class="text-center"><?= $followups->total_dump_count ?? 0 ?></td>
+                          <td class="text-center"><?= $leads->total_dump_count ?? 0 ?></td>
                         </tr>
                         <tr class="text-success">
                           <td>Success</td>
-                          <td class="text-center"><?= $followups->total_success_count ?? 0 ?></td>
+                          <td class="text-center"><?= $leads->total_success_count ?? 0 ?></td>
                         </tr>
 
                       </tbody>

@@ -85,12 +85,12 @@ class Agent extends CI_Controller
 
         if ($agent_hash):
             $where              =   "user_hash='" . $agent_hash . "'";
-                                                    $this->db->select('user.*,  role.role_name');
-                                                    $this->db->where($where);
-                                                    $this->db->from('tbl_users as user');
-                                                    $this->db->join('tbl_roles  as role', 'user.role_id = role.role_id', 'left');
+            $this->db->select('user.*,  role.role_name');
+            $this->db->where($where);
+            $this->db->from('tbl_users as user');
+            $this->db->join('tbl_roles  as role', 'user.role_id = role.role_id', 'left');
             $user               =                   $this->db->get()->row();
-    
+
         endif;
 
         if (!$user):
@@ -99,33 +99,33 @@ class Agent extends CI_Controller
         endif;
 
         # Permission Roles
-            $permission_roles                       =   [];
-            
-            # For Agent 
-            if($user->role_id == 2):
-                $permission_roles                       =   [3,4,5];
-            endif;
-            # End For Agent 
+        $permission_roles                       =   [];
 
-            # Level 1
-            if($user->role_id == 3):
-                $permission_roles                       =   [0];
-            endif;
-            # End Level 1
+        # For Agent 
+        if ($user->role_id == 2):
+            $permission_roles                       =   [3, 4, 5];
+        endif;
+        # End For Agent 
 
-            # Level 2
-            if($user->role_id == 4):
-                $permission_roles                       =   [3];
-            endif;
-            # End Level 2
+        # Level 1
+        if ($user->role_id == 3):
+            $permission_roles                       =   [0];
+        endif;
+        # End Level 1
 
-            # Level 3
-            if($user->role_id == 5):
-                $permission_roles                       =   [3, 4];
-            endif;
-            # End Level 3
+        # Level 2
+        if ($user->role_id == 4):
+            $permission_roles                       =   [3];
+        endif;
+        # End Level 2
 
-            $user->permission_roles                 =   implode(',', $permission_roles);
+        # Level 3
+        if ($user->role_id == 5):
+            $permission_roles                       =   [3, 4];
+        endif;
+        # End Level 3
+
+        $user->permission_roles                 =   implode(',', $permission_roles);
         # Permission Roles
 
         return $user;
@@ -163,38 +163,205 @@ class Agent extends CI_Controller
 
         # Trial Plan
 
-            # Magical Function
-            $this->trial_plan($is_trial, $trial_expired, $trial_remaining_days, $expire_today);
-            # End Magical Function
+        # Magical Function
+        $this->trial_plan($is_trial, $trial_expired, $trial_remaining_days, $expire_today);
+        # End Magical Function
 
-            #
-            $trial_alert_msg        = '';
+        #
+        $trial_alert_msg        = '';
 
-            if ($is_trial && $trial_expired):
-              $trial_alert_msg        = 'Your trial has ended.';
-    
-            elseif ($is_trial && $expire_today):
-              $trial_alert_msg        = 'Your trial expires today 11:59:00 PM';
-    
-            elseif ($is_trial && !$trial_expired):
-              $trial_alert_msg        = "Your trial expires in $trial_remaining_days days";
-    
-            elseif (!$is_trial && $expire_today):
-              $trial_alert_msg        = "Your plan expires today 11:59:00 PM";
-    
-            elseif (!$is_trial && $trial_remaining_days && $trial_remaining_days <= 10):
-              $trial_alert_msg        = "Your plan expires in $trial_remaining_days days";
-    
-            elseif (!$is_trial && $trial_remaining_days == 0):
-              $trial_alert_msg        = " Your plan has expired. Please update your payment details to reactive it.";
-            endif;
-            #
+        if ($is_trial && $trial_expired):
+            $trial_alert_msg        = 'Your trial has ended.';
 
-            $tiral_data             =   (object) [
-                                                    'is_trial'      => $trial_alert_msg ? true : false,
-                                                    'message'       => $trial_alert_msg,
-                                                    'pay_url'       => base_url(AGENT_URL . 'pay')
-                                                ];
+        elseif ($is_trial && $expire_today):
+            $trial_alert_msg        = 'Your trial expires today 11:59:00 PM';
+
+        elseif ($is_trial && !$trial_expired):
+            $trial_alert_msg        = "Your trial expires in $trial_remaining_days days";
+
+        elseif (!$is_trial && $expire_today):
+            $trial_alert_msg        = "Your plan expires today 11:59:00 PM";
+
+        elseif (!$is_trial && $trial_remaining_days && $trial_remaining_days <= 10):
+            $trial_alert_msg        = "Your plan expires in $trial_remaining_days days";
+
+        elseif (!$is_trial && $trial_remaining_days == 0):
+            $trial_alert_msg        = " Your plan has expired. Please update your payment details to reactive it.";
+        endif;
+        #
+
+        $tiral_data             =   (object) [
+            'is_trial'      => $trial_alert_msg ? true : false,
+            'message'       => $trial_alert_msg,
+            'pay_url'       => base_url(AGENT_URL . 'pay')
+        ];
+        # End Trial Plan
+
+        /*-------------------------------------------------------------------
+        - Leads And Followup Counting With Team Members
+        -------------------------------------------------------------------*/
+
+        # Teams Member
+        $where                              =   "(user.role_id in ($user_detail->permission_roles) or user.user_id = '$user_detail->user_id') and user.user_status='1' AND (user.user_id='$account_id' OR user.parent_id='$account_id') ORDER BY user.user_id ASC";
+        $this->db->select("user.user_id as id, concat(IFNULL(user.user_title, ''),' ', IFNULL(user.first_name, ''), ' ', IFNULL(user.last_name, '')) as full_name, role.role_name");
+        $this->db->from('tbl_users as user');
+        $this->db->join('tbl_roles  as role', 'user.role_id = role.role_id', 'left');
+        $this->db->where($where);
+        $members                            =   $this->db->get()->result();
+
+        # End Team Member
+
+        # Member Ids
+        // Extracting IDs
+        $members_ids_arr                    =  null;
+        if (!$selected_member_ids):
+            $members_ids_arr                =   array_map(function ($member) {
+                return $member->id;
+            }, $members);
+
+            $members_ids                    =   implode(",", $members_ids_arr);
+        endif;
+        # End Member Ids
+
+        # Leads Counting
+
+        $where                              =   "(user.role_id in ($user_detail->permission_roles) or user.user_id = '$user_detail->user_id')";
+
+        if (!$selected_member_ids):
+            $where                          .=   " and lead.user_id in ($members_ids) ";
+        else:
+            $where                          .=   " and lead.user_id in ($selected_member_ids) ";
+        endif;
+
+        $lead_select_query                  =   "
+                                                    COUNT(DISTINCT lead.lead_id) as all_leads_count,
+                                                    SUM(CASE WHEN ( lead.lead_stage_id != '6' AND lead.lead_stage_id != '7' ) THEN 1 ELSE 0 END) as total_active_leads_count,
+
+                                                    SUM(CASE WHEN ( (lead.lead_status = '1' AND lead.lead_stage_id = '1' AND added_to_followup = '0' AND STR_TO_DATE(lead_date, '%d-%m-%Y')  = CURDATE() )
+                                                        OR (lead.lead_status = '1' AND lead.lead_stage_id = '1'  AND followup.followup_status = '1' AND STR_TO_DATE(lead_date, '%d-%m-%Y')  = CURDATE() )
+                                                    ) THEN 1 ELSE 0 END) as today_lead_count,
+
+                                                    SUM(CASE WHEN ( (lead.lead_status = '1' AND lead.lead_stage_id = '1' AND added_to_followup = '0' )
+                                                                    OR (lead.lead_status = '1' AND lead.lead_stage_id = '1'  AND followup.followup_status = '1' )
+                                                                ) THEN 1 ELSE 0 END) as total_lead_count,
+
+                                                    SUM(CASE WHEN ( lead.lead_status = '1' AND lead.lead_stage_id = '1' AND added_to_followup = '0') 
+                                                                    OR ( followup.lead_stage_id = '1' AND  followup.lead_status_id = '1' AND followup.followup_status = '1') 
+                                                                    THEN 1 ELSE 0 END) as total_initial_count,
+
+                                                    SUM(CASE WHEN ( lead.lead_status = '1' AND lead.lead_stage_id = '2' AND followup.followup_status = '1') THEN 1 ELSE 0 END) as total_followup_count,
+
+                                                    SUM(CASE WHEN ( ( lead.lead_status = '1' AND lead.lead_stage_id = '3' AND added_to_followup = '0') 
+                                                                    OR ( followup.lead_stage_id = '3' AND  followup.lead_status_id = '1' AND followup.followup_status = '1') 
+                                                                    ) THEN 1 ELSE 0 END) as total_enquiry_count,
+
+                                                    SUM(CASE WHEN ( ( lead.lead_status = '1' AND lead.lead_stage_id = '4'  AND added_to_followup = '0') )
+                                                                    OR ( followup.lead_stage_id = '4' AND  followup.lead_status_id = '1' AND followup.followup_status = '1') 
+                                                                    THEN 1 ELSE 0 END) as total_site_visit_count,
+
+                                                    SUM(CASE WHEN ( ( lead.lead_status = '1' AND lead.lead_stage_id = '5' AND added_to_followup = '0') )
+                                                                OR ( followup.lead_stage_id = '5' AND  followup.lead_status_id = '1' AND followup.followup_status = '1') 
+                                                                THEN 1 ELSE 0 END) as total_metting_count,
+
+                                                    SUM(CASE WHEN (  ( lead.lead_stage_id = '7' AND added_to_followup = '0') 
+                                                                    OR ( followup.lead_stage_id = '7' AND  followup.followup_status = '1') 
+                                                                ) THEN 1 ELSE 0 END) as total_dump_count,
+
+                                                    COUNT(DISTINCT CASE WHEN lead.lead_stage_id = '6' THEN lead.lead_id ELSE NULL END) AS total_success_count,
+                                                    
+                                                    SUM(CASE WHEN ( followup.lead_stage_id = '2' AND  followup.lead_status_id = '1' AND followup.followup_status = '1' AND STR_TO_DATE(followup.next_followup_date, '%d-%m-%Y') = CURDATE() ) THEN 1 ELSE 0 END) as today_followup_count,
+                                                    SUM(CASE WHEN ( followup.lead_stage_id = '2' AND  followup.lead_status_id = '1' AND followup.followup_status = '1' AND STR_TO_DATE(followup.next_followup_date, '%d-%m-%Y') < CURDATE() ) THEN 1 ELSE 0 END) as missed_followup_count,
+                                                    
+                                                ";
+
+        $this->db->select($lead_select_query);
+        $this->db->where($where);
+        $this->db->from('tbl_leads as lead');
+        $this->db->join('tbl_users  as user', 'user.user_id = lead.user_id', 'left');
+        $this->db->join('tbl_followup  as followup', 'followup.lead_id = lead.lead_id', 'left');
+        $leads                          =   $this->db->get()->row();
+
+        // echo "<pre>";
+        // print_r($leads);
+
+        // echo $this->db->last_query();
+        // die;
+        # End Leads
+
+        $data['leads']                      =   $leads;
+        /*-------------------------------------------------------------------
+        - Leads And Followup Counting With Team Members
+        -------------------------------------------------------------------*/
+
+        # Data   
+        $data['trial']                      =   $tiral_data;
+
+        # Count
+        # End Count
+        $data['members']                    =   $members;
+        $data['property_types']             =   $property_types ?? [];
+        $data['user_detail']                =   $user_detail;
+        # End Data   
+
+        $this->load->view(AGENT_URL . 'index', $data);
+    }
+
+    public function index_new()
+    {
+
+        # Member Ids
+        $selected_member_ids_arr            =   [];
+        $selected_member_ids                =  $this->input->get('member');
+
+        # End Member Ids
+        $user_detail                        =   $this->user();
+
+        $account_id                         =   getAccountId();
+        $user_id                            =   $user_detail->user_id;
+
+        # Init
+        $is_trial                           =   false;
+        $trial_expired                      =   false;
+        $trial_remaining_days               =   0;
+        $expire_today                       =   0;
+        # End Init
+
+
+
+        # Trial Plan
+
+        # Magical Function
+        $this->trial_plan($is_trial, $trial_expired, $trial_remaining_days, $expire_today);
+        # End Magical Function
+
+        #
+        $trial_alert_msg        = '';
+
+        if ($is_trial && $trial_expired):
+            $trial_alert_msg        = 'Your trial has ended.';
+
+        elseif ($is_trial && $expire_today):
+            $trial_alert_msg        = 'Your trial expires today 11:59:00 PM';
+
+        elseif ($is_trial && !$trial_expired):
+            $trial_alert_msg        = "Your trial expires in $trial_remaining_days days";
+
+        elseif (!$is_trial && $expire_today):
+            $trial_alert_msg        = "Your plan expires today 11:59:00 PM";
+
+        elseif (!$is_trial && $trial_remaining_days && $trial_remaining_days <= 10):
+            $trial_alert_msg        = "Your plan expires in $trial_remaining_days days";
+
+        elseif (!$is_trial && $trial_remaining_days == 0):
+            $trial_alert_msg        = " Your plan has expired. Please update your payment details to reactive it.";
+        endif;
+        #
+
+        $tiral_data             =   (object) [
+            'is_trial'      => $trial_alert_msg ? true : false,
+            'message'       => $trial_alert_msg,
+            'pay_url'       => base_url(AGENT_URL . 'pay')
+        ];
         # End Trial Plan
 
         # Teams Member
@@ -208,22 +375,22 @@ class Agent extends CI_Controller
         # End Team Member
 
         # Member Ids
-                // Extracting IDs
-                $members_ids_arr                    =  null;
-                if(!$selected_member_ids):
-                    $members_ids_arr                =   array_map(function($member) {
-                                                                        return $member->id;
-                                                                    }, $members);
-                    
-                    $members_ids                    =   implode(",", $members_ids_arr);
-                endif;
+        // Extracting IDs
+        $members_ids_arr                    =  null;
+        if (!$selected_member_ids):
+            $members_ids_arr                =   array_map(function ($member) {
+                return $member->id;
+            }, $members);
+
+            $members_ids                    =   implode(",", $members_ids_arr);
+        endif;
         # End Member Ids
         # Leads & Followup Query
-        
+
 
         $where                              =   "(user.role_id in ($user_detail->permission_roles) or user.user_id = '$user_detail->user_id')";
-        
-        if(!$selected_member_ids):
+
+        if (!$selected_member_ids):
             $where                          .=   " and lead.user_id in ($members_ids) ";
         else:
             $where                          .=   " and lead.user_id in ($selected_member_ids) ";
@@ -233,20 +400,20 @@ class Agent extends CI_Controller
                                                     count(*) as total_count,
                                                     SUM(CASE WHEN STR_TO_DATE(lead_date, '%d-%m-%Y')  = CURDATE() THEN 1 ELSE 0 END) as today_count
                                                 ";
-                                               
+
         $this->db->select($lead_select_query);
         $this->db->where($where);
         $this->db->from('tbl_leads as lead');
         $this->db->join('tbl_users  as user', 'user.user_id = lead.user_id', 'left');
         $leads                          =   $this->db->get()->row();
-       # End Leads
+        # End Leads
 
 
         # Followup
         $where                              =   "(user.role_id in ($user_detail->permission_roles) or user.user_id = '$user_detail->user_id') and followup.account_id='$account_id'";
-        
-        
-        if(!$selected_member_ids):
+
+
+        if (!$selected_member_ids):
             $where                          .=   " and followup.user_id in ($members_ids) ";
         else:
             $where                          .=   " and followup.user_id in ($selected_member_ids) ";
@@ -274,26 +441,26 @@ class Agent extends CI_Controller
         # End Followup
 
 
-          # Today Followup 
-          $today_date                 = date('Y-m-d');
-          $today_date_n                   = date('d-m-Y');
-          $today_followups                = $this->db->where("($where and  lead_stage_id !='1' and  lead_stage_id != '6' and  lead_stage_id != '7' ) and  next_followup_date= '$today_date_n'")
-          ->join('tbl_users  as user', 'user.user_id = followup.user_id', 'left')
-          ->get('tbl_followup as followup')->num_rows();
-          # Today Followup 
-          $data['today_fullowups'] = $today_followups;
+        # Today Followup 
+        $today_date                 = date('Y-m-d');
+        $today_date_n                   = date('d-m-Y');
+        $today_followups                = $this->db->where("($where and  lead_stage_id !='1' and  lead_stage_id != '6' and  lead_stage_id != '7' ) and  next_followup_date= '$today_date_n'")
+            ->join('tbl_users  as user', 'user.user_id = followup.user_id', 'left')
+            ->get('tbl_followup as followup')->num_rows();
+        # Today Followup 
+        $data['today_fullowups'] = $today_followups;
 
-          # Total Followup 
-          $today_date_n                   = date('d-m-Y');
-          $total_followups                = $this->db->where("($where and  lead_stage_id !='1' and  lead_stage_id != '6' and  lead_stage_id != '7' ) and  added_to_followup = 1")
-          ->join('tbl_users  as user', 'user.user_id = followup.user_id', 'left')
-          ->get('tbl_leads as followup')->num_rows();
-          # Total Followup 
+        # Total Followup 
+        $today_date_n                   = date('d-m-Y');
+        $total_followups                = $this->db->where("($where and  lead_stage_id !='1' and  lead_stage_id != '6' and  lead_stage_id != '7' ) and  added_to_followup = 1")
+            ->join('tbl_users  as user', 'user.user_id = followup.user_id', 'left')
+            ->get('tbl_leads as followup')->num_rows();
+        # Total Followup 
 
-          
+
         # Missed Followup 
-            $missed_followups            =  $this->db->where("$where and DATE(STR_TO_DATE(`next_followup_date`, '%d-%m-%Y')) < '$today_date'") ->join('tbl_users  as user', 'user.user_id = followup.user_id', 'left')->get('tbl_followup as followup')->num_rows();
-            $data['missed_followups']   = $missed_followups;
+        $missed_followups            =  $this->db->where("$where and DATE(STR_TO_DATE(`next_followup_date`, '%d-%m-%Y')) < '$today_date'")->join('tbl_users  as user', 'user.user_id = followup.user_id', 'left')->get('tbl_followup as followup')->num_rows();
+        $data['missed_followups']   = $missed_followups;
         # Missed Followup 
         // print_r($missed_followups); die;
 
@@ -1575,33 +1742,33 @@ class Agent extends CI_Controller
         $missed_followup    = 0;
 
         # user data
-            $where_user                 = "user_hash='" . $this->session->userdata('agent_hash') . "'";
-            $user_detail                = $this->Action_model->select_single('tbl_users', $where_user);
-            $account_id_for_where       = $user_detail->user_id;
-            $account_id                 = getAccountId();
+        $where_user                 = "user_hash='" . $this->session->userdata('agent_hash') . "'";
+        $user_detail                = $this->Action_model->select_single('tbl_users', $where_user);
+        $account_id_for_where       = $user_detail->user_id;
+        $account_id                 = getAccountId();
 
-            if ($user_detail->role_id < 3 || $user_detail->role_id == 5) {
-                if ($user_detail->parent_id == 0) {
-                    $where_role = "is_customer = '0' AND tbl_leads.account_id = '" . $account_id_for_where . "'";
-                    $where_f = "account_id = '" . $account_id_for_where . "'";
-                } else {
-                    $where_role = "is_customer = '0' AND tbl_leads.user_id = '" . $account_id_for_where . "'";
-                    $where_f = "user_id = '" . $account_id_for_where . "'";
-                }
+        if ($user_detail->role_id < 3 || $user_detail->role_id == 5) {
+            if ($user_detail->parent_id == 0) {
+                $where_role = "is_customer = '0' AND tbl_leads.account_id = '" . $account_id_for_where . "'";
+                $where_f = "account_id = '" . $account_id_for_where . "'";
             } else {
-                $where_role = "tbl_leads.user_id = '" . $account_id_for_where . "' AND is_customer = '0'";
-                $where_f = "followup.user_id = '" . $account_id_for_where . "'";
+                $where_role = "is_customer = '0' AND tbl_leads.user_id = '" . $account_id_for_where . "'";
+                $where_f = "user_id = '" . $account_id_for_where . "'";
             }
+        } else {
+            $where_role = "tbl_leads.user_id = '" . $account_id_for_where . "' AND is_customer = '0'";
+            $where_f = "followup.user_id = '" . $account_id_for_where . "'";
+        }
 
         // print_r($where_role); die;
-        
+
         #end user data
 
         // print_r($where_role); die;
 
         # total followup count
-        
-            
+
+
 
         # end total followup count
 
@@ -1618,12 +1785,12 @@ class Agent extends CI_Controller
 
 
         // print_r($total_leads); die;
-        
+
         # Today Followup 
         $today_date_n                   = date('d-m-Y');
         $today_followups                = $this->db->where("($where_f and  lead_stage_id !='1' and  lead_stage_id != '6' and  lead_stage_id != '7' ) and  next_followup_date= '$today_date_n'")
-        // ->join('tbl_followup ', 'tbl_followup.lead_id = tbl_leads.lead_id', 'left')
-        ->get('tbl_followup')->num_rows();
+            // ->join('tbl_followup ', 'tbl_followup.lead_id = tbl_leads.lead_id', 'left')
+            ->get('tbl_followup')->num_rows();
         # Today Followup 
 
         // print_r($today_followups); die;
@@ -1631,20 +1798,20 @@ class Agent extends CI_Controller
         // print_r($this->db->last_query()); die;
 
         # Total Followup 
-            $total_followups            = $this->db->where("( $where_role and lead_stage_id !='1' and  lead_stage_id != '6' and  lead_stage_id != '7' )  and added_to_followup=1 ")->get('tbl_leads')->num_rows();
+        $total_followups            = $this->db->where("( $where_role and lead_stage_id !='1' and  lead_stage_id != '6' and  lead_stage_id != '7' )  and added_to_followup=1 ")->get('tbl_leads')->num_rows();
         # Total Followup 
 
         // print_r($total_followups); die;
 
         # Missed Followup 
-            $missed_followups            =  $this->db->where("$where_f and DATE(STR_TO_DATE(`next_followup_date`, '%d-%m-%Y')) < '$today_date'")->get('tbl_followup')->num_rows();
+        $missed_followups            =  $this->db->where("$where_f and DATE(STR_TO_DATE(`next_followup_date`, '%d-%m-%Y')) < '$today_date'")->get('tbl_followup')->num_rows();
         # Missed Followup 
 
         // print_r($missed_followups); die;
-          
+
         # lead  count
-        
-            
+
+
         # Member Ids
         $selected_member_ids_arr            =   [];
         $selected_member_ids                =  $this->input->get('member');
@@ -1661,9 +1828,13 @@ class Agent extends CI_Controller
         $trial_remaining_days               =   0;
         $expire_today                       =   0;
         # End Init
-  
 
-   
+
+
+
+        /*-------------------------------------------------------------------
+        - Leads And Followup Counting With Team Members
+        -------------------------------------------------------------------*/
 
         # Teams Member
         $where                              =   "(user.role_id in ($user_detail->permission_roles) or user.user_id = '$user_detail->user_id') and user.user_status='1' AND (user.user_id='$account_id' OR user.parent_id='$account_id') ORDER BY user.user_id ASC";
@@ -1673,117 +1844,89 @@ class Agent extends CI_Controller
         $this->db->where($where);
         $members                            =   $this->db->get()->result();
 
-        # End Team Member 
+        # End Team Member
 
         # Member Ids
-                // Extracting IDs
-                $members_ids_arr                    =  null;
-                if(!$selected_member_ids):
-                    $members_ids_arr                =   array_map(function($member) {
-                                                                        return $member->id;
-                                                                    }, $members);
-                    
-                    $members_ids                    =   implode(",", $members_ids_arr);
-                endif;
-        # End Member Ids
-        # Leads & Followup Query
-        
+        // Extracting IDs
+        $members_ids_arr                    =  null;
+        if (!$selected_member_ids):
+            $members_ids_arr                =   array_map(function ($member) {
+                return $member->id;
+            }, $members);
 
-        $where                              =   "(user.role_id in ($user_detail->permission_roles) or user.user_id = '$user_detail->user_id') AND lead_stage_id=1";
-        
-        if(!$selected_member_ids):
+            $members_ids                    =   implode(",", $members_ids_arr);
+        endif;
+        # End Member Ids
+
+        # Leads Counting
+
+        $where                              =   "(user.role_id in ($user_detail->permission_roles) or user.user_id = '$user_detail->user_id')";
+
+        if (!$selected_member_ids):
             $where                          .=   " and lead.user_id in ($members_ids) ";
         else:
             $where                          .=   " and lead.user_id in ($selected_member_ids) ";
         endif;
 
-
-
         $lead_select_query                  =   "
-                                                    count(*) as total_count,
-                                                    SUM(CASE WHEN STR_TO_DATE(lead_date, '%d-%m-%Y')  = CURDATE() THEN 1 ELSE 0 END) as today_count
+                                                    COUNT(DISTINCT lead.lead_id) as all_leads_count,
+                                                    SUM(CASE WHEN ( lead.lead_stage_id != '6' AND lead.lead_stage_id != '7' ) THEN 1 ELSE 0 END) as total_active_leads_count,
+
+                                                    SUM(CASE WHEN ( (lead.lead_status = '1' AND lead.lead_stage_id = '1' AND added_to_followup = '0' AND STR_TO_DATE(lead_date, '%d-%m-%Y')  = CURDATE() )
+                                                        OR (lead.lead_status = '1' AND lead.lead_stage_id = '1'  AND followup.followup_status = '1' AND STR_TO_DATE(lead_date, '%d-%m-%Y')  = CURDATE() )
+                                                    ) THEN 1 ELSE 0 END) as today_lead_count,
+
+                                                    SUM(CASE WHEN ( (lead.lead_status = '1' AND lead.lead_stage_id = '1' AND added_to_followup = '0' )
+                                                                    OR (lead.lead_status = '1' AND lead.lead_stage_id = '1'  AND followup.followup_status = '1' )
+                                                                ) THEN 1 ELSE 0 END) as total_lead_count,
+
+                                                    SUM(CASE WHEN ( lead.lead_status = '1' AND lead.lead_stage_id = '1' AND added_to_followup = '0') 
+                                                                    OR ( followup.lead_stage_id = '1' AND  followup.lead_status_id = '1' AND followup.followup_status = '1') 
+                                                                    THEN 1 ELSE 0 END) as total_initial_count,
+
+                                                    SUM(CASE WHEN ( lead.lead_status = '1' AND lead.lead_stage_id = '2' AND followup.followup_status = '1') THEN 1 ELSE 0 END) as total_followup_count,
+
+                                                    SUM(CASE WHEN ( ( lead.lead_status = '1' AND lead.lead_stage_id = '3' AND added_to_followup = '0') 
+                                                                    OR ( followup.lead_stage_id = '3' AND  followup.lead_status_id = '1' AND followup.followup_status = '1') 
+                                                                    ) THEN 1 ELSE 0 END) as total_enquiry_count,
+
+                                                    SUM(CASE WHEN ( ( lead.lead_status = '1' AND lead.lead_stage_id = '4'  AND added_to_followup = '0') )
+                                                                    OR ( followup.lead_stage_id = '4' AND  followup.lead_status_id = '1' AND followup.followup_status = '1') 
+                                                                    THEN 1 ELSE 0 END) as total_site_visit_count,
+
+                                                    SUM(CASE WHEN ( ( lead.lead_status = '1' AND lead.lead_stage_id = '5' AND added_to_followup = '0') )
+                                                                OR ( followup.lead_stage_id = '5' AND  followup.lead_status_id = '1' AND followup.followup_status = '1') 
+                                                                THEN 1 ELSE 0 END) as total_metting_count,
+
+                                                    SUM(CASE WHEN (  ( lead.lead_stage_id = '7' AND added_to_followup = '0') 
+                                                                    OR ( followup.lead_stage_id = '7' AND  followup.followup_status = '1') 
+                                                                ) THEN 1 ELSE 0 END) as total_dump_count,
+
+                                                    COUNT(DISTINCT CASE WHEN lead.lead_stage_id = '6' THEN lead.lead_id ELSE NULL END) AS total_success_count,
+                                                    
+                                                    SUM(CASE WHEN ( followup.lead_stage_id = '2' AND  followup.lead_status_id = '1' AND followup.followup_status = '1' AND STR_TO_DATE(followup.next_followup_date, '%d-%m-%Y') = CURDATE() ) THEN 1 ELSE 0 END) as today_followup_count,
+                                                    SUM(CASE WHEN ( followup.lead_stage_id = '2' AND  followup.lead_status_id = '1' AND followup.followup_status = '1' AND STR_TO_DATE(followup.next_followup_date, '%d-%m-%Y') < CURDATE() ) THEN 1 ELSE 0 END) as missed_followup_count,
+                                                    
                                                 ";
-                                               
+
         $this->db->select($lead_select_query);
         $this->db->where($where);
         $this->db->from('tbl_leads as lead');
         $this->db->join('tbl_users  as user', 'user.user_id = lead.user_id', 'left');
+        $this->db->join('tbl_followup  as followup', 'followup.lead_id = lead.lead_id', 'left');
         $leads                          =   $this->db->get()->row();
 
+        // echo "<pre>";
+        // print_r($leads);
 
-        // print_r($leads); die;
+        // echo $this->db->last_query();
+        // die;
+        # End Leads
 
-        
-
-       # End Leads
-
-
-        # Followup
-        $where                              =   "(user.role_id in ($user_detail->permission_roles) or user.user_id = '$user_detail->user_id') and followup.account_id='$account_id'";
-        
-        
-        if(!$selected_member_ids):
-            $where                          .=   " and followup.user_id in ($members_ids) ";
-        else:
-            $where                          .=   " and followup.user_id in ($selected_member_ids) ";
-        endif;
-
-        // print_r($where); die;
-
-        $followup_select_query                  =   "
-                                                        count(*) as total_count,
-                                                 
-                                                        SUM(CASE WHEN lead_stage_id = '1' THEN 1 ELSE 0 END) as total_initial_count,
-                                                        SUM(CASE WHEN lead_stage_id = '2' THEN 1 ELSE 0 END) as total_followup_count,
-                                                        SUM(CASE WHEN lead_stage_id = '3' THEN 1 ELSE 0 END) as total_enquiry_count,
-                                                        SUM(CASE WHEN lead_stage_id = '4' THEN 1 ELSE 0 END) as total_site_visit_count,
-                                                        SUM(CASE WHEN lead_stage_id = '5' THEN 1 ELSE 0 END) as total_metting_count,
-                                                        SUM(CASE WHEN lead_stage_id = '6' THEN 1 ELSE 0 END) as total_success_count,
-                                                        SUM(CASE WHEN lead_stage_id = '7' THEN 1 ELSE 0 END) as total_dump_count
-                                                    ";
-
-        $this->db->select($followup_select_query);
-        $this->db->where($where);
-        $this->db->from('tbl_leads as followup');
-        $this->db->join('tbl_users  as user', 'user.user_id = followup.user_id', 'left');
-        $followups                          =   $this->db->get()->row();
-
-
-        # End Followup
-
-        // print_r($followups); die;
-
-        # total 
-
-
-        $data['total_new_leads']    = $leads->total_count ?? 0;
-        $data['total_followup']     = $total_followups ?? 0;
-        $data['today_followup']     = $today_followups ?? 0;
-        $data['missed_followup']    = $missed_followups ?? 0;
-
-          # Followup
-
-        //   $followup_select_query                  =   "
-        //   count(*) as total_count,
-        //   SUM(CASE WHEN ( STR_TO_DATE(next_followup_date, '%d-%m-%Y')  = CURDATE() AND followup_status = '1' AND lead_status_id = 1 ) THEN 1 ELSE 0 END) as today_count,
-        //   SUM(CASE WHEN ( STR_TO_DATE(next_followup_date, '%d-%m-%Y')  < CURDATE() AND followup_status = '1' AND lead_status_id = 1 ) THEN 1 ELSE 0 END) as missed_count,
-        //   SUM(CASE WHEN lead_stage_id = '1' THEN 1 ELSE 0 END) as total_initial_count,
-        //   SUM(CASE WHEN lead_stage_id = '2' THEN 1 ELSE 0 END) as total_followup_count,
-        //   SUM(CASE WHEN lead_stage_id = '3' THEN 1 ELSE 0 END) as total_enquiry_count,
-        //   SUM(CASE WHEN lead_stage_id = '4' THEN 1 ELSE 0 END) as total_site_visit_count,
-        //   SUM(CASE WHEN lead_stage_id = '5' THEN 1 ELSE 0 END) as total_metting_count,
-        //   SUM(CASE WHEN lead_stage_id = '6' THEN 1 ELSE 0 END) as total_success_count,
-        //   SUM(CASE WHEN lead_stage_id = '7' THEN 1 ELSE 0 END) as total_dump_count";
-
-        //     $this->db->select($followup_select_query);
-        //     $this->db->where($where_f);
-        //     $this->db->from('tbl_followup as followup');
-        //     $this->db->join('tbl_users  as user', 'user.user_id = followup.user_id', 'left');
-        //     $followups                          =   $this->db->get()->row();
-
-
-          $data['followups']  = $followups;
-          # End Followup
+        $data['leads']                      =   $leads;
+        /*-------------------------------------------------------------------
+        - Leads And Followup Counting With Team Members
+        -------------------------------------------------------------------*/
 
 
         $where      = "account_id='" . $account_id . "'";
@@ -1816,7 +1959,7 @@ class Agent extends CI_Controller
         $query = $this->db->get();
         $product_list = $query->result();
 
-        
+
         $data['product_list'] = $product_list;
 
         $data['pie_chart_values'] = $pie_chart_values;
@@ -2846,230 +2989,230 @@ class Agent extends CI_Controller
             redirect(AGENT_URL . 'leads');
         }
     }
-    
+
     public function download_followup()
     {
 
-          # user details   
+        # user details   
 
-          $agent          = $this->getAgent();
-          $user_id        = $agent->user_id ?? 0;
-  
-          $where_user     = "user_hash='" . $this->session->userdata('agent_hash') . "'";
-          $user_detail    = $this->Action_model->select_single('tbl_users', $where_user);
-          $account_id     = $user_detail->user_id;
+        $agent          = $this->getAgent();
+        $user_id        = $agent->user_id ?? 0;
+
+        $where_user     = "user_hash='" . $this->session->userdata('agent_hash') . "'";
+        $user_detail    = $this->Action_model->select_single('tbl_users', $where_user);
+        $account_id     = $user_detail->user_id;
         # end user details 
-  
+
         $where = '';
-  
+
         # where codition  search 
-              $search_text        = $this->input->get('search_text');
-              $search_date_from   = $this->input->get('search_date_from');
-              $search_date_to     = $this->input->get('search_date_to');
-  
-              # Lead Filter
-              $lead_from          = $this->input->get('lead_from');
-              $lead_to            = $this->input->get('lead_to');
-              # End Lead Filter
-  
-              # Followup Filter
-              $followup_from      = $this->input->post('followup_from');
-              $followup_to        = $this->input->get('followup_to');
-              # End Followup Filter
-  
-              $search_state_id    = $this->input->get('search_state_id');
-              $search_city_id     = $this->input->get('search_city_id');
-              $search_source_id   = $this->input->get('search_source_id');
-              $search_stage_id    = $this->input->get('search_stage_id');
-              $search_status      = $this->input->get('search_status');
-              $search_location_id = $this->input->get('search_location_id');
-              $search_budget_min  = $this->input->get('search_budget_min');
-              $search_budget_max  = $this->input->get('search_budget_max');
-              $search_size_min    = $this->input->get('search_size_min');
-              $search_size_max    = $this->input->get('search_size_max');
-              $search_size_unit   = $this->input->get('search_size_unit');
-              $search_agent_id    = $this->input->get('search_agent_id'); 
-  
-           
-              $where_ext = "";
-  
-              if ($search_text) {
-                  $where_ext .= " AND (lead_mobile_no LIKE '%" . $search_text . "%' OR lead_email LIKE '%" . $search_text . "%' OR CONCAT(lead_title, ' ', lead_first_name, ' ', lead_last_name) LIKE '%" . $search_text . "%')";
-              }
-  
-              if ($lead_from && !$lead_to) {
-                  $where_ext .= " AND DATE(STR_TO_DATE(tbl_leads.lead_date, '%d-%m-%Y')) >= '$lead_from'";
-              }
-  
-              if ($lead_from && $lead_to) {
-                  $where_ext .= " AND DATE(STR_TO_DATE(tbl_leads.lead_date, '%d-%m-%Y')) BETWEEN '$lead_from' AND '$lead_to'";
-              }
-  
-  
-  
-              if ($followup_from && !$followup_to) {
-                  $where_ext .= " AND DATE(STR_TO_DATE(tbl_followup.next_followup_date, '%d-%m-%Y')) >= '$followup_from'";
-              }
-  
-              if ($followup_from && $followup_to) {
-  
-                  $where_ext .= " AND DATE(STR_TO_DATE(tbl_followup.next_followup_date, '%d-%m-%Y')) BETWEEN '$followup_from' AND '$followup_to'";
-              }
-  
-              if ($search_state_id) {
-                  $where_ext .= " AND lead_state_id='" . $search_state_id . "'";
-              }
-  
-              if ($search_city_id) {
-                  $where_ext .= " AND lead_city_id='" . $search_city_id . "'";
-              }
-  
-              # source  
-                  if ($search_source_id && !$search_source_id[0] == 0) { 
-                      $where_ext_s ='';
-                      $conditions_s = [];  
-                      foreach ($search_source_id as $search_source_id_row) { 
-                          $conditions_s[] = "tbl_leads.lead_source_id = '" . $search_source_id_row . "'";  
-                      }
-                      if (!empty($conditions_s)) {  
-                          $where_ext_s .= " AND (" . implode(' OR ', $conditions_s) . ")";  
-                      }
-                      $where_ext .= $where_ext_s;
-                  }       
-              # end source 
-  
-                # stage   
-                  if ($search_stage_id && !$search_stage_id[0] == 0) { 
-                      $conditions_ss = [];  
-                      foreach ($search_stage_id as $search_stage_id_row) { 
-                          $conditions_ss[] = " tbl_leads.lead_stage_id = '" . $search_stage_id_row . "'";  
-                      }
-                      if (!empty($conditions_ss)) {  
-                          $where_ext .= " AND (" . implode(' OR ', $conditions_ss) . ")";  
-                      }
-                  }
-              # end stage 
-  
-  
-              if ($search_status) {
-                  $where_ext .= " AND tbl_leads.lead_status='" . $search_status . "'";
-              }
-  
-              if ($search_location_id) {
-                  $where_ext .= " AND tbl_leads.location_id='" . $search_location_id . "'";
-                  // $where_ext .= " AND FIND_IN_SET(" . $search_location_id . ",location)";
-              }
-  
-              if ($search_budget_min && !$search_budget_max) {
-                  $where_ext .= " AND budget_min>='" . $search_budget_min . "'";
-              }
-              
-              if ($search_budget_min && $search_budget_max) {
-                  $where_ext .= " AND (budget_min>='" . $search_budget_min . "' AND budget_max<='" . $search_budget_max . "')";
-              }
-  
-              if ($search_size_min && !$search_size_max) {
-                  $where_ext .= " AND size_min<='" . $search_size_min . "'";
-              }
-              if ($search_size_min && $search_size_max) {
-                  $where_ext .= " AND (size_min<='" . $search_size_min . "' AND size_max>='" . $search_size_max . "')";
-              }
-  
-              if ($search_size_unit) {
-                  $where_ext .= " AND size_unit='" . $search_size_unit . "'";
-              }
+        $search_text        = $this->input->get('search_text');
+        $search_date_from   = $this->input->get('search_date_from');
+        $search_date_to     = $this->input->get('search_date_to');
+
+        # Lead Filter
+        $lead_from          = $this->input->get('lead_from');
+        $lead_to            = $this->input->get('lead_to');
+        # End Lead Filter
+
+        # Followup Filter
+        $followup_from      = $this->input->post('followup_from');
+        $followup_to        = $this->input->get('followup_to');
+        # End Followup Filter
+
+        $search_state_id    = $this->input->get('search_state_id');
+        $search_city_id     = $this->input->get('search_city_id');
+        $search_source_id   = $this->input->get('search_source_id');
+        $search_stage_id    = $this->input->get('search_stage_id');
+        $search_status      = $this->input->get('search_status');
+        $search_location_id = $this->input->get('search_location_id');
+        $search_budget_min  = $this->input->get('search_budget_min');
+        $search_budget_max  = $this->input->get('search_budget_max');
+        $search_size_min    = $this->input->get('search_size_min');
+        $search_size_max    = $this->input->get('search_size_max');
+        $search_size_unit   = $this->input->get('search_size_unit');
+        $search_agent_id    = $this->input->get('search_agent_id');
+
+
+        $where_ext = "";
+
+        if ($search_text) {
+            $where_ext .= " AND (lead_mobile_no LIKE '%" . $search_text . "%' OR lead_email LIKE '%" . $search_text . "%' OR CONCAT(lead_title, ' ', lead_first_name, ' ', lead_last_name) LIKE '%" . $search_text . "%')";
+        }
+
+        if ($lead_from && !$lead_to) {
+            $where_ext .= " AND DATE(STR_TO_DATE(tbl_leads.lead_date, '%d-%m-%Y')) >= '$lead_from'";
+        }
+
+        if ($lead_from && $lead_to) {
+            $where_ext .= " AND DATE(STR_TO_DATE(tbl_leads.lead_date, '%d-%m-%Y')) BETWEEN '$lead_from' AND '$lead_to'";
+        }
+
+
+
+        if ($followup_from && !$followup_to) {
+            $where_ext .= " AND DATE(STR_TO_DATE(tbl_followup.next_followup_date, '%d-%m-%Y')) >= '$followup_from'";
+        }
+
+        if ($followup_from && $followup_to) {
+
+            $where_ext .= " AND DATE(STR_TO_DATE(tbl_followup.next_followup_date, '%d-%m-%Y')) BETWEEN '$followup_from' AND '$followup_to'";
+        }
+
+        if ($search_state_id) {
+            $where_ext .= " AND lead_state_id='" . $search_state_id . "'";
+        }
+
+        if ($search_city_id) {
+            $where_ext .= " AND lead_city_id='" . $search_city_id . "'";
+        }
+
+        # source  
+        if ($search_source_id && !$search_source_id[0] == 0) {
+            $where_ext_s = '';
+            $conditions_s = [];
+            foreach ($search_source_id as $search_source_id_row) {
+                $conditions_s[] = "tbl_leads.lead_source_id = '" . $search_source_id_row . "'";
+            }
+            if (!empty($conditions_s)) {
+                $where_ext_s .= " AND (" . implode(' OR ', $conditions_s) . ")";
+            }
+            $where_ext .= $where_ext_s;
+        }
+        # end source 
+
+        # stage   
+        if ($search_stage_id && !$search_stage_id[0] == 0) {
+            $conditions_ss = [];
+            foreach ($search_stage_id as $search_stage_id_row) {
+                $conditions_ss[] = " tbl_leads.lead_stage_id = '" . $search_stage_id_row . "'";
+            }
+            if (!empty($conditions_ss)) {
+                $where_ext .= " AND (" . implode(' OR ', $conditions_ss) . ")";
+            }
+        }
+        # end stage 
+
+
+        if ($search_status) {
+            $where_ext .= " AND tbl_leads.lead_status='" . $search_status . "'";
+        }
+
+        if ($search_location_id) {
+            $where_ext .= " AND tbl_leads.location_id='" . $search_location_id . "'";
+            // $where_ext .= " AND FIND_IN_SET(" . $search_location_id . ",location)";
+        }
+
+        if ($search_budget_min && !$search_budget_max) {
+            $where_ext .= " AND budget_min>='" . $search_budget_min . "'";
+        }
+
+        if ($search_budget_min && $search_budget_max) {
+            $where_ext .= " AND (budget_min>='" . $search_budget_min . "' AND budget_max<='" . $search_budget_max . "')";
+        }
+
+        if ($search_size_min && !$search_size_max) {
+            $where_ext .= " AND size_min<='" . $search_size_min . "'";
+        }
+        if ($search_size_min && $search_size_max) {
+            $where_ext .= " AND (size_min<='" . $search_size_min . "' AND size_max>='" . $search_size_max . "')";
+        }
+
+        if ($search_size_unit) {
+            $where_ext .= " AND size_unit='" . $search_size_unit . "'";
+        }
         # end  where condtion search
-  
+
         # where 
-          if ($user_detail->role_id < 3 || $user_detail->role_id == 5) {
-  
-              if ($user_detail->parent_id == 0) {
-                  $where = "is_customer ='0' AND tbl_leads.account_id='" . $account_id . "'";
-              } else {
-                  $where = "is_customer ='0' AND tbl_leads.user_id='" . $account_id . "'";
-              }
-          } else {
-              $where = "tbl_leads.user_id='" . $account_id . "' AND is_customer='0'";
-          }
-  
-          $where_ids = "";
-          
-          $user_ids = $this->get_level_user_ids();
-  
-          $where .= $where_ids;
-  
-          $where .= $where_ext;
-  
-          
-          // print_r($where); die;
-  
-          if ($search_agent_id && !$search_agent_id[0] == 0) { 
-  
-              $conditions = [];  
-              foreach ($search_agent_id as $agent_id_row) { 
-                  $conditions[] = "tbl_leads.user_id = '" . $agent_id_row . "'";  
-              }
-              if (!empty($conditions)) {  
-                  $where_ids .= " AND (" . implode(' OR ', $conditions) . ")";  
-              }
-          }
-  
-          
-          $where .= $where_ids;
-          
-          // print_r($where); die;
-  
+        if ($user_detail->role_id < 3 || $user_detail->role_id == 5) {
+
+            if ($user_detail->parent_id == 0) {
+                $where = "is_customer ='0' AND tbl_leads.account_id='" . $account_id . "'";
+            } else {
+                $where = "is_customer ='0' AND tbl_leads.user_id='" . $account_id . "'";
+            }
+        } else {
+            $where = "tbl_leads.user_id='" . $account_id . "' AND is_customer='0'";
+        }
+
+        $where_ids = "";
+
+        $user_ids = $this->get_level_user_ids();
+
+        $where .= $where_ids;
+
+        $where .= $where_ext;
+
+
+        // print_r($where); die;
+
+        if ($search_agent_id && !$search_agent_id[0] == 0) {
+
+            $conditions = [];
+            foreach ($search_agent_id as $agent_id_row) {
+                $conditions[] = "tbl_leads.user_id = '" . $agent_id_row . "'";
+            }
+            if (!empty($conditions)) {
+                $where_ids .= " AND (" . implode(' OR ', $conditions) . ")";
+            }
+        }
+
+
+        $where .= $where_ids;
+
+        // print_r($where); die;
+
         # end where 
-  
-  
-          # Sorting
-  
-          $filter_by = $this->input->get('filter_by');
-  
-          switch ($filter_by):
-              case 'due_followup':
-                  $where .= " and tbl_leads.added_to_followup = '1'";
-                  $where .= " GROUP BY tbl_leads.lead_id";
-                  // $where .= " ORDER BY DATE(STR_TO_DATE(tbl_followup.next_followup_date, '%d-%m-%Y')) desc , tbl_followup.next_followup_time DESC";
-                  $where .= " ORDER BY DATE(STR_TO_DATE(tbl_followup.next_followup_date, '%d-%m-%Y')) desc , tbl_followup.next_followup_time DESC";
-                  break;
-  
-              case 'new_leads':
-                  $where .= " and tbl_leads.added_to_followup = 0";
-                  $where .= " GROUP BY tbl_leads.lead_id";
-                  // $where .= " ORDER BY DATE(STR_TO_DATE(`lead_date`, '%d-%m-%Y')) DESC, lead_time DESC";
-                  $where .= " ORDER BY DATE(STR_TO_DATE(`lead_date`, '%d-%m-%Y')) DESC, STR_TO_DATE(`lead_time`, '%h:%i:%s %p') DESC";
-                  break;
-              default:
-                  $where .= " GROUP BY tbl_leads.lead_id";
-                  break;
-          endswitch;
-          // # End Sorting
-  
-  
-        $array            = array(); 
-  
+
+
+        # Sorting
+
+        $filter_by = $this->input->get('filter_by');
+
+        switch ($filter_by):
+            case 'due_followup':
+                $where .= " and tbl_leads.added_to_followup = '1'";
+                $where .= " GROUP BY tbl_leads.lead_id";
+                // $where .= " ORDER BY DATE(STR_TO_DATE(tbl_followup.next_followup_date, '%d-%m-%Y')) desc , tbl_followup.next_followup_time DESC";
+                $where .= " ORDER BY DATE(STR_TO_DATE(tbl_followup.next_followup_date, '%d-%m-%Y')) desc , tbl_followup.next_followup_time DESC";
+                break;
+
+            case 'new_leads':
+                $where .= " and tbl_leads.added_to_followup = 0";
+                $where .= " GROUP BY tbl_leads.lead_id";
+                // $where .= " ORDER BY DATE(STR_TO_DATE(`lead_date`, '%d-%m-%Y')) DESC, lead_time DESC";
+                $where .= " ORDER BY DATE(STR_TO_DATE(`lead_date`, '%d-%m-%Y')) DESC, STR_TO_DATE(`lead_time`, '%h:%i:%s %p') DESC";
+                break;
+            default:
+                $where .= " GROUP BY tbl_leads.lead_id";
+                break;
+        endswitch;
+        // # End Sorting
+
+
+        $array            = array();
+
         $select           = "tbl_leads.*, 
                                       CONCAT(user.user_title, user.first_name, user.last_name) as assgin_user_full_name, 
                                       stages.lead_stage_name as stage_name, 
                                       lead_source.lead_source_name,
                                       concat(tbl_leads.profile) as full_profile_url,
                                       tbl_followup.next_followup_date,
-                                      tbl_followup.next_followup_time";  
-  
-        $page             = $this->input->get('page') ?? 1 ;
-        
-        $limit            = 10;  
-        
+                                      tbl_followup.next_followup_time";
+
+        $page             = $this->input->get('page') ?? 1;
+
+        $limit            = 10;
+
         # join data 
-          $join             = array('tbl_lead_sources as lead_source','lead_source.lead_source_id = tbl_leads.lead_source_id','tbl_lead_stages as stages', 'stages.lead_stage_id = tbl_leads.lead_stage_id','tbl_users as user', 'user.user_id = tbl_leads.user_id', '(SELECT * FROM tbl_followup WHERE followup_id IN (SELECT MAX(followup_id) FROM tbl_followup GROUP BY lead_id)) as tbl_followup', 'tbl_followup.lead_id = tbl_leads.lead_id');  
+        $join             = array('tbl_lead_sources as lead_source', 'lead_source.lead_source_id = tbl_leads.lead_source_id', 'tbl_lead_stages as stages', 'stages.lead_stage_id = tbl_leads.lead_stage_id', 'tbl_users as user', 'user.user_id = tbl_leads.user_id', '(SELECT * FROM tbl_followup WHERE followup_id IN (SELECT MAX(followup_id) FROM tbl_followup GROUP BY lead_id)) as tbl_followup', 'tbl_followup.lead_id = tbl_leads.lead_id');
         # end join data 
-        
-      //   echo json_encode($where); die;
-         
-        $records                       =   $this->Action_model->getAllData($select,$join,$where,'tbl_leads');
-  
-    
+
+        //   echo json_encode($where); die;
+
+        $records                       =   $this->Action_model->getAllData($select, $join, $where, 'tbl_leads');
+
+
 
         $array = array();
 
@@ -3080,7 +3223,7 @@ class Agent extends CI_Controller
             if ($account_id) {
 
 
-            
+
                 require_once(APPPATH . 'third_party/PHPExcel/Classes/PHPExcel.php');
                 require_once(APPPATH . 'third_party/PHPExcel/Classes/PHPExcel/IOFactory.php');
 
@@ -3117,13 +3260,13 @@ class Agent extends CI_Controller
                 $count = 1;
                 foreach ($records as $item) {
 
-                     # get country code
-                
-                     if($item->primary_mobile_number_country_data ):
-                        $code = '+'.((json_decode($item->primary_mobile_number_country_data)->dialCode) ?? '91');
+                    # get country code
+
+                    if ($item->primary_mobile_number_country_data):
+                        $code = '+' . ((json_decode($item->primary_mobile_number_country_data)->dialCode) ?? '91');
                     else:
-                            $code  = '+91'; 
-                    endif;         
+                        $code  = '+91';
+                    endif;
                     # end get country code
 
 
@@ -3131,11 +3274,11 @@ class Agent extends CI_Controller
                     $objPHPExcel->getActiveSheet()->setCellValue('B' . $o, $item->lead_title);
                     $objPHPExcel->getActiveSheet()->setCellValue('C' . $o, $item->lead_first_name);
                     $objPHPExcel->getActiveSheet()->setCellValue('D' . $o, $item->lead_last_name);
-                    $objPHPExcel->getActiveSheet()->setCellValue('E' . $o, ($code ?? '').' '.$item->lead_mobile_no);
+                    $objPHPExcel->getActiveSheet()->setCellValue('E' . $o, ($code ?? '') . ' ' . $item->lead_mobile_no);
                     $objPHPExcel->getActiveSheet()->setCellValue('F' . $o, $item->lead_email);
                     $objPHPExcel->getActiveSheet()->setCellValue('G' . $o, $item->stage_name);
                     $objPHPExcel->getActiveSheet()->setCellValue('H' . $o, $item->lead_source_name);
-                    $objPHPExcel->getActiveSheet()->setCellValue('I' . $o, ($item->next_followup_date ?? 'N/A'.' '.$item->next_followup_time ?? ''));
+                    $objPHPExcel->getActiveSheet()->setCellValue('I' . $o, ($item->next_followup_date ?? 'N/A' . ' ' . $item->next_followup_time ?? ''));
                     $objPHPExcel->getActiveSheet()->setCellValue('J' . $o, $item->assgin_user_full_name ?? '');
                     $o++;
                     $i++;
