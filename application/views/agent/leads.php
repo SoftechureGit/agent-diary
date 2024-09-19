@@ -410,7 +410,7 @@
                             <div class="card-body" style="padding: 13px 10px 4px 10px !important;">
                               <h3 class="card-title text-white" style="font-size: 14px;margin-bottom: 5px;">Today Followup</h3>
                               <div class="d-inline-block">
-                                <h2 class="text-white" style="font-size: 24px;"><?= $leads->today_followup_count ?></h2>
+                                <h2 class="text-white" style="font-size: 24px;"><?= $leads->today_followup_count ?? 0 ?></h2>
                               </div>
                             </div>
                           </div>
@@ -431,7 +431,7 @@
                             <div class="card-body" style="padding: 13px 10px 4px 10px !important;">
                               <h3 class="card-title text-white" style="font-size: 14px;margin-bottom: 5px;">Missed Followup</h3>
                               <div class="d-inline-block">
-                                <h2 class="text-white" style="font-size: 24px;"><?= $leads->missed_followup_count ?></h2>
+                                <h2 class="text-white" style="font-size: 24px;"><?= $leads->missed_followup_count ?? 0 ?></h2>
                               </div>
                             </div>
                           </div>

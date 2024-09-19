@@ -1732,15 +1732,6 @@ class Agent extends CI_Controller
         $lead_action_list = $this->Action_model->detail_result('tbl_lead_actions', $where, 'lead_action_id,lead_action_name');
         $data['lead_action_list'] = $lead_action_list;
 
-
-        # stage 
-
-        # end stage 
-
-        $total_followup     = 0;
-        $today_followup     = 0;
-        $missed_followup    = 0;
-
         # user data
         $where_user                 = "user_hash='" . $this->session->userdata('agent_hash') . "'";
         $user_detail                = $this->Action_model->select_single('tbl_users', $where_user);
@@ -1788,46 +1779,17 @@ class Agent extends CI_Controller
 
         # Today Followup 
         $today_date_n                   = date('d-m-Y');
-        $today_followups                = $this->db->where("($where_f and  lead_stage_id !='1' and  lead_stage_id != '6' and  lead_stage_id != '7' ) and  next_followup_date= '$today_date_n'")
-            // ->join('tbl_followup ', 'tbl_followup.lead_id = tbl_leads.lead_id', 'left')
-            ->get('tbl_followup')->num_rows();
-        # Today Followup 
-
-        // print_r($today_followups); die;
-
-        // print_r($this->db->last_query()); die;
-
-        # Total Followup 
-        $total_followups            = $this->db->where("( $where_role and lead_stage_id !='1' and  lead_stage_id != '6' and  lead_stage_id != '7' )  and added_to_followup=1 ")->get('tbl_leads')->num_rows();
-        # Total Followup 
-
-        // print_r($total_followups); die;
-
-        # Missed Followup 
-        $missed_followups            =  $this->db->where("$where_f and DATE(STR_TO_DATE(`next_followup_date`, '%d-%m-%Y')) < '$today_date'")->get('tbl_followup')->num_rows();
-        # Missed Followup 
-
-        // print_r($missed_followups); die;
-
-        # lead  count
-
+       
 
         # Member Ids
-        $selected_member_ids_arr            =   [];
+        
         $selected_member_ids                =  $this->input->get('member');
 
         # End Member Ids
         $user_detail                        =   $this->user();
 
         $account_id                         =   getAccountId();
-        $user_id                            =   $user_detail->user_id;
 
-        # Init
-        $is_trial                           =   false;
-        $trial_expired                      =   false;
-        $trial_remaining_days               =   0;
-        $expire_today                       =   0;
-        # End Init
 
 
 
