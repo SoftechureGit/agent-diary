@@ -1651,9 +1651,6 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 'lead_source_id'                             => $this->input->post('lead_source_id'),
                 'lead_stage_id'                              => $this->input->post('lead_stage_id'),
                 'lead_status'                                => $this->input->post('lead_status'),
-                'user_id'                                    => $user_id,
-                'added_by'                                   => $user_id,
-                'account_id'                                 => $account_id,
                 'lead_pan_no'                                => $this->input->post('lead_pan_no'),
                 'lead_adhar_no'                              => $this->input->post('lead_adhar_no'),
                 'lead_voter_id'                              => $this->input->post('lead_voter_id'),
@@ -1709,6 +1706,10 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 $record_array['updated_at'] = time();
                 $record_array['lead_email'] = $this->input->post('lead_email');
                 $record_array['lead_mobile_no'] = $lead_primary_mobile;
+                
+                $record_array['user_id']        = $user_id;
+                $record_array['added_by']       = $user_id;
+                $record_array['account_id']     = $account_id;
 
 
                 $lead_id = $this->Action_model->insert_data($record_array, 'tbl_leads');
@@ -2228,7 +2229,10 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
 
         $where_user     = "user_hash='" . $this->session->userdata('agent_hash') . "'";
         $user_detail    = $this->Action_model->select_single('tbl_users', $where_user);
-        $account_id     = $user_detail->user_id;
+
+        $account_id     = getAccountId();
+
+        // $account_id     = $user_detail->user_id;
       # end user details 
 
       $where = '';
@@ -2352,20 +2356,25 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
       # end  where condtion search
 
       # where 
-        if ($user_detail->role_id < 3 || $user_detail->role_id == 5) {
+        // if ($user_detail->role_id < 3 || $user_detail->role_id == 5) {
 
-            if ($user_detail->parent_id == 0) {
-                $where = "is_customer ='0' AND tbl_leads.account_id='" . $account_id . "'";
-            } else {
-                $where = "is_customer ='0' AND tbl_leads.user_id='" . $account_id . "'";
-            }
-        } else {
-            $where = "tbl_leads.user_id='" . $account_id . "' AND is_customer='0'";
-        }
+        //     if ($user_detail->parent_id == 0) {
+        //         $where = "is_customer ='0' AND tbl_leads.account_id='" . $account_id . "'";
+        //     } else {
+        //         $where = "is_customer ='0' AND tbl_leads.user_id='" . $account_id . "'";
+        //     }
+        // } else {
+        //     $where = "tbl_leads.user_id='" . $account_id . "' AND is_customer='0'";
+        // }
 
         $where_ids = "";
-        
+        $where      =   " 1 = 1 ";
+
+
         $user_ids = $this->get_level_user_ids();
+        if (count($user_ids)) {
+            $where_ids .= " AND (user.user_id='" . implode("' OR user.user_id='", $user_ids) . "')";
+        }
 
         $where .= $where_ids;
 
@@ -2387,6 +2396,8 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
 
         
         $where .= $where_ids;
+
+        $where .= " and tbl_leads.account_id = '$account_id' ";
         
         // print_r($where); die;
 

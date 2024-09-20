@@ -67,7 +67,7 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id, $use
 
 
         /* Toast */
- 
+
         #toast-container {
             position: fixed;
             top: 5%;
@@ -277,11 +277,11 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id, $use
         ::-webkit-scrollbar {
             width: 5px;
         }
-        
+
         ::-webkit-scrollbar-track {
             box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
         }
-        
+
         ::-webkit-scrollbar-thumb {
             background-color: #c2c2c2;
             border-radius: 20px;
@@ -303,26 +303,32 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id, $use
             background: #d3d3d391;
         }
 
-        .select2-selection__rendered { color: #9d9d9d; }
-        .logo-img{ height: 94px; padding: 0.5rem;}
+        .select2-selection__rendered {
+            color: #9d9d9d;
+        }
+
+        .logo-img {
+            height: 94px;
+            padding: 0.5rem;
+        }
 
         /* Select 2 */
-        .select2-container--default .select2-selection--single{
+        .select2-container--default .select2-selection--single {
             border: 1px solid #ced4da;
         }
 
-        .select2-container .select2-selection--single{
+        .select2-container .select2-selection--single {
             height: 32px;
         }
 
         .select2-container--default .select2-selection--single .select2-selection__rendered {
-                line-height: 31px;
-            }
+            line-height: 31px;
+        }
+
         /* Select 2 */
 
         /* .clone-template .form-control{ width: -webkit-fill-available !important; } */
         /*  */
-
     </style>
 
 </head>
@@ -392,7 +398,16 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id, $use
 
                 <div class="header-right">
                     <ul class="clearfix">
-                        <li class="icons dropdown username-desk"> Hi <?= user()->full_name ?? 'Guest' ?></li>
+                        <!-- Logged User Name -->
+                        <li class="icons dropdown username-desk">
+                            <?php $report_to_user      = user(user()->report_to); ?>
+                            <span
+                                title='Report To : <?= $report_to_user->full_name . "( $report_to_user->role_name ) " ?>'>
+                                <?= user()->full_name ?? 'Guest' ?>
+                            </span>
+
+                        </li>
+                        <!-- End Logged User Name -->
 
                         <li class="icons dropdown"><a href="javascript:void(0)">
                                 <i class="fa fa-refresh" aria-hidden="true"></i>
@@ -485,6 +500,7 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id, $use
                                 </div>
                             </div>
                         </li>
+
                     </ul>
                 </div>
             </div>

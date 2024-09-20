@@ -1064,12 +1064,12 @@ function property_components($param)
         ],
         (object)  [
 
-            'id'        => 1,
-            'name'      => 'Club Cost',
+            'id'            => 2,
+            'name'          => 'Club Cost',
             'price'         => $property_unit_details->club_cost ?? 0,
             'unit_type_id'  => $property_unit_details->club_cost_unit_type_id ?? 0,
             'unit_type'     => $property_unit_details->club_unit_type_name ?? '-',
-            'type'      => 'club_component'
+            'type'          => 'club_component'
         ],
     ];
 

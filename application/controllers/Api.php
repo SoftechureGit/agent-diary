@@ -134,45 +134,11 @@ class Api extends CI_Controller
             $user             =                   $this->db->get()->row();
 
             # Permission Roles
-            $permission_roles                       =   [];
-
-            # For Agent 
-            if ($user->role_id == 2):
-                $permission_roles                       =   [3, 4, 5];
-            endif;
-            # End For Agent 
-
-            # Level 1
-            if ($user->role_id == 3):
-                $permission_roles                       =   [0];
-            endif;
-            # End Level 1
-
-            # Level 2
-            if ($user->role_id == 4):
-                $permission_roles                       =   [3];
-            endif;
-            # End Level 2
-
-            # Level 3
-            if ($user->role_id == 5):
-                $permission_roles                       =   [3, 4];
-            endif;
-            # End Level 3
-
-            $user->permission_roles                 =   implode(',', $permission_roles);
-            # Permission Roles
-
-            # Acount Id
-            if ($user) {
-                $account_id = $user->user_id;
-                if ($user->role_id != 2) {
-                    $account_id = $user->parent_id;
-                }
-            }
-
-            $user->account_id             =   $account_id ?? 0;
-            # End Account Id 
+            $user->level_user_ids_arr                   =   $this->get_level_user_ids();
+            $user->level_user_ids                   =   implode(',', $user->level_user_ids_arr);
+            $user->account_id                       =   getAccountId();
+            # End Permission Roles
+            
             $this->user = $user;
             return true;
         endif;
@@ -266,37 +232,38 @@ class Api extends CI_Controller
         - Leads And Followup Counting With Team Members
         -------------------------------------------------------------------*/
 
-        # Teams Member
-        $where                              =   "(user.role_id in ($user_detail->permission_roles) or user.user_id = '$user_detail->user_id') and user.user_status='1' AND (user.user_id='$account_id' OR user.parent_id='$account_id') ORDER BY user.user_id ASC";
+       /*-------------------------------------------------------------------
+        - Teams Member List
+        -------------------------------------------------------------------*/
+        $team_member_where   =   " '1' ";
+
+        $team_member_where  .=  $user_detail->level_user_ids ? 
+                                " and user.user_id in ($user_detail->level_user_ids) " : 
+                                " and ( user.user_id = '$user_detail->user_id' or user.parent_id = '$user_detail->user_id') " ;
+       
         $this->db->select("user.user_id as id, concat(IFNULL(user.user_title, ''),' ', IFNULL(user.first_name, ''), ' ', IFNULL(user.last_name, '')) as full_name, role.role_name");
         $this->db->from('tbl_users as user');
         $this->db->join('tbl_roles  as role', 'user.role_id = role.role_id', 'left');
-        $this->db->where($where);
+        $this->db->where($team_member_where);
         $members                            =   $this->db->get()->result();
+        /*-------------------------------------------------------------------
+        - End Teams Member List
+        -------------------------------------------------------------------*/
 
-        # End Team Member
+        /*-------------------------------------------------------------------
+        - Leads Counting
+        -------------------------------------------------------------------*/
 
-        # Member Ids
-        // Extracting IDs
-        $members_ids_arr                    =  null;
-        if (!$selected_member_ids):
-            $members_ids_arr                =   array_map(function ($member) {
-                return $member->id;
-            }, $members);
-
-            $members_ids                    =   implode(",", $members_ids_arr);
+        $lead_counting_where                          =   " 1 = 1 ";
+        if ($selected_member_ids):
+            $lead_counting_where                      .=   " and lead.user_id in ($selected_member_ids) ";
         endif;
-        # End Member Ids
 
-        # Leads Counting
+        $lead_counting_where  .=  $user_detail->level_user_ids ? 
+                                " and user.user_id in ($user_detail->level_user_ids) " : 
+                                " and ( user.user_id = '$user_detail->user_id' or user.parent_id = '$user_detail->user_id') " ;
 
-        $where                              =   "(user.role_id in ($user_detail->permission_roles) or user.user_id = '$user_detail->user_id')";
-
-        if (!$selected_member_ids):
-            $where                          .=   " and lead.user_id in ($members_ids) ";
-        else:
-            $where                          .=   " and lead.user_id in ($selected_member_ids) ";
-        endif;
+    
 
         $lead_select_query                  =   "
                                                     COUNT(DISTINCT lead.lead_id) as all_leads,
@@ -340,7 +307,7 @@ class Api extends CI_Controller
                                                 ";
 
         $this->db->select($lead_select_query);
-        $this->db->where($where);
+        $this->db->where($lead_counting_where);
         $this->db->from('tbl_leads as lead');
         $this->db->join('tbl_users  as user', 'user.user_id = lead.user_id', 'left');
         $this->db->join('tbl_followup  as followup', 'followup.lead_id = lead.lead_id', 'left');
@@ -354,8 +321,8 @@ class Api extends CI_Controller
         # End Leads
 
         $data['leads_count_summary']                      =   $leads;
-        /*-------------------------------------------------------------------
-        - Leads And Followup Counting With Team Members
+         /*-------------------------------------------------------------------
+        - End Leads Counting
         -------------------------------------------------------------------*/
 
         # Data   

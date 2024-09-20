@@ -471,13 +471,24 @@ summary {
               <!-- End Passport Number -->
 
               <!-- Added By -->
-              <?php if ($record->lead_passport_no): ?>
+              <?php if ($record->added_by): ?>
                 <tr>
-                  <th>Added By</th>
-                  <td><?= ($record->added_by) ? $this->Action_model->get_name($record->added_by) : '' ?></td>
+                  <th>Created By</th>
+                  <?php $created_by_user      = user($record->added_by); ?>
+                  <td><?= $created_by_user->full_name."  <span class='font-italic text-muted'>( $created_by_user->role_name )</span> " ?></td>
                 </tr>
               <?php endif; ?>
               <!-- End Added By -->
+
+              <!-- Assigned To -->
+              <?php if ($record->user_id): ?>
+                <tr>
+                  <th>Assigned To</th>
+                  <?php $assigned_user      = user($record->user_id); ?>
+                  <td><?= $assigned_user->full_name."  <span class='font-italic text-muted'>( $assigned_user->role_name )</span> " ?></td>
+                </tr>
+              <?php endif; ?>
+              <!-- End Assigned To -->
 
               <!-- Action -->
               <tr>

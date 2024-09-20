@@ -25,12 +25,14 @@ if (!function_exists('db_instance')) {
 
 
 if (!function_exists('user')) {
-    function user()
+    function user($user_id = 0)
     {
-        $user_id            =    CI()->session->userdata('user_id');
-        $access_token       =    CI()->session->userdata('agent_hash');
+        if(!$user_id):
+            $user_id            =    CI()->session->userdata('user_id');
+            $access_token       =    CI()->session->userdata('agent_hash');
+        endif;
 
-        if (!$user_id && !$access_token) return null;
+        // if (!$user_id && !$access_token) return null;
 
         $where              =   '1 = 1 ';
         
@@ -38,7 +40,7 @@ if (!function_exists('user')) {
             $where              .=   " and user.user_id = '$user_id'";
         endif;
 
-        if($access_token):
+        if($access_token ?? 0):
             $where              .=   " and user.user_hash = '$access_token'";
         endif;
 
@@ -1395,4 +1397,20 @@ if (!function_exists('getAccountId')) {
         }
     }
     # Request
+
+    # History
+    // if(!function_exists('store_lead_history')):
+    //     function store_lead_history($params){
+    //         $lead_history_array =   [
+    //                                     'title'         => $params->title ?? '',
+    //                                     'description'   => $params->description ?? '',
+    //                                     'lead_id'       => $params->lead_id,
+    //                                     'created_at'    => time(),
+    //                                     "account_id"    => $params->account_id,
+    //                                     "user_id"       => $params->user_id
+    //                                 ];
+    //         $this->Action_model->insert_data($lead_history_array, 'tbl_lead_history');
+    //     }
+    // endif;
+    # End History
 }

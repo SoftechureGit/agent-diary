@@ -976,6 +976,7 @@ https://www.agentdiary.com");*/
         if ($this->session->userdata('agent_hash')) {
             redirect(AGENT_URL);
         }
+        
         $this->load->view('agent/login', $data = "");
     }
 
