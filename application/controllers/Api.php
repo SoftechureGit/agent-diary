@@ -134,7 +134,7 @@ class Api extends CI_Controller
             $user             =                   $this->db->get()->row();
 
             # Permission Roles
-            $user->level_user_ids_arr                   =   $this->get_level_user_ids();
+            $user->level_user_ids_arr                   =   $this->get_level_user_ids($access_token);
             $user->level_user_ids                   =   implode(',', $user->level_user_ids_arr);
             $user->account_id                       =   getAccountId();
             # End Permission Roles
