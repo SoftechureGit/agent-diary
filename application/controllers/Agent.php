@@ -201,11 +201,11 @@ class Agent extends CI_Controller
         $lead_counting_where                          =   " 1 = 1 ";
         if ($selected_member_ids):
             $lead_counting_where                      .=   " and lead.user_id in ($selected_member_ids) ";
+        else:
+            $lead_counting_where  .=  $user_detail->level_user_ids ? 
+                    " and user.user_id in ($user_detail->level_user_ids) " : 
+                    " and ( user.user_id = '$user_detail->user_id' or user.parent_id = '$user_detail->user_id') " ;
         endif;
-
-        $lead_counting_where  .=  $user_detail->level_user_ids ? 
-                                " and user.user_id in ($user_detail->level_user_ids) " : 
-                                " and ( user.user_id = '$user_detail->user_id' or user.parent_id = '$user_detail->user_id') " ;
 
         $lead_select_query                  =   "
                                                     COUNT(DISTINCT lead.lead_id) as all_leads_count,

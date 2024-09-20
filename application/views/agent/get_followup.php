@@ -160,7 +160,7 @@ summary {
           <!-- Primary Mobile Number -->
           <?php if ($record->lead_mobile_no): ?>
             <h6 class="card-text text-muted  ft-sm" style="margin-top: 4px;margin-bottom: 0px;padding-bottom: 0px;">
-              <i class="fa fa-mobile ft-14"></i> <span><?= ($record->primary_mobile_number_country_data ?? 0) ? '+' . json_decode($record->primary_mobile_number_country_data)->dialCode : '+91' ?> <?= $record->lead_mobile_no ?></span>
+              <i class="fa fa-mobile ft-14"></i> <span><?= ($record->primary_mobile_number_country_data ?? 0) ? '+' . ( json_decode($record->primary_mobile_number_country_data)->dialCode ?? '') : '+91' ?> <?= $record->lead_mobile_no ?></span>
             </h6>
           <?php endif; ?>
           <!-- End Primary Mobile Number -->
@@ -297,7 +297,7 @@ summary {
                   <th>Mobile</th>
                   <td>
                     <?php if($record->primary_mobile_number_country_data ?? 0): ?>
-                    <img src="https://ipdata.co/flags/<?= json_decode($record->primary_mobile_number_country_data)->iso2 ?>.png" alt="Flag" class="pr-2" title="<?= json_decode($record->primary_mobile_number_country_data)->name ?? '' ?>">
+                    <img src="https://ipdata.co/flags/<?= (json_decode($record->primary_mobile_number_country_data)->iso2 ?? 'in') ?>.png" alt="Flag" class="pr-2" title="<?= json_decode($record->primary_mobile_number_country_data)->name ?? '' ?>">
                     <?php endif; ?>
 
                     <?= $record->secondary_mobile_number_country_data ? ('+' . json_decode($record->primary_mobile_number_country_data)->dialCode ?? '') : '' ?>
