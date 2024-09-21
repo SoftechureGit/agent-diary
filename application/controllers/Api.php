@@ -13741,6 +13741,7 @@ class Api extends CI_Controller
             $inventory_id                   =   request()->inventory_id ?? 0;
             $rate                           =   request()->rate ?? 0;
             $calculate_on_size_id           =   request()->calculate_on_size_id ?? 0;
+            $calculate_on_size_type         =   request()->calculate_on_size_type ?? 0;
             $basic_selling_price            =   request()->basic_selling_price ?? 0;
             $total_amount                   =   0;
           
@@ -13776,6 +13777,19 @@ class Api extends CI_Controller
                 if($calculate_on_size_id == 5): # FIX
                     $total_amount               =   $rate;
                 elseif($calculate_on_size_id == 6):  # % of BSP
+
+                    # Basic Cost
+                    if($calculate_on_size_type == "basic_component"):
+                        echo json_encode(['status' => false, 'message' => "% of BSP not applicable on Basic Cost"]);
+                        exit;
+                    endif;
+
+                    # Basic Selling Price
+                    if(!$basic_selling_price):
+                        echo json_encode(['status' => false, 'message' => "Basic selling price required"]);
+                        exit;
+                    endif;
+
                     $total_amount               = ( $basic_selling_price / 100 ) * $rate;
                 else:
                     $total_amount               = ( $data->plot_size ?? $data->unit_size ?? 0 ) * $rate;
