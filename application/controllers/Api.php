@@ -3910,6 +3910,9 @@ class Api extends CI_Controller
 
     public function followup_save()
     {
+        # Debug
+        $this->db->insert('tbl_get_all_data_json', json_encode(request()));
+
         if ($this->input->post('lead_stage_id') < 7 && request()->lead_stage_id != 6) {
 
             $this->form_validation->set_rules('followup_id', 'Followup Id', 'required');
