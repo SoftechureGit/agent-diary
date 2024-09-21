@@ -4170,6 +4170,53 @@ class Api extends CI_Controller
                 // booking
                 if ($this->input->post("lead_stage_id") == 6) {
 
+                    # Init
+                    $buyer_name                                             =   $this->input->post('booking_buyer_name');
+                    $buyer_son_of_daughter_of_wife_of                       =   $this->input->post('booking_buyer_sdw');
+                    $seller_id                                              =   $this->input->post('booking_seller_id');
+                    $seller_son_of_daughter_of_wife_of                      =   $this->input->post('booking_seller_sdw');
+                    $state_id                                               =   $this->input->post('booking_state_id');
+                    $city_id                                                =   $this->input->post('booking_city_id');
+                    $location_id                                            =   $this->input->post('booking_location_id');
+                    $project_id                                             =   $this->input->post('booking_project_id');
+                    $unit_code_id                                           =   $this->input->post('booking_unit_code');
+                    $plot_or_unit_number                                    =   $this->input->post('booking_inventory_plot_or_unit_number');
+                    $inventory_id                                           =   $this->input->post('bk_inventory_id');
+                    $project_components                                     =   $this->input->post('project_components');
+                    # End Init
+
+                    # Booking Component Details
+                               
+                    $booking_component_details_arr                          =   [];
+
+                    foreach($project_components ?? [] as $project_component):
+                        $project_component          =   (object) $project_component;
+                        $component_id                                   = $project_component->id ?? 0;
+                        $component_type                                 = $project_component->type ?? '';
+                        $component_rate                                 = $project_component->rate ?? 0;
+                        $component_calculate_on_size_unit_id            = $project_component->calculate_on_size_unit ?? 0;
+                        $component_total_amount                         = $project_component->total_amount ?? 0;
+                    
+                        # List
+                        if($component_id && $component_type && $component_rate && $component_calculate_on_size_unit_id && $component_total_amount ):
+                        
+                        $booking_component_details_arr[]          =   (object) [
+                                                                                    'component_id'                          => $component_id,
+                                                                                    'component_type'                        => $component_type,
+                                                                                    'rate'                                  => $component_rate,
+                                                                                    'calculate_on_size_unit_id'             => $component_calculate_on_size_unit_id,
+                                                                                    'total_amount'                          => $component_total_amount,
+                                                                                ];
+                        endif;
+                        # End List
+                    endforeach;
+
+                    if(!count($booking_component_details_arr)):
+                        echo json_encode(['status' => false, 'message' => 'Please select components in deal amount']);
+                        exit;
+                    endif;
+                    # End Booking Component Details
+
                     $this->Action_model->update_data(array('followup_status' => 2), 'tbl_followup', "followup_id='" . $followup_id . "' AND account_id='" . $account_id . "'");
 
                     $where = "inventory_id='" . $this->input->post("bk_inventory_id") . "'";
@@ -4177,51 +4224,56 @@ class Api extends CI_Controller
 
                     if ($inv_data) {
                         $data_array = array(
-                            'inventory_status' => '2',
-                            'last_update' => time()
+                            'inventory_status' => '2', 'last_update' => time()
                         );
                         $this->Action_model->update_data($data_array, 'tbl_inventory', $where);
 
                         $check = $this->Action_model->select_single('tbl_bookings', "inventory_id='" . $this->input->post("bk_inventory_id") . "'");
                         if (!$check) {
-                            $bk_size = "";
-                            if ($this->input->post("bk_size")) {
-                                $bk_size = $this->input->post("bk_size");
-                                $bk_size = explode("##", $bk_size);
-                                $bk_size = $bk_size[0];
-                            }
 
-                            $bk_unit_no = "";
-                            if ($this->input->post("bk_unit_no")) {
-                                $bk_unit_no = $this->input->post("bk_unit_no");
-                                $bk_unit_no = explode("##", $bk_unit_no);
-                                $bk_unit_no = $bk_unit_no[0];
-                            }
+                            # Booking Basic Details
+                                $booking_basic_details          =   (object) [
+                                                                                    'buyer_name'                            => $buyer_name,
+                                                                                    'buyer_son_of_daughter_of_wife_of'      => $buyer_son_of_daughter_of_wife_of,
+                                                                                    'seller_id'                             => $seller_id,
+                                                                                    'seller_son_of_daughter_of_wife_of'     => $seller_son_of_daughter_of_wife_of,
+                                                                                    'state_id'                              => $state_id,
+                                                                                    'city_id'                               => $city_id,
+                                                                                    'location_id'                           => $location_id,
+                                                                                    'project_id'                            => $project_id,
+                                                                                    'unit_code_id'                          => $unit_code_id,
+                                                                                    'plot_or_unit_number'                   => $plot_or_unit_number,
+                                                                                    'inventory_id'                          => $inventory_id,
+                                                                                ];
+                            # End Booking Basic Details
+
+                            # Payment Terms Details
+                                $payment_terms                                 =   $this->input->post('payment_terms');
+                                $booking_terms_details_arr                          =   [];
+
+                                foreach($payment_terms ?? [] as $payment_term):
+                                    $payment_term          =   (object) $payment_term;
+                                    $payment_term_booking_title                                  = $payment_term->title;
+                                    $payment_term_booking_amount                                 = $payment_term->amount;
+                                    $payment_term_booking_date                                   = $payment_term->date;
+                                   
+                           
+                                    $booking_terms_details_arr[]          =   (object) [
+                                                                                'title'                                 => $payment_term_booking_title,
+                                                                                'amount'                                => $payment_term_booking_amount,
+                                                                                'date'                                  => $payment_term_booking_date,
+                                                                            ];
+                                endforeach;
+                            # End Payment Terms Details
 
                             $bk_array = array(
-                                "customer_name" => $this->input->post("bk_customer_name"),
-                                "dob" => $this->input->post("bk_dob"),
-                                "sdw" => $this->input->post("bk_sdw"),
-                                "sdw_title" => $this->input->post("bk_sdw_title"),
-                                "unit_no" => $bk_unit_no,
-                                "unit_ref_no" => $this->input->post("bk_unit_ref_no"),
-                                "address" => $this->input->post("bk_address"),
-                                "state_id" => $this->input->post("bk_state_id"),
-                                "city_id" => $this->input->post("bk_city_id"),
-                                "project_id" => $this->input->post("bk_project_id"),
-                                "tower" => $this->input->post("bk_tower"),
-                                "floor" => $this->input->post("bk_floor"),
-                                "size" => $bk_size,
-                                "accommodation" => $this->input->post("bk_accommodation"),
-                                "product_unit_detail_id" => $this->input->post("bk_product_unit_detail_id"),
-                                "inventory_id" => $this->input->post("bk_inventory_id"),
-                                "deal_amount" => $this->input->post("bk_deal_amount"),
-                                "booking_amount" => $this->input->post("bk_booking_amount"),
-                                "payment_mode" => $this->input->post("bk_payment_mode"),
-                                "cheque_no" => $this->input->post("bk_cheque_no"),
-                                "drawn_on" => $this->input->post("bk_drawn_on"),
-                                "booking_date" => $this->input->post("bk_booking_date"),
-                                "remark" => $this->input->post("bk_remark")
+                                "project_id"                    => $project_id,
+                                "product_unit_detail_id"        => $unit_code_id,
+                                "inventory_id"                  => $inventory_id,
+                                "booking_date"                  => date('d-m-Y'),
+                                "booking_basic_details"         => json_encode($booking_basic_details),
+                                "component_details"             => count($booking_component_details_arr) ? json_encode($booking_component_details_arr) : null,
+                                "payment_terms_details"         => count($booking_terms_details_arr) ? json_encode($booking_terms_details_arr) : null,
                             );
 
                             $bk_array['account_id'] = $account_id;
@@ -4280,10 +4332,6 @@ class Api extends CI_Controller
                 exit;
             endif;
         }
-
-
-
-
 
         $array = array();
 
@@ -13749,7 +13797,7 @@ class Api extends CI_Controller
             $inventory_id                   =   request()->inventory_id ?? 0;
             $rate                           =   request()->rate ?? 0;
             $calculate_on_size_id           =   request()->calculate_on_size_id ?? 0;
-            $calculate_on_size_type         =   request()->calculate_on_size_type ?? 0;
+            $component_type                 =   request()->component_type ?? 0;
             $basic_selling_price            =   request()->basic_selling_price ?? 0;
             $total_amount                   =   0;
           
@@ -13787,7 +13835,7 @@ class Api extends CI_Controller
                 elseif($calculate_on_size_id == 6):  # % of BSP
 
                     # Basic Cost
-                    if($calculate_on_size_type == "basic_component"):
+                    if($component_type == "basic_component"):
                         echo json_encode(['status' => false, 'message' => "% of BSP not applicable on Basic Cost"]);
                         exit;
                     endif;

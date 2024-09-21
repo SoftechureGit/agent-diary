@@ -4178,19 +4178,20 @@ WHERE lead_id='" . $lead_id . "'
                 // booking
                 if ($this->input->post("lead_stage_id") == 6) {
 
-
+                    # Init
                     $buyer_name                                             =   $this->input->post('booking_buyer_name');
-                                $buyer_son_of_daughter_of_wife_of                       =   $this->input->post('booking_buyer_sdw');
-                                $seller_id                                              =   $this->input->post('booking_seller_id');
-                                $seller_son_of_daughter_of_wife_of                      =   $this->input->post('booking_seller_sdw');
-                                $state_id                                               =   $this->input->post('booking_state_id');
-                                $city_id                                                =   $this->input->post('booking_city_id');
-                                $location_id                                            =   $this->input->post('booking_location_id');
-                                $project_id                                             =   $this->input->post('booking_project_id');
-                                $unit_code_id                                           =   $this->input->post('booking_unit_code');
-                                $plot_or_unit_number                                    =   $this->input->post('booking_inventory_plot_or_unit_number');
-                                $inventory_id                                           =   $this->input->post('bk_inventory_id');
-                                $project_components                                 =   $this->input->post('project_components');
+                    $buyer_son_of_daughter_of_wife_of                       =   $this->input->post('booking_buyer_sdw');
+                    $seller_id                                              =   $this->input->post('booking_seller_id');
+                    $seller_son_of_daughter_of_wife_of                      =   $this->input->post('booking_seller_sdw');
+                    $state_id                                               =   $this->input->post('booking_state_id');
+                    $city_id                                                =   $this->input->post('booking_city_id');
+                    $location_id                                            =   $this->input->post('booking_location_id');
+                    $project_id                                             =   $this->input->post('booking_project_id');
+                    $unit_code_id                                           =   $this->input->post('booking_unit_code');
+                    $plot_or_unit_number                                    =   $this->input->post('booking_inventory_plot_or_unit_number');
+                    $inventory_id                                           =   $this->input->post('bk_inventory_id');
+                    $project_components                                     =   $this->input->post('project_components');
+                    # End Init
 
                     # Booking Component Details
                                
@@ -4208,12 +4209,12 @@ WHERE lead_id='" . $lead_id . "'
                         if($component_id && $component_type && $component_rate && $component_calculate_on_size_unit_id && $component_total_amount ):
                         
                         $booking_component_details_arr[]          =   (object) [
-                                                                            'component_id'                          => $component_id,
-                                                                            'component_type'                        => $component_type,
-                                                                            'rate'                                  => $component_rate,
-                                                                            'calculate_on_size_unit_id'             => $component_calculate_on_size_unit_id,
-                                                                            'total_amount'                          => $component_total_amount,
-                                                                        ];
+                                                                                    'component_id'                          => $component_id,
+                                                                                    'component_type'                        => $component_type,
+                                                                                    'rate'                                  => $component_rate,
+                                                                                    'calculate_on_size_unit_id'             => $component_calculate_on_size_unit_id,
+                                                                                    'total_amount'                          => $component_total_amount,
+                                                                                ];
                         endif;
                         # End List
                     endforeach;
@@ -4222,7 +4223,7 @@ WHERE lead_id='" . $lead_id . "'
                         echo json_encode(['status' => false, 'message' => 'Please select components in deal amount']);
                         exit;
                     endif;
-                # End Booking Component Details
+                    # End Booking Component Details
 
                     $this->Action_model->update_data(array('followup_status' => 2), 'tbl_followup', "followup_id='" . $followup_id . "' AND account_id='" . $account_id . "'");
 
@@ -4239,9 +4240,6 @@ WHERE lead_id='" . $lead_id . "'
                         if (!$check) {
 
                             # Booking Basic Details
-
-                                
-
                                 $booking_basic_details          =   (object) [
                                                                                     'buyer_name'                            => $buyer_name,
                                                                                     'buyer_son_of_daughter_of_wife_of'      => $buyer_son_of_daughter_of_wife_of,
@@ -4275,8 +4273,6 @@ WHERE lead_id='" . $lead_id . "'
                                                                             ];
                                 endforeach;
                             # End Payment Terms Details
-
-                           
 
                             $bk_array = array(
                                 "project_id"                    => $project_id,
