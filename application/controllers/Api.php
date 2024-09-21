@@ -4234,6 +4234,8 @@ class Api extends CI_Controller
 
                     $booking_component_details_arr                          =   [];
 
+                    print_r($booking_component_details);
+                    die;
                     if(!is_array($booking_component_details)):
                         echo json_encode(['status' => false, 'message' => "Invalid component details"]);
                         exit;
