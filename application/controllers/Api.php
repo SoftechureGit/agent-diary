@@ -13551,9 +13551,11 @@ class Api extends CI_Controller
      # Inventory Plot Or Unit Numbers
      public function inventory_plot_or_unit_numbers()
      {
-        $property_id                =    request()->project_id ?? 0;
+        $lead_id                    =    request()->lead_id ?? 0;
+        $property_id                =    request()->property_id ?? 0;
         $unit_code                  =    request()->unit_code ?? 0;
         
+       
         # Validation
         if(!$property_id && !$unit_code):
             $message = "";
@@ -13571,9 +13573,15 @@ class Api extends CI_Controller
         endif;
         # Validation
 
-        $records                   =   inventory_plot_or_unit_numbers((object) ['property_id' => $property_id,  'unit_code' => $unit_code]);
+        $records                   =   inventory_plot_or_unit_numbers((object) ['property_id' => $property_id,  'unit_code' => $unit_code, 'lead_id' =>  $lead_id]);
  
-        echo json_encode(['status' => true, 'message' => 'Successfully data fetched', 'data' => $records]);
+        if(count($records)):
+            $arr   = ['status' => true, 'message' => 'Successfully data fetched', 'data' => $records];
+        else:
+            $arr   = ['status' => false, 'message' => 'No data found'];
+        endif;
+
+        echo json_encode($arr);
      }
      # End Inventory Plot Or Unit Numbers
 

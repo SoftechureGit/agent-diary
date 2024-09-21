@@ -681,7 +681,7 @@ endif;
 if (!function_exists('inventory_plot_or_unit_numbers')):
     function inventory_plot_or_unit_numbers($data = null)
     {
-
+        
         # Data 
         $property_id    = $data->property_id ?? 0;
         $unit_code      = $data->unit_code ?? 0;
@@ -708,6 +708,7 @@ if (!function_exists('inventory_plot_or_unit_numbers')):
         db_instance()->distinct("JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.plot_number')) as plot_number, JSON_UNQUOTE(JSON_EXTRACT(inventory.property_details, '$.unit_no')) as unit_number");
         db_instance()->select("
                                 inventory.inventory_id, 
+                                unit_invenotry.lead_id, 
                                 JSON_UNQUOTE(JSON_EXTRACT(inventory.property_details, '$.plot_number')) as plot_number, 
                                 JSON_UNQUOTE(JSON_EXTRACT(inventory.property_details, '$.unit_no')) as unit_number,
                                 inventory_status,
