@@ -3911,7 +3911,9 @@ class Api extends CI_Controller
     public function followup_save()
     {
         # Debug
-        $this->db->insert('tbl_get_all_data_json', json_encode(request()));
+        $this->db->insert('tbl_get_all_data_json', ['json_data' => str_replace('`.`', "_", json_encode(request()))]);
+        // echo print_r(json_encode(request()));
+        // die;
 
         if ($this->input->post('lead_stage_id') < 7 && request()->lead_stage_id != 6) {
 
