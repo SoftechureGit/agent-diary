@@ -12414,6 +12414,21 @@ class Api extends CI_Controller
             $unit_limited_arr = array();
 
             foreach ($unit_list as $unit_row):
+
+                # Unit Status
+                $status     = '';
+                $status_label     = '';
+                if($unit_row->buyer_status == 1 && $unit_row->buyer_id == $lead_id):
+                    $status     = "<span class='btn btn-sm btn-success badge text-white'>Grant</span>";
+                    $status_label     = 'Grant';
+                endif;
+                
+                if($unit_row->status == 1 && $unit_row->lead_id == $lead_id):
+                    $status     =  "<span class='btn btn-sm btn-warning badge text-white'>Sold</span>";
+                    $status_label     = 'Sold';
+                endif;
+                # End Unit Status
+                
                 $unit_limited_arr[] = array(
                     'id'                    => $unit_row->id,
                     'lead_id'               => $unit_row->lead_id,
@@ -12423,6 +12438,8 @@ class Api extends CI_Controller
                     'plot_size'             => $unit_row->property_details->plot_size,
                     'booking_date'          => $unit_row->booking_date,
                     'referance_number'      => $unit_row->property_details->referance_number,
+                    'status'                => $status,
+                    'status_label'          => $status_label,
 
                 );
             endforeach;
