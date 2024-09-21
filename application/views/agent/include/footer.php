@@ -1568,7 +1568,15 @@
         ************************************************************************/
 
         $(document).on('change', '.project_component_id', function(){
-            type = $(this).find('option:checked').data('type')
+          type = $(this).find('option:checked').data('type')
+          
+          bsp_option  = $(this).parents('.clone-template').find('.calculate_on_size_unit option[value="6"]');
+          if(type == 'basic_component'){
+            bsp_option.prop('disabled', true)
+          }else{
+            bsp_option.prop('disabled', false)
+          }
+
             $(this).parents('.clone-template').find('.type').val(type)
         })
        /***********************************************************************
@@ -1597,7 +1605,14 @@
            total_amount = parseFloat(rate).toFixed(2)
           } else if (calculate_on_size_unit_id == 6) { // Unit Type : % of BSP
             basic_selling_price         = $('[data-type="basic_component"]:checked').parents('.clone-template').find('.total_amount').val()
-            default_basic_selling_price = $('[data-type="basic_component"]').data('price')
+
+            if(!basic_selling_price){
+              total_amount    = 0;
+              showToast('danger', 'Please select Basic Cost price')
+            }
+
+            default_basic_selling_price = 0
+            // default_basic_selling_price = $('[data-type="basic_component"]').data('price')
 
             if(default_basic_selling_price){
               default_basic_selling_price = default_basic_selling_price * plot_or_unit_size
@@ -1611,8 +1626,6 @@
 
                 if(!$('.inventory_plot_or_unit_numbers').val()){
                   showToast('danger', 'Please select plot number / unit number')
-                }else{
-                  showToast('danger', 'Please update Basic Cost price')
                 }
             }
          }
