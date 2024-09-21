@@ -13470,7 +13470,8 @@ class Api extends CI_Controller
                                         'message'       => 'Data fetched',
                                         'buyer_name'    => $buyer->full_name ?? '',
                                         'sellers'       => $sellers,
-                                        'states'        => states()
+                                        'states'        => states(),
+                                        'size_units'        => sizeUnits()
                                     ];
         echo json_encode($arr);
     }

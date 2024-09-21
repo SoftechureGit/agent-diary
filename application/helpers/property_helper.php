@@ -89,7 +89,7 @@ if (function_exists('facings')) {
             $where    .= " and unit_id = '$id '";
         endif;
 
-        $records    =   db_instance()->select('*');
+        $records    =   db_instance()->select('unit_id, unit_name');
         $records->where($where);
         $records    =  $records->get('tbl_units');
         if ($id) :
