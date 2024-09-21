@@ -138,7 +138,7 @@ class Api extends CI_Controller
             $user->level_user_ids                   =   implode(',', $user->level_user_ids_arr);
             $user->account_id                       =   getAccountId();
             # End Permission Roles
-            
+
             $this->user = $user;
             return true;
         endif;
@@ -232,15 +232,15 @@ class Api extends CI_Controller
         - Leads And Followup Counting With Team Members
         -------------------------------------------------------------------*/
 
-       /*-------------------------------------------------------------------
+        /*-------------------------------------------------------------------
         - Teams Member List
         -------------------------------------------------------------------*/
         $team_member_where   =   " '1' ";
 
-        $team_member_where  .=  $user_detail->level_user_ids ? 
-                                " and user.user_id in ($user_detail->level_user_ids) " : 
-                                " and ( user.user_id = '$user_detail->user_id' or user.parent_id = '$user_detail->user_id') " ;
-       
+        $team_member_where  .=  $user_detail->level_user_ids ?
+            " and user.user_id in ($user_detail->level_user_ids) " :
+            " and ( user.user_id = '$user_detail->user_id' or user.parent_id = '$user_detail->user_id') ";
+
         $this->db->select("user.user_id as id, concat(IFNULL(user.user_title, ''),' ', IFNULL(user.first_name, ''), ' ', IFNULL(user.last_name, '')) as full_name, role.role_name");
         $this->db->from('tbl_users as user');
         $this->db->join('tbl_roles  as role', 'user.role_id = role.role_id', 'left');
@@ -258,12 +258,12 @@ class Api extends CI_Controller
         if ($selected_member_ids):
             $lead_counting_where                      .=   " and lead.user_id in ($selected_member_ids) ";
         else:
-            
-            $lead_counting_where  .=  $user_detail->level_user_ids ? 
-            " and user.user_id in ($user_detail->level_user_ids) " : 
-                                " and ( user.user_id = '$user_detail->user_id' or user.parent_id = '$user_detail->user_id') " ;
+
+            $lead_counting_where  .=  $user_detail->level_user_ids ?
+                " and user.user_id in ($user_detail->level_user_ids) " :
+                " and ( user.user_id = '$user_detail->user_id' or user.parent_id = '$user_detail->user_id') ";
         endif;
-    
+
 
         $lead_select_query                  =   "
                                                     COUNT(DISTINCT lead.lead_id) as all_leads,
@@ -321,7 +321,7 @@ class Api extends CI_Controller
         # End Leads
 
         $data['leads_count_summary']                      =   $leads;
-         /*-------------------------------------------------------------------
+        /*-------------------------------------------------------------------
         - End Leads Counting
         -------------------------------------------------------------------*/
 
@@ -3907,412 +3907,10 @@ class Api extends CI_Controller
         echo json_encode($array);
     }
 
-    public function followup_save_old()
-    {
-        $array = array();
-
-        $account_id = 0;
-        $user_id = 0;
-
-        if (isset($_POST['user_hash'])):
-
-            $where = "user_hash='" . $this->input->post('user_hash') . "'";
-        else:
-
-            $where = "user_hash='" . $this->session->userdata('agent_hash') . "'";
-
-        endif;
-        // $where = "user_hash='".$this->session->userdata('agent_hash')."'";
-        $user_detail = $this->Action_model->select_single('tbl_users', $where);
-        if ($user_detail) {
-            $user_id = $user_detail->user_id;
-            $account_id = $user_detail->user_id;
-            if ($user_detail->role_id != 2) {
-                $account_id = $user_detail->parent_id;
-            }
-        }
-
-        if ($user_detail && $this->input->post()) {
-
-            $followup_id = $this->input->post('followup_id');
-            $followup_lead_id = $this->input->post('followup_lead_id');
-            $followup_status = $this->input->post('followup_status');
-
-            if ($this->input->post("lead_stage_id") == 6) {
-                $inv_data = $this->Action_model->select_single('tbl_inventory', "inventory_id='" . $this->input->post("bk_inventory_id") . "' AND inventory_status='1'");
-                if ($inv_data) {
-                    $check = $this->Action_model->select_single('tbl_bookings', "inventory_id='" . $this->input->post("bk_inventory_id") . "' AND (booking_status='0' || booking_status='1')");
-                    if ($check) {
-                        $array = array('status' => 'false', 'msg' => 'Already Booked');
-                        echo json_encode($array);
-                        exit;
-                    }
-                } else {
-                    $array = array('status' => 'false', 'msg' => 'Not available for booking.');
-                    echo json_encode($array);
-                    exit;
-                }
-            }
-
-            $comment = "";
-            if ($this->input->post('comment')) {
-                $comment = $this->input->post('comment');
-            }
-
-            $record = $this->Action_model->select_single('tbl_followup', "followup_id='" . $followup_id . "' AND account_id='" . $account_id . "'");
-
-
-
-            if ($record) {
-                $followup_next_status = 0;
-                if ($followup_status == 2) {
-                    $followup_next_status = 1;
-                    $this->Action_model->update_data(array('followup_status' => 2, "comment" => $comment), 'tbl_followup', "followup_id='" . $followup_id . "' AND account_id='" . $account_id . "'");
-                } else if ($followup_status == 3) {
-                    $followup_next_status = 1;
-                    $this->Action_model->update_data(array('followup_status' => 3, "comment" => $comment), 'tbl_followup', "followup_id='" . $followup_id . "' AND account_id='" . $account_id . "'");
-                }
-
-                $lead_status_id = "";
-                if ($this->input->post("lead_status_id")) {
-                    $lead_status_id = $this->input->post("lead_status_id");
-                }
-
-                if ($this->input->post("lead_stage_id") == 7) {
-                    $lead_status_id = 2;
-                }
-                if ($this->input->post("lead_stage_id") == 6) {
-                    $lead_status_id = 3;
-                }
-
-                $this->Action_model->update_data(array('lead_status' => $lead_status_id, 'lead_stage_id' => $this->input->post("lead_stage_id")), 'tbl_leads', "lead_id='" . $followup_lead_id . "' AND account_id='" . $account_id . "'");
-
-                $next_followup_date = "";
-                $next_followup_time = "";
-                $next_followup = "";
-                $project_id = "";
-                $next_action = "";
-                $task_desc = "";
-
-                if ($this->input->post("next_followup_date")) {
-                    $next_followup_date = $this->input->post("next_followup_date");
-                }
-                if ($this->input->post("next_followup_time")) {
-                    $next_followup_time = $this->input->post("next_followup_time");
-                }
-                if ($this->input->post("project_id")) {
-                    $project_id = $this->input->post("project_id");
-                }
-                if ($this->input->post("next_action")) {
-                    $next_action = $this->input->post("next_action");
-                }
-                if ($this->input->post("task_desc")) {
-                    $task_desc = $this->input->post("task_desc");
-                }
-
-                if ($this->input->post("lead_stage_id") != 6) {
-                    $followup_array = array(
-                        "lead_stage_id" => $this->input->post("lead_stage_id"),
-                        "lead_status_id" => $lead_status_id,
-                        "next_action" => $next_action,
-                        "next_followup_date" => $next_followup_date,
-                        "next_followup_time" => $next_followup_time,
-                        "project_id" => $project_id,
-                        "task_desc" => $task_desc,
-                        "comment" => '',
-                        "lead_id" => $followup_lead_id,
-                        "added_by" => $user_id,
-                        "user_id" => $user_id,
-                        "account_id" => $account_id,
-                        "assign_user_id" => $this->input->post("fp_assign_to"),
-                        "followup_status" => $followup_next_status,
-                        "created_at" => time(),
-                        "updated_at" => time()
-                    );
-
-                    $this->Action_model->insert_data($followup_array, 'tbl_followup');
-
-                    $where = "lead_id='" . $followup_lead_id . "' AND account_id='" . $account_id . "' ORDER BY followup_id DESC LIMIT 1";
-                    $this->db->select('au.first_name as au_first_name,au.last_name as au_last_name,next_followup_date,next_followup_time');
-                    $this->db->from('tbl_followup');
-                    $this->db->join('tbl_users as au', 'au.user_id = tbl_followup.assign_user_id', 'left');
-                    $this->db->where($where);
-                    $query = $this->db->get();
-                    $followup_detail = $query->row();
-                    if ($followup_detail && $followup_detail->next_followup_date) {
-                        $next_followup = "<i class='fa fa-clock-o'></i> " . $followup_detail->next_followup_date . " & " . $followup_detail->next_followup_time . " &nbsp; <i class='fa fa-bookmark'></i> " . $followup_detail->au_first_name . ' ' . $followup_detail->au_last_name;
-                        $next_followup_date = $followup_detail->next_followup_date . " " . $followup_detail->next_followup_time;
-                    }
-
-                    $lead_history_array = array(
-                        'title' => 'Followup',
-                        'description' => 'Followup assign to ' . $this->Action_model->get_name($this->input->post("fp_assign_to")) . ' by ' . $this->Action_model->get_name($user_id),
-                        'lead_id' => $followup_lead_id,
-                        'created_at' => time(),
-                        "account_id" => $account_id,
-                        "user_id" => $user_id
-                    );
-                    $this->Action_model->insert_data($lead_history_array, 'tbl_lead_history');
-                }
-
-                //site visit
-                if ($this->input->post("next_action") == 2 && $this->input->post("fp_project_id")) {
-                    $fp_project = $this->input->post("fp_project_id");
-
-                    $prject_names = array();
-                    foreach ($fp_project as $rowItem) {
-
-                        $recordProject = $this->Action_model->select_single('tbl_products', "product_id='" . $rowItem . "'", "project_name");
-                        if ($recordProject) {
-                            $prject_names[] = $recordProject->project_name;
-                        }
-
-                        $sv_array = array(
-                            "lead_id" => $followup_lead_id,
-                            "project_id " => $rowItem,
-                            "visit_date " => $this->input->post("next_followup_date"),
-                            "visit_time " => $this->input->post("next_followup_time"),
-                            "attend_by" => '',
-                            "site_visit_status" => 1,
-                            "interested " => 0,
-                            "comment" => '',
-                            "account_id" => $account_id,
-                            "added_by" => $user_id,
-                            "user_id" => $user_id,
-                            "assign_to" => $this->input->post("fp_assign_to"),
-                            "created_at" => time()
-                        );
-
-                        $this->Action_model->insert_data($sv_array, 'tbl_site_visit');
-
-                        $lead_history_array = array(
-                            'title' => 'Site Visit',
-                            'description' => 'Site Visit assign to ' . $this->Action_model->get_name($this->input->post("fp_assign_to")) . ' by ' . $this->Action_model->get_name($user_id),
-                            'lead_id' => $followup_lead_id,
-                            'created_at' => time(),
-                            "account_id" => $account_id,
-                            "user_id" => $user_id
-                        );
-                        $this->Action_model->insert_data($lead_history_array, 'tbl_lead_history');
-                    }
-
-
-                    if ($this->input->post("lead_stage_id") == 4) {
-
-
-                        $recordLead = $this->Action_model->select_single('tbl_leads', "lead_id='" . $followup_lead_id . "'", "lead_mobile_no,lead_id");
-
-                        if ($recordLead) {
-                            $account_id = 0;
-                            $user_id = 0;
-
-                            $where = "user_hash='" . $this->session->userdata('agent_hash') . "'";
-                            $user_detail = $this->Action_model->select_single('tbl_users', $where);
-                            if ($user_detail) {
-                                $user_id = $user_detail->user_id;
-                                $account_id = $user_detail->user_id;
-                                if ($user_detail->role_id != 2) {
-                                    $account_id = $user_detail->parent_id;
-                                }
-                            }
-
-                            $s_account_id = $account_id;
-                            $s_team_user_id = $user_id;
-                            $s_customer_id = $recordLead->lead_id;
-                            $s_mobile = $recordLead->lead_mobile_no;
-                            $project_name = ($prject_names) ? implode(", ", $prject_names) : "";
-
-                            $where_agent = "user_id='" . $s_account_id . "'";
-                            $agent_detail = $this->Action_model->select_single('tbl_users', $where_agent);
-
-                            if ($agent_detail->no_of_sms) {
-
-                                $s_message = "Hi! Thank you for confirming your appointment @ " . $this->input->post("next_followup_time") . " on " . $this->input->post("next_followup_date") . " to visit the " . $project_name . ". for any assistance call us @ " . $this->Action_model->get_name($this->input->post("fp_assign_to"));
-
-                                $sms_response = $this->Action_model->sendMobileSMS($s_mobile, $s_message, true);
-                                if ($sms_response) {
-                                    $sms_response_array = json_decode($sms_response);
-                                    if ($sms_response_array && isset($sms_response_array->status) && $sms_response_array->status == "success") {
-
-
-
-                                        $sms_before = $agent_detail->no_of_sms;
-                                        $net_no_of_sms = $sms_before - 1;
-                                        $sms_after = $net_no_of_sms;
-
-                                        $user_data = array(
-                                            'no_of_sms' => $net_no_of_sms
-                                        );
-
-                                        $this->Action_model->update_data($user_data, 'tbl_users', $where_agent);
-
-                                        $sms_credit_array = array(
-                                            'account_id' => $s_account_id,
-                                            'team_user_id' => $s_team_user_id,
-                                            'customer_id' => $s_customer_id,
-                                            'sms_before' => $sms_before,
-                                            'sms_after' => $sms_after,
-                                            'mobile' => $s_mobile,
-                                            'message' => $s_message,
-                                            'create_at' => date("d-m-Y H:i:s A")
-                                        );
-
-                                        $this->Action_model->insert_data($sms_credit_array, 'tbl_sms_history');
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                //site visit end
-
-
-                // booking
-                if ($this->input->post("lead_stage_id") == 6) {
-
-                    # Init
-                    $buyer_name                                             =   $this->input->post('booking_buyer_name');
-                    $buyer_son_of_daughter_of_wife_of                       =   $this->input->post('booking_buyer_sdw');
-                    $seller_id                                              =   $this->input->post('booking_seller_id');
-                    $seller_son_of_daughter_of_wife_of                      =   $this->input->post('booking_seller_sdw');
-                    $state_id                                               =   $this->input->post('booking_state_id');
-                    $city_id                                                =   $this->input->post('booking_city_id');
-                    $location_id                                            =   $this->input->post('booking_location_id');
-                    $project_id                                             =   $this->input->post('booking_project_id');
-                    $unit_code_id                                           =   $this->input->post('booking_unit_code');
-                    $plot_or_unit_number                                    =   $this->input->post('booking_inventory_plot_or_unit_number');
-                    $inventory_id                                           =   $this->input->post('bk_inventory_id');
-                    $project_components                                     =   $this->input->post('project_components');
-                    # End Init
-
-                    # Booking Component Details
-                               
-                    $booking_component_details_arr                          =   [];
-
-                    foreach($project_components ?? [] as $project_component):
-                        $project_component          =   (object) $project_component;
-                        $component_id                                   = $project_component->id ?? 0;
-                        $component_type                                 = $project_component->type ?? '';
-                        $component_rate                                 = $project_component->rate ?? 0;
-                        $component_calculate_on_size_unit_id            = $project_component->calculate_on_size_unit ?? 0;
-                        $component_total_amount                         = $project_component->total_amount ?? 0;
-                    
-                        # List
-                        if($component_id && $component_type && $component_rate && $component_calculate_on_size_unit_id && $component_total_amount ):
-                        
-                        $booking_component_details_arr[]          =   (object) [
-                                                                                    'component_id'                          => $component_id,
-                                                                                    'component_type'                        => $component_type,
-                                                                                    'rate'                                  => $component_rate,
-                                                                                    'calculate_on_size_unit_id'             => $component_calculate_on_size_unit_id,
-                                                                                    'total_amount'                          => $component_total_amount,
-                                                                                ];
-                        endif;
-                        # End List
-                    endforeach;
-
-                    if(!count($booking_component_details_arr)):
-                        echo json_encode(['status' => false, 'message' => 'Please select components in deal amount']);
-                        exit;
-                    endif;
-                    # End Booking Component Details
-
-                    $this->Action_model->update_data(array('followup_status' => 2), 'tbl_followup', "followup_id='" . $followup_id . "' AND account_id='" . $account_id . "'");
-
-                    $where = "inventory_id='" . $this->input->post("bk_inventory_id") . "'";
-                    $inv_data = $this->Action_model->select_single('tbl_inventory', $where);
-
-                    if ($inv_data) {
-                        $data_array = array(
-                            'inventory_status' => '2', 'last_update' => time()
-                        );
-                        $this->Action_model->update_data($data_array, 'tbl_inventory', $where);
-
-                        $check = $this->Action_model->select_single('tbl_bookings', "inventory_id='" . $this->input->post("bk_inventory_id") . "'");
-                        if (!$check) {
-
-                            # Booking Basic Details
-                                $booking_basic_details          =   (object) [
-                                                                                    'buyer_name'                            => $buyer_name,
-                                                                                    'buyer_son_of_daughter_of_wife_of'      => $buyer_son_of_daughter_of_wife_of,
-                                                                                    'seller_id'                             => $seller_id,
-                                                                                    'seller_son_of_daughter_of_wife_of'     => $seller_son_of_daughter_of_wife_of,
-                                                                                    'state_id'                              => $state_id,
-                                                                                    'city_id'                               => $city_id,
-                                                                                    'location_id'                           => $location_id,
-                                                                                    'project_id'                            => $project_id,
-                                                                                    'unit_code_id'                          => $unit_code_id,
-                                                                                    'plot_or_unit_number'                   => $plot_or_unit_number,
-                                                                                    'inventory_id'                          => $inventory_id,
-                                                                                ];
-                            # End Booking Basic Details
-
-                            # Payment Terms Details
-                                $payment_terms                                 =   $this->input->post('payment_terms');
-                                $booking_terms_details_arr                          =   [];
-
-                                foreach($payment_terms ?? [] as $payment_term):
-                                    $payment_term          =   (object) $payment_term;
-                                    $payment_term_booking_title                                  = $payment_term->title;
-                                    $payment_term_booking_amount                                 = $payment_term->amount;
-                                    $payment_term_booking_date                                   = $payment_term->date;
-                                   
-                           
-                                    $booking_terms_details_arr[]          =   (object) [
-                                                                                'title'                                 => $payment_term_booking_title,
-                                                                                'amount'                                => $payment_term_booking_amount,
-                                                                                'date'                                  => $payment_term_booking_date,
-                                                                            ];
-                                endforeach;
-                            # End Payment Terms Details
-
-                            $bk_array = array(
-                                "project_id"                    => $project_id,
-                                "product_unit_detail_id"        => $unit_code_id,
-                                "inventory_id"                  => $inventory_id,
-                                "booking_date"                  => date('d-m-Y'),
-                                "booking_basic_details"         => json_encode($booking_basic_details),
-                                "component_details"             => count($booking_component_details_arr) ? json_encode($booking_component_details_arr) : null,
-                                "payment_terms_details"         => count($booking_terms_details_arr) ? json_encode($booking_terms_details_arr) : null,
-                            );
-
-                            $bk_array['account_id'] = $account_id;
-                            $bk_array['user_id'] = $user_id;
-                            $bk_array['lead_id'] = $followup_lead_id;
-                            $bk_array['created_at'] = time();
-
-                            $this->Action_model->insert_data($bk_array, 'tbl_bookings');
-
-                            $lead_history_array = array(
-                                'title' => 'Booking',
-                                'description' => 'New Booking by ' . $this->Action_model->get_name($user_id),
-                                'lead_id' => $followup_lead_id,
-                                'created_at' => time(),
-                                "account_id" => $account_id,
-                                "user_id" => $user_id
-                            );
-                            $this->Action_model->insert_data($lead_history_array, 'tbl_lead_history');
-                        }
-                    }
-                }
-                // booking end
-
-                $array = array('status' => 'true', 'msg' => 'Updated Successfully!!', 'next_followup' => $next_followup, 'next_followup_date' => $next_followup_date);
-            } else {
-                $array = array('status' => 'false', 'msg' => 'Record Not Found!!');
-            }
-        } else {
-            $array = array('status' => 'false', 'msg' => 'Some error occurred, please try again.');
-        }
-
-        echo json_encode($array);
-    }
-
 
     public function followup_save()
     {
-
-        if ($this->input->post('lead_stage_id') < 7) {
+        if ($this->input->post('lead_stage_id') < 7 && request()->lead_stage_id != 6) {
 
             $this->form_validation->set_rules('followup_id', 'Followup Id', 'required');
             $this->form_validation->set_rules('lead_stage_id', 'Stage', 'required');
@@ -4601,6 +4199,66 @@ class Api extends CI_Controller
 
                 // booking
                 if ($this->input->post("lead_stage_id") == 6) {
+                    # Init
+                    $booking_details        =   json_decode(request()->booking_details ?? null);
+
+                    if (!$booking_details):
+                        echo json_encode(['status' => false, 'message' => "Booking details required"]);
+                        exit;
+                    endif;
+
+                    
+                    $basic_details                                          =   $booking_details->basic_details;
+                    $booking_component_details                              =   $booking_details->component_details ?? [];
+                    $booking_payment_terms_details                          =   $booking_details->payment_terms_details ?? [];
+
+                    $buyer_name                                             =   $basic_details->buyer_name;
+                    $buyer_son_of_daughter_of_wife_of                       =   $basic_details->buyer_son_of_daughter_of_wife_of;
+                    $seller_id                                              =   $basic_details->seller_id;
+                    $seller_son_of_daughter_of_wife_of                      =   $basic_details->seller_son_of_daughter_of_wife_of;
+                    $state_id                                               =   $basic_details->state_id;
+                    $city_id                                                =   $basic_details->city_id;
+                    $location_id                                            =   $basic_details->location_id;
+                    $project_id                                             =   $basic_details->project_id;
+                    $unit_code_id                                           =   $basic_details->unit_code_id;
+                    $plot_or_unit_number                                    =   $basic_details->plot_or_unit_number;
+                    $inventory_id                                           =   $basic_details->inventory_id;
+                    # End Init
+
+                    # Booking Component Details
+
+                    $booking_component_details_arr                          =   [];
+
+                    
+                    foreach ($booking_component_details ?? [] as $project_component):
+                        
+                        $project_component          =   (object) $project_component;
+                        $component_id                                   = $project_component->id ?? 0;
+                        $component_type                                 = $project_component->type ?? '';
+                        $component_rate                                 = $project_component->rate ?? 0;
+                        $component_calculate_on_size_unit_id            = $project_component->calculate_on_size_unit_id ?? 0;
+                        $component_total_amount                         = $project_component->total_amount ?? 0;
+
+                        # List
+                        if ($component_id && $component_type && $component_rate && $component_calculate_on_size_unit_id && $component_total_amount):
+
+                            $booking_component_details_arr[]          =   (object) [
+                                'component_id'                          => $component_id,
+                                'component_type'                        => $component_type,
+                                'rate'                                  => $component_rate,
+                                'calculate_on_size_unit_id'             => $component_calculate_on_size_unit_id,
+                                'total_amount'                          => $component_total_amount,
+                            ];
+                        endif;
+                    # End List
+                    endforeach;
+
+                    if (!count($booking_component_details_arr)):
+                        echo json_encode(['status' => false, 'message' => 'Please select components in deal amount']);
+                        exit;
+                    endif;
+
+                    # End Booking Component Details
 
                     $this->Action_model->update_data(array('followup_status' => 2), 'tbl_followup', "followup_id='" . $followup_id . "' AND account_id='" . $account_id . "'");
 
@@ -4616,44 +4274,50 @@ class Api extends CI_Controller
 
                         $check = $this->Action_model->select_single('tbl_bookings', "inventory_id='" . $this->input->post("bk_inventory_id") . "'");
                         if (!$check) {
-                            $bk_size = "";
-                            if ($this->input->post("bk_size")) {
-                                $bk_size = $this->input->post("bk_size");
-                                $bk_size = explode("##", $bk_size);
-                                $bk_size = $bk_size[0];
-                            }
 
-                            $bk_unit_no = "";
-                            if ($this->input->post("bk_unit_no")) {
-                                $bk_unit_no = $this->input->post("bk_unit_no");
-                                $bk_unit_no = explode("##", $bk_unit_no);
-                                $bk_unit_no = $bk_unit_no[0];
-                            }
+                            # Booking Basic Details
+                            $booking_basic_details          =   (object) [
+                                'buyer_name'                            => $buyer_name,
+                                'buyer_son_of_daughter_of_wife_of'      => $buyer_son_of_daughter_of_wife_of,
+                                'seller_id'                             => $seller_id,
+                                'seller_son_of_daughter_of_wife_of'     => $seller_son_of_daughter_of_wife_of,
+                                'state_id'                              => $state_id,
+                                'city_id'                               => $city_id,
+                                'location_id'                           => $location_id,
+                                'project_id'                            => $project_id,
+                                'unit_code_id'                          => $unit_code_id,
+                                'plot_or_unit_number'                   => $plot_or_unit_number,
+                                'inventory_id'                          => $inventory_id,
+                            ];
+                            # End Booking Basic Details
+
+                            # Payment Terms Details
+                            
+                            $booking_terms_details_arr                          =   [];
+
+                            foreach ($booking_payment_terms_details ?? [] as $payment_term):
+                                $payment_term          =   (object) $payment_term;
+                                $payment_term_booking_title                                  = $payment_term->title;
+                                $payment_term_booking_amount                                 = $payment_term->amount;
+                                $payment_term_booking_date                                   = $payment_term->date;
+
+
+                                $booking_terms_details_arr[]          =   (object) [
+                                    'title'                                 => $payment_term_booking_title,
+                                    'amount'                                => $payment_term_booking_amount,
+                                    'date'                                  => $payment_term_booking_date,
+                                ];
+                            endforeach;
+                            # End Payment Terms Details
 
                             $bk_array = array(
-                                "customer_name" => $this->input->post("bk_customer_name"),
-                                "dob" => $this->input->post("bk_dob"),
-                                "sdw" => $this->input->post("bk_sdw"),
-                                "sdw_title" => $this->input->post("bk_sdw_title"),
-                                "unit_no" => $bk_unit_no,
-                                "unit_ref_no" => $this->input->post("bk_unit_ref_no"),
-                                "address" => $this->input->post("bk_address"),
-                                "state_id" => $this->input->post("bk_state_id"),
-                                "city_id" => $this->input->post("bk_city_id"),
-                                "project_id" => $this->input->post("bk_project_id"),
-                                "tower" => $this->input->post("bk_tower"),
-                                "floor" => $this->input->post("bk_floor"),
-                                "size" => $bk_size,
-                                "accommodation" => $this->input->post("bk_accommodation"),
-                                "product_unit_detail_id" => $this->input->post("bk_product_unit_detail_id"),
-                                "inventory_id" => $this->input->post("bk_inventory_id"),
-                                "deal_amount" => $this->input->post("bk_deal_amount"),
-                                "booking_amount" => $this->input->post("bk_booking_amount"),
-                                "payment_mode" => $this->input->post("bk_payment_mode"),
-                                "cheque_no" => $this->input->post("bk_cheque_no"),
-                                "drawn_on" => $this->input->post("bk_drawn_on"),
-                                "booking_date" => $this->input->post("bk_booking_date"),
-                                "remark" => $this->input->post("bk_remark")
+                                "project_id"                    => $project_id,
+                                "product_unit_detail_id"        => $unit_code_id,
+                                "inventory_id"                  => $inventory_id,
+                                "booking_date"                  => date('d-m-Y'),
+                                "booking_basic_details"         => json_encode($booking_basic_details),
+                                "component_details"             => count($booking_component_details_arr) ? json_encode($booking_component_details_arr) : null,
+                                "payment_terms_details"         => count($booking_terms_details_arr) ? json_encode($booking_terms_details_arr) : null,
                             );
 
                             $bk_array['account_id'] = $account_id;
@@ -4662,6 +4326,21 @@ class Api extends CI_Controller
                             $bk_array['created_at'] = time();
 
                             $this->Action_model->insert_data($bk_array, 'tbl_bookings');
+
+                            # Unit Lead
+                            $property_details               =   $this->db->select('product_unit_detail_id as  id, property_type, project_type')->where("product_unit_detail_id = '$unit_code_id'")->from('tbl_product_unit_details')->get()->row();
+                            $inventory_property_details     =   $this->db->select('inventory_id as  id, property_details')->where("inventory_id = '$inventory_id'")->from('tbl_inventory')->get()->row();
+
+                            $unit_lead_data                 =   [
+                                                                    'buyer_id'          =>  $followup_lead_id,
+                                                                    'buyer_status'      =>  1,          # Grant
+                                                                    'status'            =>  1,          # Sold
+                                                                ];
+
+                            $unit_lead_where = "inventory_id='$inventory_id'";
+                            $this->Action_model->update_data($unit_lead_data, 'tbl_lead_units', $unit_lead_where);
+
+                        # End Unit Lead
 
                             $lead_history_array = array(
                                 'title' => 'Booking',
@@ -13478,23 +13157,23 @@ class Api extends CI_Controller
         # End Buyer Details
 
         # Validation
-            if(!$buyer):
-                echo json_encode(['status' => false, 'message' => 'Buyer not found']);
-                exit;
-            endif;
+        if (!$buyer):
+            echo json_encode(['status' => false, 'message' => 'Buyer not found']);
+            exit;
+        endif;
 
-            if(!$buyer->added_to_followup):
-                echo json_encode(['status' => false, 'message' => 'Buyer not in followup']);
-                exit;
-            endif;
+        if (!$buyer->added_to_followup):
+            echo json_encode(['status' => false, 'message' => 'Buyer not in followup']);
+            exit;
+        endif;
 
-            if($buyer->lead_status != 1 && ( $buyer->lead_stage_id == 6 || $buyer->lead_stage_id == 7 )):
-                echo json_encode(['status' => false, 'message' => 'Buyer not able to perfom booking process']);
-                exit;
-            endif;
+        if ($buyer->lead_status != 1 && ($buyer->lead_stage_id == 6 || $buyer->lead_stage_id == 7)):
+            echo json_encode(['status' => false, 'message' => 'Buyer not able to perfom booking process']);
+            exit;
+        endif;
 
         # End Validation
-        
+
         # All Leads
         $leads_select_query          =  "   lead_id as id, 
                                             CONCAT(IFNULL(lead_title, ''), ' ',IFNULL(lead_first_name, ''), ' ', IFNULL(lead_last_name, '')) as full_name, 
@@ -13514,13 +13193,13 @@ class Api extends CI_Controller
         # End All Leads
 
         $arr                    =   [
-                                        'status'        => true,
-                                        'message'       => 'Data fetched',
-                                        'buyer_name'    => $buyer->full_name ?? '',
-                                        'sellers'       => $sellers,
-                                        'states'        => states(),
-                                        'size_units'        => sizeUnits()
-                                    ];
+            'status'        => true,
+            'message'       => 'Data fetched',
+            'buyer_name'    => $buyer->full_name ?? '',
+            'sellers'       => $sellers,
+            'states'        => states(),
+            'size_units'        => sizeUnits()
+        ];
         echo json_encode($arr);
     }
 
@@ -13579,16 +13258,16 @@ class Api extends CI_Controller
     public function unit_codes()
     {
         $project                =   request()->project_id;
-      
+
         $where                      =   " 1 = 1 ";
-        
+
         if ($project):
             $where                   .=   " and product_id = '$project'";
         endif;
 
         $unit_codes_query_data       =   (object)[
-                                                        'where' => $where
-                                                    ];
+            'where' => $where
+        ];
 
         $records                =   unit_codes($unit_codes_query_data);
 
@@ -13596,61 +13275,61 @@ class Api extends CI_Controller
     }
     # End Unit Codes
 
-     # Inventory Plot Or Unit Numbers
-     public function inventory_plot_or_unit_numbers()
-     {
+    # Inventory Plot Or Unit Numbers
+    public function inventory_plot_or_unit_numbers()
+    {
         $lead_id                    =    request()->lead_id ?? 0;
         $property_id                =    request()->property_id ?? 0;
         $unit_code                  =    request()->unit_code ?? 0;
-        
-       
+
+
         # Validation
-        if(!$property_id && !$unit_code):
+        if (!$property_id && !$unit_code):
             $message = "";
 
-            if(!$property_id):
+            if (!$property_id):
                 $message = "Property id required";
             endif;
 
-            if(!$unit_code):
+            if (!$unit_code):
                 $message = "Unit Code required";
             endif;
-            
+
             echo json_encode(['status' => false, 'message' => $message]);
             exit;
         endif;
         # Validation
 
         $records                   =   inventory_plot_or_unit_numbers((object) ['property_id' => $property_id,  'unit_code' => $unit_code, 'lead_id' =>  $lead_id]);
- 
-        if(count($records)):
+
+        if (count($records)):
             $arr   = ['status' => true, 'message' => 'Successfully data fetched', 'data' => $records];
         else:
             $arr   = ['status' => false, 'message' => 'No data found'];
         endif;
 
         echo json_encode($arr);
-     }
-     # End Inventory Plot Or Unit Numbers
+    }
+    # End Inventory Plot Or Unit Numbers
 
-     # Components
+    # Components
     public function project_components()
     {
         $property_id            =   request()->project_id ?? 0;
         $unit_code_id           =   request()->unit_code_id ?? 0;
 
         # Validation
-        if(!$property_id && !$unit_code_id):
+        if (!$property_id && !$unit_code_id):
             $message = "";
 
-            if(!$property_id):
+            if (!$property_id):
                 $message = "Property id required";
             endif;
 
-            if(!$unit_code):
+            if (!$unit_code):
                 $message = "Unit Code required";
             endif;
-            
+
             echo json_encode(['status' => false, 'message' => $message]);
             exit;
         endif;
@@ -13658,8 +13337,8 @@ class Api extends CI_Controller
 
         $records                =   property_components((object) ['property_id' => $property_id, 'unit_code_id' => $unit_code_id]);
 
-        unset($records->plc_components); 
-        unset($records->additional_components); 
+        unset($records->plc_components);
+        unset($records->additional_components);
 
         echo json_encode($records);
     }
@@ -13679,14 +13358,14 @@ class Api extends CI_Controller
             # Decode
             $data->property_details = json_decode($data->property_details);
 
-            if(( $data->property_details->size_unit ?? 0 ) || ( $data->property_details->sa_size_unit ?? 0 )):
+            if (($data->property_details->size_unit ?? 0) || ($data->property_details->sa_size_unit ?? 0)):
                 $size_unit      =   '';
-                $size_unit = ( ( $data->property_detail->size_unit ?? 0 ) ? $data->property_details->size_unit : ($data->property_details->sa_size_unit ?? '')) ;
+                $size_unit = (($data->property_detail->size_unit ?? 0) ? $data->property_details->size_unit : ($data->property_details->sa_size_unit ?? ''));
 
-                $plot_or_unit_size                          =   ( $data->property_details->plot_size ?? 0 ) ? $data->property_details->plot_size : ($data->property_detail->sa ?? '');
+                $plot_or_unit_size                          =   ($data->property_details->plot_size ?? 0) ? $data->property_details->plot_size : ($data->property_detail->sa ?? '');
 
                 $data->property_details->size_unit_name   = $size_unit ? sizeUnits($size_unit)->unit_name : 'N/A';
-                $data->property_details->measure_msg     =  $plot_or_unit_size." / ".$data->property_details->size_unit_name;
+                $data->property_details->measure_msg     =  $plot_or_unit_size . " / " . $data->property_details->size_unit_name;
                 $data->property_details->plot_or_unit_size     =  $plot_or_unit_size;
             endif;
             # End Decode
@@ -13701,13 +13380,13 @@ class Api extends CI_Controller
                 $data->unit_code_name  = $property_accomodation->unit_code_with_accomodation_name ?? $property_accomodation->inventory_unit_code ?? '';
             endif;
 
-            
+
 
         endif;
 
-       
+
         if ($data) :
-            $res_arr        =  ['status' => true, 'message' => 'Data fetched','data' =>  $data];
+            $res_arr        =  ['status' => true, 'message' => 'Data fetched', 'data' =>  $data];
         else :
             $res_arr        =  ['status' => false, 'message' => 'Data not found'];
         endif;
@@ -13717,152 +13396,153 @@ class Api extends CI_Controller
     }
     # End Get Inventory Details
 
-          # Get Unit Inventory
-          public function unit_inventory()
-          {
-              $arr                          =   [];
-              $id                           =   request()->id ?? 0;
-              $lead_id                      =   request()->lead_id ?? 0;
-              $inventory_id                 =   request()->inventory_id ?? 0;
+    # Get Unit Inventory
+    public function unit_inventory()
+    {
+        $arr                          =   [];
+        $id                           =   request()->id ?? 0;
+        $lead_id                      =   request()->lead_id ?? 0;
+        $inventory_id                 =   request()->inventory_id ?? 0;
 
-              $where                        =   " 1 = 1 ";
-              
-                # Id
-                if($id):
-                    $where                        .=   " and id = '$id' ";
-                endif;
-                # End Id
-              
-                # Lead Id
-                if($lead_id):
-                    $where                        .=   " and lead_id = '$lead_id' ";
-                endif;
-                # End Lead Id
-              
-                # Inventory Id
-                if($inventory_id):
-                    $where                        .=   " and inventory_id = '$inventory_id' ";
-                endif;
-                # End Inventory Id
-      
-              $data               =   $this->db->where($where)->get('tbl_lead_units')->row();
-      
-              if ($data->property_details ?? 0) :
-      
-                  # Decode
-                  $data->property_details = json_decode($data->property_details);
-      
-                  if(( $data->property_details->size_unit ?? 0 ) || ( $data->property_details->sa_size_unit ?? 0 )):
-                      $size_unit      =   '';
-                      $size_unit = ( ( $data->property_details->size_unit ?? 0 ) ? $data->property_details->size_unit : ($data->property_details->sa_size_unit ?? '')) ;
-      
-                      $plot_or_unit_size                          =   ( $data->property_details->plot_size ?? 0 ) ? $data->property_details->plot_size : ($data->property_detail->sa ?? '');
-      
-                      $data->property_details->size_unit_name   = $size_unit ? sizeUnits($size_unit)->unit_name : 'N/A';
-                      $data->property_details->measure_msg     =  $plot_or_unit_size." / ".$data->property_details->size_unit_name;
-                      $data->property_details->plot_or_unit_size     =  $plot_or_unit_size;
-                  endif;
-                  # End Decode
-      
-      
-                  $property_id = $property_details->product_id ?? 0;
-                  $unit_code = $property_details->unit_code ?? 0;
-      
-                  if ($property_id) :
-                      $property  = property($property_id);
-                      $property_accomodation  = getPropertyAccomodations($property->project_type_id ?? 0, $property->property_type_id ?? 0, $property_id, $property_details->unit_code);
-                      $data->unit_code_name  = $property_accomodation->unit_code_with_accomodation_name ?? $property_accomodation->inventory_unit_code ?? '';
-                  endif;
-      
-              endif;
-      
-              if ($data) :
-                  $res_arr        =  ['status' => true, 'message' => 'Data fetched', 'data' =>  $data];
-              else :
-                  $res_arr        =  ['status' => false, 'message' => 'Data not found'];
-              endif;
-      
-      
-              echo json_encode($res_arr);
-          }
-          # End Get Unit Inventory 
+        $where                        =   " 1 = 1 ";
 
-          # Component Calculation
-          public function component_calculation(){
-           
+        # Id
+        if ($id):
+            $where                        .=   " and id = '$id' ";
+        endif;
+        # End Id
 
-            $arr                            =   [];
-            $isValid                        =   true;
-            $lead_id                        =   request()->lead_id ?? 0;
-            $inventory_id                   =   request()->inventory_id ?? 0;
-            $rate                           =   request()->rate ?? 0;
-            $calculate_on_size_id           =   request()->calculate_on_size_id ?? 0;
-            $component_type                 =   request()->component_type ?? 0;
-            $basic_selling_price            =   request()->basic_selling_price ?? 0;
-            $total_amount                   =   0;
-          
-            # Validation
-            if(!$lead_id):
-                echo json_encode(['status' => false, 'message' => "Lead Id required"]);
-                exit;
+        # Lead Id
+        if ($lead_id):
+            $where                        .=   " and lead_id = '$lead_id' ";
+        endif;
+        # End Lead Id
+
+        # Inventory Id
+        if ($inventory_id):
+            $where                        .=   " and inventory_id = '$inventory_id' ";
+        endif;
+        # End Inventory Id
+
+        $data               =   $this->db->where($where)->get('tbl_lead_units')->row();
+
+        if ($data->property_details ?? 0) :
+
+            # Decode
+            $data->property_details = json_decode($data->property_details);
+
+            if (($data->property_details->size_unit ?? 0) || ($data->property_details->sa_size_unit ?? 0)):
+                $size_unit      =   '';
+                $size_unit = (($data->property_details->size_unit ?? 0) ? $data->property_details->size_unit : ($data->property_details->sa_size_unit ?? ''));
+
+                $plot_or_unit_size                          =   ($data->property_details->plot_size ?? 0) ? $data->property_details->plot_size : ($data->property_detail->sa ?? '');
+
+                $data->property_details->size_unit_name   = $size_unit ? sizeUnits($size_unit)->unit_name : 'N/A';
+                $data->property_details->measure_msg     =  $plot_or_unit_size . " / " . $data->property_details->size_unit_name;
+                $data->property_details->plot_or_unit_size     =  $plot_or_unit_size;
+            endif;
+            # End Decode
+
+
+            $property_id = $property_details->product_id ?? 0;
+            $unit_code = $property_details->unit_code ?? 0;
+
+            if ($property_id) :
+                $property  = property($property_id);
+                $property_accomodation  = getPropertyAccomodations($property->project_type_id ?? 0, $property->property_type_id ?? 0, $property_id, $property_details->unit_code);
+                $data->unit_code_name  = $property_accomodation->unit_code_with_accomodation_name ?? $property_accomodation->inventory_unit_code ?? '';
             endif;
 
-            if(!$inventory_id):
-                echo json_encode(['status' => false, 'message' => "Inventory Id required"]);
-                exit;
-            endif;
+        endif;
 
-            if(!$rate):
-                echo json_encode(['status' => false, 'message' => "Rate required"]);
-                exit;
-            endif;
+        if ($data) :
+            $res_arr        =  ['status' => true, 'message' => 'Data fetched', 'data' =>  $data];
+        else :
+            $res_arr        =  ['status' => false, 'message' => 'Data not found'];
+        endif;
 
-            if(!$calculate_on_size_id):
-                echo json_encode(['status' => false, 'message' => "Size id required"]);
-                exit;
-            endif;
 
-            # End Validation
+        echo json_encode($res_arr);
+    }
+    # End Get Unit Inventory 
 
-            $this->db->select("JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.plot_size')) as plot_size, JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.unit_size')) as unit_size");
-            $data               =   $this->db->where("lead_id = '$lead_id' and inventory_id = '$inventory_id'")->from('tbl_lead_units')->get()->row();
+    # Component Calculation
+    public function component_calculation()
+    {
 
-          
-            if($data):
-                # Calculation
-                if($calculate_on_size_id == 5): # FIX
-                    $total_amount               =   $rate;
-                elseif($calculate_on_size_id == 6):  # % of BSP
 
-                    # Basic Cost
-                    if($component_type == "basic_component"):
-                        echo json_encode(['status' => false, 'message' => "% of BSP not applicable on Basic Cost"]);
-                        exit;
-                    endif;
+        $arr                            =   [];
+        $isValid                        =   true;
+        $lead_id                        =   request()->lead_id ?? 0;
+        $inventory_id                   =   request()->inventory_id ?? 0;
+        $rate                           =   request()->rate ?? 0;
+        $calculate_on_size_id           =   request()->calculate_on_size_id ?? 0;
+        $component_type                 =   request()->component_type ?? 0;
+        $basic_selling_price            =   request()->basic_selling_price ?? 0;
+        $total_amount                   =   0;
 
-                    # Basic Selling Price
-                    if(!$basic_selling_price):
-                        echo json_encode(['status' => false, 'message' => "Basic selling price required"]);
-                        exit;
-                    endif;
+        # Validation
+        if (!$lead_id):
+            echo json_encode(['status' => false, 'message' => "Lead Id required"]);
+            exit;
+        endif;
 
-                    $total_amount               = ( $basic_selling_price / 100 ) * $rate;
-                else:
-                    $total_amount               = ( $data->plot_size ?? $data->unit_size ?? 0 ) * $rate;
+        if (!$inventory_id):
+            echo json_encode(['status' => false, 'message' => "Inventory Id required"]);
+            exit;
+        endif;
+
+        if (!$rate):
+            echo json_encode(['status' => false, 'message' => "Rate required"]);
+            exit;
+        endif;
+
+        if (!$calculate_on_size_id):
+            echo json_encode(['status' => false, 'message' => "Size id required"]);
+            exit;
+        endif;
+
+        # End Validation
+
+        $this->db->select("JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.plot_size')) as plot_size, JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.unit_size')) as unit_size");
+        $data               =   $this->db->where("lead_id = '$lead_id' and inventory_id = '$inventory_id'")->from('tbl_lead_units')->get()->row();
+
+
+        if ($data):
+            # Calculation
+            if ($calculate_on_size_id == 5): # FIX
+                $total_amount               =   $rate;
+            elseif ($calculate_on_size_id == 6):  # % of BSP
+
+                # Basic Cost
+                if ($component_type == "basic_component"):
+                    echo json_encode(['status' => false, 'message' => "% of BSP not applicable on Basic Cost"]);
+                    exit;
                 endif;
 
-                $total_amount   = number_format($total_amount, '2');
-                # Calculation
+                # Basic Selling Price
+                if (!$basic_selling_price):
+                    echo json_encode(['status' => false, 'message' => "Basic selling price required"]);
+                    exit;
+                endif;
 
-                $arr    = ['status' => true, 'message' => "data fetched", 'total_amount' => $total_amount ];
+                $total_amount               = ($basic_selling_price / 100) * $rate;
             else:
-                $arr    = ['status' => false, 'message' => 'No data found'];
+                $total_amount               = ($data->plot_size ?? $data->unit_size ?? 0) * $rate;
             endif;
 
-            echo json_encode($arr);
-          }
-          # End Component Calculation
-          
+            $total_amount   = number_format($total_amount, '2');
+            # Calculation
+
+            $arr    = ['status' => true, 'message' => "data fetched", 'total_amount' => $total_amount];
+        else:
+            $arr    = ['status' => false, 'message' => 'No data found'];
+        endif;
+
+        echo json_encode($arr);
+    }
+    # End Component Calculation
+
     # End Followup : Booking Form Data
 
 
