@@ -13730,6 +13730,70 @@ class Api extends CI_Controller
               echo json_encode($res_arr);
           }
           # End Get Unit Inventory 
+
+          # Component Calculation
+          public function component_calculation(){
+           
+
+            $arr                            =   [];
+            $isValid                        =   true;
+            $lead_id                        =   request()->lead_id ?? 0;
+            $inventory_id                   =   request()->inventory_id ?? 0;
+            $rate                           =   request()->rate ?? 0;
+            $calculate_on_size_id           =   request()->calculate_on_size_id ?? 0;
+            $basic_selling_price            =   request()->basic_selling_price ?? 0;
+            $total_amount                   =   0;
+          
+            # Validation
+            if(!$lead_id):
+                echo json_encode(['status' => false, 'message' => "Lead Id required"]);
+                exit;
+            endif;
+
+            if(!$inventory_id):
+                echo json_encode(['status' => false, 'message' => "Inventory Id required"]);
+                exit;
+            endif;
+
+            if(!$rate):
+                echo json_encode(['status' => false, 'message' => "Rate required"]);
+                exit;
+            endif;
+
+            if(!$calculate_on_size_id):
+                echo json_encode(['status' => false, 'message' => "Size id required"]);
+                exit;
+            endif;
+
+            # End Validation
+
+            $this->db->select("JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.plot_size')) as plot_size, JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.unit_size')) as unit_size");
+            $data               =   $this->db->where("lead_id = '$lead_id' and inventory_id = '$inventory_id'")->from('tbl_lead_units')->get()->row();
+
+          
+            if($data):
+                # Calculation
+                if($calculate_on_size_id == 5): # FIX
+                    $total_amount               =   $rate;
+                elseif($calculate_on_size_id == 6):  # % of BSP
+                    $total_amount               = ( $basic_selling_price / 100 ) * $rate;
+                else:
+                    $total_amount               = ( $data->plot_size ?? $data->unit_size ?? 0 ) * $rate;
+                endif;
+
+                $total_amount   = number_format($total_amount, '2');
+                # Calculation
+
+                $arr[]    = ['status' => true, 'message' => "data fetched", 'total_amount' => $total_amount ];
+            else:
+                $arr[]    = ['status' => false, 'message' => 'No data found'];
+            endif;
+
+            echo json_encode($arr);
+          }
+          # End Component Calculation
+          
     # End Followup : Booking Form Data
+
 
 }
