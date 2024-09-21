@@ -13334,7 +13334,7 @@ class Api extends CI_Controller
         if (count($records)):
             $arr   = ['status' => true, 'message' => 'Successfully data fetched', 'data' => $records];
         else:
-            $arr   = ['status' => false, 'message' => 'No data found'];
+            $arr   = ['status' => false, 'message' => 'No data found' ,'data' => null];
         endif;
 
         echo json_encode($arr);
