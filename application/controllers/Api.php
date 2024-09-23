@@ -13617,7 +13617,7 @@ class Api extends CI_Controller
                 $total_amount               = ($data->plot_size ?? $data->unit_size ?? 0) * $rate;
             endif;
 
-            $total_amount   = number_format($total_amount, '2');
+            // $total_amount   = number_format($total_amount, '2', '.');
             # Calculation
 
             $arr    = ['status' => true, 'message' => "data fetched", 'total_amount' => $total_amount];
