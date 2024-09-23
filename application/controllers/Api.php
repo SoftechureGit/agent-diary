@@ -13627,7 +13627,7 @@ class Api extends CI_Controller
             // $total_amount   = number_format($total_amount, '2', '.');
             # Calculation
 
-            $arr    = ['status' => true, 'message' => "data fetched", 'total_amount' => $total_amount];
+            $arr    = ['status' => true, 'message' => "data fetched", 'total_amount' => $total_amount, 'debug' =>  $data ?? null];
         else:
             $arr    = ['status' => false, 'message' => 'No data found'];
         endif;
