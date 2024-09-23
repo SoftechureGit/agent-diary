@@ -13621,7 +13621,7 @@ class Api extends CI_Controller
 
                 $total_amount               = ($basic_selling_price / 100) * $rate;
             else:
-                $total_amount               = ($data->plot_size ?? $data->unit_size ?? 0) * $rate;
+                $total_amount               = ($data->plot_size ?? 0) * $rate;
             endif;
 
             // $total_amount   = number_format($total_amount, '2', '.');
