@@ -13389,6 +13389,13 @@ class Api extends CI_Controller
         $records                   =   inventory_plot_or_unit_numbers((object) ['property_id' => $property_id,  'unit_code' => $unit_code, 'lead_id' =>  $lead_id]);
 
         if (count($records)):
+
+            foreach($records as $record):
+                if(!$record->plot_number):
+                    $record->plot_number = $record->unit_number;
+                endif;
+            endforeach;
+
             $arr   = ['status' => true, 'message' => 'Successfully data fetched', 'data' => $records];
         else:
             $arr   = ['status' => false, 'message' => 'No data found' ,'data' => [] ];
