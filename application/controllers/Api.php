@@ -4236,8 +4236,38 @@ class Api extends CI_Controller
                         exit;
                     endif;
 
+                    if (!$buyer_son_of_daughter_of_wife_of):
+                        echo json_encode(['status' => false, 'message' => 'Buyer S/W/D required']);
+                        exit;
+                    endif;
+
+                    if (!$seller_son_of_daughter_of_wife_of):
+                        echo json_encode(['status' => false, 'message' => 'Seller S/W/D required']);
+                        exit;
+                    endif;
+
+                    if (!$state_id):
+                        echo json_encode(['status' => false, 'message' => 'State required']);
+                        exit;
+                    endif;
+
+                    if (!$city_id):
+                        echo json_encode(['status' => false, 'message' => 'City required']);
+                        exit;
+                    endif;
+                    
+                    if (!$location_id):
+                        echo json_encode(['status' => false, 'message' => 'Location required']);
+                        exit;
+                    endif;
+                    
                     if (!$project_id):
                         echo json_encode(['status' => false, 'message' => 'project Id required']);
+                        exit;
+                    endif;
+
+                    if (!$unit_code_id):
+                        echo json_encode(['status' => false, 'message' => 'Unit Code required']);
                         exit;
                     endif;
 
