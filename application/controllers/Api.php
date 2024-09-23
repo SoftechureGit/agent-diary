@@ -13621,13 +13621,13 @@ class Api extends CI_Controller
 
                 $total_amount               = ($basic_selling_price / 100) * $rate;
             else:
-                $total_amount               = ($data->plot_size ?? 0) * $rate;
+                $total_amount               = ($data->plot_size ?? $data->unit_size ?? 0) * $rate;
             endif;
 
             // $total_amount   = number_format($total_amount, '2', '.');
             # Calculation
 
-            $arr    = ['status' => true, 'message' => "data fetched", 'total_amount' => $total_amount];
+            $arr    = ['status' => true, 'message' => "data fetched", 'total_amount' => $total_amount, 'debug' =>  $data ?? null];
         else:
             $arr    = ['status' => false, 'message' => 'No data found'];
         endif;
