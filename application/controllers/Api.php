@@ -4230,6 +4230,28 @@ class Api extends CI_Controller
                     $inventory_id                                           =   $basic_details->inventory_id;
                     # End Init
 
+                    # Validation
+                    if (!$seller_id):
+                        echo json_encode(['status' => false, 'message' => 'Seller required']);
+                        exit;
+                    endif;
+
+                    if (!$project_id):
+                        echo json_encode(['status' => false, 'message' => 'project Id required']);
+                        exit;
+                    endif;
+
+                    if (!$plot_or_unit_number):
+                        echo json_encode(['status' => false, 'message' => 'Plot or Unit number required']);
+                        exit;
+                    endif;
+
+                    if (!$inventory_id):
+                        echo json_encode(['status' => false, 'message' => 'Inventory Id required']);
+                        exit;
+                    endif;
+                    # End Validation
+
                     # Booking Component Details
 
                     $booking_component_details_arr                          =   [];
