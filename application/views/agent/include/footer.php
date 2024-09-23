@@ -1438,7 +1438,13 @@
              var myform = document.getElementById("lead-unit-form");
              var fd = new FormData(myform);
 
-             fd.append('inventory_id', $('[name="property_details[plot_number]"] option:selected').data('inventory-id'))
+             if($('[name="property_details[plot_number]"] option:selected').data('inventory-id') != undefined){
+               fd.append('inventory_id', $('[name="property_details[plot_number]"] option:selected').data('inventory-id'))
+              }
+              
+              if($('[name="property_details[unit_no]"] option:selected').data('inventory-id') != undefined){
+                fd.append('inventory_id', $('[name="property_details[unit_no]"] option:selected').data('inventory-id'))
+              }
 
              $.ajax({
                type: "POST",

@@ -559,13 +559,13 @@ class Helper extends CI_Controller
               # Decode
               $data->property_details = json_decode($data->property_details);
   
-              if(( $data->property_details->size_unit ?? 0 ) || ( $data->property_details->sa_size_unit ?? 0 )):
+              if(( $data->property_details->size_unit ?? 0 ) || ( $data->property_details->sa ?? 0 )):
                   $size_unit      =   '';
-                  $size_unit = ( ( $data->property_details->size_unit ?? 0 ) ? $data->property_details->size_unit : ($data->property_details->sa_size_unit ?? '')) ;
+                  $size_unit = ( ( $data->property_details->size_unit ?? 0 ) ? $data->property_details->size_unit : ($data->property_details->sa ?? '')) ;
   
-                  $plot_or_unit_size                          =   ( $data->property_details->plot_size ?? 0 ) ? $data->property_details->plot_size : ($data->property_detail->sa ?? '');
+                  $plot_or_unit_size                          =   ( $data->property_details->plot_size ?? 0 ) ? $data->property_details->plot_size : ($data->property_details->sa ?? '');
   
-                  $data->property_details->size_unit_name   = $size_unit ? sizeUnits($size_unit)->unit_name : 'N/A';
+                  $data->property_details->size_unit_name   = $size_unit ? ( sizeUnits($size_unit)->unit_name ?? 'N/A') : 'N/A';
                   $data->property_details->measure_msg     =  $plot_or_unit_size." / ".$data->property_details->size_unit_name;
                   $data->property_details->plot_or_unit_size     =  $plot_or_unit_size;
               endif;
