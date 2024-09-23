@@ -4304,7 +4304,12 @@ class Api extends CI_Controller
                             # End Booking Basic Details
 
                             # Payment Terms Details
-                            
+                            if(!is_array($booking_payment_terms_details) && $booking_payment_terms_details):
+                                $booking_payment_terms_details = json_decode($booking_payment_terms_details);
+                                // echo json_encode(['status' => false, 'message' => "Invalid component details"]);
+                                // exit;
+                            endif;
+
                             $booking_terms_details_arr                          =   [];
 
                             foreach ($booking_payment_terms_details ?? [] as $payment_term):
