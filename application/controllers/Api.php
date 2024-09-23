@@ -13597,7 +13597,7 @@ class Api extends CI_Controller
 
         # End Validation
 
-        $this->db->select("JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.plot_size')) as plot_size, JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.unit_size')) as unit_size");
+        $this->db->select("JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.plot_size')) as plot_size, JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.sa')) as unit_size");
         $data               =   $this->db->where("lead_id = '$lead_id' and inventory_id = '$inventory_id'")->from('tbl_lead_units')->get()->row();
 
 
@@ -13621,7 +13621,7 @@ class Api extends CI_Controller
 
                 $total_amount               = ($basic_selling_price / 100) * $rate;
             else:
-                $total_amount               = ($data->plot_size ?? $data->sa ?? 0) * $rate;
+                $total_amount               = ($data->plot_size ?? $data->unit_size ?? 0) * $rate;
             endif;
 
             // $total_amount   = number_format($total_amount, '2', '.');
