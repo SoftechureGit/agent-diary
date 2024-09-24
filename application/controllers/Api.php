@@ -13639,4 +13639,130 @@ class Api extends CI_Controller
     # End Followup : Booking Form Data
 
 
+    /********************************************************
+    * Report
+    *********************************************************/
+    public function booking_report(){
+        $arr                    = [];
+        $user_detail            =   $this->user();
+
+        # Filter Data
+            $search_text                =   request()->search ?? '';
+            $search_agent_id            =   request()->agent_id ?? 0;
+            $search_builder_id          =   request()->builder_id ?? 0;
+            $search_product_id          =   request()->product_id ?? 0;
+            $search_booking_status      =   request()->status ?? 0;
+            $search_from                =   request()->search_from ?? 0;
+            $search_to                  =   request()->search_to ?? 0;
+        # End Filter Data
+
+        $where = " 1 = 1 ";
+        $select         =   "
+                                booking.booking_id, 
+                                booking.lead_id,
+                                booking.inventory_id,
+                                booking.product_unit_detail_id,
+                                booking.booking_status,
+                                booking.account_id,
+                                booking.user_id,
+                                booking.booking_basic_details,
+                                booking.component_details,
+                                booking.payment_terms_details,
+                                booking.booking_date,
+                                project.project_name,
+                                JSON_UNQUOTE(JSON_EXTRACT(inventory.property_details, '$.buyer_name')) as buyer_name,
+                                JSON_UNQUOTE(JSON_EXTRACT(inventory.property_details, '$.referance_number')) as unit_refernce_number,
+                                CONCAT(IFNULL(seller.lead_title, ''), ' ', IFNULL(seller.lead_first_name, ''), ' ', IFNULL(seller.lead_last_name, '')) as seller_name,
+                                CONCAT(IFNULL(agent.user_title, ''), ' ', IFNULL(agent.first_name, ''), ' ', IFNULL(agent.last_name, '')) as agent_name
+                            ";
+
+        # Where 
+        # Search Text
+        if ($where != '') {
+            $where .= " and   (project.project_name like '%" . $search_text . "%' 
+                                    OR 
+                                    JSON_UNQUOTE(JSON_EXTRACT(inventory.property_details, '$.referance_number')) like '%" . $search_text . "%'
+                                    OR
+                                    JSON_UNQUOTE(JSON_EXTRACT(booking.booking_basic_details, '$.buyer_name')) like '%" . $search_text . "%'
+                                    OR
+                                    CONCAT(IFNULL(seller.lead_title, ''), ' ', IFNULL(seller.lead_first_name, ''), ' ', IFNULL(seller.lead_last_name, '')) like '%" . $search_text . "%' 
+                                    OR
+                                    CONCAT(IFNULL(agent.user_title, ''), ' ', IFNULL(agent.first_name, ''), ' ', IFNULL(agent.last_name, '')) like '%" . $search_text . "%'
+                                   )";
+        }
+        # End Search Text
+
+        # Filter
+        if ($search_agent_id != '') {
+            $searchQuery .= " and booking.account_id='" . $search_agent_id . "' ";
+        }
+
+        if ($search_builder_id != '') {
+            $searchQuery .= " and project.builder_id='" . $search_builder_id . "' ";
+        }
+
+        if ($search_product_id != '') {
+            $searchQuery .= " and booking.project_id='" . $search_product_id . "' ";
+        }
+
+        if ($search_booking_status != '') {
+            $searchQuery .= " and booking.booking_status='" . $search_booking_status . "' ";
+        }
+
+        if ($search_from && $search_to) {
+            $searchQuery .= " and (str_to_date(booking.booking_date,'%d-%m-%Y') BETWEEN str_to_date('" . $search_from . "','%d-%m-%Y') AND str_to_date('" . $search_to . "','%d-%m-%Y'))";
+        } else if ($search_from && !$search_to) {
+            $searchQuery .= " and (str_to_date(booking.booking_date,'%d-%m-%Y')>=str_to_date('" . $search_from . "','%d-%m-%Y'))";
+        } else if (!$search_from && $search_to) {
+            $searchQuery .= " and (str_to_date(booking.booking_date,'%d-%m-%Y')<=str_to_date('" . $search_to . "','%d-%m-%Y'))";
+        }
+        # Filter
+
+        $where  .=  $user_detail->level_user_ids ?
+                " and booking.user_id in ($user_detail->level_user_ids) and ( booking.account_id = '$user_detail->account_id' )" :
+                " and ( booking.user_id = '$user_detail->user_id') and ( booking.account_id = '$user_detail->account_id' )";
+        # End Where 
+
+        # Join
+        $join =     [   
+                        ['tbl_leads as seller', "seller.lead_id = JSON_UNQUOTE(JSON_EXTRACT(booking.booking_basic_details, '$.seller_id'))" ], # Seller
+                        [ 'tbl_users as agent', "agent.user_id = booking.user_id" ], # Agent
+                        [ 'tbl_products as project', "project.product_id = booking.project_id" ], # Project
+                        [ 'tbl_inventory as inventory', "inventory.inventory_id = booking.inventory_id" ] # Inventory
+                    ];
+        # End Join
+
+        # Query
+        $booking_report_query_data            = (object) [
+                                                            'where'     => $where,
+                                                            'select'    => $select,
+                                                            'join'      => $join,
+                                                        ];
+        $booking_reports    =   booking_reports($booking_report_query_data);
+        # End Query
+        $booking_reports_arr            =   [];
+        if(count($booking_reports ?? [])):
+
+            foreach($booking_reports as $booking_report):
+                $booking_reports_arr[]      = (object) [
+                                                            'booking_date'  => $booking_report->booking_date,
+                                                            'buyer_name'    => $booking_report->buyer_name,
+                                                            'seller_name'   => $booking_report->seller_name,
+                                                            'agent_name'    => $booking_report->agent_name,
+                                                            'unit_ref_no'   => $booking_report->unit_refernce_number,
+                                                            'project_name'  => $booking_report->project_name,
+                                                            'status'        =>  $booking_report->booking_status,
+                                                        ];
+            endforeach;
+
+            $arr        =   ['status' => true, 'message' => 'Successfully data fetched', 'data' => $booking_reports_arr];
+        else:
+            $arr        =   ['status' => true, 'message' => 'No data found'];
+        endif;
+
+        echo json_encode($arr);
+    }
+    /********************************************************
+    * End Report
+    *********************************************************/
 }

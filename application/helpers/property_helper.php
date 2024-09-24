@@ -1,4 +1,8 @@
-<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
+<?php
+
+use PgSql\Lob;
+
+ if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 
 # Facings
@@ -1084,3 +1088,68 @@ function property_components($param)
 }
 # End Get Inventory Details
 /** End Components */
+
+
+/********************************************************
+* Report
+*********************************************************/
+if(!function_exists('booking_reports')){
+    function booking_reports($param = null){
+
+        $default_select         =   "JSON_VALID(booking_basic_details) AS is_booking_basic_details_json_valid, JSON_VALID(component_details) AS is_component_details_json_valid, JSON_VALID(payment_terms_details) AS is_payment_terms_details_json_valid";
+        $select                 =   $param->select ?? '';
+        $where                  =   $param->where ?? '';
+        $join                   =   $param->join ?? [];
+
+        # Select
+        if($select): 
+                $select         = " $select, $default_select"; 
+                db_instance()->select($select); 
+            else:
+                db_instance()->select("*, $default_select"); 
+        endif;
+        # End Select
+        
+        # Table
+        db_instance()->from('tbl_bookings as booking');
+        # End Table
+
+        # Join
+        if (count($join)):
+                foreach ($join as $j):
+                    db_instance()->join($j[0], $j[1], 'left');
+                endforeach;
+        endif;
+        # End Join
+
+        # Where
+        if($where): db_instance()->where($where); endif;
+        # End Where
+        
+        # Result
+        $booking_reports  =    db_instance()->get()->result();
+        # End Result
+
+        # Modify
+        foreach($booking_reports as $booking_report):
+
+            if($booking_report->is_booking_basic_details_json_valid && ($booking_basic_details ?? 0)):
+                $booking_report->booking_basic_details = json_decode($booking_report->booking_basic_details);
+            endif;
+            
+            if($booking_report->is_component_details_json_valid && ($component_details ?? 0)):
+                $booking_report->component_details = json_decode($booking_report->component_details);
+            endif;
+            
+            if($booking_report->is_payment_terms_details_json_valid && ($payment_terms_details ?? 0)):
+                $booking_report->payment_terms_details = json_decode($booking_report->payment_terms_details);
+            endif;
+        endforeach;
+        # End Modify
+
+        return $booking_reports;
+    }
+}
+/********************************************************
+* End Report
+*********************************************************/
