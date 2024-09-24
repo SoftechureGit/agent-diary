@@ -29,32 +29,36 @@
                 <div style="margin-top: 16px;padding: 0px;">
                   <form method="post" onsubmit="return filterRecords()" autocomplete="off">
                     <div class="form-row">
-                      <div class="form-group col-md-6">
+                      <div class="form-group col-md-3">
+                        <label for="">Search</label>
                         <input type="text" class="form-control" id="search_text" name="search_text" placeholder="Client Name, Unit Ref. No..." autocomplete="off">
                         </select>
                       </div>
 
-                      <div class="form-group col-md-6">
+                      <div class="form-group col-md-3">
+                        <label for="">Members</label>
                         <select class="form-control" id="search_agent_id" name="search_agent_id">
-                          <option value="">Select Agent</option>
-                          <?php foreach ($agent_list as $agent) { ?>
-                            <option value="<?= $agent->user_id ?>"><?= ($agent->is_individual) ? ucwords($agent->first_name . ' ' . $agent->last_name) : $agent->firm_name ?></option>
+                          <option value="0" selected>All</option>
+                          <?php foreach ($members as $member) { ?>
+                            <option value="<?= $member->id ?>"><?= $member->full_name ?></option>
                           <?php } ?>
                         </select>
                       </div>
 
-                      <div class="form-group col-md-6">
+                      <div class="form-group col-md-3">
+                      <label for="">Builders</label>
                         <select class="form-control" id="search_builder_id" name="search_builder_id">
-                          <option value="">Select Builder</option>
+                        <option value="0" selected>All</option>
                           <?php foreach ($builder_list as $builder) { ?>
                             <option value="<?= $builder->builder_id ?>"><?= $builder->firm_name ?></option>
                           <?php } ?>
                         </select>
                       </div>
 
-                      <div class="form-group col-md-6">
+                      <div class="form-group col-md-3">
+                      <label for="">Projects</label>
                         <select class="form-control" id="search_product_id" name="search_product_id">
-                          <option value="">Select Project</option>
+                        <option value="0" selected>All</option>
                           <?php foreach ($product_list as $product) { ?>
                             <option value="<?= $product->product_id ?>"><?= $product->project_name ?></option>
                           <?php } ?>
@@ -62,8 +66,9 @@
                       </div>
 
                       <div class="form-group col-md-3">
+                      <label for="">Status</label>
                         <select class="form-control" id="search_booking_status" name="search_booking_status">
-                          <option value="">Select Status</option>
+                        <option value="0" selected>All</option>
                           <option value="1">Accept</option>
                           <option value="2">Reject</option>
                           <option value="3">Cancel</option>
@@ -71,31 +76,18 @@
                       </div>
 
                       <div class="form-group col-md-3">
+                      <label for="">From</label>
                         <input type="text" class="form-control from_date" id="search_from" name="search_from" placeholder="From" autocomplete="off">
                         </select>
                       </div>
 
                       <div class="form-group col-md-3">
+                      <label for="">To</label>
                         <input type="text" class="form-control from_date" id="search_to" name="search_to" placeholder="To" autocomplete="off">
                         </select>
                       </div>
 
-                      <!--<div class="form-group col-md-5">
-                                                <select class="form-control" id="search_state_id" name="search_state_id" onchange="getCitySearch(this.value)">
-                                                  <option value="">------------Select State------------</option>
-                                                      <?php foreach ($state_list as $state) { ?>
-                                                    <option value="<?= $state->state_id ?>"><?= $state->state_name ?></option>
-                                                  <?php } ?>
-                                            </select>
-                                            </div>
-
-                                            <div class="form-group col-md-5">
-                                                <select class="form-control" id="search_city_id" name="search_city_id">
-                                                  <option value="">------------Select City------------</option>
-                                                </select>
-                                            </div>-->
-
-                      <div class="form-group col-md-3">
+                      <div class="form-group col-md-3 align-self-end">
                         <button type="submit" class="btn btn-info btn-block" style="height: 36px;">Filter</button>
                       </div>
 

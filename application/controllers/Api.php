@@ -13786,19 +13786,23 @@ class Api extends CI_Controller
         # End Search Text
 
         # Filter
-        if ($search_member_id != '') {
+        if ($search_member_id) {
             $where .= " and booking.user_id='" . $search_member_id . "' ";
+        }else{
+            $where  .= $user_detail->level_user_ids ?
+                " and agent.user_id in ($user_detail->level_user_ids) " :
+                " and ( agent.user_id = '$user_detail->user_id' or agent.parent_id = '$user_detail->user_id') ";
         }
 
-        if ($search_builder_id != '') {
+        if ($search_builder_id) {
             $where .= " and project.builder_id='" . $search_builder_id . "' ";
         }
 
-        if ($search_project_id != '') {
+        if ($search_project_id) {
             $where .= " and booking.project_id='" . $search_project_id . "' ";
         }
 
-        if ($search_booking_status != '') {
+        if ($search_booking_status) {
             $where .= " and booking.booking_status='" . $search_booking_status . "' ";
         }
 
@@ -13810,13 +13814,7 @@ class Api extends CI_Controller
             $where .= " and (str_to_date(booking.booking_date,'%d-%m-%Y')<=str_to_date('" . $search_to . "','%d-%m-%Y'))";
         }
         # Filter
-
-        if($user_detail->level_user_ids && !$search_member_id):
-            $where  .=          " and booking.user_id in ($user_detail->level_user_ids) and ( booking.account_id = '$user_detail->account_id' )" ;
-        elseif($search_member_id):
-            $where  .=          " and ( booking.user_id = '$search_member_id')";
-        endif;
-        
+       
         $where  .=  " and ( booking.account_id = '$user_detail->account_id' )";
         # End Where 
 

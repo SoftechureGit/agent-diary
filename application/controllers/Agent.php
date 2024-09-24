@@ -2072,6 +2072,8 @@ class Agent extends CI_Controller
     /* booking report */
     public function booking_report()
     {
+        $user_detail            = $this->user();
+
         $where = "state_id!='' AND state_status=1";
         $state_list = $this->Action_model->detail_result('tbl_states', $where);
         $data['state_list'] = $state_list;
@@ -2084,13 +2086,35 @@ class Agent extends CI_Controller
         }
         $data['builder_list'] = $builder_list;
 
-        $agent_list = array();
-        $where = "role_id='2' ";
-        $agent_data = $this->Action_model->detail_result('tbl_users', $where);
-        if ($agent_data) {
-            $agent_list  = $agent_data;
-        }
-        $data['agent_list'] = $agent_list;
+        // $agent_list = array();
+        // $where = "role_id='2' ";
+        // $agent_data = $this->Action_model->detail_result('tbl_users', $where);
+        // if ($agent_data) {
+        //     $agent_list  = $agent_data;
+        // }
+        // $data['agent_list'] = $agent_list;
+
+        /*-------------------------------------------------------------------
+            - Teams Member List
+            -------------------------------------------------------------------*/
+            $team_member_where   =   " '1' ";
+
+            $team_member_where  .=  $user_detail->level_user_ids ?
+                " and user.user_id in ($user_detail->level_user_ids) " :
+                " and ( user.user_id = '$user_detail->user_id' or user.parent_id = '$user_detail->user_id') ";
+
+            $this->db->select("user.user_id as id, 
+                                concat(IFNULL(user.user_title, ''),' ', IFNULL(user.first_name, ''), ' ', IFNULL(user.last_name, '')) as full_name, 
+                                role.role_name,
+                            ");
+            $this->db->from('tbl_users as user');
+            $this->db->join('tbl_roles  as role', 'user.role_id = role.role_id', 'left');
+            $this->db->where($team_member_where);
+            $members                            =   $this->db->get()->result();
+            $data['members']                    = $members;
+            /*-------------------------------------------------------------------
+            - End Teams Member List
+            -------------------------------------------------------------------*/
 
         $product_list = array();
         $where = "product_status='1'";
