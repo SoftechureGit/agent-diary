@@ -1664,6 +1664,18 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 # Fetch Fresh Record
 
                 $array = array('status' => 'updated', 'message' => 'Lead Updated Successfully!!', 'data' => $lead);
+
+                # Lead History
+                $lead_history_array     =   array(
+                    'title'         =>  'Lead Updated',
+                    'description'   =>  'Lead updated by ' . $this->Action_model->get_name($user_id),
+                    'lead_id'       =>  $id,
+                    'created_at'    =>  time(),
+                    "account_id"    =>  $account_id,
+                    "user_id"       =>  $user_id
+                );
+
+                $this->Action_model->insert_data($lead_history_array, 'tbl_lead_history');
             } else {
 
                 // if($this->Action_model->select_single('tbl_leads',"lead_email='".$this->input->post('lead_email')."' AND account_id='".$account_id."'")){

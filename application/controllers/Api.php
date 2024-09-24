@@ -2169,7 +2169,20 @@ class Api extends CI_Controller
                 $this->Action_model->update_data($record_array, 'tbl_leads', "lead_id='$id'");
                 # End Update Lead
 
-                $array                  =  array('status' => 'true', 'msg' => 'Lead Updated Successfully!!');
+                $array                  =  array('status' => 'true', 'msg' => 'Profile Updated Successfully!!');
+
+                # Lead History
+                $lead_history_array     =   array(
+                    'title'         =>  'Lead Updated',
+                    'description'   =>  'Lead updated by ' . $this->Action_model->get_name($user_id),
+                    'lead_id'       =>  $id,
+                    'created_at'    =>  time(),
+                    "account_id"    =>  $account_id,
+                    "user_id"       =>  $user_id
+                );
+
+                $this->Action_model->insert_data($lead_history_array, 'tbl_lead_history');
+                # End Lead History
             } else {
                 # Create Lead
                 $record_array['created_at']             =   time();
