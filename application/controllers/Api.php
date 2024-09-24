@@ -13648,13 +13648,107 @@ class Api extends CI_Controller
 
         # Filter Data
             $search_text                =   request()->search ?? '';
-            $search_agent_id            =   request()->agent_id ?? 0;
+            $search_member_id           =   request()->member_id ?? 0;
             $search_builder_id          =   request()->builder_id ?? 0;
-            $search_product_id          =   request()->product_id ?? 0;
+            $search_project_id          =   request()->project_id ?? 0;
             $search_booking_status      =   request()->status ?? 0;
             $search_from                =   request()->search_from ?? 0;
             $search_to                  =   request()->search_to ?? 0;
         # End Filter Data
+
+        # Additional Listing
+            $filter_data                =   [];
+
+            /*-------------------------------------------------------------------
+            - Teams Member List
+            -------------------------------------------------------------------*/
+            $team_member_where   =   " '1' ";
+
+            $team_member_where  .=  $user_detail->level_user_ids ?
+                " and user.user_id in ($user_detail->level_user_ids) " :
+                " and ( user.user_id = '$user_detail->user_id' or user.parent_id = '$user_detail->user_id') ";
+
+            $this->db->select("user.user_id as id, 
+                                concat(IFNULL(user.user_title, ''),' ', IFNULL(user.first_name, ''), ' ', IFNULL(user.last_name, '')) as full_name, 
+                                role.role_name,
+                                CASE WHEN user.user_id = '$search_member_id' THEN 1 ELSE 0 END AS is_selected,
+                            ");
+            $this->db->from('tbl_users as user');
+            $this->db->join('tbl_roles  as role', 'user.role_id = role.role_id', 'left');
+            $this->db->where($team_member_where);
+            $members                            =   $this->db->get()->result();
+            /*-------------------------------------------------------------------
+            - End Teams Member List
+            -------------------------------------------------------------------*/
+
+            /*-------------------------------------------------------------------
+            - Builder List
+            -------------------------------------------------------------------*/
+            $builders = array();
+                $where = "builder_status='1'";
+                $this->db->select("builder_id as id, firm_name,
+                                    CASE WHEN builder_id = '$search_builder_id' THEN 1 ELSE 0 END AS is_selected,
+                                ");
+                $builder_data = $this->Action_model->detail_result('tbl_builders', $where);
+                if ($builder_data) {
+                    $builders  = $builder_data;
+                }
+             /*-------------------------------------------------------------------
+            * End Builder List
+            -------------------------------------------------------------------*/
+
+             /*-------------------------------------------------------------------
+            - Product List
+            -------------------------------------------------------------------*/
+            $projects = array();
+            $where = "product_status='1'";
+            $this->db->select("product_id as id, project_name,
+                                 CASE WHEN product_id = '$search_project_id' THEN 1 ELSE 0 END AS is_selected,
+                            ");
+            $product_data = $this->Action_model->detail_result('tbl_products', $where);
+            if ($product_data) {
+                $projects  = $product_data;
+            }
+             /*-------------------------------------------------------------------
+            - End Product List
+            -------------------------------------------------------------------*/
+
+             /*-------------------------------------------------------------------
+            - Status
+            -------------------------------------------------------------------*/
+                $status =   [
+                                (object) [
+                                                    'id' => 1,
+                                                    'name' => "Accept",
+                                                    'is_selected'   => ( $search_booking_status == 1 ) ? 1 : 0 
+                                        ],
+                                (object) [
+                                                    'id' => 2,
+                                                    'name' => "Reject",
+                                                    'is_selected'   => ( $search_booking_status == 2 ) ? 1 : 0
+                                        ],
+                                (object) [
+                                                    'id' => 3,
+                                                    'name' => "Cancel",
+                                                    'is_selected'   => ( $search_booking_status == 3 ) ? 1 : 0
+                                        ],
+                            ];
+             /*-------------------------------------------------------------------
+            - End Status
+            -------------------------------------------------------------------*/
+          
+            # Filter Data
+            $filter_data    =   [
+                                    'search_text'       => $search_text,
+                                    'search_from'       => $search_from,
+                                    'search_to'         => $search_to,
+                                    'members'           => $members,
+                                    'builders'          => $builders,
+                                    'projects'          => $projects,
+                                    'status'            => $status,
+                                ];
+            # End Filter Data
+        # End Additional Listing
 
         $where = " 1 = 1 ";
         $select         =   "
@@ -13670,12 +13764,11 @@ class Api extends CI_Controller
                                 booking.payment_terms_details,
                                 booking.booking_date,
                                 project.project_name,
-                                JSON_UNQUOTE(JSON_EXTRACT(inventory.property_details, '$.buyer_name')) as buyer_name,
+                                JSON_UNQUOTE(JSON_EXTRACT(booking.booking_basic_details, '$.buyer_name')) as buyer_name,
                                 JSON_UNQUOTE(JSON_EXTRACT(inventory.property_details, '$.referance_number')) as unit_refernce_number,
                                 CONCAT(IFNULL(seller.lead_title, ''), ' ', IFNULL(seller.lead_first_name, ''), ' ', IFNULL(seller.lead_last_name, '')) as seller_name,
                                 CONCAT(IFNULL(agent.user_title, ''), ' ', IFNULL(agent.first_name, ''), ' ', IFNULL(agent.last_name, '')) as agent_name
                             ";
-
         # Where 
         # Search Text
         if ($where != '') {
@@ -13693,34 +13786,38 @@ class Api extends CI_Controller
         # End Search Text
 
         # Filter
-        if ($search_agent_id != '') {
-            $searchQuery .= " and booking.account_id='" . $search_agent_id . "' ";
+        if ($search_member_id != '') {
+            $where .= " and booking.user_id='" . $search_member_id . "' ";
         }
 
         if ($search_builder_id != '') {
-            $searchQuery .= " and project.builder_id='" . $search_builder_id . "' ";
+            $where .= " and project.builder_id='" . $search_builder_id . "' ";
         }
 
-        if ($search_product_id != '') {
-            $searchQuery .= " and booking.project_id='" . $search_product_id . "' ";
+        if ($search_project_id != '') {
+            $where .= " and booking.project_id='" . $search_project_id . "' ";
         }
 
         if ($search_booking_status != '') {
-            $searchQuery .= " and booking.booking_status='" . $search_booking_status . "' ";
+            $where .= " and booking.booking_status='" . $search_booking_status . "' ";
         }
 
         if ($search_from && $search_to) {
-            $searchQuery .= " and (str_to_date(booking.booking_date,'%d-%m-%Y') BETWEEN str_to_date('" . $search_from . "','%d-%m-%Y') AND str_to_date('" . $search_to . "','%d-%m-%Y'))";
+            $where .= " and (str_to_date(booking.booking_date,'%d-%m-%Y') BETWEEN str_to_date('" . $search_from . "','%d-%m-%Y') AND str_to_date('" . $search_to . "','%d-%m-%Y'))";
         } else if ($search_from && !$search_to) {
-            $searchQuery .= " and (str_to_date(booking.booking_date,'%d-%m-%Y')>=str_to_date('" . $search_from . "','%d-%m-%Y'))";
+            $where .= " and (str_to_date(booking.booking_date,'%d-%m-%Y')>=str_to_date('" . $search_from . "','%d-%m-%Y'))";
         } else if (!$search_from && $search_to) {
-            $searchQuery .= " and (str_to_date(booking.booking_date,'%d-%m-%Y')<=str_to_date('" . $search_to . "','%d-%m-%Y'))";
+            $where .= " and (str_to_date(booking.booking_date,'%d-%m-%Y')<=str_to_date('" . $search_to . "','%d-%m-%Y'))";
         }
         # Filter
 
-        $where  .=  $user_detail->level_user_ids ?
-                " and booking.user_id in ($user_detail->level_user_ids) and ( booking.account_id = '$user_detail->account_id' )" :
-                " and ( booking.user_id = '$user_detail->user_id') and ( booking.account_id = '$user_detail->account_id' )";
+        if($user_detail->level_user_ids && !$search_member_id):
+            $where  .=          " and booking.user_id in ($user_detail->level_user_ids) and ( booking.account_id = '$user_detail->account_id' )" ;
+        elseif($search_member_id):
+            $where  .=          " and ( booking.user_id = '$search_member_id')";
+        endif;
+        
+        $where  .=  " and ( booking.account_id = '$user_detail->account_id' )";
         # End Where 
 
         # Join
@@ -13739,25 +13836,29 @@ class Api extends CI_Controller
                                                             'join'      => $join,
                                                         ];
         $booking_reports    =   booking_reports($booking_report_query_data);
+
+        // echo $this->db->last_query();
+        // die;
         # End Query
         $booking_reports_arr            =   [];
         if(count($booking_reports ?? [])):
 
             foreach($booking_reports as $booking_report):
                 $booking_reports_arr[]      = (object) [
+                                                            'booking_id'    => $booking_report->booking_id,
                                                             'booking_date'  => $booking_report->booking_date,
                                                             'buyer_name'    => $booking_report->buyer_name,
                                                             'seller_name'   => $booking_report->seller_name,
                                                             'agent_name'    => $booking_report->agent_name,
                                                             'unit_ref_no'   => $booking_report->unit_refernce_number,
                                                             'project_name'  => $booking_report->project_name,
-                                                            'status'        =>  $booking_report->booking_status,
+                                                            'status'        =>  $booking_report->booking_status
                                                         ];
             endforeach;
 
-            $arr        =   ['status' => true, 'message' => 'Successfully data fetched', 'data' => $booking_reports_arr];
+            $arr        =   ['status' => true, 'message' => 'Successfully data fetched', 'filter_data' => $filter_data,'data' => $booking_reports_arr];
         else:
-            $arr        =   ['status' => true, 'message' => 'No data found'];
+            $arr        =   ['status' => false, 'message' => 'No data found', 'filter_data' => $filter_data];
         endif;
 
         echo json_encode($arr);
