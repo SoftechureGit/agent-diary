@@ -13261,15 +13261,15 @@ class Api extends CI_Controller
             exit;
         endif;
 
-        if (!$buyer->added_to_followup):
-            echo json_encode(['status' => false, 'message' => 'Buyer not in followup']);
-            exit;
-        endif;
+        // if (!$buyer->added_to_followup):
+        //     echo json_encode(['status' => false, 'message' => 'Buyer not in followup']);
+        //     exit;
+        // endif;
 
-        if ($buyer->lead_status != 1 && ($buyer->lead_stage_id == 6 || $buyer->lead_stage_id == 7)):
-            echo json_encode(['status' => false, 'message' => 'Buyer not able to perfom booking process']);
-            exit;
-        endif;
+        // if ($buyer->lead_status != 1 && ($buyer->lead_stage_id == 6 || $buyer->lead_stage_id == 7)):
+        //     echo json_encode(['status' => false, 'message' => 'Buyer not able to perfom booking process']);
+        //     exit;
+        // endif;
 
         # End Validation
 
