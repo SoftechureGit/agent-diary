@@ -132,6 +132,9 @@
                         <option value="Mrs." <?php if ($id && $lead_detail->lead_title == 'Mrs.') {
                                                 echo 'selected';
                                               } ?>>Mrs.</option>
+                        <option value="M/s." <?php if ($id && $lead_detail->lead_title == 'M/s.') {
+                                                echo 'selected';
+                                              } ?>>M/s.</option>
                         <option value="Dr." <?php if ($id && $lead_detail->lead_title == 'Dr.') {
                                               echo 'selected';
                                             } ?>>Dr.</option>

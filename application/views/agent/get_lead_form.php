@@ -67,6 +67,7 @@
                     <option value="Mr." <?php if($id && $lead_detail->lead_title=='Mr.') { echo 'selected'; } ?>>Mr.</option>
                     <option value="Ms." <?php if($id && $lead_detail->lead_title=='Ms.') { echo 'selected'; } ?>>Ms.</option>
                     <option value="Mrs." <?php if($id && $lead_detail->lead_title=='Mrs.') { echo 'selected'; } ?>>Mrs.</option>
+                    <option value="M/s." <?php if($id && $lead_detail->lead_title=='M/s.') { echo 'selected'; } ?>>M/s.</option>
                     <option value="Dr." <?php if($id && $lead_detail->lead_title=='Dr.') { echo 'selected'; } ?>>Dr.</option>
                     <option value="Prof." <?php if($id && $lead_detail->lead_title=='Prof.') { echo 'selected'; } ?>>Prof.</option>
                    

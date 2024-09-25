@@ -1388,6 +1388,7 @@
                           <option value="Mr." <?php if($lead_detail && $lead_detail->lead_title=='Mr.') { echo 'selected'; } ?>>Mr.</option>
                           <option value="Ms." <?php if($lead_detail && $lead_detail->lead_title=='Ms.') { echo 'selected'; } ?>>Ms.</option>
                           <option value="Mrs." <?php if($lead_detail && $lead_detail->lead_title=='Mrs.') { echo 'selected'; } ?>>Mrs.</option>
+                          <option value="M/s." <?php if($lead_detail && $lead_detail->lead_title=='M/s.') { echo 'selected'; } ?>>M/s.</option>
                           <option value="Dr." <?php if($lead_detail && $lead_detail->lead_title=='Dr.') { echo 'selected'; } ?>>Dr.</option>
                           <option value="Prof." <?php if($lead_detail && $lead_detail->lead_title=='Prof.') { echo 'selected'; } ?>>Prof.</option>
                          
@@ -1409,6 +1410,7 @@
                           <option value="Mr." <?php if($booking_detail && $booking_detail->sdw_title=='Mr.') { echo 'selected'; } ?>>Mr.</option>
                           <option value="Ms." <?php if($booking_detail && $booking_detail->sdw_title=='Ms.') { echo 'selected'; } ?>>Ms.</option>
                           <option value="Mrs." <?php if($booking_detail && $booking_detail->sdw_title=='Mrs.') { echo 'selected'; } ?>>Mrs.</option>
+                          <option value="M/s." <?php if($lead_detail && $lead_detail->lead_title=='M/s.') { echo 'selected'; } ?>>M/s.</option>
                           <option value="Dr." <?php if($booking_detail && $booking_detail->sdw_title=='Dr.') { echo 'selected'; } ?>>Dr.</option>
                           <option value="Prof." <?php if($booking_detail && $booking_detail->sdw_title=='Prof.') { echo 'selected'; } ?>>Prof.</option>
                          

@@ -762,6 +762,8 @@
 			                                                    <option value="Mr." <?php if($id && $property_detail->owner_title=='Mr.') { echo 'selected'; } ?>>Mr.</option>
 			                                                    <option value="Ms." <?php if($id && $property_detail->owner_title=='Ms.') { echo 'selected'; } ?>>Ms.</option>
 			                                                    <option value="Mrs." <?php if($id && $property_detail->owner_title=='Mrs.') { echo 'selected'; } ?>>Mrs.</option>
+			                                                    <option value="M/s." <?php if($id && $property_detail->owner_title=='M/s.') { echo 'selected'; } ?>>M/s.</option>
+                                                          
 			                                                    <option value="Dr." <?php if($id && $property_detail->owner_title=='Dr.') { echo 'selected'; } ?>>Dr.</option>
 			                                                    <option value="Prof." <?php if($id && $property_detail->owner_title=='Prof.') { echo 'selected'; } ?>>Prof.</option>
 			                                                   
