@@ -13603,10 +13603,28 @@ class Api extends CI_Controller
         // echo $this->db->last_query();
         // die;
         # End Query
+
         $booking_reports_arr            =   [];
         if(count($booking_reports ?? [])):
 
             foreach($booking_reports as $booking_report):
+
+
+                # Status
+                    $status             =   $booking_report->booking_status;
+                    $status_label       =   $booking_report->booking_status;
+
+                    if($status == 1):
+                        $status_label = "Accept";
+                    endif;
+                    if($status == 2):
+                        $status_label = "Reject";
+                    endif;
+                    if($status == 3):
+                        $status_label = "Cancel";
+                    endif;
+                # End Status
+
                 $booking_reports_arr[]      = (object) [
                                                             'booking_id'    => $booking_report->booking_id,
                                                             'booking_date'  => $booking_report->booking_date,
@@ -13615,7 +13633,7 @@ class Api extends CI_Controller
                                                             'agent_name'    => $booking_report->agent_name,
                                                             'unit_ref_no'   => $booking_report->unit_refernce_number,
                                                             'project_name'  => $booking_report->project_name,
-                                                            'status'        =>  $booking_report->booking_status
+                                                            'status'        =>  $status_label
                                                         ];
             endforeach;
 

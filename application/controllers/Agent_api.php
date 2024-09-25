@@ -5040,7 +5040,7 @@ WHERE lead_id='" . $lead_id . "'
         
         $table_headings             =   $this->inventory_table_headings($property->property_type_id);
       
-        $table_view                 =   "<div class='table-responsive inventory-table'>
+        $table_view                 =   "<div class='table-responsivee inventory-table'>
                                         <table class='table table-bordered'>
                                         <caption>* $property_type_name *</caption>
                                         <thead>
@@ -11831,7 +11831,7 @@ WHERE lead_id='" . $lead_id . "'
 
                                         $total_data_count++;
 
-                                        switch($property_details->property_type_id):
+                                        switch($property_details->property_type_id ?? 0):
                                             case '2': #Villa
                                                     $property_details = array(
                                                         'id' => '',

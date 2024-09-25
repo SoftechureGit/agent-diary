@@ -1100,12 +1100,12 @@
                  // $(".project_inventory").html(response.data_view);
                  $(".inventory-list-container").html(response.table_view);
                  if (response.status) {
-                   $(".inventory-list-container table").dataTable({
-                     columnDefs: [{
-                       "defaultContent": "-",
-                       "targets": "_all"
-                     }]
-                   })
+                  //  $(".inventory-list-container table").dataTable({
+                  //    columnDefs: [{
+                  //      "defaultContent": "-",
+                  //      "targets": "_all"
+                  //    }]
+                  //  })
                  }
                }, 100);
              },
