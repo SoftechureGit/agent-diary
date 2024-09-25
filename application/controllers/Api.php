@@ -1641,102 +1641,7 @@ class Api extends CI_Controller
         echo json_encode($data);
     }
 
-    public function get_leadddd()
-    {
-
-        if ($this->input->post()) {
-            $account_id = getAccountIdHash($this->input->post('user_hash'));
-            if (!$account_id) {
-                $array['data'] = array('status' => 'false', 'msg' => 'Some Error Occured.');
-                echo json_encode($array);
-                exit;
-            }
-            $id = $this->input->post('lead_id');
-
-            $where = "lead_id='" . $id . "' AND account_id='" . $account_id . "'";
-
-            $this->db->select("tbl_users.username as added_by_name,tbl_leads.*,tbl_states.*,tbl_states.*,tbl_city.*,tbl_occupations.*,tbl_lead_types.*,tbl_lead_stages.*,tbl_lead_sources.*,tbl_designations.*");
-            $this->db->from('tbl_leads');
-            $this->db->join('tbl_states', 'tbl_states.state_id = tbl_leads.lead_state_id', 'left');
-            $this->db->join('tbl_city', 'tbl_city.city_id = tbl_leads.lead_city_id', 'left');
-            $this->db->join('tbl_occupations', 'tbl_occupations.occupation_id = tbl_leads.lead_occupation_id', 'left');
-            $this->db->join('tbl_lead_types', 'tbl_lead_types.lead_type_id = tbl_leads.lead_status', 'left');
-            $this->db->join('tbl_lead_stages', 'tbl_lead_stages.lead_stage_id = tbl_leads.lead_stage_id', 'left');
-            $this->db->join('tbl_lead_sources', 'tbl_lead_sources.lead_source_id = tbl_leads.lead_source_id', 'left');
-            $this->db->join('tbl_designations', 'tbl_designations.designation_id = tbl_leads.lead_designation', 'left');
-            $this->db->join('tbl_users', 'tbl_leads.added_by = tbl_users.user_id', 'left');
-            $this->db->where($where);
-            $query = $this->db->get();
-            $record = $query->row();
-
-            if ($record) {
-
-
-                $account_id = getAccountIdHash($this->input->post('user_hash'));
-
-                $where = "user_status='1' AND ((parent_id='" . $account_id . "') OR (user_id='" . $account_id . "' AND role_id='2'))";
-                $where_ids = "";
-                $user_ids = $this->get_level_user_ids($this->input->post('user_hash'));
-
-                if (count($user_ids)) {
-
-                    $where_ids .= " AND (tbl_users.user_id='" . implode("' OR tbl_users.user_id='", $user_ids) . "')";
-                }
-                $where .= $where_ids;
-
-                $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,user_title,first_name,last_name,parent_id,is_individual,firm_name');
-
-                $lead_data = array();
-                foreach ($user_list as $row) {
-                    $row->is_individual = (($row->is_individual != '') ? $row->is_individual : "");
-                    $row->firm_name = (($row->firm_name != '') ? $row->firm_name : "");
-                    $row->parent_id = (($row->parent_id != '') ? $row->parent_id : "");
-                    $lead_data[] = $row;
-                }
-
-                $where = "country_id='1' AND state_status=1";
-                $state_list = $this->Action_model->detail_result('tbl_states', $where);
-                $where = "state_id='" . $record->lead_state_id . "'";
-                $city_list = $this->Action_model->detail_result('tbl_city', $where);
-
-                $where = "occupation_status='1'";
-                $occupation_list = $this->Action_model->detail_result('tbl_occupations', $where);
-
-                $where = "department_status='1'";
-                $department_list = $this->Action_model->detail_result('tbl_departments', $where);
-
-                $where = "lead_source_status='1'";
-                $lead_source_list = $this->Action_model->detail_result('tbl_lead_sources', $where);
-
-                $where = "lead_stage_status='1'";
-                $lead_stage_list = $this->Action_model->detail_result('tbl_lead_stages', $where);
-
-                $where = "lead_type_status='1'";
-                $lead_type_list = $this->Action_model->detail_result('tbl_lead_types', $where, 'lead_type_id,lead_type_name');
-                $data['lead_type_list'] = (($lead_type_list) ? $lead_type_list : array());
-
-
-                $state_list = (($state_list) ? $state_list : array());
-                $city_list = (($city_list) ? $city_list : array());
-                $occupation_list = (($occupation_list) ? $occupation_list : array());
-                $department_list = (($department_list) ? $department_list : array());
-                $lead_source_list = (($lead_source_list) ? $lead_source_list : array());
-                $lead_stage_list = (($lead_stage_list) ? $lead_stage_list : array());
-
-                foreach ($record as $k => $v) {
-                    $record->$k =  ($v || $v == 0) ? $v : '';
-                }
-
-                $array['data'] = array('status' => 'true', 'msg' => 'Lead Found', 'lead_data' => $record, 'records' => $lead_data, 'state_list' => $state_list, 'occupation_list' => $occupation_list, 'department_list' => $department_list, 'lead_source_list' => $lead_source_list, 'lead_stage_list' => $lead_stage_list, 'city_list' => $city_list);
-            } else {
-                $array['data'] = array('status' => 'false', 'msg' => 'Record Not Found.');
-            }
-        } else {
-            $array['data'] = array('status' => 'false', 'msg' => 'Some error occurred, please try again.');
-        }
-
-        echo json_encode($array);
-    }
+   
 
     public function get_lead()
     {
@@ -3154,9 +3059,9 @@ class Api extends CI_Controller
         $account_id = 0;
         $user_id = 0;
 
-        $data['json_data']  = json_encode($this->input->post());
+        // $data['json_data']  = json_encode($this->input->post());
 
-        $this->db->insert('tbl_get_all_data_json', $data);
+        // $this->db->insert('tbl_get_all_data_json', $data);
 
         if (isset($_POST['user_hash'])):
 
@@ -11564,155 +11469,6 @@ class Api extends CI_Controller
     }
 
 
-    # start lead details
-
-    public function get_lead_details_with_p_c_n()
-    {
-
-        $previous_lead_id         = $this->input->post('previous_id');
-        $current_lead_id          = $this->input->post('current_id');
-        $next_lead_id             = $this->input->post('next_id');
-
-
-        if ($this->input->post()) {
-            $account_id = getAccountIdHash($this->input->post('user_hash'));
-
-            if (!$account_id) {
-                $array['data'] = array('status' => 'false', 'msg' => 'Some Error Occurred.');
-                echo json_encode($array);
-                exit;
-            }
-
-            // $id = $this->input->post('lead_id');
-
-            $where = "lead_id='" . $current_lead_id . "' AND account_id='" . $account_id . "'";
-
-            $profile_base_url     =   base_url('public/other/profile/');
-
-            $this->db->select("tbl_users.username as added_by_name, tbl_leads.* ,tbl_states.*, tbl_city.*, tbl_occupations.*, tbl_lead_types.*, tbl_lead_stages.*, tbl_lead_sources.*, tbl_designations.*");
-            $this->db->from('tbl_leads');
-            $this->db->join('tbl_states', 'tbl_states.state_id = tbl_leads.lead_state_id', 'left');
-            $this->db->join('tbl_city', 'tbl_city.city_id = tbl_leads.lead_city_id', 'left');
-            $this->db->join('tbl_occupations', 'tbl_occupations.occupation_id = tbl_leads.lead_occupation_id', 'left');
-            $this->db->join('tbl_lead_types', 'tbl_lead_types.lead_type_id = tbl_leads.lead_status', 'left');
-            $this->db->join('tbl_lead_stages', 'tbl_lead_stages.lead_stage_id = tbl_leads.lead_stage_id', 'left');
-            $this->db->join('tbl_lead_sources', 'tbl_lead_sources.lead_source_id = tbl_leads.lead_source_id', 'left');
-            $this->db->join('tbl_designations', 'tbl_designations.designation_id = tbl_leads.lead_designation', 'left');
-            $this->db->join('tbl_users', 'tbl_leads.added_by = tbl_users.user_id', 'left');
-            $this->db->where($where);
-            $query = $this->db->get();
-            $record = $query->row();
-
-            if ($record) {
-                # start   
-                $record->full_profile_url = $record->profile ? $profile_base_url . $record->profile : base_url('public/front/user.png');
-
-                # Primary Mobile Number Country Code
-                $primary_country_code                          =   ($record->primary_mobile_number_country_data ?? null) ? json_decode($record->primary_mobile_number_country_data) : '';
-                $record->primary_mobile_number_country_data    =   $primary_country_code->dialCode ?? 0;
-                # End Primary Mobile Number Country Code
-
-                # Secondary Mobile Number Country Code
-                $primary_country_code                          =   ($record->secondary_mobile_number_country_data ?? null) ? json_decode($record->secondary_mobile_number_country_data) : '';
-                $record->secondary_mobile_number_country_data    =   $primary_country_code->dialCode ?? 0;
-                # End Secondary Mobile Number Country Code
-
-                $record_p = '';
-
-                if ($previous_lead_id) {
-
-                    $where = "lead_id='" . $previous_lead_id . "' AND account_id='" . $account_id . "'";
-
-                    $this->db->select("tbl_users.username as added_by_name, tbl_leads.*, tbl_states.*, tbl_city.*, tbl_occupations.*, tbl_lead_types.*, tbl_lead_stages.*, tbl_lead_sources.*, tbl_designations.*");
-                    $this->db->from('tbl_leads');
-                    $this->db->join('tbl_states', 'tbl_states.state_id = tbl_leads.lead_state_id', 'left');
-                    $this->db->join('tbl_city', 'tbl_city.city_id = tbl_leads.lead_city_id', 'left');
-                    $this->db->join('tbl_occupations', 'tbl_occupations.occupation_id = tbl_leads.lead_occupation_id', 'left');
-                    $this->db->join('tbl_lead_types', 'tbl_lead_types.lead_type_id = tbl_leads.lead_status', 'left');
-                    $this->db->join('tbl_lead_stages', 'tbl_lead_stages.lead_stage_id = tbl_leads.lead_stage_id', 'left');
-                    $this->db->join('tbl_lead_sources', 'tbl_lead_sources.lead_source_id = tbl_leads.lead_source_id', 'left');
-                    $this->db->join('tbl_designations', 'tbl_designations.designation_id = tbl_leads.lead_designation', 'left');
-                    $this->db->join('tbl_users', 'tbl_leads.added_by = tbl_users.user_id', 'left');
-                    $this->db->where($where);
-                    $query = $this->db->get();
-                    $record_p = $query->row();
-
-                    if ($record_p) {
-                        # start   
-                        $record_p->full_profile_url = $record_p->profile ? $profile_base_url . $record_p->profile : base_url('public/front/user.png');
-
-                        # Primary Mobile Number Country Code
-                        $primary_country_code                          =   ($record_p->primary_mobile_number_country_data ?? null) ? json_decode($record_p->primary_mobile_number_country_data) : '';
-                        $record_p->primary_mobile_number_country_data    =   $primary_country_code->dialCode ?? 0;
-                        # End Primary Mobile Number Country Code
-
-                        # Secondary Mobile Number Country Code
-                        $primary_country_code                          =   ($record_p->secondary_mobile_number_country_data ?? null) ? json_decode($record_p->secondary_mobile_number_country_data) : '';
-                        $record_p->secondary_mobile_number_country_data    =   $primary_country_code->dialCode ?? 0;
-                        # End Secondary Mobile Number Country Code
-                    }
-                }
-
-
-                $record_n = '';
-
-                if ($next_lead_id) {
-
-                    $where = "lead_id='" . $next_lead_id . "' AND account_id='" . $account_id . "'";
-
-                    $this->db->select("tbl_users.username as added_by_name, tbl_leads.*, tbl_states.*, tbl_city.*, tbl_occupations.*, tbl_lead_types.*, tbl_lead_stages.*, tbl_lead_sources.*, tbl_designations.*");
-                    $this->db->from('tbl_leads');
-                    $this->db->join('tbl_states', 'tbl_states.state_id = tbl_leads.lead_state_id', 'left');
-                    $this->db->join('tbl_city', 'tbl_city.city_id = tbl_leads.lead_city_id', 'left');
-                    $this->db->join('tbl_occupations', 'tbl_occupations.occupation_id = tbl_leads.lead_occupation_id', 'left');
-                    $this->db->join('tbl_lead_types', 'tbl_lead_types.lead_type_id = tbl_leads.lead_status', 'left');
-                    $this->db->join('tbl_lead_stages', 'tbl_lead_stages.lead_stage_id = tbl_leads.lead_stage_id', 'left');
-                    $this->db->join('tbl_lead_sources', 'tbl_lead_sources.lead_source_id = tbl_leads.lead_source_id', 'left');
-                    $this->db->join('tbl_designations', 'tbl_designations.designation_id = tbl_leads.lead_designation', 'left');
-                    $this->db->join('tbl_users', 'tbl_leads.added_by = tbl_users.user_id', 'left');
-                    $this->db->where($where);
-                    $query = $this->db->get();
-                    $record_n = $query->row();
-
-                    if ($record_n) {
-                        # start   
-                        $record_n->full_profile_url = $record_n->profile ? $profile_base_url . $record_n->profile : base_url('public/front/user.png');
-
-                        # Primary Mobile Number Country Code
-                        $primary_country_code                          =   ($record_n->primary_mobile_number_country_data ?? null) ? json_decode($record_n->primary_mobile_number_country_data) : '';
-                        $record_n->primary_mobile_number_country_data    =   $primary_country_code->dialCode ?? 0;
-                        # End Primary Mobile Number Country Code
-
-                        # Secondary Mobile Number Country Code
-                        $primary_country_code                          =   ($record_n->secondary_mobile_number_country_data ?? null) ? json_decode($record_n->secondary_mobile_number_country_data) : '';
-                        $record_n->secondary_mobile_number_country_data    =   $primary_country_code->dialCode ?? 0;
-                        # End Secondary Mobile Number Country Code
-                    }
-                }
-
-                $array['data'] = array(
-                    'status'                    =>  true,
-                    'msg'                       =>  'Lead Found',
-                    'current_lead_data'         =>  $record,
-                    'next_lead_data'            =>  $record_n ?? null,
-                    'previous_lead_data'        =>  $record_p ?? null,
-                    'next_lead_id'              =>  $previous_lead_id ?? 0,
-                    'previous_lead_id'          =>  $next_lead_id  ?? 0
-                );
-            } else {
-                $array['data'] = array('status' => 'false', 'msg' => 'Record Not Found.');
-            }
-        } else {
-
-            $array['data'] = array('status' => 'false', 'msg' => 'Some error occurred, please try again.');
-        }
-
-        echo json_encode($array);
-    }
-
-
-    # end lead details
-
     # download sample excel file 
 
     public function data_excel_sample()
@@ -12136,8 +11892,6 @@ class Api extends CI_Controller
 
         $data['followup_data'] = $followup_data;
 
-
-
         $where          = "user_hash='" .  $this->input->post('user_hash') . "'";
         $user_detail    = $this->Action_model->select_single('tbl_users', $where);
 
@@ -12167,8 +11921,6 @@ class Api extends CI_Controller
         }
 
         # End get agent account id 
-
-
 
         $where                  = "agent_id='" . $aget_account_id  . "' OR share_account_id='" . $aget_account_id . "'";
 
@@ -13665,8 +13417,8 @@ class Api extends CI_Controller
             $search_builder_id          =   request()->builder_id ?? 0;
             $search_project_id          =   request()->project_id ?? 0;
             $search_booking_status      =   request()->status ?? 0;
-            $search_from                =   request()->search_from ?? 0;
-            $search_to                  =   request()->search_to ?? 0;
+            $search_from                =   request()->search_from ?? "";
+            $search_to                  =   request()->search_to ?? "";
         # End Filter Data
 
         # Additional Listing
