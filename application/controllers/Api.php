@@ -13612,7 +13612,7 @@ class Api extends CI_Controller
 
                 # Status
                     $status             =   $booking_report->booking_status;
-                    $status_label       =   $booking_report->booking_status;
+                    $status_label       =   "Pending";
 
                     if($status == 1):
                         $status_label = "Accept";
