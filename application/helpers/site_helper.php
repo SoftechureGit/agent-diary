@@ -23,6 +23,15 @@ if (!function_exists('db_instance')) {
 }
 # End Get DB Instance
 
+# SMS
+if (!function_exists('sms')) {
+    function sms()
+    {
+       return false;
+    }
+}
+# End SMS
+
 
 if (!function_exists('user')) {
     function user($user_id = 0)

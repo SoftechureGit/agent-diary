@@ -91,7 +91,7 @@
                     <!-- Block Or Floor -->
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="">Tower</label>
+                            <label for="">Block</label>
                             <select name="property_details[block_or_tower_id]" id="" class="form-control" data-saved-value="<?= $block_or_tower_id ?? '' ?>">
                                 <option value="" disabled selected>Choose...</option>
                                 <?php
