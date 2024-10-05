@@ -199,67 +199,124 @@ class Agent extends CI_Controller
         -------------------------------------------------------------------*/
 
         $lead_counting_where                          =   " 1 = 1 ";
+    
         if ($selected_member_ids):
-            $lead_counting_where                      .=   " and lead.user_id in ($selected_member_ids) ";
+            $lead_counting_where                      .=   " and user_id in ($selected_member_ids) ";
         else:
             $lead_counting_where  .=  $user_detail->level_user_ids ? 
-                    " and user.user_id in ($user_detail->level_user_ids) " : 
-                    " and ( user.user_id = '$user_detail->user_id' or user.parent_id = '$user_detail->user_id') " ;
+                    " and user_id in ($user_detail->level_user_ids) " : 
+                    " and ( user_id = '$user_detail->user_id' or account_id = '$user_detail->user_id') " ;
         endif;
+
+        // $lead_select_query                  =   "
+        //                                             COUNT(DISTINCT lead.lead_id) as all_leads_count,
+        //                                             SUM(CASE WHEN ( $total_active_leads_count_query) THEN 1 ELSE 0 END) as total_active_leads_count,
+
+        //                                             SUM(CASE WHEN ( (lead.lead_status = '1' AND lead.lead_stage_id = '1' AND added_to_followup = '0' AND STR_TO_DATE(lead_date, '%d-%m-%Y')  = CURDATE() )
+        //                                                 OR (lead.lead_status = '1' AND lead.lead_stage_id = '1'  AND followup.followup_status = '1' AND STR_TO_DATE(lead_date, '%d-%m-%Y')  = CURDATE() )
+        //                                             ) THEN 1 ELSE 0 END) as today_lead_count,
+
+        //                                             SUM(CASE WHEN ( (lead.lead_status = '1' AND lead.lead_stage_id = '1' AND added_to_followup = '0' )
+        //                                                             OR (lead.lead_status = '1' AND lead.lead_stage_id = '1'  AND followup.followup_status = '1' )
+        //                                                         ) THEN 1 ELSE 0 END) as total_lead_count,
+
+        //                                             SUM(CASE WHEN ( lead.lead_status = '1' AND lead.lead_stage_id = '1' AND added_to_followup = '0') 
+        //                                                             OR ( followup.lead_stage_id = '1' AND  followup.lead_status_id = '1' AND followup.followup_status = '1') 
+        //                                                             THEN 1 ELSE 0 END) as total_initial_count,
+
+        //                                             SUM(CASE WHEN ( lead.lead_status = '1' AND lead.lead_stage_id = '2' AND followup.followup_status = '1') THEN 1 ELSE 0 END) as total_followup_count,
+
+        //                                             SUM(CASE WHEN ( ( lead.lead_status = '1' AND lead.lead_stage_id = '3' AND added_to_followup = '0') 
+        //                                                             OR ( followup.lead_stage_id = '3' AND  followup.lead_status_id = '1' AND followup.followup_status = '1') 
+        //                                                             ) THEN 1 ELSE 0 END) as total_enquiry_count,
+
+        //                                             SUM(CASE WHEN ( ( lead.lead_status = '1' AND lead.lead_stage_id = '4'  AND added_to_followup = '0') )
+        //                                                             OR ( followup.lead_stage_id = '4' AND  followup.lead_status_id = '1' AND followup.followup_status = '1') 
+        //                                                             THEN 1 ELSE 0 END) as total_site_visit_count,
+
+        //                                             SUM(CASE WHEN ( ( lead.lead_status = '1' AND lead.lead_stage_id = '5' AND added_to_followup = '0') )
+        //                                                         OR ( followup.lead_stage_id = '5' AND  followup.lead_status_id = '1' AND followup.followup_status = '1') 
+        //                                                         THEN 1 ELSE 0 END) as total_metting_count,
+
+        //                                             SUM(CASE WHEN (  ( lead.lead_stage_id = '7' AND added_to_followup = '0') 
+        //                                                             OR ( followup.lead_stage_id = '7' AND  followup.followup_status = '1') 
+        //                                                         ) THEN 1 ELSE 0 END) as total_dump_count,
+
+        //                                             COUNT(DISTINCT CASE WHEN lead.lead_stage_id = '6' THEN lead.lead_id ELSE NULL END) AS total_success_count,
+                                                    
+        //                                             SUM(CASE WHEN ( followup.lead_stage_id = '2' AND  followup.lead_status_id = '1' AND followup.followup_status = '1' AND STR_TO_DATE(followup.next_followup_date, '%d-%m-%Y') = CURDATE() ) THEN 1 ELSE 0 END) as today_followup_count,
+        //                                             SUM(CASE WHEN ( followup.lead_stage_id = '2' AND  followup.lead_status_id = '1' AND followup.followup_status = '1' AND STR_TO_DATE(followup.next_followup_date, '%d-%m-%Y') < CURDATE() ) THEN 1 ELSE 0 END) as missed_followup_count,
+                                                    
+        //                                         ";
+        
+        /****************************************************
+        *   Leads Counting 
+        ****************************************************/
+        # Counting Query
+        $total_active_leads_count_query             =   "lead.lead_stage_id != '6' AND lead.lead_stage_id != '7'";
+        $today_lead_count_query                     =   "(( lead.lead_status = '1' ) AND ( lead.lead_stage_id = '1' ) AND ( lead.added_to_followup = 0 ) AND ( DATE(FROM_UNIXTIME(created_at))  = CURDATE()) ) ";
+        $initial_leads_count_query                  =   "lead.lead_stage_id = '1'";
+        $followup_leads_count_query                 =   "lead.lead_stage_id = '2'";
+        $enquiry_leads_count_query                  =   "lead.lead_stage_id = '3'";
+        $site_visit_leads_count_query               =   "lead.lead_stage_id = '4'";
+        $metting_leads_count_query                  =   "lead.lead_stage_id = '5'";
+        $success_leads_count_query                  =   "lead.lead_stage_id = '6'";
+        $dump_leads_count_query                     =   "lead.lead_stage_id = '7'";
+        # End Counting Query
 
         $lead_select_query                  =   "
                                                     COUNT(DISTINCT lead.lead_id) as all_leads_count,
-                                                    SUM(CASE WHEN ( lead.lead_stage_id != '6' AND lead.lead_stage_id != '7' ) THEN 1 ELSE 0 END) as total_active_leads_count,
+                                                    SUM(CASE WHEN ( $total_active_leads_count_query) THEN 1 ELSE 0 END) as total_active_leads_count,
+                                                    SUM(CASE WHEN ( $today_lead_count_query) THEN 1 ELSE 0 END) as today_initial_lead_count,
+                                                    SUM(CASE WHEN ( $initial_leads_count_query) THEN 1 ELSE 0 END) as total_initial_count,
+                                                    SUM(CASE WHEN ( $followup_leads_count_query) THEN 1 ELSE 0 END) as total_followup_count,
+                                                    SUM(CASE WHEN ( $enquiry_leads_count_query) THEN 1 ELSE 0 END) as total_enquiry_count,
+                                                    SUM(CASE WHEN ( $site_visit_leads_count_query) THEN 1 ELSE 0 END) as total_site_visit_count,
+                                                    SUM(CASE WHEN ( $metting_leads_count_query) THEN 1 ELSE 0 END) as total_metting_count,
+                                                    SUM(CASE WHEN ( $success_leads_count_query) THEN 1 ELSE 0 END) as total_success_count,
+                                                    SUM(CASE WHEN ( $dump_leads_count_query) THEN 1 ELSE 0 END) as total_dump_count
+                                                    ";
 
-                                                    SUM(CASE WHEN ( (lead.lead_status = '1' AND lead.lead_stage_id = '1' AND added_to_followup = '0' AND STR_TO_DATE(lead_date, '%d-%m-%Y')  = CURDATE() )
-                                                        OR (lead.lead_status = '1' AND lead.lead_stage_id = '1'  AND followup.followup_status = '1' AND STR_TO_DATE(lead_date, '%d-%m-%Y')  = CURDATE() )
-                                                    ) THEN 1 ELSE 0 END) as today_lead_count,
-
-                                                    SUM(CASE WHEN ( (lead.lead_status = '1' AND lead.lead_stage_id = '1' AND added_to_followup = '0' )
-                                                                    OR (lead.lead_status = '1' AND lead.lead_stage_id = '1'  AND followup.followup_status = '1' )
-                                                                ) THEN 1 ELSE 0 END) as total_lead_count,
-
-                                                    SUM(CASE WHEN ( lead.lead_status = '1' AND lead.lead_stage_id = '1' AND added_to_followup = '0') 
-                                                                    OR ( followup.lead_stage_id = '1' AND  followup.lead_status_id = '1' AND followup.followup_status = '1') 
-                                                                    THEN 1 ELSE 0 END) as total_initial_count,
-
-                                                    SUM(CASE WHEN ( lead.lead_status = '1' AND lead.lead_stage_id = '2' AND followup.followup_status = '1') THEN 1 ELSE 0 END) as total_followup_count,
-
-                                                    SUM(CASE WHEN ( ( lead.lead_status = '1' AND lead.lead_stage_id = '3' AND added_to_followup = '0') 
-                                                                    OR ( followup.lead_stage_id = '3' AND  followup.lead_status_id = '1' AND followup.followup_status = '1') 
-                                                                    ) THEN 1 ELSE 0 END) as total_enquiry_count,
-
-                                                    SUM(CASE WHEN ( ( lead.lead_status = '1' AND lead.lead_stage_id = '4'  AND added_to_followup = '0') )
-                                                                    OR ( followup.lead_stage_id = '4' AND  followup.lead_status_id = '1' AND followup.followup_status = '1') 
-                                                                    THEN 1 ELSE 0 END) as total_site_visit_count,
-
-                                                    SUM(CASE WHEN ( ( lead.lead_status = '1' AND lead.lead_stage_id = '5' AND added_to_followup = '0') )
-                                                                OR ( followup.lead_stage_id = '5' AND  followup.lead_status_id = '1' AND followup.followup_status = '1') 
-                                                                THEN 1 ELSE 0 END) as total_metting_count,
-
-                                                    SUM(CASE WHEN (  ( lead.lead_stage_id = '7' AND added_to_followup = '0') 
-                                                                    OR ( followup.lead_stage_id = '7' AND  followup.followup_status = '1') 
-                                                                ) THEN 1 ELSE 0 END) as total_dump_count,
-
-                                                    COUNT(DISTINCT CASE WHEN lead.lead_stage_id = '6' THEN lead.lead_id ELSE NULL END) AS total_success_count,
-                                                    
-                                                    SUM(CASE WHEN ( followup.lead_stage_id = '2' AND  followup.lead_status_id = '1' AND followup.followup_status = '1' AND STR_TO_DATE(followup.next_followup_date, '%d-%m-%Y') = CURDATE() ) THEN 1 ELSE 0 END) as today_followup_count,
-                                                    SUM(CASE WHEN ( followup.lead_stage_id = '2' AND  followup.lead_status_id = '1' AND followup.followup_status = '1' AND STR_TO_DATE(followup.next_followup_date, '%d-%m-%Y') < CURDATE() ) THEN 1 ELSE 0 END) as missed_followup_count,
-                                                    
-                                                ";
-
+        
         $this->db->select($lead_select_query);
         $this->db->where($lead_counting_where);
         $this->db->from('tbl_leads as lead');
-        $this->db->join('tbl_users  as user', 'user.user_id = lead.user_id', 'left');
-        $this->db->join('tbl_followup  as followup', 'followup.lead_id = lead.lead_id', 'left');
         $leads                          =   $this->db->get()->row();
 
-        // echo "<pre>";
-        // print_r($leads);
+        /****************************************************
+        *   End Leads Counting 
+        ****************************************************/
 
-        echo $this->db->last_query();
-        die;
+        $today_followup_lead_count_query        =   "( followup_status = '1' ) AND ( lead_stage_id = '1' ) AND ( STR_TO_DATE(next_followup_date, '%d-%m-%Y') = CURDATE() ) ";
+
+        $followup_select_query                  =   "
+                                                    SUM(CASE WHEN ( $today_followup_lead_count_query ) THEN 1 ELSE 0 END) as today_initial_followup_lead_count
+                                                    ";
+
+        
+        $this->db->select($followup_select_query);
+        $this->db->where($lead_counting_where);
+        $this->db->from('tbl_followup as followup');
+        $followup_count_summary                          =   $this->db->get()->row();
+
+        // echo "<pre>";
+        // print_r($followup_count_summary);
+        // echo $this->db->last_query();
+
+        // die;
+     
+        /****************************************************
+        *   Followup Counting 
+        ****************************************************/
+
+        /****************************************************
+        *   End Followup Counting 
+        ****************************************************/
+
+        # Today Leads
+            $leads->today_lead_count = ( $leads->today_initial_lead_count ?? 0 ) + ( $followup_count_summary->today_initial_followup_lead_count ?? 0);
+        # End Today Leads
+       
         # End Leads
 
         $data['leads']                      =   $leads;

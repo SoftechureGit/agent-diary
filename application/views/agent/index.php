@@ -148,7 +148,7 @@
               <div class="card-body">
                 <h3 class="card-title text-white">Total Leads</h3>
                 <div class="d-inline-block">
-                  <h2 class="text-white"><?= $leads->total_lead_count ?? 0 ?></h2>
+                  <h2 class="text-white"><?= $leads->total_active_leads_count ?? 0 ?></h2>
                   <!--<p class="text-white mb-0">Jan - March 2019</p>-->
                 </div>
                 <span class="float-right display-5 opacity-5"><i class="fa fa-users" aria-hidden="true"></i></span>
