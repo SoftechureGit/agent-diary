@@ -8771,6 +8771,10 @@ WHERE lead_id='" . $lead_id . "'
                     $this->db->where($where);
                     $query = $this->db->get();
                     $item_data = $query->result();
+
+                    echo $where;
+                    die;
+
                     foreach ($item_data as $item) {
 
                         $current_rate = "";

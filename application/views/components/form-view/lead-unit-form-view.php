@@ -150,6 +150,23 @@
     <!-- Form View -->
     <div class="set_property_form w-100"></div>
     <!-- Form View -->
+     
+
+    <!-- Booking Deal Amount -->
+    <div class="col-md-12 my-3">
+      <details <?= isset($record) ? 'open' : '' ?>>
+        <summary>Deal Amount</summary>
+        <div class="booking-deal-amount-container p-4">
+          <?php $this->view('components/other/add-more/booking-project-components', ['records' => $record->booking_deal_amount ?? []]) ?>
+
+          <div class="text-right">
+            <button type="button" class="btn btn-warning btn-sm text-white add-more-btn" onclick="add_more(this, 'booking-deal-amount' ,'.booking-deal-amount-container')">Add More</button>
+          </div>
+        </div>
+
+      </details>
+    </div>
+    <!-- End Booking Deal Amount -->
 
     <!-- Youtube Links -->
      <div class="col-md-12">

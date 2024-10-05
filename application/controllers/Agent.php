@@ -3354,6 +3354,7 @@ class Agent extends CI_Controller
         $costing_price                              =   $this->input->post('costing_price');
         $youtube_data                               =   $this->input->post('youtube_data');
         $inventory_id                               =   $this->input->post('inventory_id');
+        $project_components                         =   $this->input->post('project_components');
 
         # Validation
         # Unit Code Validation
@@ -3411,6 +3412,38 @@ class Agent extends CI_Controller
         $property_layout                            =   $upload_response->file_name;
         # End File Upload
 
+        # Booking Component Details
+                               
+        $booking_component_details_arr                          =   [];
+
+        foreach($project_components ?? [] as $project_component):
+            $project_component          =   (object) $project_component;
+            $component_id                                   = $project_component->id ?? 0;
+            $component_type                                 = $project_component->type ?? '';
+            $component_rate                                 = $project_component->rate ?? 0;
+            $component_calculate_on_size_unit_id            = $project_component->calculate_on_size_unit ?? 0;
+            $component_total_amount                         = $project_component->total_amount ?? 0;
+        
+            # List
+            if($component_id && $component_type && $component_rate && $component_calculate_on_size_unit_id && $component_total_amount ):
+            
+            $booking_component_details_arr[]          =   (object) [
+                                                                        'component_id'                          => $component_id,
+                                                                        'component_type'                        => $component_type,
+                                                                        'rate'                                  => $component_rate,
+                                                                        'calculate_on_size_unit_id'             => $component_calculate_on_size_unit_id,
+                                                                        'total_amount'                          => $component_total_amount,
+                                                                    ];
+            endif;
+            # End List
+        endforeach;
+
+        if(!count($booking_component_details_arr)):
+            echo json_encode(['status' => false, 'message' => 'Please select components in deal amount']);
+            exit;
+        endif;
+        # End Booking Component Details
+
         # Db Data
         $data                                   =   [
             'inventory_id'      => $inventory_id,
@@ -3430,6 +3463,7 @@ class Agent extends CI_Controller
             'youtube_data'      => ($youtube_data_arr ?? 0) ? json_encode($youtube_data_arr) : NULL,
             'property_layout'   => $property_layout,
             'costing_price'     => $costing_price,
+            "component_details" => count($booking_component_details_arr) ? json_encode($booking_component_details_arr) : null,
             'created_at'        => date('Y-m-d h:i:m:s'),
         ];
         # End Db Data

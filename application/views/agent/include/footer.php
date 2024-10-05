@@ -444,6 +444,15 @@
          var project_id = $('[name="booking_project_id"]').val();
          var unit_code_id = $('[name="booking_unit_code"]').val();
 
+         if(project_id == undefined){
+          project_id   = $('[name="project_id"]').val();
+         }
+         if(unit_code_id == undefined){
+          unit_code_id   = $('[name="property_details[unit_code]"]').val();
+         }
+
+         console.log(project_id)
+         console.log(unit_code_id)
          /** Ajax */
          if (!project_id) return;
 
@@ -1612,6 +1621,10 @@
          rate = parent.find('.rate').val()
 
          plot_or_unit_size = $('.plot_or_unit_size').val()
+
+         if(plot_or_unit_size == undefined){
+          plot_or_unit_size = $('[name="property_details[plot_size]"]').val()
+         }
 
          total_amount = parseFloat(plot_or_unit_size) * parseFloat(rate);
 
