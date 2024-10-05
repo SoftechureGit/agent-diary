@@ -320,7 +320,9 @@ class Api extends CI_Controller
         // die;
         # End Leads
 
-        $data['leads_count_summary']                      =   $leads;
+        $data['leads_count_summary']              =   count_summary($user_detail, $selected_member_ids);
+
+        // $data['leads_count_summary']                      =   $leads;
         /*-------------------------------------------------------------------
         - End Leads Counting
         -------------------------------------------------------------------*/

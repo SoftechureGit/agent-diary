@@ -400,7 +400,7 @@
                             <div class="card-body" style="padding: 13px 10px 4px 10px !important;">
                               <h3 class="card-title text-white" style="font-size: 14px;margin-bottom: 5px;">Today Leads</h3>
                               <div class="d-inline-block">
-                                <h2 class="text-white" style="font-size: 24px;"><?= $leads->today_lead_count ?? 0 ?></h2>
+                                <h2 class="text-white" style="font-size: 24px;"><?= $count_summary->today_lead ?? 0 ?></h2>
                               </div>
                             </div>
                           </div>
@@ -410,7 +410,7 @@
                             <div class="card-body" style="padding: 13px 10px 4px 10px !important;">
                               <h3 class="card-title text-white" style="font-size: 14px;margin-bottom: 5px;">Today Followup</h3>
                               <div class="d-inline-block">
-                                <h2 class="text-white" style="font-size: 24px;"><?= $leads->today_followup_count ?? 0 ?></h2>
+                                <h2 class="text-white" style="font-size: 24px;"><?= $count_summary->today_followup ?? 0 ?></h2>
                               </div>
                             </div>
                           </div>
@@ -420,7 +420,7 @@
                             <div class="card-body" style="padding: 13px 10px 4px 10px !important;">
                               <h3 class="card-title text-white" style="font-size: 14px;margin-bottom: 5px;">Total Followup</h3>
                               <div class="d-inline-block">
-                                <h2 class="text-white" style="font-size: 24px;"><?= $leads->total_followup_count ?? 0 ?></h2>
+                                <h2 class="text-white" style="font-size: 24px;"><?= $count_summary->total_followup ?? 0 ?></h2>
                               </div>
                             </div>
                           </div>
@@ -431,7 +431,7 @@
                             <div class="card-body" style="padding: 13px 10px 4px 10px !important;">
                               <h3 class="card-title text-white" style="font-size: 14px;margin-bottom: 5px;">Missed Followup</h3>
                               <div class="d-inline-block">
-                                <h2 class="text-white" style="font-size: 24px;"><?= $leads->missed_followup_count ?? 0 ?></h2>
+                                <h2 class="text-white" style="font-size: 24px;"><?= $count_summary->missed_followup ?? 0 ?></h2>
                               </div>
                             </div>
                           </div>
@@ -453,13 +453,13 @@
                           <th class="text-success">Success</th>
                         </tr>
                         <tr>
-                          <td class="text-center"><?= $leads->total_initial_count ?? 0 ?></td>
-                          <td class="text-center"><?= $leads->total_followup_count ?? 0 ?></td>
-                          <td class="text-center"><?= $leads->total_enquiry_count ?? 0 ?></td>
-                          <td class="text-center"><?= $leads->total_site_visit_count ?? 0 ?></td>
-                          <td class="text-center"><?= $leads->total_metting_count ?? 0 ?></td>
-                          <td class="text-center"><?= $leads->total_dump_count ?? 0 ?></td>
-                          <td class="text-center"><?= $leads->total_success_count ?? 0 ?></td>
+                          <td class="text-center"><?= $count_summary->total_initial ?? 0 ?></td>
+                          <td class="text-center"><?= $count_summary->total_followup ?? 0 ?></td>
+                          <td class="text-center"><?= $count_summary->total_enquiry ?? 0 ?></td>
+                          <td class="text-center"><?= $count_summary->total_site_visit ?? 0 ?></td>
+                          <td class="text-center"><?= $count_summary->total_metting ?? 0 ?></td>
+                          <td class="text-center"><?= $count_summary->total_dump ?? 0 ?></td>
+                          <td class="text-center"><?= $count_summary->total_success ?? 0 ?></td>
                         </tr>
                       </table>
                     </div>
