@@ -412,6 +412,7 @@ if (!function_exists('getAccountId')) {
 
         if($record) :
             $record->property_details           =   ($record->property_details ?? 0) ? json_decode($record->property_details) : null;
+            $record->component_details          =   ($record->component_details ?? 0) ? json_decode($record->component_details) : null;
             $record->property_layout_url        =   $record->property_layout ? base_url("public/other/lead-unit-layouts/$record->property_layout") : null;          
         else:
             return  null; 
