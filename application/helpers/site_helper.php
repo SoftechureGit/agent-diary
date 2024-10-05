@@ -1422,4 +1422,118 @@ if (!function_exists('getAccountId')) {
     //     }
     // endif;
     # End History
+
+    # Counting Summary
+    if(!function_exists('counting_summary')){
+        function count_summary($user, $selected_member_ids = null){
+            $count_summary                  =   [];
+            $where                          =   " 1 = 1 ";
+    
+            if ($selected_member_ids):
+                $where                      .=   " and user_id in ($selected_member_ids) ";
+            else:
+                $where  .=  $user->level_user_ids ? 
+                        " and user_id in ($user->level_user_ids) " : 
+                        " and ( user_id = '$user->user_id' or account_id = '$user->user_id') " ;
+            endif;
+
+        /****************************************************
+        *   Leads Counting 
+        ****************************************************/
+        # Counting Query
+        $total_leads_count_query                    =   "lead.lead_stage_id != '6' AND lead.lead_stage_id != '7'";
+        $total_active_leads_count_query             =   "( lead.lead_status = '1' ) and lead.lead_stage_id != '6' AND lead.lead_stage_id != '7'";
+        $total_inactive_leads_count_query             =   "(  lead.lead_status is NULL or lead.lead_status = '0' or lead.lead_status = '2' ) and lead.lead_stage_id != '6' AND lead.lead_stage_id != '7'";
+        $today_lead_count_query                     =   "(( lead.lead_status = '1' ) AND ( lead.lead_stage_id = '1' ) AND ( lead.added_to_followup = 0 ) AND ( DATE(FROM_UNIXTIME(created_at))  = CURDATE()) ) ";
+        
+        $initial_leads_count_query                  =   " ( lead.lead_stage_id = '1' or lead.lead_stage_id = '0' )";
+        $followup_leads_count_query                 =   "lead.lead_stage_id = '2'";
+        $enquiry_leads_count_query                  =   "lead.lead_stage_id = '3'";
+        $site_visit_leads_count_query               =   "lead.lead_stage_id = '4'";
+        $metting_leads_count_query                  =   "lead.lead_stage_id = '5'";
+        $success_leads_count_query                  =   "lead.lead_stage_id = '6'";
+        $dump_leads_count_query                     =   "lead.lead_stage_id = '7'";
+        $unknown_stage_count_query                  =   "lead.lead_stage_id is NULL";
+        # End Counting Query
+
+        $lead_select_query                  =   "
+                                                    COUNT(DISTINCT lead.lead_id) as all_leads_count,
+                                                    SUM(CASE WHEN ( $total_leads_count_query) THEN 1 ELSE 0 END) as total_leads_count,
+                                                    SUM(CASE WHEN ( $total_active_leads_count_query) THEN 1 ELSE 0 END) as total_active_leads_count,
+                                                    SUM(CASE WHEN ( $total_inactive_leads_count_query) THEN 1 ELSE 0 END) as total_inactive_leads_count,
+                                                    SUM(CASE WHEN ( $today_lead_count_query) THEN 1 ELSE 0 END) as today_initial_lead_count,
+                                                    SUM(CASE WHEN ( $initial_leads_count_query) THEN 1 ELSE 0 END) as total_initial_count,
+                                                    SUM(CASE WHEN ( $followup_leads_count_query) THEN 1 ELSE 0 END) as total_followup_count,
+                                                    SUM(CASE WHEN ( $enquiry_leads_count_query) THEN 1 ELSE 0 END) as total_enquiry_count,
+                                                    SUM(CASE WHEN ( $site_visit_leads_count_query) THEN 1 ELSE 0 END) as total_site_visit_count,
+                                                    SUM(CASE WHEN ( $metting_leads_count_query) THEN 1 ELSE 0 END) as total_metting_count,
+                                                    SUM(CASE WHEN ( $success_leads_count_query) THEN 1 ELSE 0 END) as total_success_count,
+                                                    SUM(CASE WHEN ( $dump_leads_count_query) THEN 1 ELSE 0 END) as total_dump_count,
+                                                    SUM(CASE WHEN ( $unknown_stage_count_query ) THEN 1 ELSE 0 END) as total_unknown_stage_count
+                                                    ";
+
+        
+                                                    db_instance()->select($lead_select_query);
+                                                    db_instance()->where($where);
+                                                    db_instance()->from('tbl_leads as lead');
+        $leads_count_sumamry                          =   db_instance()->get()->row();
+
+        /****************************************************
+        *   End Leads Counting 
+        ****************************************************/
+
+        $today_initial_followup_lead_count_query        =   "( followup_status = '1' ) AND ( lead_stage_id = '1' ) AND ( STR_TO_DATE(next_followup_date, '%d-%m-%Y') = CURDATE() ) ";
+
+        $today_followup_count_query                     =   "followup_status = '1' AND STR_TO_DATE(next_followup_date, '%d-%m-%Y') = CURDATE() ";
+        $missed_followup_count_query                    =   "(( lead_stage_id != '6' and lead_stage_id != '7' ) AND  followup.lead_status_id = '1' AND followup.followup_status = '1' AND STR_TO_DATE(followup.next_followup_date, '%d-%m-%Y') < CURDATE() )";
+              
+        $followup_select_query                          =   "
+                                                                SUM(CASE WHEN ( $today_initial_followup_lead_count_query ) THEN 1 ELSE 0 END) as today_initial_followup_lead_count,
+                                                                SUM(CASE WHEN ( $today_followup_count_query ) THEN 1 ELSE 0 END) as today_followup_lead_count,
+                                                                SUM(CASE WHEN ( $missed_followup_count_query ) THEN 1 ELSE 0 END) as missed_followup_count
+                                                            ";
+
+        
+        db_instance()->select($followup_select_query);
+        db_instance()->where($where);
+        db_instance()->from('tbl_followup as followup');
+        $followup_count_summary                          =   db_instance()->get()->row();
+
+        /****************************************************
+        *   Followup Counting 
+        ****************************************************/
+
+        /****************************************************
+        *   End Followup Counting 
+        ****************************************************/
+
+        #
+        $today_lead                                               =   ( $leads_count_sumamry->today_initial_lead_count ?? 0 ) + ( $followup_count_summary->today_initial_followup_lead_count ?? 0);
+
+        $count_summary['today_lead']                              =   $today_lead;
+        $count_summary['today_followup']                          =   ( $followup_count_summary->today_followup_lead_count ?? 0 );
+        $count_summary['missed_followup']                         =   ( $followup_count_summary->missed_followup_count ?? 0 );
+
+        
+        $count_summary['total_leads']                             =   $leads_count_sumamry->total_leads_count ?? 0;
+        $count_summary['total_active_leads']                      =   $leads_count_sumamry->total_active_leads_count ?? 0;
+        $count_summary['total_inactive_leads']                    =   $leads_count_sumamry->total_inactive_leads_count ?? 0;
+
+        # Stage Count
+            $count_summary['total_initial']                       =   $leads_count_sumamry->total_initial_count ?? 0;
+            $count_summary['total_followup']                      =   $leads_count_sumamry->total_followup_count ?? 0;
+            $count_summary['total_enquiry']                       =   $leads_count_sumamry->total_enquiry_count ?? 0;
+            $count_summary['total_site_visit']                    =   $leads_count_sumamry->total_site_visit_count ?? 0;
+            $count_summary['total_metting']                       =   $leads_count_sumamry->total_metting_count ?? 0;
+            $count_summary['total_dump']                          =   $leads_count_sumamry->total_dump_count ?? 0;
+            $count_summary['total_success']                       =   $leads_count_sumamry->total_success_count ?? 0;
+            $count_summary['unknown_stage']                       =   $leads_count_sumamry->total_unknown_stage_count ?? 0;
+        # End Stage Count
+
+       # End 
+            
+           return (object) $count_summary;
+        }
+    }
+    # End Counting Summary
 }

@@ -120,7 +120,7 @@
               <div class="card-body">
                 <h3 class="card-title text-white">Today Leads</h3>
                 <div class="d-inline-block">
-                  <h2 class="text-white"><?= ( $leads->today_lead_count ?? 0 )?></h2>
+                  <h2 class="text-white"><?= ( $count_summary->today_lead ?? 0 )?></h2>
                 </div>
                 <span class="float-right display-5 opacity-5"><i class="icon-chart" aria-hidden="true"></i></span>
               </div>
@@ -134,7 +134,7 @@
               <div class="card-body">
                 <h3 class="card-title text-white">Today's Followup</h3>
                 <div class="d-inline-block">
-                  <h2 class="text-white"><?= $leads->today_followup_count ?? 0 ?></h2>
+                  <h2 class="text-white"><?= $count_summary->today_followup ?? 0 ?></h2>
                 </div>
                 <span class="float-right display-5 opacity-5"><i class="fa fa-bullseye" aria-hidden="true"></i></span>
               </div>
@@ -148,8 +148,11 @@
               <div class="card-body">
                 <h3 class="card-title text-white">Total Leads</h3>
                 <div class="d-inline-block">
-                  <h2 class="text-white"><?= $leads->total_active_leads_count ?? 0 ?></h2>
-                  <!--<p class="text-white mb-0">Jan - March 2019</p>-->
+                  <h2 class="text-white"><?= $count_summary->total_leads ?? 0 ?></h2>
+                  <p class="text-white mb-0 d-none">Active : <?= $count_summary->total_active_leads ?? 0 ?></p>
+                  <p class="text-white mb-0 d-none">Inactive : <?= $count_summary->total_inactive_leads ?? 0 ?></p>
+                  <p class="text-white mb-0 d-none">Unknown Stage : <?= $count_summary->unknown_stage ?? 0 ?></p>
+                  <p class="text-white mb-0 d-none">All : <?= $count_summary->all_leads_count ?? 0 ?></p>
                 </div>
                 <span class="float-right display-5 opacity-5"><i class="fa fa-users" aria-hidden="true"></i></span>
               </div>
@@ -163,7 +166,7 @@
               <div class="card-body">
                 <h3 class="card-title text-white">Missed Followup</h3>
                 <div class="d-inline-block">
-                  <h2 class="text-white"><?= $leads->missed_followup_count?? 0 ?></h2>
+                  <h2 class="text-white"><?= $count_summary->missed_followup?? 0 ?></h2>
                 </div>
                 <span class="float-right display-5 opacity-5"><i class="fa fa-users" aria-hidden="true"></i></span>
               </div>
@@ -194,31 +197,31 @@
 
                         <tr>
                           <td>Initial</td>
-                          <td class="text-center"><?=( $leads->total_initial_count ?? 0 ) ?></td>
+                          <td class="text-center"><?=( $count_summary->total_initial ?? 0 ) ?></td>
                         </tr>
                         <tr class="text-primary">
                           <td>Followup</td>
-                          <td class="text-center"><?= $leads->total_followup_count ?? 0 ?></td>
+                          <td class="text-center"><?= $count_summary->total_followup ?? 0 ?></td>
                         </tr>
                         <tr>
                           <td>Enquiry</td>
-                          <td class="text-center"><?= $leads->total_enquiry_count ?? 0 ?></td>
+                          <td class="text-center"><?= $count_summary->total_enquiry ?? 0 ?></td>
                         </tr>
                         <tr>
                           <td>Site Visit</td>
-                          <td class="text-center"><?= $leads->total_site_visit_count ?? 0 ?></td>
+                          <td class="text-center"><?= $count_summary->total_site_visit ?? 0 ?></td>
                         </tr>
                         <tr>
                           <td>Metting</td>
-                          <td class="text-center"><?= $leads->total_metting_count ?? 0 ?></td>
+                          <td class="text-center"><?= $count_summary->total_metting ?? 0 ?></td>
                         </tr>
                         <tr class="text-danger">
                           <td>Dump</td>
-                          <td class="text-center"><?= $leads->total_dump_count ?? 0 ?></td>
+                          <td class="text-center"><?= $count_summary->total_dump ?? 0 ?></td>
                         </tr>
                         <tr class="text-success">
                           <td>Success</td>
-                          <td class="text-center"><?= $leads->total_success_count ?? 0 ?></td>
+                          <td class="text-center"><?= $count_summary->total_success ?? 0 ?></td>
                         </tr>
 
                       </tbody>
