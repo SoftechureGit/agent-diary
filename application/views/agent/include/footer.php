@@ -84,10 +84,11 @@
            });
            //  }
 
-           /** Dropdown UI issue */
-           $('select#builder_id, select#product_id').select2()
-           /** Dropdown UI issue */
-         });
+          });
+
+          /** Dropdown UI issue */
+             $('select#builder_id, select#product_id, select#product_type_id').select2()
+          /** Dropdown UI issue */
        }  
 
        convertToSelect2()
