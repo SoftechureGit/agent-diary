@@ -49,6 +49,7 @@ class Front extends CI_Controller
 
     public function property($slug = '', $aid = '')
     {
+        
         if ($slug && $aid) {
             $where_pd = "slug='" . $slug . "'";
             //$product_detail = $this->Action_model->select_single('tbl_products',$where_pd);
@@ -89,8 +90,6 @@ class Front extends CI_Controller
                 $product_amenitie_data = $this->Action_model->detail_result('tbl_amenities', $where_pd, "amenitie_name,amenitie_image");
                 $product_amenities = $product_amenitie_data;
             }
-
-
 
             $where_pd = "product_id='" . $id . "'";
             $this->db->select('specification_name,description');

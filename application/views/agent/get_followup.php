@@ -495,6 +495,10 @@ summary {
                 <th>Action</th>
                 <td>
                 <button type="button" class="btn btn-info btn-sm" onclick="get_lead_form(<?= $record->lead_id ?>)"><i class="fa fa-edit"></i> Edit</button>
+
+                <?php if(in_array(user()->role_id, [2,5])): ?>
+                  <button type="button" class="btn btn-danger btn-sm delete-lead" data-id=<?= $record->lead_id ?>><i class="fa fa-trash"></i> Delete</button>
+                <?php endif; ?>
                 </td>
               </tr>
               <!-- End Action -->

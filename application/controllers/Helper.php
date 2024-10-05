@@ -441,8 +441,8 @@ class Helper extends CI_Controller
         }
 
         # Permission
-        if (user()->role_id != 1 || user()->role_id != 5) :
-            echo json_encode(['status' => false, 'message' => 'Permission denied']);
+        if (!in_array(user()->role_id, [2, 5])) :
+            echo json_encode(['status' => false, 'message' => user()->role_name." are not allowed to delete leads."]);
             exit;
         endif;
         # End Permission
@@ -452,13 +452,13 @@ class Helper extends CI_Controller
         if ($id) :
 
             # Fetch Record
-            $record = $this->db->where("id = $id")->get('tbl_leads')->row();
+            $record = $this->db->where("lead_id = '$id'")->get('tbl_leads')->row();
 
-            if ($record) :
+            if ($record->profile ?? 0) :
 
                 # Remove File From Folder
                 $file_path = "./public/other/profile/" . $record->profile;
-
+ 
                 if (file_exists($file_path)) :
                     unlink($file_path);
                 endif;
@@ -467,7 +467,7 @@ class Helper extends CI_Controller
             # End Fetch Record
 
             # Delete Record
-            $this->db->where("id = $id")->delete('tbl_leads');
+            $this->db->where("lead_id = $id")->delete('tbl_leads');
         # End Delete Record
         endif;
         echo json_encode(['status' => true, 'message' => 'Successfully record deleted.']);

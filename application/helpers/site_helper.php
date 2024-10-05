@@ -69,38 +69,11 @@ if (!function_exists('user')) {
             ->get('tbl_users as user')->row();
             
 
-            # Permission Roles
-            $permission_roles                           =   [];
-            
-            # For Agent 
-            if($user->role_id == 2):
-                $permission_roles                       =   [3,4,5];
-            endif;
-            # End For Agent 
-
-            # Level 1
-            if($user->role_id == 3):
-                $permission_roles                       =   [0];
-            endif;
-            # End Level 1
-
-            # Level 2
-            if($user->role_id == 4):
-                $permission_roles                       =   [3];
-            endif;
-            # End Level 2
-
-            # Level 3
-            if($user->role_id == 5):
-                $permission_roles                       =   [3, 4];
-            endif;
-            # End Level 3
-
-            $user->permission_roles                 =   implode(',', $permission_roles);
-        # Permission Roles
-
-        # Permission User Ids
-        # End Permission User Ids
+         # Permission Roles
+        $user->level_user_ids_arr               =   get_level_user_ids();
+        $user->level_user_ids                   =   implode(',', $user->level_user_ids_arr);
+        $user->account_id                       =   getAccountId();
+        # End Permission Roles
 
         return $user;
     }
@@ -1330,6 +1303,8 @@ if (!function_exists('getAccountId')) {
     if(!function_exists('getAgent')){
     function getAgent()
     {
+        CI()->load->model('Action_model');
+
         $user_hash = CI()->input->request_headers()['Access-Token'] ?? null;
 
         if($user_hash):
@@ -1346,6 +1321,7 @@ if (!function_exists('getAccountId')) {
     if(!function_exists('get_level_user_ids')){
         function get_level_user_ids()
         {
+            CI()->load->model('Action_model');
             $agent = getAgent();
             $user_role_id = $agent->role_id;
 
@@ -1354,14 +1330,14 @@ if (!function_exists('getAccountId')) {
                 $user_ids[] = $agent->user_id;
 
                 $w1 = "role_id='4' AND report_to='" . $agent->user_id . "'";
-                $d1 = $this->Action_model->detail_result('tbl_users', $w1);
+                $d1 = CI()->Action_model->detail_result('tbl_users', $w1);
                 if ($d1) {
                     foreach ($d1 as $item1) {
 
                         $user_ids[] = $item1->user_id;
 
                         $w2 = "role_id='3' AND report_to='" . $item1->user_id . "'";
-                        $d2 = $this->Action_model->detail_result('tbl_users', $w2);
+                        $d2 = CI()->Action_model->detail_result('tbl_users', $w2);
                         if ($d2) {
                             foreach ($d2 as $item2) {
 
@@ -1374,7 +1350,7 @@ if (!function_exists('getAccountId')) {
                 $user_ids[] = $agent->user_id;
 
                 $w1 = "role_id='3' AND report_to='" . $agent->user_id . "'";
-                $d1 = $this->Action_model->detail_result('tbl_users', $w1);
+                $d1 =CI()->Action_model->detail_result('tbl_users', $w1);
                 if ($d1) {
                     foreach ($d1 as $item1) {
 

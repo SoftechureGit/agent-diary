@@ -923,12 +923,19 @@
              data: {
                id: id
              },
-             success: (data) => {
-               if (data.status) {
-                 showToast('success', data.message)
-               } else {
-                 showToast('danger', data.message)
-               }
+            success: (data) => {
+              if (data.status) {
+                showToast('success', data.message)
+                // $('.lead-list .customer.active').remove()
+
+                $('.lead-list .customer.active').fadeOut(400, function() {
+                  $(this).remove();
+                });
+
+                $('.search-btn').trigger('click')
+              } else {
+                showToast('danger', data.message)
+              }
              },
              error: function() {
                showToast('danger', 'Some Error Occured.')
@@ -1645,6 +1652,33 @@
        }
        /***********************************************************************
         * End Calculate Project Component Total Amount
+        ************************************************************************/
+
+       /***********************************************************************
+        * Copy Text
+        ************************************************************************/
+        $(document).on('click', '.copy-btn', function() {
+          // Get the text to copy from the data-text attribute
+          var copyText = $(this).data('text');
+
+          // Create a temporary input element to hold the text
+          var tempInput = $('<input>');
+          $('body').append(tempInput);
+
+          // Set the value of the temporary input to the text to copy
+          tempInput.val(copyText).select();
+
+          // Copy the text to the clipboard
+          document.execCommand("copy");
+
+          // Remove the temporary input
+          tempInput.remove();
+
+          // Optionally, show a message or feedback
+          showToast('success', 'Link copied!')
+      });
+       /***********************************************************************
+        * End Copy Text
         ************************************************************************/
      </script>
      <!--  -->

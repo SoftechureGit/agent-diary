@@ -1176,12 +1176,7 @@
                 //   "</div>";
 
 
-                delete_lead_btn = <?php if (user()->role_id == 1 || user()->role_id == 5): ?> `<div class="delete-lead" data-id="${record.lead_id}"><i class="fa fa-times"></i></div>`
-              <?php else: ?> ''
-              <?php endif; ?>;
-
               html += `<div class='customer position-relative'>
-                    ${delete_lead_btn}
                      <div class='row data-add-${record.lead_id}'  onclick='showCustomer(${record.lead_id},0)'>
 
                      <div class='col-md-2' style='' align='center'>
@@ -2029,7 +2024,9 @@
                   edit = "<button type='button' class='btn btn-success btn-sm btn-rounded' onclick='feedbackFormModal(" + feedback_list[i].feedback_id + ",0," + lead_id + ")' style='color: white;' data-toggle='tooltip' data-placement='top' title='Edit'><i class='fa fa-edit'></i></button>";
                 }
 
-                edit += " &nbsp;&nbsp;<a href='" + feedback_list[i].project_url + "' target='_blank' class='btn btn-info btn-sm btn-rounded' style='color:white;' data-toggle='tooltip' data-placement='top' title='View Project'><i class='fa fa-eye'></i></a>&nbsp;&nbsp;<button type='button' class='btn btn-dark btn-sm btn-rounded' style='color:white;outline:none;' data-toggle='tooltip' data-placement='top' title='Share Project' onclick='share_project(\"" + feedback_list[i].project_url + "\",\"" + feedback_list[i].lead_mobile + "\",\"" + feedback_list[i].lead_email + "\",\"" + feedback_list[i].lead_id + "\",\"" + feedback_list[i].pid + "\",\"" + feedback_list[i].project_name + "\")'><i class='fa fa-share'></i></button>";
+                // edit += " &nbsp;&nbsp;<a href='" + feedback_list[i].project_url + "' target='_blank' class='btn btn-info btn-sm btn-rounded' style='color:white;' data-toggle='tooltip' data-placement='top' title='View Project'><i class='fa fa-eye'></i></a>&nbsp;&nbsp;<button type='button' class='btn btn-dark btn-sm btn-rounded' style='color:white;outline:none;' data-toggle='tooltip' data-placement='top' title='Share Project' onclick='share_project(\"" + feedback_list[i].project_url + "\",\"" + feedback_list[i].lead_mobile + "\",\"" + feedback_list[i].lead_email + "\",\"" + feedback_list[i].lead_id + "\",\"" + feedback_list[i].pid + "\",\"" + feedback_list[i].project_name + "\")'><i class='fa fa-share'></i></button>";
+                edit += " &nbsp;&nbsp;<a href='" + feedback_list[i].project_url + "' target='_blank' class='btn btn-info btn-sm btn-rounded' style='color:white;' data-toggle='tooltip' data-placement='top' title='View Project'><i class='fa fa-eye'></i></a>&nbsp;&nbsp;";
+                edit  += `<button class='btn btn-sm btn-info btn-rounded copy-btn' data-text='${feedback_list[i].project_url}'><i class='fa fa-share'></i></button>`;
 
                 var visit_status = "";
                 if (feedback_list[i].visit_status == "Yes") {
