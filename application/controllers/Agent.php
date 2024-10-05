@@ -258,8 +258,8 @@ class Agent extends CI_Controller
         // echo "<pre>";
         // print_r($leads);
 
-        // echo $this->db->last_query();
-        // die;
+        echo $this->db->last_query();
+        die;
         # End Leads
 
         $data['leads']                      =   $leads;

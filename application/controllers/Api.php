@@ -12269,7 +12269,7 @@ class Api extends CI_Controller
                     'project_type_name'     => $unit_row->project_type_name,
                     'property_type_name'    => $unit_row->property_type_name,
                     'location'              => $unit_row->location_name . ',' . $unit_row->city_name . ',' . $unit_row->state_name,
-                    'plot_size'             => $unit_row->property_details->plot_size,
+                    'plot_size'             => $unit_row->property_details->plot_size ?? $unit_row->property_details->sa ?? 0,
                     'booking_date'          => $unit_row->booking_date,
                     'referance_number'      => $unit_row->property_details->referance_number,
                     'status'                => $status,
