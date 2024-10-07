@@ -2852,7 +2852,8 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 $query = $this->db->get();
                 $followup_detail = $query->row();
                 if ($followup_detail && $followup_detail->next_followup_date) {
-                    $next_followup = "<i class='fa fa-clock-o'></i> " . $followup_detail->next_followup_date . " ( " . $followup_detail->next_followup_time . " ) &nbsp; <i class='fa fa-bookmark'></i> " . $followup_detail->au_first_name . ' ' . $followup_detail->au_last_name;
+                    // $next_followup = "<i class='fa fa-clock-o'></i> " . $followup_detail->next_followup_date . " ( " . $followup_detail->next_followup_time . " ) &nbsp; <i class='fa fa-bookmark'></i> " . $followup_detail->au_first_name . ' ' . $followup_detail->au_last_name;
+                    $next_followup = "<i class='fa fa-clock-o'></i> " . $followup_detail->next_followup_date . " ( " . $followup_detail->next_followup_time . " ) ";
                     $next_followup_date = $followup_detail->next_followup_date . "<br>" . $followup_detail->next_followup_time;
                 }
 
@@ -10977,7 +10978,7 @@ WHERE lead_id='" . $lead_id . "'
 
                 $this->Action_model->update_data($record_array, 'tbl_leads', "lead_id='" . $transfer_lead_id . "' AND account_id='" . $account_id . "'");
 
-                $this->Action_model->update_data($record_array, 'tbl_followup', "lead_id='" . $transfer_lead_id . "' AND user_id='" . $record->user_id . "'");
+                $this->Action_model->update_data([ 'user_id' => $transfer_to, 'assign_user_id' =>  $transfer_to ], 'tbl_followup', "lead_id='" . $transfer_lead_id . "' AND user_id='" . $record->user_id . "'");
                 $this->Action_model->update_data($record_array, 'tbl_requirements', "lead_id='" . $transfer_lead_id . "' AND user_id='" . $record->user_id . "'");
                 $this->Action_model->update_data($record_array, 'tbl_site_visit', "lead_id='" . $transfer_lead_id . "' AND user_id='" . $record->user_id . "'");
 
@@ -11579,12 +11580,19 @@ WHERE lead_id='" . $lead_id . "'
             $searchQuery .= " file_name= '$file_name'";
         }
 
+
         if ($this->input->post('account_id')) {
-
             $account_id = $this->input->post('account_id');
-            $searchQuery .= " AND tbl_data.added_by= '$account_id'";
-        }
+            // $searchQuery .= " AND tbl_data.added_by= '$account_id'";
+            if($account_id && $account_id != 'unassigned'):
+                $searchQuery .= " AND tbl_leads.user_id= '$account_id'";
+            endif;
 
+            if($account_id == 'unassigned'):
+                $searchQuery .= " AND tbl_data.is_in_lead= 0";
+            endif;
+        }
+        
         if ($this->input->post('reason')) {
 
             $reason = $this->input->post('reason');

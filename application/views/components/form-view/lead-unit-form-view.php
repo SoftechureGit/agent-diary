@@ -138,14 +138,6 @@
     </div>
     <!-- End Layout Upload -->
 
-    <!-- Costing price  -->
-    <div class="col-md-4 costing-price-wrapper">
-      <div class="form-group">
-        <label for="">Costing price</label>
-        <input type="number" class="form-control" name="costing_price" value="<?= $record->costing_price ?? '' ?>" placeholder="Enter Costing price">
-      </div>
-    </div>
-    <!-- End Costing price -->
 
     <!-- Form View -->
     <div class="set_property_form w-100"></div>

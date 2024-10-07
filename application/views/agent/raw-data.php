@@ -201,6 +201,7 @@
               <div class="col-md-3">
                 <select id="teamFilter" class="form-control select-2-team-with-search">
                   <option value="" >All Team Member</option>
+                  <option value="unassigned" >Unassigned</option>
                   <?php foreach ($user_list ?? [] as $item) {
                   if (($record->user_id ?? 0 ) != $item->user_id) { ?>
                     <option value="<?= $item->user_id ?>">

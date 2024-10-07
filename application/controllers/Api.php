@@ -2803,7 +2803,7 @@ class Api extends CI_Controller
         # end stage 
 
 
-        if ($search_status) {
+        if ($search_status != 4) {
             $where_ext .= " AND tbl_leads.lead_status='" . $search_status . "'";
         }
 
@@ -12349,7 +12349,7 @@ class Api extends CI_Controller
         $lead_type_list = $this->Action_model->detail_result('tbl_lead_types', $where, 'lead_type_id,lead_type_name');
 
         $lead_type_list_default[]             =    [
-                                                                                'lead_type_id'      =>  "0",
+                                                                                'lead_type_id'      =>  "4",
                                                                                 'lead_type_name'    =>  "All"
                                                                             ];
         $lead_type_list_arr = array_merge($lead_type_list_default, $lead_type_list);

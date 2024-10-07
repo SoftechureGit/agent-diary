@@ -198,7 +198,12 @@ summary {
       </div>
 
       <div>
-        <div class="text-muted ft-sm next_followup_<?= $record->lead_id ?>"><?= $next_followup ?></div>
+         <!-- Assigned To -->
+         <?php if ($record->user_id): ?>
+                  <?php $assigned_user      = user($record->user_id); ?>
+              <?php endif; ?>
+              <!-- End Assigned To -->
+        <div class="text-muted ft-sm next_followup_<?= $record->lead_id ?>"><?= "$next_followup <i class='fa fa-bookmark px-2'></i>$assigned_user->full_name" ?></div>
       </div>
 
       <div style="margin-top: 10px;">

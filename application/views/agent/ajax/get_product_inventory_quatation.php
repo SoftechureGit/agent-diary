@@ -1175,6 +1175,7 @@
 		<li>All Payment should be make in the name of <?= $inventory_data->b_firm_name ?> Payable at Par</li>
 		<li>Final price will be calculate at the time of Booking</li>
 		<li>Terms and conditional applicable</li>
+		<li>GST as applicable</li>
 	</ul>
 	</div>
 </div>

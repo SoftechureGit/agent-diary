@@ -554,18 +554,6 @@
        }
        /*  End Lead Units */
 
-       /** Costing Validation */
-       //  $(document).on('change', '#lead-unit-form [name="looking_for"]', function() {
-       //    if (this.value == 'no_action') {
-       //      $('#lead-unit-form .costing-price-wrapper').find('span.text-danger').html('')
-       //      $('#lead-unit-form .costing-price-wrapper').find('[name="costing_price"]').prop('required', false)
-       //    } else {
-       //      $('#lead-unit-form .costing-price-wrapper').find('span.text-danger').html('*')
-       //      $('#lead-unit-form .costing-price-wrapper').find('[name="costing_price"]').prop('required', true)
-       //    }
-       //  });
-       /** Costing Validation */
-
        /*  Projects */
        $(document).on('change', '#lead-unit-form [name="property_type_id"], #lead-unit-form [name="location_id"]', function() {
          project_type_id = $('#lead-unit-form [name="project_type_id"]').val();

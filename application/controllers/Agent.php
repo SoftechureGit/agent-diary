@@ -3351,7 +3351,6 @@ class Agent extends CI_Controller
         $old_property_layout                        =   $this->input->post('old_property_layout');
         $project_name                               =   $this->input->post('project_name');
         $agent_id                                   =   $this->session->userdata('user_id');
-        $costing_price                              =   $this->input->post('costing_price');
         $youtube_data                               =   $this->input->post('youtube_data');
         $inventory_id                               =   $this->input->post('inventory_id');
         $project_components                         =   $this->input->post('project_components');
@@ -3462,7 +3461,6 @@ class Agent extends CI_Controller
             'property_details'  => ($property_details ?? 0) ? json_encode($property_details) : NULL,
             'youtube_data'      => ($youtube_data_arr ?? 0) ? json_encode($youtube_data_arr) : NULL,
             'property_layout'   => $property_layout,
-            'costing_price'     => $costing_price,
             "component_details" => count($booking_component_details_arr) ? json_encode($booking_component_details_arr) : null,
             'created_at'        => date('Y-m-d h:i:m:s'),
         ];

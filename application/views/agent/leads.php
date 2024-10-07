@@ -368,9 +368,9 @@
                             <div class="col-md-4">
                               <label for="">Status</label>
                               <select class="form-control" id="search_status" name="search_status" style="height: 38px;border-radius: 6px;margin-top: 10px;">
-                              <option value="0" class="default-option" selected>All</option>
+                              <option value="0" class="default-option">All</option>
                                 <?php foreach ($lead_type_list as $item) { ?>
-                                  <option value="<?= $item->lead_type_id ?>"><?= $item->lead_type_name ?></option>
+                                  <option value="<?= $item->lead_type_id ?>" <?= ( $item->lead_type_id == 1 ) ? 'selected' : '' ?>><?= $item->lead_type_name ?></option>
                                 <?php } ?>
                               </select>
                             </div>
