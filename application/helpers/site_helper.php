@@ -447,10 +447,10 @@ if (!function_exists('getAccountId')) {
                 $form          =   'commercial';
                 $property_type_name          =   'Shop';
                 break;
-                case '5':
-                    $form          =   'commercial';
-                    $property_type_name          =   'Office';
-                break;
+            case '5':
+                $form          =   'commercial';
+                $property_type_name          =   'Office';
+            break;
             case '7':
                 $form          =   'builder-floor';
                 break;
@@ -617,7 +617,7 @@ if (!function_exists('getAccountId')) {
                   # end Applicable PLC
             
                 break;
-            case '4':
+            case '4': # Shop
                 $form          =   'shop';
 
                 $excel_sheet[0]['title']                    =  'Shop';
@@ -1099,7 +1099,112 @@ if (!function_exists('getAccountId')) {
                 
                 # end parkings 
                 break;
-        endswitch;
+                
+                default:
+                $form          =   'shop';
+
+                $excel_sheet[0]['title']                    =  'Shop';
+                $excel_sheet[0]['headers']                  =  ['S.N.', 'Unit Code ', 'Referance Number', 'Unit no', 'Floor ', 'Tower' ,'Unit Type' ,'Area' , 'Size Unit' ,'Applicable PLC' , 'Facing' ,'Parking' , 'Layout upload'];
+                $excel_sheet[0]['data'][]                   =  ['', '', '', '', '', ''];
+
+                # unit code
+                   $excel_sheet[1]['title']      = 'Unit Code';  
+                   $excel_sheet[1]['headers']    = ['S.N' ,'Unit Code', 'Code Id' , 'Property Type Name'  ];  
+                   
+                   $count = 1;
+                   foreach($unit_codes as $unit_code){
+                      $excel_sheet[1]['data'][] = [$count,$unit_code->inventory_unit_code , $unit_code->id , $unit_code->property_type_name ?? ''] ;
+                      $count++;
+                   } 
+                # end unit code
+
+                # size unit 
+                    $excel_sheet[2]['title']         = 'Size Unit';  
+                    $excel_sheet[2]['headers']       =  ['S.N.', 'Unit', 'Unit Id' ];
+                    $count = 1;
+
+                    foreach(sizeUnits() as $size_unit){
+                    $excel_sheet[2]['data'][] = [$count,$size_unit->unit_name , $size_unit->unit_id] ;
+                    $count++;
+                    } 
+                # end size  unit 
+
+                # facing
+                   $excel_sheet[3]['title']         = 'Facing';
+                   $excel_sheet[3]['headers']       =  ['S.N', 'Title', 'Facing Id'];
+
+                   $count = 1; 
+
+                   foreach(facings() as $facing){
+
+                    $excel_sheet[3]['data'][] = [$count,$facing->title , $facing->facing_id] ;
+                    $count++;
+
+                 } 
+                # end facing  
+                        
+                   # parkings
+                
+                   $excel_sheet[4]['title']         = 'Parkings';
+                   $excel_sheet[4]['headers']       =  ['S.N', 'Label', 'Value'];
+  
+                   $count = 1; 
+          
+                   foreach($parkings as $parking ){
+  
+                       $excel_sheet[4]['data'][] = [$count,$parking->label , $parking->value] ;
+                       $count++;
+  
+                   } 
+                   if($parkings){
+                       $excel_sheet[4]['data'][] = ['','',''];
+                   }
+  
+               
+               # end parkings 
+
+                      # Applicable PLC
+                  
+                      $excel_sheet[5]['title']         = 'Applicable PLC';  
+                      $excel_sheet[5]['headers']       =  ['S.N.', 'Title', 'PLC ID' ];
+                      $count = 1;
+  
+                      foreach(getPropertyPlcs($property_id ?? 0) as $ApplicablePlc){
+                      $excel_sheet[5]['data'][] = [$count,$ApplicablePlc->price_component_name , $ApplicablePlc->price_component_id] ;
+                      $count++;
+                      } 
+                      if(count(getPropertyPlcs($property_id ?? 0)) == 0){
+                          $excel_sheet[5]['data'][] = ['','',''];
+                      }
+                    # end Applicable PLC
+
+                         # size Floor 
+                         $excel_sheet[6]['title']         = 'Floor';  
+                         $excel_sheet[6]['headers']       =  ['S.N.', 'Name', 'Floor Id' ];
+                         $count = 1;
+
+                         foreach(getFloors() as $get_floor){
+                         $excel_sheet[6]['data'][] = [$count,$get_floor->name , $get_floor->id] ;
+                         $count++;
+                         } 
+                         # end size  Tower 
+
+                         # size Floor 
+                         $excel_sheet[7]['title']         = 'Tower';  
+                         $excel_sheet[7]['headers']       =  ['S.N.', 'Name', 'Floor Id' ];
+                         $count = 1;
+
+                         foreach(getBlocksOrTowers() as $block_or_tower){
+                         $excel_sheet[7]['data'][] = [$count,$block_or_tower->name , $block_or_tower->id] ;
+                         $count++;
+                         } 
+
+            
+                        # end size  Floor 
+
+         
+                break;
+            endswitch;
         
 
         if ($form) :  
@@ -1282,7 +1387,7 @@ if (!function_exists('getAccountId')) {
         # create mutiple sheet
             $count = 0;
             foreach($excel_sheet  as $excel_row):
-                createSheet($objPHPExcel, $count , $excel_row['title'],  $excel_row['headers'], $excel_row['data']);  
+                createSheet($objPHPExcel, $count , $excel_row['title'],  $excel_row['headers'], $excel_row['data'] ?? []);  
                 $count++;
             endforeach;  
         # end create mutiple sheet 
