@@ -2917,7 +2917,7 @@ class Api extends CI_Controller
                                                 COALESCE(added_by_user.last_name, '')
                                             ) as added_by_user_full_name,
 
-                                        CONCAT(user.user_title, user.first_name, user.last_name) as assgin_user_full_name, 
+                                        CONCAT(assgin_followup_user.user_title, ' ', assgin_followup_user.first_name, ' ', assgin_followup_user.last_name) as assgin_followup_user_full_name, 
                                         stages.lead_stage_name as stage_name, 
                                         lead_source.lead_source_name,
                                         concat(tbl_leads.profile) as full_profile_url,
@@ -2940,12 +2940,20 @@ class Api extends CI_Controller
             'lead_source.lead_source_id = tbl_leads.lead_source_id',
             'tbl_lead_stages as stages',
             'stages.lead_stage_id = tbl_leads.lead_stage_id',
+            
             'tbl_users as user',
             'user.user_id = tbl_leads.user_id',
+
+            
             'tbl_users as added_by_user',
             'added_by_user.user_id = tbl_leads.added_by',
             '(SELECT * FROM tbl_followup WHERE followup_id IN (SELECT MAX(followup_id) FROM tbl_followup GROUP BY lead_id)) as tbl_followup',
+            
             'tbl_followup.lead_id = tbl_leads.lead_id',
+            'tbl_users as assgin_followup_user',
+            'assgin_followup_user.user_id = tbl_followup.assign_user_id',
+
+
             'tbl_states as state',
             'state.state_id = tbl_leads.lead_state_id',
             'tbl_city as city',
@@ -2992,8 +3000,8 @@ class Api extends CI_Controller
                 # End Secondary Mobile Number Country Code
                 #
 
-                $lead_or_next_followp_date                  =   $item->next_followup_date ? date('d-m-Y', strtotime($item->next_followup_date)) : ($item->lead_date ? date('d-m-Y', strtotime($item->lead_date)) : 'N/A');
-                $lead_or_next_followp_time                  =   $item->next_followup_time ? $item->next_followup_time : ($item->lead_time ? date('H:i', strtotime($item->lead_time)) : 'N/A');
+                $lead_or_next_followp_date                  =   $item->next_followup_date ? date('d-m-Y', strtotime($item->next_followup_date)) : '';
+                $lead_or_next_followp_time                  =   $item->next_followup_time ? $item->next_followup_time : '';
 
                 $records[$key] = array(
                     'lead_id'                               => $item->lead_id,
@@ -3006,12 +3014,12 @@ class Api extends CI_Controller
                     'lead_source_name'                      => $item->lead_source_name ?? 'N/A',
                     'lead_email'                            => $item->lead_email,
                     'is_followup'                           => $item->added_to_followup,
-                    'assgin_user_full_name'                 => $item->assgin_user_full_name,
+                    'assgin_followup_user_full_name'        => $item->assgin_followup_user_full_name,
                     'stage_name'                            => $item->stage_name ?? 'N/A',
                     'full_profile_url'                      => $item->full_profile_url ? ($profile_base_url . $item->full_profile_url) : base_url('public/front/user.png'),
                     'lead_or_next_followp_date'             => $lead_or_next_followp_date,
                     'lead_or_next_followp_time'             => $lead_or_next_followp_time,
-                    'lead_or_next_followp_date_and_time'    => $lead_or_next_followp_date . ' ( ' . $lead_or_next_followp_time . ' )'
+                    'lead_or_next_followp_date_and_time'    => $lead_or_next_followp_date ? $lead_or_next_followp_date . ' ( ' . $lead_or_next_followp_time . ' )' : ''
                 );
 
                 # Is Detail View

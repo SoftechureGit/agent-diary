@@ -12,7 +12,7 @@
                     <div class="form-group">
                         <label for="project_component_id">Components</label>
 
-                        <select name="project_components[1][id]" id="" class="project_component_id form-control set_propety_components">
+                        <select name="project_components[1][id]" id="" class="project_component_id form-control set_propety_components" data-value="<?= $record->component_id ?>">
                             <option value="">Choose...</option>
                         </select>
 
