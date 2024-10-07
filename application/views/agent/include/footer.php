@@ -84,12 +84,12 @@
            });
            //  }
 
-          });
+         });
 
-          /** Dropdown UI issue */
-             $('select#builder_id, select#product_id, select#product_type_id').select2()
-          /** Dropdown UI issue */
-       }  
+         /** Dropdown UI issue */
+         $('select#builder_id, select#product_id, select#product_type_id').select2()
+         /** Dropdown UI issue */
+       }
 
        convertToSelect2()
 
@@ -153,6 +153,7 @@
                /***********************************************************************
                 * End Lead Unit Form Validate
                 ************************************************************************/
+
              }
              /** # **/
            }
@@ -296,19 +297,19 @@
        /*  Get Cities */
        $(document).on('change', '.get_cities', function() {
 
-          /******************************************************
-              *  Booking Form : Fields Reset
-              ********************************************************/
-              booking_form       =   $('#followup-form-modal .booking_form')
+         /******************************************************
+          *  Booking Form : Fields Reset
+          ********************************************************/
+         booking_form = $('#followup-form-modal .booking_form')
 
-          booking_form.find('[name="booking_location_id"]').html('')
-          booking_form.find('[name="booking_project_id"]').html('')
-          booking_form.find('[name="booking_unit_code"]').html('')
-          booking_form.find('[name="booking_inventory_plot_or_unit_number"]').html('')
-          booking_form.find('.project_component_id').html('')
-          booking_form.find('.plot-unit-number-measure-msg').html('')
+         booking_form.find('[name="booking_location_id"]').html('')
+         booking_form.find('[name="booking_project_id"]').html('')
+         booking_form.find('[name="booking_unit_code"]').html('')
+         booking_form.find('[name="booking_inventory_plot_or_unit_number"]').html('')
+         booking_form.find('.project_component_id').html('')
+         booking_form.find('.plot-unit-number-measure-msg').html('')
 
-          /******************************************************** 
+         /******************************************************** 
           * End Booking Form : Fields Reset
           ********************************************************/
 
@@ -349,20 +350,20 @@
 
        /*  Get Locations */
        $(document).on('change', '.get_locations', function() {
-            /******************************************************
-              *  Booking Form : Fields Reset
-              ********************************************************/
-              booking_form       =   $('#followup-form-modal .booking_form')
+         /******************************************************
+          *  Booking Form : Fields Reset
+          ********************************************************/
+         booking_form = $('#followup-form-modal .booking_form')
 
-              booking_form.find('[name="booking_project_id"]').html('')
-              booking_form.find('[name="booking_unit_code"]').html('')
-              booking_form.find('[name="booking_inventory_plot_or_unit_number"]').html('')
-              booking_form.find('.plot-unit-number-measure-msg').html('')
-              booking_form.find('.project_component_id').html('')
+         booking_form.find('[name="booking_project_id"]').html('')
+         booking_form.find('[name="booking_unit_code"]').html('')
+         booking_form.find('[name="booking_inventory_plot_or_unit_number"]').html('')
+         booking_form.find('.plot-unit-number-measure-msg').html('')
+         booking_form.find('.project_component_id').html('')
 
-              /******************************************************** 
-              * End Booking Form : Fields Reset
-              ********************************************************/
+         /******************************************************** 
+          * End Booking Form : Fields Reset
+          ********************************************************/
 
          var city_id = $(this).val();
          var selected_id = $('.set_locations').data('selected_id');
@@ -388,7 +389,7 @@
                $('.set_locations').html(res.view)
                $('[name="location_id"]').trigger('change')
 
-               
+
              }
            }
          })
@@ -399,19 +400,19 @@
 
        $(document).on('change', '.get_properties_via_location', function() {
 
-          /******************************************************
-              *  Booking Form : Fields Reset
-              ********************************************************/
-              booking_form       =   $('#followup-form-modal .booking_form')
+         /******************************************************
+          *  Booking Form : Fields Reset
+          ********************************************************/
+         booking_form = $('#followup-form-modal .booking_form')
 
-              booking_form.find('[name="booking_unit_code"]').html('')
-              booking_form.find('[name="booking_inventory_plot_or_unit_number"]').html('')
-              booking_form.find('.plot-unit-number-measure-msg').html('')
-              booking_form.find('.project_component_id').html('')
+         booking_form.find('[name="booking_unit_code"]').html('')
+         booking_form.find('[name="booking_inventory_plot_or_unit_number"]').html('')
+         booking_form.find('.plot-unit-number-measure-msg').html('')
+         booking_form.find('.project_component_id').html('')
 
-              /******************************************************** 
-              * End Booking Form : Fields Reset
-              ********************************************************/
+         /******************************************************** 
+          * End Booking Form : Fields Reset
+          ********************************************************/
 
          var location_id = $(this).val();
 
@@ -444,11 +445,11 @@
          var project_id = $('[name="booking_project_id"]').val();
          var unit_code_id = $('[name="booking_unit_code"]').val();
 
-         if(project_id == undefined){
-          project_id   = $('[name="project_id"]').val();
+         if (project_id == undefined) {
+           project_id = $('[name="project_id"]').val();
          }
-         if(unit_code_id == undefined){
-          unit_code_id   = $('[name="property_details[unit_code]"]').val();
+         if (unit_code_id == undefined) {
+           unit_code_id = $('[name="property_details[unit_code]"]').val();
          }
 
          /** Ajax */
@@ -467,6 +468,23 @@
            success: (res) => {
              if (res.status) {
                $('.set_propety_components').html(res.view)
+
+                setTimeout(() => {
+                  
+                $('select.set_propety_components').each(function() {
+                 $item = $(this)
+                 value = $item.data('value')
+                 console.log(value)
+                 if (value) {
+                   // Find the option with the matching value and set it as selected
+                   $item.find(`option[value='${value}']`).prop('selected', true);
+                   // Optionally, trigger change if needed
+                   $item.trigger('change');
+                 } else {
+                   console.log('No data-value found for this element');
+                 }
+               })
+               }, 500);
              }
            }
          })
@@ -478,18 +496,18 @@
 
        $(document).on('change', '.get_property_unit_codes', function() {
 
-          /******************************************************
-              *  Booking Form : Fields Reset
-              ********************************************************/
-              booking_form       =   $('#followup-form-modal .booking_form')
+         /******************************************************
+          *  Booking Form : Fields Reset
+          ********************************************************/
+         booking_form = $('#followup-form-modal .booking_form')
 
-              booking_form.find('[name="booking_inventory_plot_or_unit_number"]').html('')
-              booking_form.find('.project_component_id').html('')
-              booking_form.find('.plot-unit-number-measure-msg').html('')
+         booking_form.find('[name="booking_inventory_plot_or_unit_number"]').html('')
+         booking_form.find('.project_component_id').html('')
+         booking_form.find('.plot-unit-number-measure-msg').html('')
 
-              /******************************************************** 
-              * End Booking Form : Fields Reset
-              ********************************************************/
+         /******************************************************** 
+          * End Booking Form : Fields Reset
+          ********************************************************/
 
          var property_id = $(this).val();
 
@@ -509,7 +527,7 @@
              if (res.status) {
                $('.set_property_unit_codes').html(res.view)
 
-              
+
              }
            }
          })
@@ -930,19 +948,19 @@
              data: {
                id: id
              },
-            success: (data) => {
-              if (data.status) {
-                showToast('success', data.message)
-                // $('.lead-list .customer.active').remove()
+             success: (data) => {
+               if (data.status) {
+                 showToast('success', data.message)
+                 // $('.lead-list .customer.active').remove()
 
-                $('.lead-list .customer.active').fadeOut(400, function() {
-                  $(this).remove();
-                });
+                 $('.lead-list .customer.active').fadeOut(400, function() {
+                   $(this).remove();
+                 });
 
-                $('.search-btn').trigger('click')
-              } else {
-                showToast('danger', data.message)
-              }
+                 $('.search-btn').trigger('click')
+               } else {
+                 showToast('danger', data.message)
+               }
              },
              error: function() {
                showToast('danger', 'Some Error Occured.')
@@ -977,7 +995,7 @@
 
        /** Get Inventory Details */
        function get_unit_inventory_details({
-        inventory_id = 0,
+         inventory_id = 0,
          lead_id = 0,
        }) {
 
@@ -988,8 +1006,8 @@
            type: "GET",
            url: "<?= base_url('helper/get_unit_inventory_details'); ?>",
            data: {
-              inventory_id: inventory_id,
-              lead_id: lead_id,
+             inventory_id: inventory_id,
+             lead_id: lead_id,
            },
            dataType: 'json',
            beforeSend: function(data) {
@@ -997,7 +1015,7 @@
            },
            success: function(res) {
              if (res.status) {
-           
+
                $('.plot-unit-number-measure-msg').text(res.data.property_details.measure_msg)
 
                $('input.plot_or_unit_size').val(res.data.property_details.plot_or_unit_size)
@@ -1038,10 +1056,10 @@
              if (res.status) {
                $('#view-inventory-details-Modal .inventory-details-container').html(res.detail_view)
 
-              //  $('.plot-unit-number-measure-msg').text(res.data.property_detail.measure_msg)
+               //  $('.plot-unit-number-measure-msg').text(res.data.property_detail.measure_msg)
 
-              //  $('input.plot_or_unit_size').val(res.data.property_detail.plot_or_unit_size)
-              //  $('.booking-deal-amount-container .rate').trigger('input')
+               //  $('input.plot_or_unit_size').val(res.data.property_detail.plot_or_unit_size)
+               //  $('.booking-deal-amount-container .rate').trigger('input')
 
              } else {
                showToast(res.message);
@@ -1115,12 +1133,12 @@
                  // $(".project_inventory").html(response.data_view);
                  $(".inventory-list-container").html(response.table_view);
                  if (response.status) {
-                  //  $(".inventory-list-container table").dataTable({
-                  //    columnDefs: [{
-                  //      "defaultContent": "-",
-                  //      "targets": "_all"
-                  //    }]
-                  //  })
+                   //  $(".inventory-list-container table").dataTable({
+                   //    columnDefs: [{
+                   //      "defaultContent": "-",
+                   //      "targets": "_all"
+                   //    }]
+                   //  })
                  }
                }, 100);
              },
@@ -1453,13 +1471,13 @@
              var myform = document.getElementById("lead-unit-form");
              var fd = new FormData(myform);
 
-             if($('[name="property_details[plot_number]"] option:selected').data('inventory-id') != undefined){
+             if ($('[name="property_details[plot_number]"] option:selected').data('inventory-id') != undefined) {
                fd.append('inventory_id', $('[name="property_details[plot_number]"] option:selected').data('inventory-id'))
-              }
-              
-              if($('[name="property_details[unit_no]"] option:selected').data('inventory-id') != undefined){
-                fd.append('inventory_id', $('[name="property_details[unit_no]"] option:selected').data('inventory-id'))
-              }
+             }
+
+             if ($('[name="property_details[unit_no]"] option:selected').data('inventory-id') != undefined) {
+               fd.append('inventory_id', $('[name="property_details[unit_no]"] option:selected').data('inventory-id'))
+             }
 
              $.ajax({
                type: "POST",
@@ -1588,18 +1606,18 @@
         * Project Component 
         ************************************************************************/
 
-        $(document).on('change', '.project_component_id', function(){
-          type = $(this).find('option:checked').data('type')
-          
-          bsp_option  = $(this).parents('.clone-template').find('.calculate_on_size_unit option[value="6"]');
-          if(type == 'basic_component'){
-            bsp_option.prop('disabled', true)
-          }else{
-            bsp_option.prop('disabled', false)
-          }
+       $(document).on('change', '.project_component_id', function() {
+         type = $(this).find('option:checked').data('type')
 
-            $(this).parents('.clone-template').find('.type').val(type)
-        })
+         bsp_option = $(this).parents('.clone-template').find('.calculate_on_size_unit option[value="6"]');
+         if (type == 'basic_component') {
+           bsp_option.prop('disabled', true)
+         } else {
+           bsp_option.prop('disabled', false)
+         }
+
+         $(this).parents('.clone-template').find('.type').val(type)
+       })
        /***********************************************************************
         * End Project Component
         ************************************************************************/
@@ -1608,7 +1626,7 @@
        /***********************************************************************
         * Calculate Project Component Total Amount
         ************************************************************************/
-       
+
 
        function calculatePCTotalAmount(e) {
          parent = $(e).parents('.clone-template');
@@ -1620,42 +1638,42 @@
 
          plot_or_unit_size = $('.plot_or_unit_size').val()
 
-         if(plot_or_unit_size == undefined){
-          plot_or_unit_size = $('[name="property_details[plot_size]"]').val()
+         if (plot_or_unit_size == undefined) {
+           plot_or_unit_size = $('[name="property_details[plot_size]"]').val()
          }
 
          total_amount = parseFloat(plot_or_unit_size) * parseFloat(rate);
 
          if (calculate_on_size_unit_id == 5) { // Unit Type : Fix 
            total_amount = parseFloat(rate).toFixed(2)
-          } else if (calculate_on_size_unit_id == 6) { // Unit Type : % of BSP
-            basic_selling_price         = $('[data-type="basic_component"]:checked').parents('.clone-template').find('.total_amount').val()
+         } else if (calculate_on_size_unit_id == 6) { // Unit Type : % of BSP
+           basic_selling_price = $('[data-type="basic_component"]:checked').parents('.clone-template').find('.total_amount').val()
 
-            if(!basic_selling_price){
-              total_amount    = 0;
-              showToast('danger', 'Please select Basic Cost price')
-            }
+           if (!basic_selling_price) {
+             total_amount = 0;
+             showToast('danger', 'Please select Basic Cost price')
+           }
 
-            default_basic_selling_price = 0
-            // default_basic_selling_price = $('[data-type="basic_component"]').data('price')
+           default_basic_selling_price = 0
+           // default_basic_selling_price = $('[data-type="basic_component"]').data('price')
 
-            if(default_basic_selling_price){
-              default_basic_selling_price = default_basic_selling_price * plot_or_unit_size
-            }
+           if (default_basic_selling_price) {
+             default_basic_selling_price = default_basic_selling_price * plot_or_unit_size
+           }
 
-            basic_selling_price = basic_selling_price ? basic_selling_price : default_basic_selling_price
+           basic_selling_price = basic_selling_price ? basic_selling_price : default_basic_selling_price
 
-            if(basic_selling_price){
-              total_amount      = ( basic_selling_price / 100 ) * rate;
-            }else{
+           if (basic_selling_price) {
+             total_amount = (basic_selling_price / 100) * rate;
+           } else {
 
-                if(!$('.inventory_plot_or_unit_numbers').val()){
-                  showToast('danger', 'Please select plot number / unit number')
-                }
-            }
+             if (!$('.inventory_plot_or_unit_numbers').val()) {
+               showToast('danger', 'Please select plot number / unit number')
+             }
+           }
          }
 
-          total_amount = parseFloat(total_amount).toFixed(2)
+         total_amount = parseFloat(total_amount).toFixed(2)
 
 
          parent.find('.total_amount').val(total_amount)
@@ -1668,26 +1686,26 @@
        /***********************************************************************
         * Copy Text
         ************************************************************************/
-        $(document).on('click', '.copy-btn', function() {
-          // Get the text to copy from the data-text attribute
-          var copyText = $(this).data('text');
+       $(document).on('click', '.copy-btn', function() {
+         // Get the text to copy from the data-text attribute
+         var copyText = $(this).data('text');
 
-          // Create a temporary input element to hold the text
-          var tempInput = $('<input>');
-          $('body').append(tempInput);
+         // Create a temporary input element to hold the text
+         var tempInput = $('<input>');
+         $('body').append(tempInput);
 
-          // Set the value of the temporary input to the text to copy
-          tempInput.val(copyText).select();
+         // Set the value of the temporary input to the text to copy
+         tempInput.val(copyText).select();
 
-          // Copy the text to the clipboard
-          document.execCommand("copy");
+         // Copy the text to the clipboard
+         document.execCommand("copy");
 
-          // Remove the temporary input
-          tempInput.remove();
+         // Remove the temporary input
+         tempInput.remove();
 
-          // Optionally, show a message or feedback
-          showToast('success', 'Link copied!')
-      });
+         // Optionally, show a message or feedback
+         showToast('success', 'Link copied!')
+       });
        /***********************************************************************
         * End Copy Text
         ************************************************************************/
