@@ -3000,6 +3000,9 @@ class Api extends CI_Controller
                 # End Secondary Mobile Number Country Code
                 #
 
+                $lead_date                                  =   $item->lead_date ? date('d-m-Y', strtotime($item->lead_date)) : '';
+                $lead_time                                  =   $item->lead_time ? $item->lead_time : '';
+
                 $lead_or_next_followp_date                  =   $item->next_followup_date ? date('d-m-Y', strtotime($item->next_followup_date)) : '';
                 $lead_or_next_followp_time                  =   $item->next_followup_time ? $item->next_followup_time : '';
 
@@ -3019,7 +3022,8 @@ class Api extends CI_Controller
                     'full_profile_url'                      => $item->full_profile_url ? ($profile_base_url . $item->full_profile_url) : base_url('public/front/user.png'),
                     'lead_or_next_followp_date'             => $lead_or_next_followp_date,
                     'lead_or_next_followp_time'             => $lead_or_next_followp_time,
-                    'lead_or_next_followp_date_and_time'    => $lead_or_next_followp_date ? $lead_or_next_followp_date . ' ( ' . $lead_or_next_followp_time . ' )' : ''
+                    'lead_or_next_followp_date_and_time'    => $lead_or_next_followp_date ? $lead_or_next_followp_date . ' ( ' . $lead_or_next_followp_time . ' )' : '',
+                    'lead_date'                             => $lead_date ? $lead_date . ' ( ' . $lead_time . ' )' : '',
                 );
 
                 # Is Detail View
@@ -12344,6 +12348,13 @@ class Api extends CI_Controller
         $where = "lead_type_status='1'";
         $lead_type_list = $this->Action_model->detail_result('tbl_lead_types', $where, 'lead_type_id,lead_type_name');
 
+        $lead_type_list_default[]             =    [
+                                                                                'lead_type_id'      =>  "0",
+                                                                                'lead_type_name'    =>  "All"
+                                                                            ];
+        $lead_type_list_arr = array_merge($lead_type_list_default, $lead_type_list);
+
+
         $where = "user_status='1' AND ((parent_id='" . $account_id . "') OR (user_id='" . $account_id . "' AND role_id='2'))";
         $where_ids = "";
 
@@ -12365,7 +12376,7 @@ class Api extends CI_Controller
             'lead_source_list' => $lead_source_list,
             'lead_stage_list' => $lead_stage_list,
             'user_list' => $user_list ?? [],
-            'lead_type_list' => $lead_type_list
+            'lead_type_list' => $lead_type_list_arr
         );
 
         echo json_encode($array);
