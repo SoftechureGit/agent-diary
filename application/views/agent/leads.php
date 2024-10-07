@@ -293,7 +293,7 @@
                             <div class="form-group">
 
                               <label for="">To</label>
-                              <input type="date" id="followup_to" name="followup_to" class="form-control">
+                              <input type="date" id="followup_to" name="followup_to" class="form-control" value="<?= date('Y-m-d') ?>">
                             </div>
                           </div>
                           <!-- End Followup Date Filter -->

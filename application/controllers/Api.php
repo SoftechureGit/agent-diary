@@ -2739,6 +2739,7 @@ class Api extends CI_Controller
         $search_size_max    = $this->input->post('search_size_max');
         $search_size_unit   = $this->input->post('search_size_unit');
         $search_agent_id    = $this->input->post('search_agent_id');
+        $filter_by          = $this->input->post('filter_by');
 
 
         $where_ext = "";
@@ -2755,15 +2756,22 @@ class Api extends CI_Controller
             $where_ext .= " AND DATE(STR_TO_DATE(tbl_leads.lead_date, '%d-%m-%Y')) BETWEEN '$lead_from' AND '$lead_to'";
         }
 
+        if($filter_by == 'due_followup'):
 
-        if ($followup_from && !$followup_to) {
-            $where_ext .= " AND DATE(STR_TO_DATE(tbl_followup.next_followup_date, '%d-%m-%Y')) >= '$followup_from'";
-        }
+            if ($followup_from && !$followup_to) {
+                $where_ext .= " AND DATE(STR_TO_DATE(tbl_followup.next_followup_date, '%d-%m-%Y')) >= '$followup_from'";
+            }
 
-        if ($followup_from && $followup_to) {
+            if ($followup_from && $followup_to) {
 
-            $where_ext .= " AND DATE(STR_TO_DATE(tbl_followup.next_followup_date, '%d-%m-%Y')) BETWEEN '$followup_from' AND '$followup_to'";
-        }
+                $where_ext .= " AND DATE(STR_TO_DATE(tbl_followup.next_followup_date, '%d-%m-%Y')) BETWEEN '$followup_from' AND '$followup_to'";
+            }
+
+            if (!$followup_from && $followup_to) {
+
+                $where_ext .= " AND DATE(STR_TO_DATE(tbl_followup.next_followup_date, '%d-%m-%Y')) <= '$followup_to'";
+            }
+        endif;
 
 
         if ($search_state_id) {
@@ -2875,7 +2883,7 @@ class Api extends CI_Controller
 
         # Sorting
 
-        $filter_by = $this->input->post('filter_by');
+        
 
         switch ($filter_by):
             case 'due_followup':
@@ -9966,13 +9974,15 @@ class Api extends CI_Controller
                         "lead_id"               => $item->lead_id,
                         "look_for"              => $item->look_for,
                         "budget"                => (($item->budget_minimum) ? $item->budget_minimum : '') . ' - ' . (($item->budget_maximum) ? $item->budget_maximum : ''),
-                        "size"              => $item->size_min . '-' . $item->size_max . ' ' . $item->size_unit_name,
+                        "size"                  => $item->size_min . '-' . $item->size_max . ' ' . $item->size_unit_name,
                         "remark"                => $item->remark,
                         "dor"                   => $item->dor,
                         "state_id"              => $item->state_id,
                         "city_id"               => $item->city_id,
                         "product_type_id"       => $item->product_type_id,
+                        "product_type_name"     => $item->product_type_name,
                         "product_unit_id"       => $item->unit_type_id,
+                        "unit_type_name"       => $item->unit_type_name,
                         "lead_option_id"        => $item->lead_option_id,
                         "location"              => $location,
                         "requirement_status"    => $item->requirement_status == 1 ? 'Open' : 'Close',

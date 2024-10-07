@@ -2252,6 +2252,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
             $search_size_max    = $this->input->post('search_size_max');
             $search_size_unit   = $this->input->post('search_size_unit');
             $search_agent_id    = $this->input->post('search_agent_id'); 
+            $filter_by          = $this->input->post('filter_by');
 
          
             $where_ext = "";
@@ -2268,17 +2269,23 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 $where_ext .= " AND DATE(STR_TO_DATE(tbl_leads.lead_date, '%d-%m-%Y')) BETWEEN '$lead_from' AND '$lead_to'";
             }
 
+            if($filter_by == 'due_followup'):
 
+                if ($followup_from && !$followup_to) {
+                    $where_ext .= " AND DATE(STR_TO_DATE(tbl_followup.next_followup_date, '%d-%m-%Y')) >= '$followup_from'";
+                }
 
-            if ($followup_from && !$followup_to) {
-                $where_ext .= " AND DATE(STR_TO_DATE(tbl_followup.next_followup_date, '%d-%m-%Y')) >= '$followup_from'";
-            }
+                if ($followup_from && $followup_to) {
 
-            if ($followup_from && $followup_to) {
+                    $where_ext .= " AND DATE(STR_TO_DATE(tbl_followup.next_followup_date, '%d-%m-%Y')) BETWEEN '$followup_from' AND '$followup_to'";
+                }
 
-                $where_ext .= " AND DATE(STR_TO_DATE(tbl_followup.next_followup_date, '%d-%m-%Y')) BETWEEN '$followup_from' AND '$followup_to'";
-            }
+                if (!$followup_from && $followup_to) {
 
+                    $where_ext .= " AND DATE(STR_TO_DATE(tbl_followup.next_followup_date, '%d-%m-%Y')) <= '$followup_to'";
+                }
+            endif;
+            
             if ($search_state_id) {
                 $where_ext .= " AND lead_state_id='" . $search_state_id . "'";
             }
@@ -2394,7 +2401,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
 
         # Sorting
 
-        $filter_by = $this->input->post('filter_by');
+       
 
         switch ($filter_by):
             case 'due_followup':
