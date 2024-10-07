@@ -3942,6 +3942,7 @@ WHERE lead_id='" . $lead_id . "'
             $followup_id = $this->input->post('followup_id');
             $followup_lead_id = $this->input->post('followup_lead_id');
             $followup_status = $this->input->post('followup_status');
+            $fp_assign_to   = $this->input->post('fp_assign_to');
 
             if ($this->input->post("lead_stage_id") == 6) {
                 $inv_data = $this->Action_model->select_single('tbl_inventory', "inventory_id='" . $this->input->post("bk_inventory_id") . "' AND inventory_status='1'");

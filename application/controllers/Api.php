@@ -3009,7 +3009,7 @@ class Api extends CI_Controller
                 #
 
                 $lead_date                                  =   $item->lead_date ? date('d-m-Y', strtotime($item->lead_date)) : '';
-                $lead_time                                  =   $item->lead_time ? $item->lead_time : '';
+                $lead_time                                  =   $item->lead_time ? date('H:i', strtotime($item->lead_time)) : '';
 
                 $lead_or_next_followp_date                  =   $item->next_followup_date ? date('d-m-Y', strtotime($item->next_followup_date)) : '';
                 $lead_or_next_followp_time                  =   $item->next_followup_time ? $item->next_followup_time : '';
