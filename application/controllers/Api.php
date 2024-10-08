@@ -2124,7 +2124,7 @@ class Api extends CI_Controller
     {
         $array = array();
 
-        $account_id = getAccountId();
+        $account_id = user()->account_id;
 
         if ($account_id && $this->input->post()) {
 
@@ -12080,19 +12080,21 @@ class Api extends CI_Controller
         endif;
         # End Validation
 
-        $arr               =    [];
+        $arr                    =    [];
 
+        # Delete Query
         $this->db->from('tbl_users');
         $this->db->where('user_id', $id);
         $this->db->where('parent_id', $account_id);
-        $result      =   $this->db->delete();
+        $result                 =   $this->db->delete();
+        # End Delete Query
 
-        $is_exists      =    $this->db->select('user_id')->from('tbl_users')->where('user_id', $id)->get()->row();
+        $is_exists              =    $this->db->select('user_id')->from('tbl_users')->where('user_id', $id)->get()->row();
 
         if (!$is_exists) :
-            $arr               =    ['status' => true, 'message' => 'Record deleted successfully'];
+            $arr                =    ['status' => true, 'message' => 'Record deleted successfully'];
         else:
-            $arr               =    ['status' => false, 'message' => 'Some error occured'];
+            $arr                =    ['status' => false, 'message' => 'Some error occured'];
         endif;
 
         echo json_encode($arr);
