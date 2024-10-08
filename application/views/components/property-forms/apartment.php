@@ -232,7 +232,10 @@
                         <div class="form-group">
                             <label for="">Parking</label>
                             <?php
-                            $formatted_parking = "['" . implode("', '", is_array($parking ?? []) ? $parking : [] ) . "']";
+                          
+                            $parking  = is_array($parking ?? null) ? $parking : [];
+
+                            $formatted_parking = "['" . implode("', '",  $parking) . "']";
                             ?>
                             <select name="property_details[parking][]" id="" class="form-select" multiple data-saved-value="<?= $formatted_parking ?>">
 
