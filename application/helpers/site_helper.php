@@ -1619,5 +1619,14 @@ if (!function_exists('getAccountId')) {
     }
     # End Counting Summary
 
+    if(!function_exists('transfer_or_assign_lead')){
+        function transfer_or_assign_lead($param = null){
+            if(!$param) return false;
+
+            $lead_id                =   $param->lead_id;
+
+        }
+    }
+
 
 }

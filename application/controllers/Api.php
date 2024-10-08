@@ -2852,6 +2852,7 @@ class Api extends CI_Controller
             $where = "tbl_leads.user_id='" . $account_id . "' AND is_customer='0'";
         }
 
+        
         $where_ids = "";
 
         // $user_ids = $this->get_level_user_ids();
@@ -11650,7 +11651,7 @@ class Api extends CI_Controller
         $user_detail    = $this->Action_model->select_single('tbl_users', $where);
 
 
-        $account_id     =   $user_detail->user_id;
+        $account_id     =   $user_detail->parent_id ? $user_detail->parent_id : $user_detail->user_id;
         $user_id        =   $user_detail->user_id;
 
         $where            = ' 1 = 1 ';
@@ -11664,7 +11665,6 @@ class Api extends CI_Controller
         $filters['all_file_type'] = $this->db->distinct()->select('file_name')->where($where)->get('tbl_data')->result();
 
         $filters['all_status']  =  $this->db->distinct()->select('lead_stage_id as lead_status_id,lead_stage_name as lead_status_name')->where(['lead_stage_status' => 1])->get('tbl_lead_stages')->result();
-
 
 
         # Reasons
@@ -11695,16 +11695,16 @@ class Api extends CI_Controller
         }
 
         $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,CONCAT(user_title," ",first_name," ",last_name) as user_full_name');
-        $filters['user_list'] = $user_list;
+        
+        $user_list_arr              =   array_merge([[ 'user_id' => "0", 'user_full_name' => "Unassigned" ]], $user_list ?? []);
+
+        $filters['user_list'] = $user_list_arr;
 
         # End Team Meber 
 
-
         # data list 
 
-
         $postData = $this->input->post();
-
 
         $searchValue = '';
         $searchQuery = '';
@@ -11724,7 +11724,15 @@ class Api extends CI_Controller
         if ($this->input->post('user')) {
 
             $account_id = $this->input->post('user');
-            $searchQuery .= " AND tbl_data.added_by= '$account_id'";
+            // $searchQuery .= " AND tbl_data.added_by= '$account_id'";
+
+              if($account_id && $account_id != '0'):
+                $searchQuery .= " AND tbl_leads.user_id= '$account_id'";
+            endif;
+
+            if(!$account_id || $account_id == '0'):
+                $searchQuery .= " AND tbl_data.is_in_lead= 0";
+            endif;
         }
 
         if ($this->input->post('reason')) {
