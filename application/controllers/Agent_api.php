@@ -11597,7 +11597,7 @@ WHERE lead_id='" . $lead_id . "'
             endif;
 
             if($account_id == 'unassigned'):
-                $searchQuery .= " AND tbl_data.is_in_lead= 0";
+                $searchQuery .= " AND tbl_data.is_in_lead= '0' AND data_reason is NULL ";
             endif;
         }
         

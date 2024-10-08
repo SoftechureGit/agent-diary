@@ -11721,20 +11721,20 @@ class Api extends CI_Controller
             $searchQuery .= " file_name= '$file_name'";
         }
 
-        if ($this->input->post('user')) {
+        $user_id = $this->input->post('user');
+        if ($user_id != '') {
 
-            // $account_id = $this->input->post('user');
             // $searchQuery .= " AND tbl_data.added_by= '$account_id'";
 
-              if($account_id && $account_id != '0'):
+              if($user_id && $user_id != '0'):
                 $searchQuery .= " AND tbl_leads.user_id= '$user_id'";
             endif;
 
-            if(!$account_id || $account_id == '0'):
-                $searchQuery .= " AND tbl_data.is_in_lead= 0";
+            if(!$user_id || $user_id == "0"):
+                $searchQuery .= " AND tbl_data.is_in_lead= '0' AND data_reason is NULL " ;
             endif;
         }
-
+        
         if ($this->input->post('reason')) {
 
             $reason = $this->input->post('reason');
