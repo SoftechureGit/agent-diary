@@ -2723,9 +2723,8 @@ class Api extends CI_Controller
         # End Lead Filter
 
         # Followup Filter
-        $followup_from      =   $this->input->post('followup_from');
-        $followup_from      =   $followup_from ? date('Y-m-d', strtotime($followup_from)) : date('Y-m-d');
-        $followup_to        =   $this->input->post('followup_to');
+        $followup_from      = $this->input->post('followup_from');
+        $followup_to        = $this->input->post('followup_to');
         # End Followup Filter
 
         $search_state_id    = $this->input->post('search_state_id');
