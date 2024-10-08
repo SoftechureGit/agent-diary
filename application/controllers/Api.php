@@ -11723,7 +11723,7 @@ class Api extends CI_Controller
 
         if ($this->input->post('user')) {
 
-            $account_id = $this->input->post('user');
+            // $account_id = $this->input->post('user');
             // $searchQuery .= " AND tbl_data.added_by= '$account_id'";
 
               if($account_id && $account_id != '0'):
