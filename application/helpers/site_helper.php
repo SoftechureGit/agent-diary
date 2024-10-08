@@ -104,9 +104,6 @@ if (!function_exists('upload_file')) {
         $config['max_size']             = 10 * 1024;
         $config['remove_spaces']        = TRUE;
 
-        print_r($_FILES[$name]['name']);
-        die;
-
         # File Upload
         if (!empty($_FILES[$name]['name'])) :
             # File Name and Config
@@ -121,6 +118,74 @@ if (!function_exists('upload_file')) {
                 return (object) ['status' => false, 'message' => $error['error']];
             else :
                 CI()->upload->data($name);
+            endif;
+        else :
+            $file_name                  =   $old_file_name;
+        endif;
+        # End File Upload
+
+        return (object) ['status' => true, 'messgae' => 'Successfully file uploaded', 'file_name' => $file_name];
+    }
+}
+# End Upload File
+
+# Upload Files : One at a time
+if (!function_exists('uploadFilesWithoutLoop')) {
+    function uploadFilesWithoutLoop($param)
+    {
+
+        $file_group_name             =   $param->file_group_name;
+        $index                       =   $param->index;
+        $name                        =   $param->name;
+        
+        $upload_folder               =   $param->upload_folder;
+        $old_file_name               =   $param->old_file_name ?? null;
+        $is_new_upload_path          =   $param->is_new_upload_path ?? true;
+
+        if($is_new_upload_path):
+            $upload_path                    = "./public/other/$upload_folder/";
+        else:
+            
+            $upload_path                    =  $upload_folder;
+        endif;
+
+        # Create Folder if Folder Not Exits
+        if (!file_exists($upload_path)) {
+            mkdir($upload_path, 0777, true);
+        }
+        # End Create Folder if Folder Not Exits
+
+        $config                         = array();
+        $config['upload_path']          = $upload_path;
+        // $config['allowed_types']        = 'png|jpg|jpeg|pdf';
+        $config['allowed_types']        = '*';
+        $config['max_size']             = 10 * 1024;
+        $config['remove_spaces']        = TRUE;
+
+        # File Upload
+        if (!empty($_FILES[$file_group_name]['name'][$index][$name])) :
+
+             // Restructure $_FILES array for the specific file
+            $_FILES['file_temp']['name']     = $_FILES[$file_group_name]['name'][$index][$name];
+            $_FILES['file_temp']['type']     = $_FILES[$file_group_name]['type'][$index][$name];
+            $_FILES['file_temp']['tmp_name'] = $_FILES[$file_group_name]['tmp_name'][$index][$name];
+            $_FILES['file_temp']['error']    = $_FILES[$file_group_name]['error'][$index][$name];
+            $_FILES['file_temp']['size']     = $_FILES[$file_group_name]['size'][$index][$name];
+
+            
+            # File Name and Config
+            $file_name                  = strtolower(str_replace(' ', '-', $_FILES[$file_group_name]['name'][$index][$name]));
+            $config['file_name']        = $file_name;
+
+            CI()->load->library('upload', $config);
+            # End File Name and Config
+
+            if (!CI()->upload->do_upload('file_temp')) :
+                $error   =   array('error' => CI()->upload->display_errors());
+                return (object) ['status' => false, 'message' => $error['error']];
+            else :
+                $uploaded_data = CI()->upload->data();
+                $file_name = $uploaded_data['file_name'];
             endif;
         else :
             $file_name                  =   $old_file_name;

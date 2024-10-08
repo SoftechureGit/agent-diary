@@ -1572,26 +1572,6 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
     public function lead_process()
     {
 
-        // $documents_arr              =   [];
-        
-        // foreach(request()->documents ?? [] as $document_key => $document):
-
-        //     $document           = (object)  $document;
-
-        //     $upload_result                      =   upload_file("documents[$document_key][file]", "leads/1/documents");
-
-        //     print_r( $upload_result);
-        //         $documents_arr[]              =   (object) [
-        //                                                             'title'     => $document->title,
-        //                                                             'file_name' => $upload_result->file_name ?? '',
-        //                                                     ];
-        // endforeach;
-
-        
-        // print_r($documents_arr);
-
-        // die;
-
         $array = array();
 
         $account_id = 0;
@@ -1695,6 +1675,42 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 );
 
                 $this->Action_model->insert_data($lead_history_array, 'tbl_lead_history');
+
+                # Documents Upload
+                $documents_arr              =   [];
+                
+                foreach(request()->documentss ?? [] as $document_key => $document):
+
+                    $document           =   (object)  $document;
+
+                    $title              =   $document->title ?? '';
+
+                    if($title):
+                    $lead_document      =   uploadFilesWithoutLoop((object)[ 
+                                                                                'file_group_name'   =>  'documents', 
+                                                                                'index'             =>  $document_key, 
+                                                                                'name'              =>  'file', 
+                                                                                'upload_folder'     =>  "leads/$id/documents" 
+                                                                            ]);
+                                                                        endif;
+
+                        if($title && ( $lead_document->file_name ?? 0 )):
+                            $documents_arr                              =   [
+                                                                                'lead_id'       => $id,
+                                                                                'title'         => $title,
+                                                                                'file_name'     => $lead_document->file_name ?? '',
+                                                                            ];
+
+                            if($document->id ?? 0):
+                                $this->db->where('id', $document->id)->udpate('tbl_documents', $documents_arr);
+                            else:
+                                $this->db->insert('tbl_documents', $documents_arr);
+                            endif;
+                        endif;
+                endforeach;
+                
+                # End Documents Upload
+                
             } else {
 
                 // if($this->Action_model->select_single('tbl_leads',"lead_email='".$this->input->post('lead_email')."' AND account_id='".$account_id."'")){

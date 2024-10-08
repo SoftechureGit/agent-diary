@@ -190,7 +190,7 @@ function parkings($id)
 # End Get Property Parkings Details
 
 # Get Inventory Details
-function getInventory($id, $plot_or_unit_number = null)
+function getInventory($id, $plot_or_unit_number = null, $property_id = null)
 {
     $where = " 1 = 1 ";
 
@@ -198,9 +198,13 @@ function getInventory($id, $plot_or_unit_number = null)
         $where .= " and inventory_id = $id";
     endif;
 
+    if ($property_id):
+        $where .= " and product_id = '$property_id'";
+    endif;
+
     if ($plot_or_unit_number):
-        $where          .=  " and JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.plot_number')) = '$plot_or_unit_number'
-                               or JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.unit_no')) = '$plot_or_unit_number'
+        $where          .=  " and ( JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.plot_number')) = '$plot_or_unit_number'
+                               or JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.unit_no')) = '$plot_or_unit_number' )
                             ";
     endif;
 

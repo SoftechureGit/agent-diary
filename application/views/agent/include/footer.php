@@ -1357,6 +1357,7 @@
 
        function getInventory({
          id = 0,
+         property_id = 0,
          plot_or_unit_number = null
        }) {
 
@@ -1369,6 +1370,7 @@
            url: "<?= base_url('helper/get_inventory_details'); ?>",
            data: {
              id: id,
+             property_id: property_id,
              plot_or_unit_number: plot_or_unit_number,
            },
            dataType: 'json',
@@ -1431,6 +1433,7 @@
        /** Fetch Inventory Data Via Plot Number */
        $(document).on('change', '[name="property_details[plot_number]"], [name="property_details[unit_no]"]', function() {
          plot_or_unit_number = this.value;
+         property_id         = $('.product_id').val()
 
          /************************************************************
           *  Saved Data set in fields
@@ -1442,6 +1445,7 @@
 
 
          getInventory({
+           property_id: property_id,
            plot_or_unit_number: plot_or_unit_number
          })
        })

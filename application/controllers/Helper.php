@@ -113,9 +113,10 @@ class Helper extends CI_Controller
     {
         $arr                        =   [];
         $id                         =   $this->input->get('id');
-        $plot_or_unit_number                         =   $this->input->get('plot_or_unit_number');
+        $property_id                =   $this->input->get('property_id');
+        $plot_or_unit_number        =   $this->input->get('plot_or_unit_number');
 
-        $inventory                  =  getInventory($id, $plot_or_unit_number);
+        $inventory                  =  getInventory($id, $plot_or_unit_number, $property_id);
         $property_layout            =  $inventory->property_layout ?? null;
         $property_layout_url        =  ($inventory->property_layout ?? 0) ? base_url("/uploads/images/property/unit/$inventory->property_layout") : null;;
         $property_details           =  ($inventory->property_details ?? 0) ? json_decode($inventory->property_details ?? []) : $inventory;
