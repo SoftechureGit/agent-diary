@@ -38,7 +38,7 @@ if (!function_exists('user')) {
     {
         if(!$user_id):
             $user_id            =    CI()->session->userdata('user_id');
-            $access_token       =    CI()->session->userdata('agent_hash');
+            $access_token       =    CI()->input->request_headers()['Access-Token'] ?? '';
         endif;
 
         // if (!$user_id && !$access_token) return null;

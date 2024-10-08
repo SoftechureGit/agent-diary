@@ -1643,7 +1643,7 @@ class Api extends CI_Controller
         echo json_encode($data);
     }
 
-   
+
 
     public function get_lead()
     {
@@ -2756,7 +2756,7 @@ class Api extends CI_Controller
             $where_ext .= " AND DATE(STR_TO_DATE(tbl_leads.lead_date, '%d-%m-%Y')) BETWEEN '$lead_from' AND '$lead_to'";
         }
 
-        if($filter_by == 'due_followup'):
+        if ($filter_by == 'due_followup'):
 
             if ($followup_from && !$followup_to) {
                 $where_ext .= " AND DATE(STR_TO_DATE(tbl_followup.next_followup_date, '%d-%m-%Y')) >= '$followup_from'";
@@ -2852,7 +2852,7 @@ class Api extends CI_Controller
             $where = "tbl_leads.user_id='" . $account_id . "' AND is_customer='0'";
         }
 
-        
+
         $where_ids = "";
 
         // $user_ids = $this->get_level_user_ids();
@@ -2884,7 +2884,7 @@ class Api extends CI_Controller
 
         # Sorting
 
-        
+
 
         switch ($filter_by):
             case 'due_followup':
@@ -2949,15 +2949,15 @@ class Api extends CI_Controller
             'lead_source.lead_source_id = tbl_leads.lead_source_id',
             'tbl_lead_stages as stages',
             'stages.lead_stage_id = tbl_leads.lead_stage_id',
-            
+
             'tbl_users as user',
             'user.user_id = tbl_leads.user_id',
 
-            
+
             'tbl_users as added_by_user',
             'added_by_user.user_id = tbl_leads.added_by',
             '(SELECT * FROM tbl_followup WHERE followup_id IN (SELECT MAX(followup_id) FROM tbl_followup GROUP BY lead_id)) as tbl_followup',
-            
+
             'tbl_followup.lead_id = tbl_leads.lead_id',
             'tbl_users as assgin_followup_user',
             'assgin_followup_user.user_id = tbl_followup.assign_user_id',
@@ -4153,7 +4153,7 @@ class Api extends CI_Controller
                         exit;
                     endif;
 
-                    
+
                     $basic_details                                          =   $booking_details->basic_details;
                     $booking_component_details                              =   $booking_details->component_details ?? [];
                     $booking_payment_terms_details                          =   $booking_details->payment_terms_details ?? [];
@@ -4196,12 +4196,12 @@ class Api extends CI_Controller
                         echo json_encode(['status' => false, 'message' => 'City required']);
                         exit;
                     endif;
-                    
+
                     if (!$location_id):
                         echo json_encode(['status' => false, 'message' => 'Location required']);
                         exit;
                     endif;
-                    
+
                     if (!$project_id):
                         echo json_encode(['status' => false, 'message' => 'project Id required']);
                         exit;
@@ -4229,14 +4229,14 @@ class Api extends CI_Controller
 
                     // print_r($booking_component_details[0]->calculate_on_size_unit_id);
                     // die;
-                    if(!is_array($booking_component_details) && $booking_component_details):
+                    if (!is_array($booking_component_details) && $booking_component_details):
                         $booking_component_details = json_decode($booking_component_details);
-                        // echo json_encode(['status' => false, 'message' => "Invalid component details"]);
-                        // exit;
+                    // echo json_encode(['status' => false, 'message' => "Invalid component details"]);
+                    // exit;
                     endif;
 
                     foreach ($booking_component_details ?? [] as $project_component):
-                        
+
                         $project_component          =   (object) $project_component;
                         $component_id                                   = $project_component->id ?? 0;
                         $component_type                                 = $project_component->type ?? '';
@@ -4297,10 +4297,10 @@ class Api extends CI_Controller
                             # End Booking Basic Details
 
                             # Payment Terms Details
-                            if(!is_array($booking_payment_terms_details) && $booking_payment_terms_details):
+                            if (!is_array($booking_payment_terms_details) && $booking_payment_terms_details):
                                 $booking_payment_terms_details = json_decode($booking_payment_terms_details);
-                                // echo json_encode(['status' => false, 'message' => "Invalid component details"]);
-                                // exit;
+                            // echo json_encode(['status' => false, 'message' => "Invalid component details"]);
+                            // exit;
                             endif;
 
                             $booking_terms_details_arr                          =   [];
@@ -4342,15 +4342,15 @@ class Api extends CI_Controller
                             $inventory_property_details     =   $this->db->select('inventory_id as  id, property_details')->where("inventory_id = '$inventory_id'")->from('tbl_inventory')->get()->row();
 
                             $unit_lead_data                 =   [
-                                                                    'buyer_id'          =>  $followup_lead_id,
-                                                                    'buyer_status'      =>  1,          # Grant
-                                                                    'status'            =>  1,          # Sold
-                                                                ];
+                                'buyer_id'          =>  $followup_lead_id,
+                                'buyer_status'      =>  1,          # Grant
+                                'status'            =>  1,          # Sold
+                            ];
 
                             $unit_lead_where = "inventory_id='$inventory_id'";
                             $this->Action_model->update_data($unit_lead_data, 'tbl_lead_units', $unit_lead_where);
 
-                        # End Unit Lead
+                            # End Unit Lead
 
                             $lead_history_array = array(
                                 'title' => 'Booking',
@@ -11695,8 +11695,8 @@ class Api extends CI_Controller
         }
 
         $user_list = $this->Action_model->detail_result('tbl_users', $where, 'user_id,CONCAT(user_title," ",first_name," ",last_name) as user_full_name');
-        
-        $user_list_arr              =   array_merge([[ 'user_id' => "0", 'user_full_name' => "Unassigned" ]], $user_list ?? []);
+
+        $user_list_arr              =   array_merge([['user_id' => "0", 'user_full_name' => "Unassigned"]], $user_list ?? []);
 
         $filters['user_list'] = $user_list_arr;
 
@@ -11721,16 +11721,16 @@ class Api extends CI_Controller
             $searchQuery .= " file_name= '$file_name'";
         }
 
-        
+
         $user_id = $this->input->post('user');
-        if($user_id):
+        if ($user_id):
             $searchQuery .= " AND tbl_leads.user_id= '$user_id'";
-        elseif($user_id != '' && $user_id == 0):
-            $searchQuery .= " AND tbl_data.is_in_lead= '0' AND data_reason is NULL " ;
+        elseif ($user_id != '' && $user_id == 0):
+            $searchQuery .= " AND tbl_data.is_in_lead= '0' AND data_reason is NULL ";
         endif;
 
 
-        
+
         if ($this->input->post('reason')) {
 
             $reason = $this->input->post('reason');
@@ -11756,7 +11756,7 @@ class Api extends CI_Controller
                 $searchQuery .= "(tbl_data.data_first_name LIKE '%" . $searchValue . "%' OR tbl_data.data_mobile LIKE '%" . $searchValue . "%') ";
             }
         }
-        
+
         if ($searchQuery != ''):
             $searchQuery .= " and tbl_data.account_id = '$account_id'";
         endif;
@@ -12059,6 +12059,44 @@ class Api extends CI_Controller
         echo json_encode($arr);
     }
 
+    public function delete_team_member()
+    {
+        $id                     =   request()->id ?? 0;
+        $account_id             =   user()->account_id;
+
+        # Validation
+        if (!$id):
+            $arr               =    ['status' => false, 'message' => 'The Id field requried'];
+
+            echo json_encode($arr);
+            exit;
+        endif;
+
+        if ($id == $account_id):
+            $arr               =    ['status' => false, 'message' => 'Not allowed to delete Agent Admin'];
+
+            echo json_encode($arr);
+            exit;
+        endif;
+        # End Validation
+
+        $arr               =    [];
+
+        $this->db->from('tbl_users');
+        $this->db->where('user_id', $id);
+        $this->db->where('parent_id', $account_id);
+        $result      =   $this->db->delete();
+
+        $is_exists      =    $this->db->select('user_id')->from('tbl_users')->where('user_id', $id)->get()->row();
+
+        if (!$is_exists) :
+            $arr               =    ['status' => true, 'message' => 'Record deleted successfully'];
+        else:
+            $arr               =    ['status' => false, 'message' => 'Some error occured'];
+        endif;
+
+        echo json_encode($arr);
+    }
 
     # Team Data Store
 
@@ -12283,17 +12321,17 @@ class Api extends CI_Controller
                 # Unit Status
                 $status     = '';
                 $status_label     = '';
-                if($unit_row->buyer_status == 1 && $unit_row->buyer_id == $lead_id):
+                if ($unit_row->buyer_status == 1 && $unit_row->buyer_id == $lead_id):
                     $status     = "<span class='btn btn-sm btn-success badge text-white'>Grant</span>";
                     $status_label     = 'Grant';
                 endif;
-                
-                if($unit_row->status == 1 && $unit_row->lead_id == $lead_id):
+
+                if ($unit_row->status == 1 && $unit_row->lead_id == $lead_id):
                     $status     =  "<span class='btn btn-sm btn-warning badge text-white'>Sold</span>";
                     $status_label     = 'Sold';
                 endif;
                 # End Unit Status
-                
+
                 $unit_limited_arr[] = array(
                     'id'                    => $unit_row->id,
                     'lead_id'               => $unit_row->lead_id,
@@ -12366,9 +12404,9 @@ class Api extends CI_Controller
         $lead_type_list = $this->Action_model->detail_result('tbl_lead_types', $where, 'lead_type_id,lead_type_name');
 
         $lead_type_list_default[]             =    [
-                                                                                'lead_type_id'      =>  "4",
-                                                                                'lead_type_name'    =>  "All"
-                                                                            ];
+            'lead_type_id'      =>  "4",
+            'lead_type_name'    =>  "All"
+        ];
         $lead_type_list_arr = array_merge($lead_type_list_default, $lead_type_list);
 
 
@@ -13193,15 +13231,15 @@ class Api extends CI_Controller
 
         if (count($records)):
 
-            foreach($records as $record):
-                if(!$record->plot_number):
+            foreach ($records as $record):
+                if (!$record->plot_number):
                     $record->plot_number = $record->unit_number;
                 endif;
             endforeach;
 
             $arr   = ['status' => true, 'message' => 'Successfully data fetched', 'data' => $records];
         else:
-            $arr   = ['status' => false, 'message' => 'No data found' ,'data' => [] ];
+            $arr   = ['status' => false, 'message' => 'No data found', 'data' => []];
         endif;
 
         echo json_encode($arr);
@@ -13443,114 +13481,115 @@ class Api extends CI_Controller
 
 
     /********************************************************
-    * Report
-    *********************************************************/
-    public function booking_report(){
+     * Report
+     *********************************************************/
+    public function booking_report()
+    {
         $arr                    = [];
         $user_detail            =   $this->user();
 
         # Filter Data
-            $search_text                =   request()->search ?? '';
-            $search_member_id           =   request()->member_id ?? 0;
-            $search_builder_id          =   request()->builder_id ?? 0;
-            $search_project_id          =   request()->project_id ?? 0;
-            $search_booking_status      =   request()->status ?? 0;
-            $search_from                =   request()->search_from ?? "";
-            $search_to                  =   request()->search_to ?? "";
+        $search_text                =   request()->search ?? '';
+        $search_member_id           =   request()->member_id ?? 0;
+        $search_builder_id          =   request()->builder_id ?? 0;
+        $search_project_id          =   request()->project_id ?? 0;
+        $search_booking_status      =   request()->status ?? 0;
+        $search_from                =   request()->search_from ?? "";
+        $search_to                  =   request()->search_to ?? "";
         # End Filter Data
 
         # Additional Listing
-            $filter_data                =   [];
+        $filter_data                =   [];
 
-            /*-------------------------------------------------------------------
+        /*-------------------------------------------------------------------
             - Teams Member List
             -------------------------------------------------------------------*/
-            $team_member_where   =   " '1' ";
+        $team_member_where   =   " '1' ";
 
-            $team_member_where  .=  $user_detail->level_user_ids ?
-                " and user.user_id in ($user_detail->level_user_ids) " :
-                " and ( user.user_id = '$user_detail->user_id' or user.parent_id = '$user_detail->user_id') ";
+        $team_member_where  .=  $user_detail->level_user_ids ?
+            " and user.user_id in ($user_detail->level_user_ids) " :
+            " and ( user.user_id = '$user_detail->user_id' or user.parent_id = '$user_detail->user_id') ";
 
-            $this->db->select("user.user_id as id, 
+        $this->db->select("user.user_id as id, 
                                 concat(IFNULL(user.user_title, ''),' ', IFNULL(user.first_name, ''), ' ', IFNULL(user.last_name, '')) as full_name, 
                                 role.role_name,
                                 CASE WHEN user.user_id = '$search_member_id' THEN 1 ELSE 0 END AS is_selected,
                             ");
-            $this->db->from('tbl_users as user');
-            $this->db->join('tbl_roles  as role', 'user.role_id = role.role_id', 'left');
-            $this->db->where($team_member_where);
-            $members                            =   $this->db->get()->result();
-            /*-------------------------------------------------------------------
+        $this->db->from('tbl_users as user');
+        $this->db->join('tbl_roles  as role', 'user.role_id = role.role_id', 'left');
+        $this->db->where($team_member_where);
+        $members                            =   $this->db->get()->result();
+        /*-------------------------------------------------------------------
             - End Teams Member List
             -------------------------------------------------------------------*/
 
-            /*-------------------------------------------------------------------
+        /*-------------------------------------------------------------------
             - Builder List
             -------------------------------------------------------------------*/
-            $builders = array();
-                $where = "builder_status='1'";
-                $this->db->select("builder_id as id, firm_name,
+        $builders = array();
+        $where = "builder_status='1'";
+        $this->db->select("builder_id as id, firm_name,
                                     CASE WHEN builder_id = '$search_builder_id' THEN 1 ELSE 0 END AS is_selected,
                                 ");
-                $builder_data = $this->Action_model->detail_result('tbl_builders', $where);
-                if ($builder_data) {
-                    $builders  = $builder_data;
-                }
-             /*-------------------------------------------------------------------
+        $builder_data = $this->Action_model->detail_result('tbl_builders', $where);
+        if ($builder_data) {
+            $builders  = $builder_data;
+        }
+        /*-------------------------------------------------------------------
             * End Builder List
             -------------------------------------------------------------------*/
 
-             /*-------------------------------------------------------------------
+        /*-------------------------------------------------------------------
             - Product List
             -------------------------------------------------------------------*/
-            $projects = array();
-            $where = "product_status='1'";
-            $this->db->select("product_id as id, project_name,
+        $projects = array();
+        $where = "product_status='1'";
+        $this->db->select("product_id as id, project_name,
                                  CASE WHEN product_id = '$search_project_id' THEN 1 ELSE 0 END AS is_selected,
                             ");
-            $product_data = $this->Action_model->detail_result('tbl_products', $where);
-            if ($product_data) {
-                $projects  = $product_data;
-            }
-             /*-------------------------------------------------------------------
+        $product_data = $this->Action_model->detail_result('tbl_products', $where);
+        if ($product_data) {
+            $projects  = $product_data;
+        }
+        /*-------------------------------------------------------------------
             - End Product List
             -------------------------------------------------------------------*/
 
-             /*-------------------------------------------------------------------
+        /*-------------------------------------------------------------------
             - Status
             -------------------------------------------------------------------*/
-                $status =   [
-                                (object) [
-                                                    'id' => 1,
-                                                    'name' => "Accept",
-                                                    'is_selected'   => ( $search_booking_status == 1 ) ? 1 : 0 
-                                        ],
-                                (object) [
-                                                    'id' => 2,
-                                                    'name' => "Reject",
-                                                    'is_selected'   => ( $search_booking_status == 2 ) ? 1 : 0
-                                        ],
-                                (object) [
-                                                    'id' => 3,
-                                                    'name' => "Cancel",
-                                                    'is_selected'   => ( $search_booking_status == 3 ) ? 1 : 0
-                                        ],
-                            ];
-             /*-------------------------------------------------------------------
+        $status =   [
+            (object) [
+                'id' => 1,
+                'name' => "Accept",
+                'is_selected'   => ($search_booking_status == 1) ? 1 : 0
+            ],
+            (object) [
+                'id' => 2,
+                'name' => "Reject",
+                'is_selected'   => ($search_booking_status == 2) ? 1 : 0
+            ],
+            (object) [
+                'id' => 3,
+                'name' => "Cancel",
+                'is_selected'   => ($search_booking_status == 3) ? 1 : 0
+            ],
+        ];
+        /*-------------------------------------------------------------------
             - End Status
             -------------------------------------------------------------------*/
-          
-            # Filter Data
-            $filter_data    =   [
-                                    'search_text'       => $search_text,
-                                    'search_from'       => $search_from,
-                                    'search_to'         => $search_to,
-                                    'members'           => $members,
-                                    'builders'          => $builders,
-                                    'projects'          => $projects,
-                                    'status'            => $status,
-                                ];
-            # End Filter Data
+
+        # Filter Data
+        $filter_data    =   [
+            'search_text'       => $search_text,
+            'search_from'       => $search_from,
+            'search_to'         => $search_to,
+            'members'           => $members,
+            'builders'          => $builders,
+            'projects'          => $projects,
+            'status'            => $status,
+        ];
+        # End Filter Data
         # End Additional Listing
 
         $where = " 1 = 1 ";
@@ -13591,7 +13630,7 @@ class Api extends CI_Controller
         # Filter
         if ($search_member_id) {
             $where .= " and booking.user_id='" . $search_member_id . "' ";
-        }else{
+        } else {
             $where  .= $user_detail->level_user_ids ?
                 " and agent.user_id in ($user_detail->level_user_ids) " :
                 " and ( agent.user_id = '$user_detail->user_id' or agent.parent_id = '$user_detail->user_id') ";
@@ -13617,25 +13656,25 @@ class Api extends CI_Controller
             $where .= " and (str_to_date(booking.booking_date,'%d-%m-%Y')<=str_to_date('" . $search_to . "','%d-%m-%Y'))";
         }
         # Filter
-       
+
         $where  .=  " and ( booking.account_id = '$user_detail->account_id' )";
         # End Where 
 
         # Join
-        $join =     [   
-                        ['tbl_leads as seller', "seller.lead_id = JSON_UNQUOTE(JSON_EXTRACT(booking.booking_basic_details, '$.seller_id'))" ], # Seller
-                        [ 'tbl_users as agent', "agent.user_id = booking.user_id" ], # Agent
-                        [ 'tbl_products as project', "project.product_id = booking.project_id" ], # Project
-                        [ 'tbl_inventory as inventory', "inventory.inventory_id = booking.inventory_id" ] # Inventory
-                    ];
+        $join =     [
+            ['tbl_leads as seller', "seller.lead_id = JSON_UNQUOTE(JSON_EXTRACT(booking.booking_basic_details, '$.seller_id'))"], # Seller
+            ['tbl_users as agent', "agent.user_id = booking.user_id"], # Agent
+            ['tbl_products as project', "project.product_id = booking.project_id"], # Project
+            ['tbl_inventory as inventory', "inventory.inventory_id = booking.inventory_id"] # Inventory
+        ];
         # End Join
 
         # Query
         $booking_report_query_data            = (object) [
-                                                            'where'     => $where,
-                                                            'select'    => $select,
-                                                            'join'      => $join,
-                                                        ];
+            'where'     => $where,
+            'select'    => $select,
+            'join'      => $join,
+        ];
         $booking_reports    =   booking_reports($booking_report_query_data);
 
         // echo $this->db->last_query();
@@ -13643,39 +13682,39 @@ class Api extends CI_Controller
         # End Query
 
         $booking_reports_arr            =   [];
-        if(count($booking_reports ?? [])):
+        if (count($booking_reports ?? [])):
 
-            foreach($booking_reports as $booking_report):
+            foreach ($booking_reports as $booking_report):
 
 
                 # Status
-                    $status             =   $booking_report->booking_status;
-                    $status_label       =   "Pending";
+                $status             =   $booking_report->booking_status;
+                $status_label       =   "Pending";
 
-                    if($status == 1):
-                        $status_label = "Accept";
-                    endif;
-                    if($status == 2):
-                        $status_label = "Reject";
-                    endif;
-                    if($status == 3):
-                        $status_label = "Cancel";
-                    endif;
+                if ($status == 1):
+                    $status_label = "Accept";
+                endif;
+                if ($status == 2):
+                    $status_label = "Reject";
+                endif;
+                if ($status == 3):
+                    $status_label = "Cancel";
+                endif;
                 # End Status
 
                 $booking_reports_arr[]      = (object) [
-                                                            'booking_id'    => $booking_report->booking_id,
-                                                            'booking_date'  => $booking_report->booking_date,
-                                                            'buyer_name'    => $booking_report->buyer_name,
-                                                            'seller_name'   => $booking_report->seller_name,
-                                                            'agent_name'    => $booking_report->agent_name,
-                                                            'unit_ref_no'   => $booking_report->unit_refernce_number,
-                                                            'project_name'  => $booking_report->project_name,
-                                                            'status'        =>  $status_label
-                                                        ];
+                    'booking_id'    => $booking_report->booking_id,
+                    'booking_date'  => $booking_report->booking_date,
+                    'buyer_name'    => $booking_report->buyer_name,
+                    'seller_name'   => $booking_report->seller_name,
+                    'agent_name'    => $booking_report->agent_name,
+                    'unit_ref_no'   => $booking_report->unit_refernce_number,
+                    'project_name'  => $booking_report->project_name,
+                    'status'        =>  $status_label
+                ];
             endforeach;
 
-            $arr        =   ['status' => true, 'message' => 'Successfully data fetched', 'filter_data' => $filter_data,'data' => $booking_reports_arr];
+            $arr        =   ['status' => true, 'message' => 'Successfully data fetched', 'filter_data' => $filter_data, 'data' => $booking_reports_arr];
         else:
             $arr        =   ['status' => false, 'message' => 'No data found', 'filter_data' => $filter_data];
         endif;
@@ -13683,6 +13722,6 @@ class Api extends CI_Controller
         echo json_encode($arr);
     }
     /********************************************************
-    * End Report
-    *********************************************************/
+     * End Report
+     *********************************************************/
 }
