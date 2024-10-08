@@ -1572,6 +1572,25 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
     public function lead_process()
     {
 
+        // $documents_arr              =   [];
+        
+        // foreach(request()->documents ?? [] as $document_key => $document):
+
+        //     $document           = (object)  $document;
+
+        //     $upload_result                      =   upload_file("documents[$document_key][file]", "leads/1/documents");
+
+        //     print_r( $upload_result);
+        //         $documents_arr[]              =   (object) [
+        //                                                             'title'     => $document->title,
+        //                                                             'file_name' => $upload_result->file_name ?? '',
+        //                                                     ];
+        // endforeach;
+
+        
+        // print_r($documents_arr);
+
+        // die;
 
         $array = array();
 

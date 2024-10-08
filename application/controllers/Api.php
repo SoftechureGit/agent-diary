@@ -2133,12 +2133,12 @@ class Api extends CI_Controller
 
             if ($record) {
                 $this->Action_model->delete_query('tbl_leads', "lead_id='" . $id . "'");
-                $array = array('status' => 'added', 'msg' => 'Lead Deleted Successfully!!');
+                $array = array('status' => true, 'msg' => 'Lead Deleted Successfully!!');
             } else {
-                $array = array('status' => 'added', 'msg' => 'Record Not Found!!');
+                $array = array('status' => false, 'msg' => 'Record Not Found!!');
             }
         } else {
-            $array = array('status' => 'false', 'msg' => 'Some error occurred, please try again.');
+            $array = array('status' => false, 'msg' => 'Some error occurred, please try again.');
         }
 
         echo json_encode($array);

@@ -104,6 +104,9 @@ if (!function_exists('upload_file')) {
         $config['max_size']             = 10 * 1024;
         $config['remove_spaces']        = TRUE;
 
+        print_r($_FILES[$name]['name']);
+        die;
+
         # File Upload
         if (!empty($_FILES[$name]['name'])) :
             # File Name and Config

@@ -794,6 +794,11 @@
              dublicate_clone_template.find('.link').attr('name', "youtube_data[" + clone_template_id + "][link]").val('');
              break;
 
+           case 'documents':
+              dublicate_clone_template.find('.document-title').attr('name', "documents[" + clone_template_id + "][title]").val('');
+              dublicate_clone_template.find('.file').attr('name', "documents[" + clone_template_id + "][file]").val('');
+             break;
+
            case 'booking-deal-amount':
 
              //

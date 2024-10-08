@@ -245,6 +245,22 @@
             	<input type="text" class="form-control" id="lead_passport_no" name="lead_passport_no" value="<?php if($id) { echo $lead_detail->lead_passport_no; } ?>"  placeholder="Enter Passport Number">
             </div>
 
+                <!-- Documents -->
+                <div class="col-md-12">
+                  <details <?= isset($record) ? 'open' : '' ?> class="mb-2">
+                    <summary>Documents</summary>
+                    <div class="documents-container p-4">
+                    <?php $this->view('components/other/add-more/documents', [ 'records' => $record->documents ?? [] ]) ?>
+
+                    <div class="text-right">
+                      <button type="button" class="btn btn-warning btn-sm text-white add-more-btn" onclick="add_more(this, 'documents' ,'.documents-container')">Add More</button>
+                    </div>
+                    </div>
+                    
+                  </details>
+                </div>
+                <!-- End Documents -->
+      
         </div>
 
         <div align="center" class="pt-2 pb-2">
