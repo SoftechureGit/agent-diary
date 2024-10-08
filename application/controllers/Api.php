@@ -11729,6 +11729,7 @@ class Api extends CI_Controller
             $searchQuery .= " AND tbl_data.is_in_lead= '0' AND data_reason is NULL " ;
         endif;
 
+
         
         if ($this->input->post('reason')) {
 
@@ -11755,7 +11756,10 @@ class Api extends CI_Controller
                 $searchQuery .= "(tbl_data.data_first_name LIKE '%" . $searchValue . "%' OR tbl_data.data_mobile LIKE '%" . $searchValue . "%') ";
             }
         }
-
+        
+        if ($searchQuery != ''):
+            $searchQuery .= " and tbl_data.account_id = '$account_id'";
+        endif;
 
 
         $page   = $this->input->post('page') ?? 1;
