@@ -2281,11 +2281,10 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 }
 
                 if (!$followup_from && $followup_to) {
-
                     $where_ext .= " AND DATE(STR_TO_DATE(tbl_followup.next_followup_date, '%d-%m-%Y')) <= '$followup_to'";
                 }
             endif;
-            
+
             if ($search_state_id) {
                 $where_ext .= " AND lead_state_id='" . $search_state_id . "'";
             }
