@@ -11727,7 +11727,7 @@ class Api extends CI_Controller
             // $searchQuery .= " AND tbl_data.added_by= '$account_id'";
 
               if($account_id && $account_id != '0'):
-                $searchQuery .= " AND tbl_leads.user_id= '$account_id'";
+                $searchQuery .= " AND tbl_leads.user_id= '$user_id'";
             endif;
 
             if(!$account_id || $account_id == '0'):
