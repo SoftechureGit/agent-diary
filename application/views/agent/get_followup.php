@@ -115,6 +115,31 @@ summary {
     z-index: 9;
   }
 
+  .reset-clone-template-row {
+    position: absolute;
+    top: 12px;
+    right: 45px;
+    background: orange;
+    color: #fff;
+    padding: 8px;
+    border-radius: 50%;
+    font-size: 12px;
+    cursor: pointer;
+    z-index: 9;
+  }
+
+  .saved-file-name {
+    position: absolute;
+    top: 40%;
+    left: calc(115px + 0vw);
+    background: white;
+    width: 60%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
  .clone-template .form-group {
     margin-bottom: 0;
   }

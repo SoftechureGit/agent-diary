@@ -433,6 +433,65 @@ class Helper extends CI_Controller
     }
     # End Remove Add More Record
 
+    # Remove Add More Record
+    public function remove_add_more_record()
+    {
+        if (!$this->input->post()) {
+            echo json_encode(['status' => false, 'message' => 'Request method not matched.']);
+            exit;
+        }
+        $id                 =   $this->input->post('id');
+        $type                 =   $this->input->post('type');
+
+        if ($id && $type) :
+
+            $table              =   "";
+            $file_path          =   "";
+
+            # Table 
+            switch($type):
+                case 'documents':
+                    $table              =   "tbl_documents";
+                    break;
+            endswitch;
+            # End Table 
+
+            if (!$table) {
+                echo json_encode(['status' => false, 'message' => 'Table not found']);
+                exit;
+            }
+
+            # Fetch Record
+            $record = $this->db->where("id = $id")->get($table)->row();
+
+            if ($record) :
+
+                # Remove File From Folder
+                    # Path 
+                    switch($type):
+                        case 'documents':
+                            $file_path          =   "./public/other/leads/$record->lead_id/documents/".$record->file_name;
+                            break;
+                    endswitch;
+                    # End Path 
+
+                    if (file_exists($file_path)) :
+                        unlink($file_path);
+                    endif;
+            # End Remove File From Folder
+            endif;
+            # End Fetch Record
+
+            # Delete Record
+            $this->db->where("id = '$id'")->delete($table);
+        # End Delete Record
+        endif;
+
+
+        echo json_encode(['status' => true, 'message' => 'Successfully record removed.']);
+    }
+    # End Remove Add More Record
+
     # Delete Lead
     public function delete_lead()
     {

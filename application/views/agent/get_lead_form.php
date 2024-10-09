@@ -246,11 +246,18 @@
             </div>
 
                 <!-- Documents -->
+                    <?php 
+                      if($lead_detail):
+                        $document_base_url      = base_url("public/other/leads/$lead_detail->lead_id/documents/");
+                        $documents      = $this->db->select("*, CONCAT('$document_base_url', file_name) as file_url")->where('lead_id', $lead_detail->lead_id)->from('tbl_documents')->get()->result();
+                      endif;
+                    ?>
+
                 <div class="col-md-12">
-                  <details <?= isset($record) ? 'open' : '' ?> class="mb-2">
+                  <details <?= isset($lead_detail) ? 'open' : '' ?> class="mb-2">
                     <summary>Documents</summary>
                     <div class="documents-container p-4">
-                    <?php $this->view('components/other/add-more/documents', [ 'records' => $record->documents ?? [] ]) ?>
+                    <?php $this->view('components/other/add-more/documents', [ 'records' => $documents ?? [] ]) ?>
 
                     <div class="text-right">
                       <button type="button" class="btn btn-warning btn-sm text-white add-more-btn" onclick="add_more(this, 'documents' ,'.documents-container')">Add More</button>
@@ -383,7 +390,7 @@ $("#form-modal").validate({
                   
                 }
                 else {
-                  showToast('success', obj.message)
+                  showToast('danger', obj.message)
                   $(".error-msg").html(alertMessage('error',obj.message));
                 }
               }

@@ -137,6 +137,7 @@ if (!function_exists('uploadFilesWithoutLoop')) {
         $file_group_name             =   $param->file_group_name;
         $index                       =   $param->index;
         $name                        =   $param->name;
+        $allowed_types               =   $param->allowed_types ?? 'png|jpg|jpeg';
         
         $upload_folder               =   $param->upload_folder;
         $old_file_name               =   $param->old_file_name ?? null;
@@ -157,8 +158,11 @@ if (!function_exists('uploadFilesWithoutLoop')) {
 
         $config                         = array();
         $config['upload_path']          = $upload_path;
-        // $config['allowed_types']        = 'png|jpg|jpeg|pdf';
-        $config['allowed_types']        = '*';
+
+        if($allowed_types):
+            $config['allowed_types']        = $allowed_types;
+        endif;
+        // $config['allowed_types']        = '*';
         $config['max_size']             = 10 * 1024;
         $config['remove_spaces']        = TRUE;
 

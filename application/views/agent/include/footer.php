@@ -691,7 +691,7 @@
        // ########## Toast #########
        // $(document).ready(function() {
        function showToast(type, message) {
-         const toast = $(`<div class="toast alert alert-${type}"></div>`).text(message);
+         const toast = $(`<div class="toast alert alert-${type}"></div>`).html(message);
          $('#toast-container').append(toast);
 
          setTimeout(() => {
@@ -712,10 +712,63 @@
 
        // Add More
 
+        function removeCloneTemplateRowDB(e) {
+          var id          = $(e).data('id')
+          var type        = $(e).data('type');
+          var is_parent   = $(e).parents('.clone-template').hasClass('parent-clone-template');
+
+          if (confirm('Are you sure to remove this file?')) {
+           
+             // Ajax - Remove Add More Record
+             $.ajax({
+               type: "post",
+               url: "<?= base_url('helper/remove_add_more_record') ?>",
+               dataType: 'json',
+               data: {
+                 id: id,
+                 type: type,
+               },
+              success: (data) => {
+                if (data.status) {
+
+                    if(is_parent){
+                      resetCloneTemplateRow(e)
+                    }
+                    else{ $(e).parents('.clone-template').remove() }
+
+                    showToast('success', data.message)
+                  } else {
+                    showToast('danger', data.message)
+                  }
+                },
+              error: function() {
+                showToast('danger', 'Some Error Occured.')
+              }
+            });
+             // End Ajax - Remove Add More Record
+           }
+
+       }
+
+        /** Reset */
+        function resetCloneTemplateRow(e) {
+          parent        =   $(e).parents('.parent-clone-template.clone-template');
+          parent_type   =   parent.data('parent-type')
+          
+          switch(parent_type){
+            case 'documents':
+              parent.find('.document-title').val('')
+              parent.find('.old-file').val('')
+              parent.find('.view-file').remove()
+              break;
+          }
+        }
+        /** End Reset */
+
        function removeCloneTemplateRow(el) {
 
-         var id = $(el).data('id')
-         var is_main = $(el).data('type') == 'main' ? true : false;
+         var id       = $(el).data('id')
+         var is_main  = $(el).data('type') == 'main' ? true : false;
 
 
          if (id) {
@@ -797,6 +850,8 @@
            case 'documents':
               dublicate_clone_template.find('.document-title').attr('name', "documents[" + clone_template_id + "][title]").val('');
               dublicate_clone_template.find('.file').attr('name', "documents[" + clone_template_id + "][file]").val('');
+              dublicate_clone_template.find('.view-file').remove();
+              dublicate_clone_template.find('.old-file').remove();
              break;
 
            case 'booking-deal-amount':

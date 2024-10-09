@@ -78,6 +78,8 @@ $menu_item_array = $this->Action_model->get_menu_items($user_data->user_id, $use
             margin: auto;
         }
 
+        #toast-container p { margin: 0; }
+
         .toast {
             padding: 10px 20px;
             margin-bottom: 10px;
