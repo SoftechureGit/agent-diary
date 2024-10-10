@@ -1,15 +1,25 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 
+
 # Get Instance
 if (!function_exists('CI')) {
     function CI()
     {
         $CI          = &get_instance();
-
+        
         return $CI;
     }
 }
 # End Get Instance
+
+# FCM
+if (!function_exists('fcm')) {
+    function fcm() {
+        CI()->load->library('fcm');
+        return CI()->fcm;
+    }
+}
+# FCM
 
 # Get DB Instance
 if (!function_exists('db_instance')) {
@@ -1693,9 +1703,30 @@ if (!function_exists('getAccountId')) {
 
     if(!function_exists('transfer_or_assign_lead')){
         function transfer_or_assign_lead($param = null){
-            if(!$param) return false;
+            
+            $lead_id                =   $param->lead_id ?? 0;
+            $from_user_id           =   $param->from_user_id ?? 0;
+            $to_user_id             =   $param->to_user_id ?? 0;
 
-            $lead_id                =   $param->lead_id;
+            
+            # Validation
+            if(!$lead_id || !$from_user_id || !$to_user_id){
+                return (object) [ 'status' => false, 'message' => "Parameters required" ];
+            }
+            # End Validation
+            
+            $account_id       = user($from_user_id)->account_id;
+
+            # Validation
+            if(!$account_id) return (object) [ 'status' => false, 'message' => "Account Id required" ];
+            # End Validation
+
+            $lead             =   db_instance()->select('lead_id')->where('lead_id',  $lead_id)->where('account_id', $account_id)->from('tbl_leads')->get()->row();
+
+
+            echo "<pre>";
+            print_r( $lead);
+            
 
         }
     }

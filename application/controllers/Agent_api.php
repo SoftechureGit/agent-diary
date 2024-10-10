@@ -10812,6 +10812,22 @@ WHERE lead_id='" . $lead_id . "'
                 );
                 $this->Action_model->insert_data($lead_history_array, 'tbl_lead_history');
 
+                $transfer_from_name              =   $this->Action_model->get_name($user_id);
+
+                /******************************************************************************
+                * Push Notification
+                *******************************************************************************/ 
+                $fcm_notify_data      =   (object) [ 
+                                                            'device_id' => ( $user_detail->fcm_device_id ?? 0 ),
+                                                            'title'     => "New Lead assigned",
+                                                            'message'   => "$transfer_from_name has assign you new lead ",
+                                                        ];
+
+                fcm()->send($fcm_notify_data);
+                /******************************************************************************
+                * End Push Notification
+                *******************************************************************************/ 
+                
                 $array = array('status' => 'success', 'message' => 'Lead Transfered Successfully!!');
             } else {
                 $array = array('status' => 'error', 'message' => 'Lead Not Found!!');

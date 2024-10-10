@@ -18,6 +18,32 @@ class Front extends CI_Controller
         //print_r($ss);exit;
     }
 
+    public function test(){
+        return false;
+
+        // print_r(transfer_or_assign_lead((object) [ 'lead_id' => 997, 'from_user_id' => 26, 'to_user_id' => 4 ]));
+        // die;
+
+        /******************************************************************************
+        * Push Notification
+        *******************************************************************************/ 
+
+        $device_id                  =   "cIdQD-FGS7mTizzipmpWXC:APA91bH_Vao7VbS3tDI-vU5zgWJoWOs2q8c8YJlvgcbcx0q0_VIISVGK_WMeGUUSe3bJ1bdbPZvzfCd9fWYYcjwmHav_6xGodlghMC-2u-JBmJu0tMnWFxphW6JTqx1kLzrUR7low2gg";
+        $title                      =   "Hello";
+        $message                    =   "Test";
+
+        $fcm_notify_data      =   (object) [ 
+                                                    'device_id' => $device_id ?? '',
+                                                    'title'     => $title ?? '',
+                                                    'message'   => $message ?? '',
+                                                ];
+
+        print_r(fcm()->send($fcm_notify_data));
+        /******************************************************************************
+        * End Push Notification
+        *******************************************************************************/ 
+    }
+
     public function index()
     {
         //$this->Action_model->send_mail("rakeshkumar.softechure@gmail.com","Test","Hello");
