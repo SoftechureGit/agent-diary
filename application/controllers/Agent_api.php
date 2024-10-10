@@ -8207,10 +8207,13 @@ WHERE lead_id='" . $lead_id . "'
 
                 $where = "tbl_inventory.product_id='" . $product_id . "' AND unit_code='" . $product_unit_detail_data->product_unit_detail_id . "'";
                 if ($tower_id) {
-                    $where .= " AND tbl_inventory.block_id='" . $tower_id . "'";
+                    // $where .= " AND tbl_inventory.block_id='" . $tower_id . "'";
+                    $where .= " AND JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.block_or_tower_id')) = '$tower_id' ";
                 }
                 if ($floor_id) {
-                    $where .= " AND tbl_inventory.floor_id='" . $floor_id . "'";
+                    // $where .= " AND tbl_inventory.floor_id='" . $floor_id . "'";
+                    $where .= " AND JSON_UNQUOTE(JSON_EXTRACT(property_details, '$.floor_id')) = '$floor_id' ";
+                    
                 }
 
                 $items = array();
@@ -8284,11 +8287,19 @@ WHERE lead_id='" . $lead_id . "'
                             }
                         }
 
-                        $items[] = array('inventory_id' => $item->inventory_id, 'unit_code' => $item->unit_code, 'unit_ref_no' => $item->unit_no, 'current_rate' => $current_rate, 'floor' => ($item->floor_name) ? $item->floor_name : '', 'size' => $size, 'block' => ($item->block_name) ? $item->block_name : '', 'unit_type' => $unit_type, 'selected' => '0');
+                        $items[] = array(
+                                            'inventory_id' => $item->inventory_id, 
+                                            'unit_code' => $item->unit_code, 
+                                            'current_rate' => $current_rate, 
+                                            'size' => $size, 
+                                            'unit_ref_no'       =>  $item->unit_no ?? $inventory_property_details->referance_number ?? '', 
+                                            'floor'             =>  ( $inventory_property_details->floor_id ?? 0 ) ? getFloors($inventory_property_details->floor_id)->name : '' , 
+                                            'block'             => ( $inventory_property_details->block_or_tower_id ?? 0 ) ? getBlocksOrTowers($inventory_property_details->block_or_tower_id)->name : '', 
+                                           'unit_type' => $unit_type, 
+                                            'selected' => '0'
+                                        );
                     }
                 }
-
-
 
                 if (strpos($cost_type, "PLC_") !== false) {
 
@@ -8315,28 +8326,81 @@ WHERE lead_id='" . $lead_id . "'
                     $item_data = $query->result();
 
 
-                    // print_r($item_data);
+                    // print_r($this->db->last_query());
                     // die;
 
                     foreach ($item_data as $item) {
 
                         $inventory_property_details    =  ( $item->property_details ?? null ) ? json_decode($item->property_details) : null;
 
+                        // 
+                        $current_rate = "";
+                        if ($item->cost_update) {
+                            if ($item->current_rate) {
+                                $current_rate = $item->current_rate . ' ' . $item->current_rate_unit_name;
+                                if ($item->current_rate_gst) {
+                                    $current_rate .= ", GST:" . $item->current_rate_gst . "%";
+                                }
+                            }
+                        } else {
+                            $current_rate = $plc_detail_data->price . ' ' . $plc_detail_data->unit_name;
+                            if ($plc_detail_data->gst) {
+                                $current_rate .= ", GST:" . $plc_detail_data->gst . "%";
+                            }
+                        }
+
+                        $unit_type = "";
+                        $size = "";
+
+                        if ($product_unit_detail_data->project_type == '2') {
+                            $unit_type = $product_unit_detail_data->accomodation_name;
+
+                            if ($product_unit_detail_data->sa) {
+                                $size = $product_unit_detail_data->sa;
+                                if ($product_unit_detail_data->sa_unit_name) {
+                                    $size .= ' ' . $product_unit_detail_data->sa_unit_name;
+                                }
+                            }
+
+                            if ($product_unit_detail_data->plot_size) {
+                                $size = $product_unit_detail_data->plot_size;
+                                if ($product_unit_detail_data->plot_unit_name) {
+                                    $size .= ' ' . $product_unit_detail_data->plot_unit_name;
+                                }
+                            }
+                        }
+                        if ($product_unit_detail_data->project_type == '3') {
+                            $unit_type = $product_unit_detail_data->unit_type_name;
+
+                            $size = $product_unit_detail_data->sa;
+                            if ($product_unit_detail_data->sa_unit_name) {
+                                $size .= ' ' . $product_unit_detail_data->sa_unit_name;
+                            }
+                        }
+                        // 
+
                         $items[] = array(
-                                            'inventory_id' => $item->inventory_id, 
-                                            'unit_code' => $item->unit_code, 
-                                            'unit_ref_no' => $item->unit_no ?? $inventory_property_details->referance_number ?? '', 
-                                            'current_rate' => $item->current_rate ?? 0, 
-                                            'floor' => ($item->floor_name) ? $item->floor_name : '', 
-                                            'size' => $size, 
-                                            'block' =>  $item->block_name  ?? $inventory_property_details->block ?? '', 
-                                            'unit_type' => $unit_type ?? '', 
-                                            'selected' => '0');
+                                            'inventory_id'      => $item->inventory_id, 
+                                            'unit_code'         => $item->unit_code, 
+                                            'unit_ref_no'       => $item->unit_no ?? $inventory_property_details->referance_number ?? '', 
+                                            'current_rate'      => $current_rate, 
+                                            'size'              => $size, 
+                                            'floor'             =>  ( $inventory_property_details->floor_id ?? 0 ) ? getFloors($inventory_property_details->floor_id)->name : '' , 
+                                            'block'             => ( $inventory_property_details->block_or_tower_id ?? 0 ) ? getBlocksOrTowers($inventory_property_details->block_or_tower_id)->name : '', 
+                                            'unit_type'         => $unit_type ?? '', 
+                                            'selected'          => '0'
+                                        );
                     }
                 }
 
                 if (strpos($cost_type, "Parking_Open") !== false) {
-                    $where .= " AND parking='1' AND parking_open='1'";
+
+                    $where .= " AND JSON_CONTAINS(property_details, '\"open\"', '$.parking')";
+                    // $where .= " AND parking='1' AND parking_open='1'";
+
+                    // echo  $where;
+                    // die;
+
                     $this->db->select('*,tbl_inventory.inventory_id,b_unit.unit_name as current_rate_unit_name');
                     $this->db->from('tbl_inventory');
                     $this->db->join('tbl_product_unit_details', 'tbl_product_unit_details.product_unit_detail_id = tbl_inventory.unit_code');
@@ -8348,7 +8412,7 @@ WHERE lead_id='" . $lead_id . "'
                     $query = $this->db->get();
                     $item_data = $query->result();
                     foreach ($item_data as $item) {
-
+                        $inventory_property_details    =  ( $item->property_details ?? null ) ? json_decode($item->property_details) : null;
                         $current_rate = "";
                         if ($item->o_cost_update) {
                             if ($item->o_current_rate) {
@@ -8393,12 +8457,23 @@ WHERE lead_id='" . $lead_id . "'
                             }
                         }
 
-                        $items[] = array('inventory_id' => $item->inventory_id, 'unit_code' => $item->unit_code, 'unit_ref_no' => $item->unit_no, 'current_rate' => $current_rate, 'floor' => ($item->floor_name) ? $item->floor_name : '', 'size' => $size, 'block' => ($item->block_name) ? $item->block_name : '', 'unit_type' => $unit_type, 'selected' => '0');
+                        $items[] = array(
+                                            'inventory_id'      => $item->inventory_id, 
+                                            'unit_code'         => $item->unit_code, 
+                                            'current_rate'      => $current_rate, 
+                                            'size'              => $size, 
+                                            'unit_ref_no'       =>  $item->unit_no ?? $inventory_property_details->referance_number ?? '', 
+                                            'floor'             =>  ( $inventory_property_details->floor_id ?? 0 ) ? getFloors($inventory_property_details->floor_id)->name : '' , 
+                                            'block'             => ( $inventory_property_details->block_or_tower_id ?? 0 ) ? getBlocksOrTowers($inventory_property_details->block_or_tower_id)->name : '', 
+                                            'unit_type'         => $unit_type, 
+                                            'selected'          => '0'
+                                        );
                     }
                 }
 
                 if (strpos($cost_type, "Parking_Stilt") !== false) {
-                    $where .= " AND parking='1' AND parking_stilt='1'";
+                    // $where .= " AND parking='1' AND parking_stilt='1'";
+                    $where .= " AND JSON_CONTAINS(property_details, '\"stilt\"', '$.parking')";
 
                     $this->db->select('*,tbl_inventory.inventory_id,b_unit.unit_name as current_rate_unit_name');
                     $this->db->from('tbl_inventory');
@@ -8410,7 +8485,13 @@ WHERE lead_id='" . $lead_id . "'
                     $this->db->where($where);
                     $query = $this->db->get();
                     $item_data = $query->result();
+
+                    // echo $this->db->last_query();
+                    // die;
+
                     foreach ($item_data as $item) {
+
+                        $inventory_property_details    =  ( $item->property_details ?? null ) ? json_decode($item->property_details) : null;
 
                         $current_rate = "";
                         if ($item->s_cost_update) {
@@ -8456,12 +8537,24 @@ WHERE lead_id='" . $lead_id . "'
                             }
                         }
 
-                        $items[] = array('inventory_id' => $item->inventory_id, 'unit_code' => $item->unit_code, 'unit_ref_no' => $item->unit_no, 'current_rate' => $current_rate, 'floor' => ($item->floor_name) ? $item->floor_name : '', 'size' => $size, 'block' => ($item->block_name) ? $item->block_name : '', 'unit_type' => $unit_type, 'selected' => '0');
+                        $items[] = array(
+                                            'inventory_id' => $item->inventory_id, 
+                                            'unit_code' => $item->unit_code, 
+                                            'current_rate' => $current_rate, 
+                                            'size' => $size, 
+                                            'unit_ref_no' => $item->unit_no ?? $inventory_property_details->referance_number ?? '', 
+                                            'floor'             =>  ( $inventory_property_details->floor_id ?? 0 ) ? getFloors($inventory_property_details->floor_id)->name : '' , 
+                                            'block'             => ( $inventory_property_details->block_or_tower_id ?? 0 ) ? getBlocksOrTowers($inventory_property_details->block_or_tower_id)->name : '', 
+                                            'unit_type' => $unit_type, 
+                                            'selected' => '0'
+                                        );
                     }
                 }
 
                 if (strpos($cost_type, "Parking_Basment") !== false) {
-                    $where .= " AND parking='1' AND parking_basment='1'";
+                    // $where .= " AND parking='1' AND parking_basment='1'";
+
+                    $where .= " AND JSON_CONTAINS(property_details, '\"basement\"', '$.parking')";
 
                     $this->db->select('*,tbl_inventory.inventory_id,b_unit.unit_name as current_rate_unit_name');
                     $this->db->from('tbl_inventory');
@@ -8474,10 +8567,10 @@ WHERE lead_id='" . $lead_id . "'
                     $query = $this->db->get();
                     $item_data = $query->result();
 
-                    echo $where;
-                    die;
 
                     foreach ($item_data as $item) {
+
+                        $inventory_property_details    =  ( $item->property_details ?? null ) ? json_decode($item->property_details) : null;
 
                         $current_rate = "";
                         if ($item->b_cost_update) {
@@ -8523,7 +8616,17 @@ WHERE lead_id='" . $lead_id . "'
                             }
                         }
 
-                        $items[] = array('inventory_id' => $item->inventory_id, 'unit_code' => $item->unit_code, 'unit_ref_no' => $item->unit_no, 'current_rate' => $current_rate, 'floor' => ($item->floor_name) ? $item->floor_name : '', 'size' => $size, 'block' => ($item->block_name) ? $item->block_name : '', 'unit_type' => $unit_type, 'selected' => '0');
+                        $items[] = array(
+                                            'inventory_id' => $item->inventory_id, 
+                                            'unit_code' => $item->unit_code, 
+                                            'current_rate' => $current_rate, 
+                                            'size' => $size, 
+                                            'unit_ref_no' => $item->unit_no ?? $inventory_property_details->referance_number ?? '', 
+                                            'floor'             =>  ( $inventory_property_details->floor_id ?? 0 ) ? getFloors($inventory_property_details->floor_id)->name : '' , 
+                                            'block'             => ( $inventory_property_details->block_or_tower_id ?? 0 ) ? getBlocksOrTowers($inventory_property_details->block_or_tower_id)->name : '', 
+                                            'unit_type' => $unit_type, 
+                                            'selected' => '0'
+                                        );
                     }
                 }
 
@@ -11472,6 +11575,7 @@ WHERE lead_id='" . $lead_id . "'
 
                         $tbl_product_plc_details        =   $this->db->where('product_id', $product_id)->where("price_comp_id IN ( $applicable_plc_ids_str )")->from('tbl_product_plc_details')->get()->result();
 
+                        # Delete Extra PLC
                         # PLC ID
                         $product_plc_detail_ids         =   array_map(function($item) {
                                                                 return $item->product_plc_detail_id;
@@ -11482,6 +11586,7 @@ WHERE lead_id='" . $lead_id . "'
                         if($product_plc_detail_ids_arr_str):
                             $this->db->where('inventory_id', $id)->where("product_plc_detail_id NOT IN ( $product_plc_detail_ids_arr_str )")->from('tbl_inventory_plc')->delete();
                         endif;
+                        # End Delete Extra PLC
                     endif;
                 else:
                     $this->db->where('inventory_id', $id)->from('tbl_inventory_plc')->delete();
@@ -11503,19 +11608,50 @@ WHERE lead_id='" . $lead_id . "'
 
                 # End Inventory PLC
 
+                 # Inventory Additional PLC
+                 $product_additional_plc_details     = $this->db->where('product_id', $product_id)->from('tbl_product_additional_details')->get()->result();
+
+                  # Delete Extra Additional PLC
+                        # PLC ID
+                        $product_additional_plc_detail_ids         =   array_map(function($item) {
+                            return $item->product_additional_detail_id;
+                        }, $product_additional_plc_details);
+                        # End PLC ID
+                        $product_additional_plc_detail_ids_arr_str   = implode(',', $product_additional_plc_detail_ids);
+
+                        // echo $product_additional_plc_detail_ids_arr_str;
+                        // die;
+
+                        if($product_additional_plc_detail_ids_arr_str):
+                            $this->db->where('inventory_id', $id)->where("product_additional_detail_id NOT IN ( $product_additional_plc_detail_ids_arr_str )")->from('tbl_inventory_additional')->delete();
+                        endif;
+                        # End Delete Extra Additional PLC
+
+                        foreach($product_additional_plc_details ?? [] as $product_additional_plc_detail):
+                            $product_additional_plc_detail_id           =   $product_additional_plc_detail->product_additional_detail_id;
+
+                            $inv_additional_plc        =   $this->db->where('inventory_id', $id)->where("product_additional_detail_id", $product_additional_plc_detail_id)->from('tbl_inventory_additional')->get()->num_rows();
+
+                            if(!$inv_additional_plc):
+                                $this->db->insert('tbl_inventory_additional', [ 'inventory_id' =>  $id , 'product_additional_detail_id' => $product_additional_plc_detail_id, 'is_active' => 1]);
+                            endif;
+                        endforeach;
+
+                 # End Inventory Additional PLC
+
                 $res_arr                            =   $result ? ['status' => true, 'message' => 'Successfully record updated'] : ['status' => false, 'message' => 'Some error occured'];
             else :
-                $result                             =   $this->Action_model->insert_data($data, 'tbl_inventory');
+                $inventory_id                             =   $this->Action_model->insert_data($data, 'tbl_inventory');
 
-                if ($result) :
-                    $property_details['id']         =   $result;
+                if ($inventory_id) :
+                    $property_details['id']         =   $inventory_id;
 
                     $property_details               =   $property_details ? json_encode($property_details) : NULL;
 
                     $data                                   =   [
                                                                     'property_details'      =>  $property_details,
                                                                 ];
-                    $result_res                             =   $this->Action_model->update_data($data, 'tbl_inventory', "inventory_id = $result");
+                    $result_res                             =   $this->Action_model->update_data($data, 'tbl_inventory', "inventory_id = $inventory_id");
                 endif;
 
                 # Inventory PLC
@@ -11523,10 +11659,21 @@ WHERE lead_id='" . $lead_id . "'
                     $tbl_product_plc_details = $this->db->where('product_id', $product_id)->where('price_comp_id', $applicable_plc_id)->from('tbl_product_plc_details')->get()->row();
 
                     if($tbl_product_plc_details->product_plc_detail_id ?? 0 ):
-                        $this->db->insert('tbl_inventory_plc', [ 'inventory_id' =>  $result , 'product_plc_detail_id' => $tbl_product_plc_details->product_plc_detail_id, 'is_active' => 1]);
+                        $this->db->insert('tbl_inventory_plc', [ 'inventory_id' =>  $inventory_id , 'product_plc_detail_id' => $tbl_product_plc_details->product_plc_detail_id, 'is_active' => 1]);
                     endif;
                 endforeach;
                 # End Inventory PLC
+
+                # Inventory Additional PLC
+                    $product_additional_plc_details     = $this->db->where('product_id', $product_id)->from('tbl_product_additional_details')->get()->result();
+
+                    foreach($product_additional_plc_details ?? [] as $product_additional_plc_detail):
+                        $this->db->insert('tbl_inventory_additional', [ 'inventory_id' =>  $inventory_id , 'product_additional_detail_id' => $product_additional_plc_detail->product_additional_detail_id, 'is_active' => 1]);
+                    endforeach;
+
+                # End Inventory Additional PLC
+
+
 
                 $res_arr                            =   $result_res ? ['status' => true, 'message' => 'Successfully record inserted'] : ['status' => false, 'message' => 'Some error occured'];
             endif;

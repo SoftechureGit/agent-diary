@@ -677,7 +677,7 @@
 	                        $current_rate = $item->plot_size*$itemInv->current_rate;
 	                    }
 	                    else if ($b_cost_unit=='2') {// for Sq.Ft
-	                        $current_rate += $item->construction_area*$itemInv->current_rate;
+	                        $current_rate += ($item->construction_area ?? 1) *$itemInv->current_rate;
 	                    } 
 	                    else if ($b_cost_unit=='5') {// for Fix
 	                        $current_rate = $itemInv->current_rate;
