@@ -3657,7 +3657,6 @@ class Api extends CI_Controller
     public function requirement_add_or_edit_view_data()
     {
 
-
         $arr = array();
 
         $account_id = getAccountIdHash($this->input->request_headers()['Access-Token']);
@@ -13726,4 +13725,52 @@ class Api extends CI_Controller
     /********************************************************
      * End Report
      *********************************************************/
+
+          # edit_or_create_realted_data
+          public function edit_or_create_related_data()
+          {
+     
+           $res = array();  
+            
+           # looking for
+           $looking_for = array(
+                 array(
+                     'value' => 'sale',
+                     'title' => 'Sale' 
+                 ),
+                 array(
+                     'value' => 'rent',
+                     'title' => 'Rent' 
+                 ),
+                 array(
+                     'value' => 'no_action',
+                     'title' => 'No Action' 
+                 )
+           ) ; 
+           #end looking for
+           $project_type = project_types();
+           $states       = states();
+           
+           # unit size list 
+            $where = "unit_status='1'";
+            $unit_list = $this->Action_model->detail_result('tbl_units', $where, 'unit_id,unit_name');
+            # end unit size list
+     
+          
+          $res =  array(
+                 'status'        =>  true ,
+                 'message'       => 'Data Found' ,
+                 'looking_for'   =>  $looking_for,
+                 'project_type'  =>  $project_type,
+                 'states'        =>  $states
+             );
+     
+          echo json_encode($res);
+          
+     
+             
+          }
+         # edit_or_create_realted_data
+
+
 }
