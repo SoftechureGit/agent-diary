@@ -13754,10 +13754,11 @@ class Api extends CI_Controller
         
         
         $arr            =   [
-                                'status'        => true,
-                                'message'       => "Data fetched",
-                                'looking_for'   => $looking_for,
-                                'states'        => states(),
+                                'status'            => true,
+                                'message'           => "Data fetched",
+                                'looking_for'       => $looking_for,
+                                'project_types'     => project_types(),
+                                'states'            => states(),
                             ];
 
         echo json_encode($arr);
