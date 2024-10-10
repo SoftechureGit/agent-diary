@@ -16,7 +16,7 @@ if (!function_exists('CI')) {
 if (!function_exists('fcm')) {
     function fcm() {
         CI()->load->library('FCM');
-        return CI()->fcm;
+        return CI()->FCM;
     }
 }
 # FCM

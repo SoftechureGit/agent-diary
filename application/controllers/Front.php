@@ -28,7 +28,7 @@ class Front extends CI_Controller
         * Push Notification
         *******************************************************************************/ 
 
-        $device_id                  =   request()->device_id;
+        $device_id                  =   request()->device_id ?? '';
         $title                      =   "Hello";
         $message                    =   "Test";
 
