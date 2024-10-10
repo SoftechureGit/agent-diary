@@ -345,6 +345,12 @@ function getBasicCostData(f='') {
                     "</tr>";
                }
                $(".inventory_unit_list").html(row_html);
+
+               if(items.length == 0){
+
+                console.log(items.length)
+                $(".inventory_unit_list").html(`<tr><td colspan='10' class='text-center'>No data found</td></tr>`);
+               }
              }
              else {
                
