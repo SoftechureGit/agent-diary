@@ -1609,7 +1609,7 @@ if (!function_exists('getAccountId')) {
         $total_active_leads_count_query             =   "( lead.lead_status = '1' ) and lead.lead_stage_id != '6' AND lead.lead_stage_id != '7'";
         $total_inactive_leads_count_query             =   "(  lead.lead_status is NULL or lead.lead_status = '0' or lead.lead_status = '2' ) and lead.lead_stage_id != '6' AND lead.lead_stage_id != '7'";
         // $today_lead_count_query                     =   "(( lead.lead_status = '1' ) AND ( lead.lead_stage_id = '1' ) AND ( lead.added_to_followup = 0 ) AND ( DATE(FROM_UNIXTIME(created_at))  = CURDATE()) ) ";
-        $today_lead_count_query                     =   "( ( DATE(FROM_UNIXTIME(created_at))  = CURDATE()) ) ";
+        $today_lead_count_query                     =   "( ( lead.added_to_followup = 0 ) AND ( DATE(FROM_UNIXTIME(created_at))  = CURDATE()) ) ";
         
         $initial_leads_count_query                  =   " ( lead.lead_stage_id = '1' or lead.lead_stage_id = '0' )";
         $followup_leads_count_query                 =   "lead.lead_stage_id = '2'";
@@ -1673,9 +1673,10 @@ if (!function_exists('getAccountId')) {
         ****************************************************/
 
         #
-        $today_lead                                               =   ( $leads_count_sumamry->today_initial_lead_count ?? 0 ) + ( $followup_count_summary->today_initial_followup_lead_count ?? 0);
+        // $today_lead                                               =   ( $leads_count_sumamry->today_initial_lead_count ?? 0 ) + ( $followup_count_summary->today_initial_followup_lead_count ?? 0);
 
-        $count_summary['today_lead']                              =   $today_lead;
+        // $count_summary['today_lead']                              =   $today_lead;
+        $count_summary['today_lead']                              =   ( $leads_count_sumamry->today_initial_lead_count ?? 0 );
         $count_summary['today_followup']                          =   ( $followup_count_summary->today_followup_lead_count ?? 0 );
         $count_summary['missed_followup']                         =   ( $followup_count_summary->missed_followup_count ?? 0 );
 
