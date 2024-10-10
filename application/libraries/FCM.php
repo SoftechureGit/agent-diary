@@ -1,6 +1,6 @@
 <?php
 
-class FCM
+class Fcm
 {
     protected static $access_token         =   "";
 
