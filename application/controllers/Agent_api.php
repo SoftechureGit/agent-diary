@@ -1726,7 +1726,7 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                 $title              =   $document->title ?? '';
 
                 if($title):
-                $lead_document      =   uploadFilesWithoutLoop((object)[ 
+                    $lead_document      =   uploadFilesWithoutLoop((object)[ 
                                                                             'file_group_name'   =>  'documents', 
                                                                             'index'             =>  $document_key, 
                                                                             'name'              =>  'file', 
@@ -1735,22 +1735,20 @@ LEFT JOIN tbl_budgets as bgt_max ON bgt_max.budget_id = req.budget_max
                                                                         ]);
                                                                     endif;
                     
-                    if(!$lead_document->status):
-                        echo json_encode(['status' => 'error', 'message' => $lead_document->message ?? 'Some error occured']);
-                        exit;
-                    endif;
-
-                    if($title && ( $lead_document->file_name ?? 0 )):
+                    if(isset($lead_document)):
+                        
+                        if($title && ( $lead_document->file_name ?? 0 )):
                         $documents_arr                              =   [
                                                                             'lead_id'       => $id ?? $lead_id ?? 0,
                                                                             'title'         => $title,
                                                                             'file_name'     => $lead_document->file_name ?? '',
                                                                         ];
-
+                                                                        
                         if($document->id ?? 0):
                             $this->db->where('id', $document->id)->udpate('tbl_documents', $documents_arr);
                         else:
                             $this->db->insert('tbl_documents', $documents_arr);
+                        endif;
                         endif;
                     endif;
             endforeach;

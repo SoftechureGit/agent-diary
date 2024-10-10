@@ -95,10 +95,14 @@
                       <select class="form-control" id="lead_stage_id" name="lead_stage_id" required>
                         <option value="" disabled selected>Select Lead Stage</option>
                         <?php foreach ($lead_stage_list as $lead_stage) { ?>
-                          <option value="<?= $lead_stage->lead_stage_id ?>" <?php if ($id && $lead_detail->lead_stage_id == $lead_stage->lead_stage_id) {
-                                                                              echo 'selected';
-                                                                            } ?>><?= $lead_stage->lead_stage_name ?></option>
-                        <?php } ?>
+                          <?php if( $lead_stage->lead_stage_id == 1): ?>
+                          <option value="<?= $lead_stage->lead_stage_id ?>" 
+                            
+                              <?php if ($id && $lead_detail->lead_stage_id == $lead_stage->lead_stage_id) { echo 'selected';} ?>>
+                              <?= $lead_stage->lead_stage_name ?>
+                            </option>
+                            <?php endif; ?>
+                            <?php } ?>
                       </select>
                     </div>
                   </div>
@@ -171,8 +175,8 @@
                       <input type="text" class="form-control w-100 primary_mobile_number" placeholder="Enter mobile" id="primary_mobile_number" name="lead_mobile_no" value="<?php if ($id) {
                                                                                                                                                                                 echo $lead_detail->lead_mobile_no;
                                                                                                                                                                               } ?>" required="" <?php if ($id) {
-                                                                                                                                                                            echo 'disabled';
-                                                                                                                                                                          } ?>>
+                                                                                                                                                                                                  echo 'disabled';
+                                                                                                                                                                                                } ?>>
                       <!-- Primary Mobile Number Country Code -->
                       <input type="hidden" value='{ "name" : "India", "iso2" : "in", "dialCode" : "91" }' name="primary_mobile_number_country_data" data-iso2="in">
                       <!-- End Primary Mobile Number Country Code -->
@@ -195,13 +199,13 @@
                   </div>
 
                   <!-- Profile -->
-                   <div class="col-md-4">
-                     <div class="form-group">
-                       <label>Profile</label>
-                       <input type="file" class="form-control p-1" name="profile" accept="image/*">
-                       <input type="hidden" name="old_profile" value="<?= $lead_detail->profile ?? '' ?>">
-                      </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label>Profile</label>
+                      <input type="file" class="form-control p-1" name="profile" accept="image/*">
+                      <input type="hidden" name="old_profile" value="<?= $lead_detail->profile ?? '' ?>">
                     </div>
+                  </div>
                   <!-- End Profile -->
 
                   <div class="form-group col-md-4">
@@ -261,15 +265,15 @@
                   <div class="form-group col-md-4">
                     <label>Date of Birth</label>
                     <input type="date" class="form-control" data-date-format='dd-mm-yyyy' placeholder="Select..." id="lead_dob" name="lead_dob" value="<?php if ($id) {
-                                                                                                                                                                      echo $lead_detail->lead_dob;
-                                                                                                                                                                    } ?>">
+                                                                                                                                                          echo $lead_detail->lead_dob;
+                                                                                                                                                        } ?>">
                   </div>
 
                   <div class="form-group col-md-4">
                     <label>DOA</label>
                     <input type="date" class="form-control" data-date-format='dd-mm-yyyy' placeholder="" id="lead_doa" name="lead_doa" value="<?php if ($id) {
-                                                                                                                                                              echo $lead_detail->lead_doa;
-                                                                                                                                                            } ?>">
+                                                                                                                                                echo $lead_detail->lead_doa;
+                                                                                                                                              } ?>">
                   </div>
 
                   <div class="form-group col-md-4">
