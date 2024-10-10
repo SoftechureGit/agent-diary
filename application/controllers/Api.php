@@ -13726,4 +13726,43 @@ class Api extends CI_Controller
     /********************************************************
      * End Report
      *********************************************************/
+
+    /********************************************************
+    * Lead Unit Form Data
+    *********************************************************/
+    public function lead_unit_form_data(){
+
+        $arr            =   [];
+
+        $looking_for    =   [
+                                (object) [
+                                            'id'    => 1,
+                                            'label'    => "Sale",
+                                            'value'    => "sale",
+                                        ],
+                                (object) [
+                                            'id'    => 2,
+                                            'label'    => "Rent",
+                                            'value'    => "rent",
+                                        ],
+                                (object) [
+                                            'id'        => 3,
+                                            'label'    => "No Action",
+                                            'value'    => "action",
+                                        ],
+                            ];
+        
+        
+        $arr            =   [
+                                'status'        => true,
+                                'message'       => "Data fetched",
+                                'looking_for'   => $looking_for,
+                                'states'        => states(),
+                            ];
+
+        echo json_encode($arr);
+    }
+    /********************************************************
+    * End Lead Unit Form Data
+    *********************************************************/
 }
