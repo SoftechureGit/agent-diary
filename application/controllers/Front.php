@@ -19,7 +19,7 @@ class Front extends CI_Controller
     }
 
     public function test(){
-        return false;
+        // return false;
 
         // print_r(transfer_or_assign_lead((object) [ 'lead_id' => 997, 'from_user_id' => 26, 'to_user_id' => 4 ]));
         // die;
@@ -28,7 +28,7 @@ class Front extends CI_Controller
         * Push Notification
         *******************************************************************************/ 
 
-        $device_id                  =   "cIdQD-FGS7mTizzipmpWXC:APA91bH_Vao7VbS3tDI-vU5zgWJoWOs2q8c8YJlvgcbcx0q0_VIISVGK_WMeGUUSe3bJ1bdbPZvzfCd9fWYYcjwmHav_6xGodlghMC-2u-JBmJu0tMnWFxphW6JTqx1kLzrUR7low2gg";
+        $device_id                  =   request()->device_id;
         $title                      =   "Hello";
         $message                    =   "Test";
 
