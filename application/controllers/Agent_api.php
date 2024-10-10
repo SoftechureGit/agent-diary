@@ -10816,7 +10816,7 @@ WHERE lead_id='" . $lead_id . "'
                 * Push Notification
                 *******************************************************************************/ 
                 $fcm_notify_data      =   (object) [ 
-                                                            'device_id' => ( $user_detail->fcm_device_id ?? 0 ),
+                                                            'device_id' => (user($transfer_lead_id)->fcm_device_id ?? 0 ),
                                                             'title'     => "New Lead assigned",
                                                             'message'   => "$transfer_from_name has assign you new lead ",
                                                         ];
